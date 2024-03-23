@@ -1,0 +1,12 @@
+[
+	{
+		"ID": 1,
+		"DestinationDialogID": 3,
+		"DialogueText": "Sample dialogue text 1"
+	},
+	{
+		"ID": 2,
+		"DestinationDialogID": 4,
+		"DialogueText": "Sample dialogue text 2"
+	}
+]

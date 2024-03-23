@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://dhy33lvasufkr"]
+
+[ext_resource type="Script" path="res://Scenes/DialogueDisplay.cs" id="1_2foar"]
+
+[node name="GameStartScene" type="Node2D"]
+
+[node name="DialogueDisplay" type="RichTextLabel" parent="."]
+offset_right = 1153.0
+offset_bottom = 482.0
+bbcode_enabled = true
+script = ExtResource("1_2foar")

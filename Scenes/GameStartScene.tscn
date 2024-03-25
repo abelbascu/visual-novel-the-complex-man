@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dhy33lvasufkr"]
 
-[ext_resource type="Script" path="res://Scenes/DialogueDisplay.cs" id="1_2foar"]
+[ext_resource type="Script" path="res://Scripts/DialogueDisplay.cs" id="1_2foar"]
 
 [node name="GameStartScene" type="Node2D"]
 

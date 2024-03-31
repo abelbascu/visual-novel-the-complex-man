@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public partial class DialogueManagerSecond : Node
 {
-    private Dictionary<int, List<DialogueRow>> dialogueRowsByConversation;
+    private Dictionary<int, List<DialogueObject>> dialogueRowsByConversation;
 
     public override void _Ready()
     {
@@ -27,7 +27,7 @@ public partial class DialogueManagerSecond : Node
         DialogueDisplay dialogueDisplay = GetNode<DialogueDisplay>("/root/GameStartScene/DialogueDisplay");
 
         // Initialize and display dialogue
-        dialogueDisplay.InitializeDialogueRows(dialogueRowsByConversation);
+        dialogueDisplay.InitializeConversationDialogues(dialogueRowsByConversation);
         foreach(var conversationID in dialogueRowsByConversation.Keys)
         {
         dialogueDisplay.DisplayDialogue();
@@ -54,10 +54,10 @@ public partial class DialogueManagerSecond : Node
         }
     }
 
-    private Dictionary<int, List<DialogueRow>> ExtractDialogueRows(string jsonText)
+    private Dictionary<int, List<DialogueObject>> ExtractDialogueRows(string jsonText)
     {
         // Initialize a dictionary to store dialogue rows by conversation ID
-        var dialogueRowsByConversation = new Dictionary<int, List<DialogueRow>>();
+        var dialogueRowsByConversation = new Dictionary<int, List<DialogueObject>>();
 
         // Deserialize the JSON data into a dynamic object
         var jsonObject = JsonSerializer.Deserialize<dynamic>(jsonText);
@@ -66,7 +66,7 @@ public partial class DialogueManagerSecond : Node
         foreach (var conversation in jsonObject["Assets"]["Conversations"])
         {
             int conversationID = conversation["ID"];
-            var dialogueRows = new List<DialogueRow>();
+            var dialogueRows = new List<DialogueObject>();
 
             foreach (var dialogNode in conversation["DialogNodes"])
             {
@@ -81,7 +81,7 @@ public partial class DialogueManagerSecond : Node
                     string dialogueText = dialogNode["Fields"]["Dialogue Text"];
 
                     // Add the extracted dialogue row to the list
-                    dialogueRows.Add(new DialogueRow
+                    dialogueRows.Add(new DialogueObject
                     {
                         ID = dialogID,
                         DestinationDialogID = destinationDialogID,

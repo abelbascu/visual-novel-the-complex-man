@@ -11,17 +11,17 @@ config_version=5
 [application]
 
 config/name="Visual Novel The Complex Man"
-run/main_scene="res://Scenes/GameStartScene.tscn"
+run/main_scene="res://Scenes/MainMenu.tscn"
 config/features=PackedStringArray("4.3", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
-
-[autoload]
-
-DialogueManager="*res://Scripts/DialogueManager.cs"
 
 [dotnet]
 
 project/assembly_name="Visual Novel The Complex Man"
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://menu_translations.en.translation", "res://menu_translations.fr.translation")
 
 [rendering]
 

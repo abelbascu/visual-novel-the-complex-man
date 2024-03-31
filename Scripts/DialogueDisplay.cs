@@ -3,30 +3,30 @@ using System.Collections.Generic;
 
 public partial class DialogueDisplay : RichTextLabel
 {
-    private Dictionary<int, List<DialogueRow>> dialogueRowsByConversation;
+    private Dictionary<int, List<DialogueObject>> conversationDialogues;
 
-    public void InitializeDialogueRows(Dictionary<int, List<DialogueRow>> dialogueRowsByConversation)
+    public void InitializeConversationDialogues(Dictionary<int, List<DialogueObject>> conversationDialogues)
     {
-        this.dialogueRowsByConversation = dialogueRowsByConversation;
+        this.conversationDialogues = conversationDialogues;
     }
 
     public void DisplayDialogue()
     {
         // Clear the current text
         Clear();
-        foreach (var conversationID in dialogueRowsByConversation.Keys) {
+        foreach (var conversationID in conversationDialogues.Keys) {
             // Check if the conversation ID exists
-            if (dialogueRowsByConversation.ContainsKey(conversationID)) {
+            if (conversationDialogues.ContainsKey(conversationID)) {
                 // Find the dialogue rows for the specified conversation ID
-                List<DialogueRow> conversation = dialogueRowsByConversation[conversationID];
+                List<DialogueObject> conversation = conversationDialogues[conversationID];
 
                 // Display each dialogue row
-                foreach (var dialogueRow in conversation) {
-                    string dialogueText = $"[b]ID:[/b] {dialogueRow.ID}, [b]Destination ID:[/b] {dialogueRow.DestinationDialogID}\n";
-                    dialogueText += $"{dialogueRow.DialogueText}\n\n";
+                foreach (var dialogueObject in conversation) {
+                    string dialogueProperties = $"[b]ID:[/b] {dialogueObject.ID}, [b]Destination ID:[/b] {dialogueObject.DestinationDialogID}\n";
+                    dialogueProperties += $"{dialogueObject.DialogueText}\n\n";
 
-                    AddText(dialogueText);
-                    Text = dialogueText;
+                    AddText(dialogueProperties);
+                    Text = dialogueProperties;
                 }
             } else {
                 GD.PrintErr($"Conversation with ID {conversationID} not found.");

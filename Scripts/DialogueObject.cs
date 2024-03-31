@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class DialogueRow
+public class DialogueObject
 {
     public int ID { get; set; }
     public int DestinationDialogID { get; set; }

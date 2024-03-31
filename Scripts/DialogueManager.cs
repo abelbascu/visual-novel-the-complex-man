@@ -5,25 +5,31 @@ using System.Text.Json;
 using System.Collections.Generic;
 
 public partial class DialogueManager : Node {
-    private Dictionary<int, List<DialogueRow>> dialogueRowsByConversation;
+    private Dictionary<int, List<DialogueObject>> conversationDialogues;
 
     public override void _Ready() {
         // Load dialogue data and populate dialogueRowsByConversation
-        LoadDialogueData("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
+        LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
 
         //Display the extracted dialogue rows for each conversation
-        foreach (var kvp in dialogueRowsByConversation) {
+        foreach (var kvp in conversationDialogues) {
             GD.Print($"Conversation ID: {kvp.Key}");
             foreach (var row in kvp.Value) {
                 GD.Print($"ID: {row.ID}, DestinationDialogID: {row.DestinationDialogID}, Dialogue Text: {row.DialogueText}");
             }
         }
 
+        
+
+         //GetTree().Connect("tree_changed");
+
+
+
         // Get reference to DialogueDisplay node
         DialogueDisplay dialogueDisplay = GetNode<DialogueDisplay>("/root/GameStartScene/DialogueDisplay");
 
         // Initialize and display dialogue
-        dialogueDisplay.InitializeDialogueRows(dialogueRowsByConversation);
+        dialogueDisplay.InitializeConversationDialogues(conversationDialogues);
 
 
         // Display the dialogue for the current conversation
@@ -32,13 +38,18 @@ public partial class DialogueManager : Node {
 
     }
 
-    private void LoadDialogueData(string filePath) {
+    //     private void OnTreeChanged()
+    // {
+    //     Disconnect from the TreeChanged signal
+    //     GetTree().Disconnect("tree_changed", this, nameof(OnTreeChanged));
+
+    private void LoadDialogueObjects(string filePath) {
         try {
             // Read JSON data from file
             string jsonText = File.ReadAllText(filePath);
 
             // Deserialize JSON data and extract the required fields
-            dialogueRowsByConversation = ExtractDialogueRows(jsonText);
+            conversationDialogues = ExtractDialogueObjects(jsonText);
         } catch (IOException e) {
             GD.PrintErr("Error loading dialogue data: " + e.Message);
         } catch (JsonException e) {
@@ -46,9 +57,9 @@ public partial class DialogueManager : Node {
         }
     }
 
-    private Dictionary<int, List<DialogueRow>> ExtractDialogueRows(string jsonText) {
+    private Dictionary<int, List<DialogueObject>> ExtractDialogueObjects(string jsonText) {
         // Initialize a dictionary to store dialogue rows by conversation ID
-        var dialogueRowsByConversation = new Dictionary<int, List<DialogueRow>>();
+        var conversationObjectsDB = new Dictionary<int, List<DialogueObject>>();
 
         try {
             // Deserialize JSON data into a JsonElement
@@ -62,7 +73,7 @@ public partial class DialogueManager : Node {
                     foreach (var conversation in conversationsElement.EnumerateArray()) {
                         // Access conversation properties
                         int conversationID = conversation.GetProperty("ID").GetInt32();
-                        var dialogueRows = new List<DialogueRow>();
+                        var dialogueObjects = new List<DialogueObject>();
 
                         // Access "DialogNodes" property within the conversation
                         if (conversation.TryGetProperty("DialogNodes", out JsonElement dialogNodesElement)) {
@@ -98,7 +109,7 @@ public partial class DialogueManager : Node {
                                                 int destinationDialogID = destinationDialogIDElement.GetInt32();
 
                                                 // Add the extracted dialogue row to the list  
-                                                dialogueRows.Add(new DialogueRow {
+                                                dialogueObjects.Add(new DialogueObject {
                                                     ID = dialogID,
                                                     DestinationDialogID = destinationDialogID,
                                                     DialogueText = dialogueText
@@ -117,7 +128,7 @@ public partial class DialogueManager : Node {
                         }
 
                         // Add the list of dialogue rows to the dictionary
-                        dialogueRowsByConversation[conversationID] = dialogueRows;
+                        conversationObjectsDB[conversationID] = dialogueObjects;
                     }
                 } else {
                     GD.PrintErr("Error: 'Conversations' property not found in 'Assets'.");
@@ -129,6 +140,6 @@ public partial class DialogueManager : Node {
             GD.PrintErr("Error parsing JSON data: " + e.Message);
         }
 
-        return dialogueRowsByConversation;
+        return conversationObjectsDB;
     }
 }

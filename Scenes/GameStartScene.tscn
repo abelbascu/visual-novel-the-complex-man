@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://dhy33lvasufkr"]
+[gd_scene load_steps=2 format=3 uid="uid://dhy33lvasufkr"]
 
 [ext_resource type="Script" path="res://Scripts/DialogueDisplay.cs" id="1_2foar"]
-[ext_resource type="Script" path="res://Scripts/DialogueManager.cs" id="2_21a6l"]
 
 [node name="GameStartScene" type="Node2D"]
 
@@ -10,6 +9,3 @@ offset_right = 1153.0
 offset_bottom = 482.0
 bbcode_enabled = true
 script = ExtResource("1_2foar")
-
-[node name="DialogueManager" type="Node2D" parent="."]
-script = ExtResource("2_21a6l")

@@ -6,42 +6,46 @@ using System.Collections.Generic;
 
 public partial class DialogueManager : Node {
     private Dictionary<int, List<DialogueObject>> conversationDialogues;
+    public static Action<string> LanguageLocaleChosen;
+    public static Action treeChanged;
+    public static Action DialogueDisplayAddedToTree;
+    public string languageLocale;
 
     public override void _Ready() {
+
+        LanguageLocaleChosen += OnLanguageLocaleChosen;
+        DialogueDisplayAddedToTree += OnDialogueDisplayAddedToTree;
+        treeChanged += OnDialogueDisplayAddedToTree;
         // Load dialogue data and populate dialogueRowsByConversation
         LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
 
         //Display the extracted dialogue rows for each conversation
-        foreach (var kvp in conversationDialogues) {
-            GD.Print($"Conversation ID: {kvp.Key}");
-            foreach (var row in kvp.Value) {
-                GD.Print($"ID: {row.ID}, DestinationDialogID: {row.DestinationDialogID}, Dialogue Text: {row.DialogueText}");
-            }
-        }
+        // foreach (var kvp in conversationDialogues) {
+        //     GD.Print($"Conversation ID: {kvp.Key}");
+        //     foreach (var row in kvp.Value) {
+        //         GD.Print($"ID: {row.ID}, DestinationDialogID: {row.DestinationDialogID}, Dialogue Text: {row.DialogueText}");
+        //     }
+        // }
+    }
 
-        
+    private void OnLanguageLocaleChosen(string language)
+    {
+        languageLocale = language;
+        GD.Print($"language on Dialogue Manager received from Main Menu: {languageLocale} ");
+    }
 
-         //GetTree().Connect("tree_changed");
-
-
-
+    private void OnDialogueDisplayAddedToTree()
+    {
         // Get reference to DialogueDisplay node
         DialogueDisplay dialogueDisplay = GetNode<DialogueDisplay>("/root/GameStartScene/DialogueDisplay");
 
         // Initialize and display dialogue
         dialogueDisplay.InitializeConversationDialogues(conversationDialogues);
 
-
         // Display the dialogue for the current conversation
         dialogueDisplay.DisplayDialogue();
-
-
     }
 
-    //     private void OnTreeChanged()
-    // {
-    //     Disconnect from the TreeChanged signal
-    //     GetTree().Disconnect("tree_changed", this, nameof(OnTreeChanged));
 
     private void LoadDialogueObjects(string filePath) {
         try {

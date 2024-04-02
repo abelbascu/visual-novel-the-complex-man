@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://c8t14jwiqekss"]
+[gd_scene load_steps=3 format=3 uid="uid://c8t14jwiqekss"]
 
 [ext_resource type="Script" path="res://Scripts/MainMenu.cs" id="1_2ygpx"]
+[ext_resource type="Texture2D" uid="uid://bf2g14vt6hibs" path="res://Scenes/cosmos ether.png" id="2_15dhf"]
 
 [node name="MainMenuControl" type="Control"]
 layout_mode = 3
@@ -14,39 +15,72 @@ grow_vertical = 2
 size_flags_horizontal = 4
 script = ExtResource("1_2ygpx")
 
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -960.0
+offset_top = -560.0
+offset_right = 960.0
+offset_bottom = 560.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_15dhf")
+expand_mode = 3
+
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_direction = 2
 layout_mode = 1
-anchors_preset = 13
+anchors_preset = 8
 anchor_left = 0.5
+anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -73.5
-offset_right = 73.5
+anchor_bottom = 0.5
+offset_left = -202.0
+offset_top = -168.5
+offset_right = 202.0
+offset_bottom = 168.5
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="StartNewGameButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_colors/icon_normal_color = Color(0, 0.854902, 0, 1)
+theme_override_font_sizes/font_size = 40
 text = "START_NEW_GAME"
 
 [node name="LoadGameButton" type="Button" parent="VBoxContainer"]
 auto_translate_mode = 1
 layout_mode = 2
+theme_override_font_sizes/font_size = 40
 text = "LOAD_GAME"
 
 [node name="LanguageButton" type="Button" parent="VBoxContainer"]
 auto_translate_mode = 1
 layout_mode = 2
+theme_override_font_sizes/font_size = 40
 text = "LANGUAGE"
 
 [node name="CreditsButton" type="Button" parent="VBoxContainer"]
 auto_translate_mode = 1
 layout_mode = 2
+theme_override_font_sizes/font_size = 40
 text = "CREDITS"
 
-[node name="ExtiButton" type="Button" parent="VBoxContainer"]
+[node name="ExitButton" type="Button" parent="VBoxContainer"]
 auto_translate_mode = 1
 layout_mode = 2
+theme_override_font_sizes/font_size = 40
 text = "EXIT"
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+title = ""
+position = Vector2i(760, 540)
+size = Vector2i(400, 100)
+always_on_top = true
+ok_button_text = "YES"
+dialog_text = "WANT_QUIT_GAME?"
+cancel_button_text = "NO"

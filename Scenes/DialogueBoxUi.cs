@@ -3,10 +3,10 @@ using System;
 using System.Linq;
 
 public partial class DialogueBoxUi : MarginContainer {
-    private const int MAX_WIDTH = 800;
+    private const int MAX_WIDTH = 1500;
     private string dialogueLineToDisplay = "";
     private int letterIndex = 0;
-    private float letterTime = 0.83f;
+    private float letterTime = 0.02f;
     private float spaceTime = 0.06f;
     private float punctuationTime = 0.2f;
     Label dialogueLineLabel;

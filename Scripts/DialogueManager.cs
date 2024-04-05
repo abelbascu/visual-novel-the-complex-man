@@ -24,7 +24,11 @@ public partial class DialogueManager : Node {
 
     private void OnDialogueBoxUIAddedToTree() {
         //DialogueDisplay dialogueDisplay = GetNode<DialogueDisplay>("/root/GameStartScene/DialogueDisplay");
-        dialogueBoxUI = ResourceLoader.Load<DialogueBoxUi>("res://Scenes/DialogueBoxUI.tscn");
+        PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
+        Node instance = scene.Instantiate();
+        AddChild(instance);
+
+        dialogueBoxUI = instance as DialogueBoxUi;
         
         //dialogueBoxUI = GetNode<DialogueBoxUi>("/root/GameStartScene/DialogueBoxUI");
 

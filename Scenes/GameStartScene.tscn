@@ -5,6 +5,7 @@
 [node name="GameStartScene" type="Node2D"]
 
 [node name="DialogueDisplay" type="RichTextLabel" parent="."]
+visible = false
 offset_right = 1153.0
 offset_bottom = 482.0
 bbcode_enabled = true

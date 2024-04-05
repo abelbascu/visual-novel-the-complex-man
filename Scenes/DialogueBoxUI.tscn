@@ -1,0 +1,40 @@
+[gd_scene load_steps=4 format=3 uid="uid://8ytymk06gtxw"]
+
+[ext_resource type="Script" path="res://Scenes/DialogueBoxUi.cs" id="1_i37ha"]
+[ext_resource type="Texture2D" uid="uid://ddqt0olom3m5a" path="res://Images/UI/dialogueBox.png" id="1_vo8kf"]
+
+[sub_resource type="SystemFont" id="SystemFont_u5emw"]
+
+[node name="DialogueBoxUI" type="MarginContainer"]
+offset_left = 600.0
+offset_top = 700.0
+offset_right = 1400.0
+offset_bottom = 900.0
+script = ExtResource("1_i37ha")
+
+[node name="NinePatchRect" type="NinePatchRect" parent="."]
+layout_mode = 2
+texture = ExtResource("1_vo8kf")
+region_rect = Rect2(0, 0, 48, 48)
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="DialogueLineLabel" type="Label" parent="MarginContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = SubResource("SystemFont_u5emw")
+theme_override_font_sizes/font_size = 15
+text = "JÑLKJ ÑLKJ "
+
+[node name="LetterDisplayTimer" type="Timer" parent="."]
+one_shot = true

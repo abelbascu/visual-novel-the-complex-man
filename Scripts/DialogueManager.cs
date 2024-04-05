@@ -3,53 +3,100 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class DialogueManager : Node {
     private Dictionary<int, List<DialogueObject>> conversationDialogues;
     public static Action<string> LanguageLocaleChosen;
     public static Action treeChanged;
-    public static Action DialogueDisplayAddedToTree;
-    public string languageLocale;
+    public static Action DialogueBoxUIAddedToTree;
+    private string languageLocale;
+    private DialogueBoxUi dialogueBoxUI;
+    private int currentConversationID;
+    private int currentDialogueID;
+
+    int currentLineIndex = 0;
+    bool isDialogActive = false;
+    bool canAdvanceLine = false;
+
+    public DialogueObject currentDialogueObject {get; private set;}
+
+
+    private void OnDialogueBoxUIAddedToTree() {
+        //DialogueDisplay dialogueDisplay = GetNode<DialogueDisplay>("/root/GameStartScene/DialogueDisplay");
+        dialogueBoxUI = ResourceLoader.Load<DialogueBoxUi>("res://Scenes/DialogueBoxUI.tscn");
+        
+        //dialogueBoxUI = GetNode<DialogueBoxUi>("/root/GameStartScene/DialogueBoxUI");
+
+        currentConversationID = 2; //set here the conversation you want to load
+        currentDialogueID = 1; //set here the starting dialogue of the conversation
+
+        //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
+
+        currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
+        
+        StartDialogue(currentDialogueObject);
+        //dialogueDisplay.InitializeConversationDialogues(conversationDialogues);
+        //dialogueDisplay.DisplayDialogue();
+    }
+
+    private DialogueObject GetDialogueObject(int conversationID, int dialogueObjectID) {
+        // Check if the conversationID exists in the dictionary
+        if (conversationDialogues.TryGetValue(conversationID, out List<DialogueObject> dialogueList)) {
+            // Use LINQ to find the first DialogueObject with the specified ID
+            return dialogueList.FirstOrDefault(dialogue => dialogue.ID == dialogueObjectID);
+        }
+
+        // Return null if the conversationID is not found in the dictionary
+        return null;
+    }
+
+    public void StartDialogue(DialogueObject currentDialogueObject) {
+        if (isDialogActive)
+            return;
+        ShowTextBox(currentDialogueObject);
+        isDialogActive = true;
+    }
+
+    public void ShowTextBox(DialogueObject currentDialogueObject) {
+        dialogueBoxUI.Show();
+        dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine;
+        DisplayText(currentDialogueObject);
+        canAdvanceLine = false;
+    }
+
+    public void DisplayText(DialogueObject currentDialogueObject) {
+        dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, languageLocale);
+    }
+
+    public void OnTextBoxFinishedDisplayingDialogueLine() {
+        canAdvanceLine = true;
+    }
+
+    public override void _UnhandledInput(InputEvent @event) {
+        if (@event.IsActionPressed("advance_dialogue"))
+            if (isDialogActive && canAdvanceLine) {
+                dialogueBoxUI.QueueFree();
+                currentDialogueID = currentDialogueObject.DestinationDialogID;
+                StartDialogue(GetDialogueObject(currentConversationID, currentDialogueID));
+            }
+    }
 
     public override void _Ready() {
 
         LanguageLocaleChosen += OnLanguageLocaleChosen;
-        DialogueDisplayAddedToTree += OnDialogueDisplayAddedToTree;
-        treeChanged += OnDialogueDisplayAddedToTree;
-        // Load dialogue data and populate dialogueRowsByConversation
+        DialogueBoxUIAddedToTree += OnDialogueBoxUIAddedToTree;
+        treeChanged += OnDialogueBoxUIAddedToTree;
         LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
-
-        //Display the extracted dialogue rows for each conversation
-        // foreach (var kvp in conversationDialogues) {
-        //     GD.Print($"Conversation ID: {kvp.Key}");
-        //     foreach (var row in kvp.Value) {
-        //         GD.Print($"ID: {row.ID}, DestinationDialogID: {row.DestinationDialogID}, Dialogue Text: {row.DialogueText}");
-        //     }
-        // }
     }
 
-    private void OnLanguageLocaleChosen(string language)
-    {
+    private void OnLanguageLocaleChosen(string language) {
         languageLocale = language;
         GD.Print($"language on Dialogue Manager received from Main Menu: {languageLocale} ");
     }
 
-    private void OnDialogueDisplayAddedToTree()
-    {
-        // Get reference to DialogueDisplay node
-        DialogueDisplay dialogueDisplay = GetNode<DialogueDisplay>("/root/GameStartScene/DialogueDisplay");
-
-        // Initialize and display dialogue
-        dialogueDisplay.InitializeConversationDialogues(conversationDialogues);
-
-        // Display the dialogue for the current conversation
-        dialogueDisplay.DisplayDialogue();
-    }
-
-
     private void LoadDialogueObjects(string filePath) {
         try {
-            // Read JSON data from file
             string jsonText = File.ReadAllText(filePath);
 
             // Deserialize JSON data and extract the required fields
@@ -86,6 +133,8 @@ public partial class DialogueManager : Node {
                                 // Extract "ID" from the dialog node
                                 int dialogID = dialogNode.GetProperty("ID").GetInt32();
                                 string dialogueText = "";
+                                string catLocaleText = "";
+                                string frLocaleText = "";
 
 
                                 // Attempt to access "Fields" property
@@ -98,6 +147,22 @@ public partial class DialogueManager : Node {
                                     } else {
                                         GD.PrintErr("Error: 'Dialogue Text' property not found in 'Fields'.");
                                     }
+                                    if (fieldsElement.TryGetProperty("fr-FR", out JsonElement frenchTextElement)) {
+                                        // Get the string value of "Dialogue Text"
+                                        frLocaleText = frenchTextElement.GetString();
+
+                                    } else {
+                                        GD.PrintErr("Error: 'Dialogue Text' property not found in 'Fields'.");
+                                    }
+                                    if (fieldsElement.TryGetProperty("cat-CAT", out JsonElement catalanTextElement)) {
+                                        // Get the string value of "Dialogue Text"
+                                        catLocaleText = catalanTextElement.GetString();
+
+                                    } else {
+                                        GD.PrintErr("Error: 'Dialogue Text' property not found in 'Fields'.");
+                                    }
+
+
                                 } else {
                                     GD.PrintErr("Error: 'Fields' property not found in dialog node.");
                                 }
@@ -116,7 +181,9 @@ public partial class DialogueManager : Node {
                                                 dialogueObjects.Add(new DialogueObject {
                                                     ID = dialogID,
                                                     DestinationDialogID = destinationDialogID,
-                                                    DialogueText = dialogueText
+                                                    DialogueText = dialogueText,
+                                                    CatalanText = catLocaleText,
+                                                    FrenchText = frLocaleText
                                                 });
                                             } else {
                                                 GD.PrintErr("Error: 'DestinationDialogID' property not found in 'OutgoingLinks'.");

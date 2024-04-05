@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bf2g14vt6hibs"
-path="res://.godot/imported/cosmos ether.png-1f31dd9ae7b9379986a9dc3b2133c3a6.ctex"
+uid="uid://ddqt0olom3m5a"
+path="res://.godot/imported/dialogueBox.png-e5d21516f8fad189d974797afd65d59c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Scenes/cosmos ether.png"
-dest_files=["res://.godot/imported/cosmos ether.png-1f31dd9ae7b9379986a9dc3b2133c3a6.ctex"]
+source_file="res://Images/UI/dialogueBox.png"
+dest_files=["res://.godot/imported/dialogueBox.png-e5d21516f8fad189d974797afd65d59c.ctex"]
 
 [params]
 

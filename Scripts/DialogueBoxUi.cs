@@ -6,10 +6,10 @@ public partial class DialogueBoxUi : MarginContainer {
     private const int MAX_WIDTH = 1500;
     private string dialogueLineToDisplay = "";
     private int letterIndex = 0;
-    private float letterTime = 0.02f;
+    private float letterTime = 0.005f;
     private float spaceTime = 0.06f;
     private float punctuationTime = 0.2f;
-    Label dialogueLineLabel;
+    public Label dialogueLineLabel;
     Timer letterDisplayTimer;
 
     public Action FinishedDisplaying;
@@ -55,18 +55,21 @@ public partial class DialogueBoxUi : MarginContainer {
     }
 
     public void DisplayLetter() {
-        dialogueLineLabel.Text += dialogueLineToDisplay[letterIndex];
-        letterIndex++;
-        if (letterIndex >= dialogueLineToDisplay.Length) {
+        if (letterIndex < dialogueLineToDisplay.Length) {
+            dialogueLineLabel.Text += dialogueLineToDisplay[letterIndex];
+            letterIndex++;
+            GD.Print($"letterIndex = {letterIndex}\ndialogueLineToDisplay.Length = {dialogueLineToDisplay.Length} ");
+        } else {
             FinishedDisplaying.Invoke();
+            letterIndex = 0;
             return;
         }
 
         char[] punctuationCharacters = { '!', '.', ',' };
 
-        if (punctuationCharacters.Contains(dialogueLineToDisplay[letterIndex]))
+        if (letterIndex < dialogueLineToDisplay.Length && punctuationCharacters.Contains(dialogueLineToDisplay[letterIndex]))
             letterDisplayTimer.Start(punctuationTime);
-        else if (dialogueLineToDisplay[letterIndex] == ' ')
+        else if (letterIndex < dialogueLineToDisplay.Length && dialogueLineToDisplay[letterIndex] == ' ')
             letterDisplayTimer.Start(spaceTime);
         else
             letterDisplayTimer.Start(letterTime);

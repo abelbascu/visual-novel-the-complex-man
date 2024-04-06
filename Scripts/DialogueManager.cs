@@ -13,24 +13,32 @@ public partial class DialogueManager : Node {
     private string languageLocale;
     private DialogueBoxUi dialogueBoxUI;
     private int currentConversationID;
-    private int currentDialogueID;
+    public int currentDialogueID;
 
     int currentLineIndex = 0;
     bool isDialogActive = false;
     bool canAdvanceLine = false;
 
-    public DialogueObject currentDialogueObject {get; private set;}
+    public DialogueObject currentDialogueObject { get; private set; }
 
 
-    private void OnDialogueBoxUIAddedToTree() {
-        //DialogueDisplay dialogueDisplay = GetNode<DialogueDisplay>("/root/GameStartScene/DialogueDisplay");
+    public override void _Ready() {
+
+        LanguageLocaleChosen += OnLanguageLocaleChosen;
+
+        
+        
+        //DialogueBoxUIAddedToTree += OnDialogueBoxUIAddedToTree;
+        //treeChanged += OnDialogueBoxUIAddedToTree;
+        LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
+
         PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
         Node instance = scene.Instantiate();
         AddChild(instance);
 
         dialogueBoxUI = instance as DialogueBoxUi;
-        
-        //dialogueBoxUI = GetNode<DialogueBoxUi>("/root/GameStartScene/DialogueBoxUI");
+
+        dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine;
 
         currentConversationID = 2; //set here the conversation you want to load
         currentDialogueID = 1; //set here the starting dialogue of the conversation
@@ -38,10 +46,9 @@ public partial class DialogueManager : Node {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
 
         currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
-        
+
         StartDialogue(currentDialogueObject);
-        //dialogueDisplay.InitializeConversationDialogues(conversationDialogues);
-        //dialogueDisplay.DisplayDialogue();
+
     }
 
     private DialogueObject GetDialogueObject(int conversationID, int dialogueObjectID) {
@@ -64,9 +71,10 @@ public partial class DialogueManager : Node {
 
     public void ShowTextBox(DialogueObject currentDialogueObject) {
         dialogueBoxUI.Show();
-        dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine;
+       // dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine;
         DisplayText(currentDialogueObject);
-        canAdvanceLine = false;
+        //canAdvanceLine = false;  // I HAD TO DISABLE THIS LINE AS ON THE CLOTHES EVERYWHERE DIALOG IT DOESN'T TRIGGER THE FinishedDisplaying.Invoke() ON DialogueBoxUI.cs;
+                                   // SO THEN canAdvanceLine IS NOT SET TO TRUE. DON'T KNOW WHY THIS HAPPENS. 
     }
 
     public void DisplayText(DialogueObject currentDialogueObject) {
@@ -79,20 +87,15 @@ public partial class DialogueManager : Node {
 
     public override void _UnhandledInput(InputEvent @event) {
         if (@event.IsActionPressed("advance_dialogue"))
-            if (isDialogActive && canAdvanceLine) {
-                dialogueBoxUI.QueueFree();
+            if (canAdvanceLine && isDialogActive) {
+                isDialogActive = false;
+                dialogueBoxUI.dialogueLineLabel.Text = "";
                 currentDialogueID = currentDialogueObject.DestinationDialogID;
-                StartDialogue(GetDialogueObject(currentConversationID, currentDialogueID));
+                currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
+                StartDialogue(currentDialogueObject);
             }
     }
 
-    public override void _Ready() {
-
-        LanguageLocaleChosen += OnLanguageLocaleChosen;
-        DialogueBoxUIAddedToTree += OnDialogueBoxUIAddedToTree;
-        treeChanged += OnDialogueBoxUIAddedToTree;
-        LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
-    }
 
     private void OnLanguageLocaleChosen(string language) {
         languageLocale = language;

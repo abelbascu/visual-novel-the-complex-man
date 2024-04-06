@@ -3,7 +3,7 @@ using System;
 
 public partial class MainMenu : Control {
 
-    private string language = "fr";
+    private string language = "ca";
     ConfirmationDialog confirmationDialog;
     VBoxContainer MainOptionsContainer;
 
@@ -35,10 +35,11 @@ public partial class MainMenu : Control {
         DialogueManager.LanguageLocaleChosen.Invoke(language);
 
         PackedScene gameStartScene = (PackedScene)ResourceLoader.Load("res://Scenes/GameStartScene.tscn");
-        Node gameStartNode = gameStartScene.Instantiate();
-        GetTree().Root.AddChild(gameStartNode);
+        //Node gameStartNode = gameStartScene.Instantiate();
+        //GetTree().Root.AddChild(gameStartNode);
         //we wait at the very end before the next frame starts to ensure that gameStartNode was properly added to the tree.
-        GetTree().ProcessFrame += DialogueManager.treeChanged;
+        //GetTree().ProcessFrame += DialogueManager.treeChanged;
+
         Hide();
     }
 

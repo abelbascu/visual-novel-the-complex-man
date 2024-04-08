@@ -22,7 +22,7 @@ public partial class DialogueDisplay : RichTextLabel
 
                 // Display each dialogue row
                 foreach (var dialogueObject in conversation) {
-                    string dialogueProperties = $"[b]ID:[/b] {dialogueObject.ID}, [b]Destination ID:[/b] {dialogueObject.DestinationDialogID}\n";
+                    string dialogueProperties = $"[b]ID:[/b] {dialogueObject.ID}, [b]Destination ID:[/b] {dialogueObject.DestinationDialogIDs}\n";
                     dialogueProperties += $"{dialogueObject.DialogueText}\n\n";
 
                     AddText(dialogueProperties);

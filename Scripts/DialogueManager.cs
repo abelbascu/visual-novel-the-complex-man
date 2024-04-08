@@ -21,29 +21,26 @@ public partial class DialogueManager : Node {
     public static Action StartButtonPressed;
 
     private const int UI_BOTTOM_POSITION = 200;
-    
+
 
     public override void _Ready() {
 
         LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
-        StartButtonPressed += OnStartButtonPressed;   
+        StartButtonPressed += OnStartButtonPressed;
         PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
         Node instance = scene.Instantiate();
         AddChild(instance);
-        dialogueBoxUI = instance as DialogueBoxUi; 
-        // Get the screen size
+        dialogueBoxUI = instance as DialogueBoxUi;
+        // position dialogue UI centered at the bottom
         Vector2 screenSize = GetTree().Root.Size;
-        // Calculate the position to center the dialogueBoxUI horizontally
-        float xPosition = (screenSize.X - dialogueBoxUI.Size.X)/3;
-        // Calculate the position to place the dialogueBoxUI at the bottom of the screen
+        float xPosition = (screenSize.X - dialogueBoxUI.Size.X) / 3;
         float yPosition = (screenSize.Y - UI_BOTTOM_POSITION);
-        // Set the position of the dialogueBoxUI
         dialogueBoxUI.Position = new Vector2(xPosition, yPosition);
         //once all chars of the dialogue text are displayed in the container, we can show the next line.
-        dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine; 
+        dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine;
     }
 
-    public void OnStartButtonPressed() {   
+    public void OnStartButtonPressed() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
         currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
         StartDialogue(currentDialogueObject);
@@ -77,7 +74,7 @@ public partial class DialogueManager : Node {
         if (@event.IsActionPressed("advance_dialogue"))
             if (canAdvanceLine && !isDialogueBeingPrinted) {
                 dialogueBoxUI.dialogueLineLabel.Text = "";
-                currentDialogueID = currentDialogueObject.DestinationDialogID[0];
+                currentDialogueID = currentDialogueObject.DestinationDialogIDs[0];
                 currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
                 StartDialogue(currentDialogueObject);
             }
@@ -96,6 +93,7 @@ public partial class DialogueManager : Node {
     }
 
     private Dictionary<int, List<DialogueObject>> ExtractDialogueObjects(string jsonText) {
+        
         // Initialize a dictionary to store dialogue rows by conversation ID
         var conversationObjectsDB = new Dictionary<int, List<DialogueObject>>();
 
@@ -123,7 +121,6 @@ public partial class DialogueManager : Node {
                                 string catLocaleText = "";
                                 string frLocaleText = "";
 
-
                                 // Attempt to access "Fields" property
                                 if (dialogNode.TryGetProperty("Fields", out JsonElement fieldsElement)) {
                                     // Attempt to access "Dialogue Text" property within "Fields"
@@ -148,58 +145,52 @@ public partial class DialogueManager : Node {
                                     } else {
                                         GD.PrintErr("Error: 'Dialogue Text' property not found in 'Fields'.");
                                     }
-
-
                                 } else {
                                     GD.PrintErr("Error: 'Fields' property not found in dialog node.");
                                 }
 
                                 if (dialogNode.TryGetProperty("OutgoingLinks", out JsonElement outgoingLinksElement)) {
-                                    
-                                    // Check if the "OutgoingLinks" property is an array
-                                    if (outgoingLinksElement.ValueKind == JsonValueKind.Array) {
-                                        List<int> destinationDialogIDs = new List<int>();
-                                        // Iterate over each element in the array   
-                                                                       
-                                        foreach (var outgoingLink in outgoingLinksElement.EnumerateArray()) {
-                                            if (outgoingLink.TryGetProperty("DestinationDialogID", out JsonElement destinationDialogIDElement)) {
 
-                                                int destinationDialogID = destinationDialogIDElement.GetInt32();
-                                                destinationDialogIDs.Add(destinationDialogID);
-                                                // Add the extracted dialogue row to the list  
-                                                dialogueObjects.Add(new DialogueObject {
-                                                    ID = dialogID,
-                                                    DestinationDialogID = destinationDialogIDs,
-                                                    DialogueText = dialogueText,
-                                                    CatalanText = catLocaleText,
-                                                    FrenchText = frLocaleText
-                                                });
-                                            } else {
-                                                GD.PrintErr("Error: 'DestinationDialogID' property not found in 'OutgoingLinks'.");
-                                            }
+                                    // Check if the "OutgoingLinks" property is an array
+                                    //if (outgoingLinksElement.ValueKind == JsonValueKind.Array) {
+                                    List<int> destinationDialogIDs = new();
+                                    // Iterate over each element in the array   
+
+                                    foreach (var outgoingLink in outgoingLinksElement.EnumerateArray()) {
+                                        if (outgoingLink.TryGetProperty("DestinationDialogID", out JsonElement destinationDialogIDElement)) {
+                                            int destinationDialogID = destinationDialogIDElement.GetInt32();
+                                            destinationDialogIDs.Add(destinationDialogID);                                       
+                                        } else {
+                                            GD.PrintErr("Error: 'DestinationDialogID' property not found in 'OutgoingLinks'.");
                                         }
-                                    } else {
-                                        GD.PrintErr("Error: 'OutgoingLinks' property not found in dialog node.");
                                     }
+                                    dialogueObjects.Add(new DialogueObject {
+                                        ID = dialogID,
+                                        DestinationDialogIDs = destinationDialogIDs,
+                                        DialogueText = dialogueText,
+                                        CatalanText = catLocaleText,
+                                        FrenchText = frLocaleText
+                                    });
+                                } else {
+                                    GD.PrintErr("Error: 'OutgoingLinks' property not found in dialog node.");
                                 }
                             }
                         } else {
                             GD.PrintErr("Error: 'DialogNodes' property not found in conversation.");
                         }
-
                         // Add the list of dialogue rows to the dictionary
                         conversationObjectsDB[conversationID] = dialogueObjects;
                     }
                 } else {
                     GD.PrintErr("Error: 'Conversations' property not found in 'Assets'.");
-                }
+                }            
             } else {
                 GD.PrintErr("Error: 'Assets' property not found in JSON.");
-            }
+            }          
         } catch (JsonException e) {
             GD.PrintErr("Error parsing JSON data: " + e.Message);
         }
 
-        return conversationObjectsDB;
+         return conversationObjectsDB;
     }
 }

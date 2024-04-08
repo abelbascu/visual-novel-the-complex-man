@@ -7,9 +7,9 @@ public partial class DialogueBoxUi : MarginContainer {
     private const float MAX_WIDTH = 800f;
     private string dialogueLineToDisplay = "";
     private int letterIndex = 0;
-    private float letterTime = 0.005f;
-    private float spaceTime = 0.06f;
-    private float punctuationTime = 0.2f;
+    private float letterTime = 0.0005f;
+    private float spaceTime = 0.0006f;
+    private float punctuationTime = 0.002f;
     public Label dialogueLineLabel;
     Timer letterDisplayTimer;
 

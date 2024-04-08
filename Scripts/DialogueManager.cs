@@ -67,7 +67,7 @@ public partial class DialogueManager : Node {
         if (@event.IsActionPressed("advance_dialogue"))
             if (canAdvanceLine && !isDialogueBeingPrinted) {
                 dialogueBoxUI.dialogueLineLabel.Text = "";
-                currentDialogueID = currentDialogueObject.DestinationDialogID;
+                currentDialogueID = currentDialogueObject.DestinationDialogID[0];
                 currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
                 StartDialogue(currentDialogueObject);
             }
@@ -145,19 +145,21 @@ public partial class DialogueManager : Node {
                                 }
 
                                 if (dialogNode.TryGetProperty("OutgoingLinks", out JsonElement outgoingLinksElement)) {
-
+                                    
                                     // Check if the "OutgoingLinks" property is an array
                                     if (outgoingLinksElement.ValueKind == JsonValueKind.Array) {
-                                        // Iterate over each element in the array
+                                        List<int> destinationDialogIDs = new List<int>();
+                                        // Iterate over each element in the array   
+                                                                       
                                         foreach (var outgoingLink in outgoingLinksElement.EnumerateArray()) {
                                             if (outgoingLink.TryGetProperty("DestinationDialogID", out JsonElement destinationDialogIDElement)) {
 
                                                 int destinationDialogID = destinationDialogIDElement.GetInt32();
-
+                                                destinationDialogIDs.Add(destinationDialogID);
                                                 // Add the extracted dialogue row to the list  
                                                 dialogueObjects.Add(new DialogueObject {
                                                     ID = dialogID,
-                                                    DestinationDialogID = destinationDialogID,
+                                                    DestinationDialogID = destinationDialogIDs,
                                                     DialogueText = dialogueText,
                                                     CatalanText = catLocaleText,
                                                     FrenchText = frLocaleText

@@ -24,22 +24,16 @@ public partial class MainMenu : Control {
         exitGameButton.Pressed += OnExitButtonPressed;
         confirmationDialog.Canceled += OnCancelButtonPressed;
         confirmationDialog.Confirmed += OnConfirmButtonPressed;
-        TranslationServer.SetLocale(language);
-        TranslationServer.GetLocale();
-        //string language = OS.GetLocaleLanguage();
+
+        TranslationServer.SetLocale(language); //set up language
         GD.Print($"langauage: {language}");
     }
 
     private void OnStartNewGameButtonPressed() {
-        //we pass the locale to Dialogue Manager so he knows what translations to load
-        DialogueManager.LanguageLocaleChosen.Invoke(language);
 
-        PackedScene gameStartScene = (PackedScene)ResourceLoader.Load("res://Scenes/GameStartScene.tscn");
-        //Node gameStartNode = gameStartScene.Instantiate();
-        //GetTree().Root.AddChild(gameStartNode);
-        //we wait at the very end before the next frame starts to ensure that gameStartNode was properly added to the tree.
-        //GetTree().ProcessFrame += DialogueManager.treeChanged;
-
+        DialogueManager.LanguageLocale = language;
+        //now we can start showing the first dialogue
+        DialogueManager.StartButtonPressed.Invoke(); 
         Hide();
     }
 
@@ -57,47 +51,19 @@ public partial class MainMenu : Control {
 
     private void OnExitButtonPressed() {
         ShowConfirmationPopup();
-        //GetTree().Root.PropagateNotification((int)NotificationWMCloseRequest);
+
     }
 
-//     public override void _Notification(int what)
-// {
-//     if (what == NotificationWMCloseRequest)
-//          ShowConfirmationPopup();
-// }
-
-
-
-   public void ShowConfirmationPopup()
-    {
-        // Show a confirmation popup
-        // PopupPanel popUpPanel = GetNode<PopupPanel>("PopUpPanel");
-        // popUpPanel.Show();
-        // popUpPanel.PopupCentered();
-
-        // // Connect the signals of the confirmation popup
-        // Button confirmButton = GetNode<Button>("PopUpPanel/ConfirmButton");
-        // confirmButton.Show();
-        // confirmButton.Pressed += OnConfirmButtonPressed;
-        // Button cancelButton = GetNode<Button>("PopUpPanel/CancelButton");
-        // cancelButton.Show();
-        // cancelButton.Pressed += OnCancelButtonPressed;
-
+    public void ShowConfirmationPopup() {
         MainOptionsContainer.Hide();
         confirmationDialog.Show();
-       
-
-       
     }
 
-    private void OnConfirmButtonPressed()
-    {
+    private void OnConfirmButtonPressed() {
         GetTree().Quit(); // Exit the game
     }
 
-    private void OnCancelButtonPressed()
-    {
-        
+    private void OnCancelButtonPressed() {
         // Close the confirmation popup
         GetTree().CallGroup("popups", "close_all");
         MainOptionsContainer.Show();

@@ -1,9 +1,10 @@
 using Godot;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 public partial class DialogueBoxUi : MarginContainer {
-    private const int MAX_WIDTH = 1500;
+    private const float MAX_WIDTH = 800f;
     private string dialogueLineToDisplay = "";
     private int letterIndex = 0;
     private float letterTime = 0.005f;
@@ -17,33 +18,21 @@ public partial class DialogueBoxUi : MarginContainer {
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
+        Show(); //make the dialogue box visible
         dialogueLineLabel = GetNode<Label>("MarginContainer/DialogueLineLabel");
         letterDisplayTimer = GetNode<Timer>("LetterDisplayTimer");
         letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;
     }
 
-    public async void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
+    public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
 
-        this.dialogueLineToDisplay = GetLocaleString(dialogueObject, locale);
-        dialogueLineLabel.Text = this.dialogueLineToDisplay;
-
-        await ToSignal(this, "resized");
-
-        float customMinX = Math.Min(Size.X, MAX_WIDTH);
-        CustomMinimumSize = new Vector2(customMinX, CustomMinimumSize.Y);
-
-        if (Size.X > MAX_WIDTH) {
-            dialogueLineLabel.AutowrapMode = TextServer.AutowrapMode.Word;
-            await ToSignal(this, "resized"); //wait for resizing x of DialogueBoxUI
-            await ToSignal(this, "resized"); //wait for resizing y of DialogueBoxUI
-
-            CustomMinimumSize = new Vector2(customMinX, Size.Y);
-        }
-
+        this.dialogueLineToDisplay = GetLocaleString(dialogueObject, locale);       
+        dialogueLineLabel.Text = "";
         DisplayLetter();
     }
 
     public string GetLocaleString(DialogueObject dialogueObj, string locale) {
+
         string localeCurrentDialogue = locale switch {
             "fr" => dialogueObj.FrenchText,
             "ca" => dialogueObj.CatalanText,
@@ -54,12 +43,23 @@ public partial class DialogueBoxUi : MarginContainer {
         return localeCurrentDialogue;
     }
 
-    public void DisplayLetter() {
+    public void DisplayLetter() {      
+         
+               if (Size.X > MAX_WIDTH) {            
+            dialogueLineLabel.AutowrapMode = TextServer.AutowrapMode.Word;
+           // await ToSignal(this, "resized"); //wait for resizing x of DialogueBoxUI
+           // await ToSignal(this, "resized"); //wait for resizing y of DialogueBoxUI
+
+           float customMinX = Math.Min(Size.X, MAX_WIDTH);
+           CustomMinimumSize = new Vector2(customMinX, Size.Y);
+           Size = CustomMinimumSize;
+        }
         if (letterIndex < dialogueLineToDisplay.Length) {
             dialogueLineLabel.Text += dialogueLineToDisplay[letterIndex];
             letterIndex++;
             GD.Print($"letterIndex = {letterIndex}\ndialogueLineToDisplay.Length = {dialogueLineToDisplay.Length} ");
         } else {
+            GD.Print($"dialogueLineLabel.Size: {dialogueLineLabel.Size}");
             FinishedDisplaying.Invoke();
             letterIndex = 0;
             return;

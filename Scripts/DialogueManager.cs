@@ -4,91 +4,68 @@ using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 public partial class DialogueManager : Node {
+
+    private int currentConversationID = 2; //set here the conversation you want to load
+    public int currentDialogueID = 1; //set here the starting dialogue of the conversation
     private Dictionary<int, List<DialogueObject>> conversationDialogues;
-    public static Action<string> LanguageLocaleChosen;
-    public static Action treeChanged;
-    public static Action DialogueBoxUIAddedToTree;
-    private string languageLocale;
+    public static string LanguageLocale { get; set; } = "ca";
     private DialogueBoxUi dialogueBoxUI;
-    private int currentConversationID;
-    public int currentDialogueID;
-
-    int currentLineIndex = 0;
-    bool isDialogActive = false;
-    bool canAdvanceLine = false;
-
     public DialogueObject currentDialogueObject { get; private set; }
 
+    int currentLineIndex = 0;
+    bool isDialogueBeingPrinted = false;
+    bool canAdvanceLine = false;
+    public static Action StartButtonPressed;
+    
 
     public override void _Ready() {
 
-        LanguageLocaleChosen += OnLanguageLocaleChosen;
-
-        
-        
-        //DialogueBoxUIAddedToTree += OnDialogueBoxUIAddedToTree;
-        //treeChanged += OnDialogueBoxUIAddedToTree;
         LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
-
+        StartButtonPressed += OnStartButtonPressed;   
         PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
         Node instance = scene.Instantiate();
         AddChild(instance);
-
-        dialogueBoxUI = instance as DialogueBoxUi;
-
-        dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine;
-
-        currentConversationID = 2; //set here the conversation you want to load
-        currentDialogueID = 1; //set here the starting dialogue of the conversation
-
-        //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
-
-        currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
-
-        StartDialogue(currentDialogueObject);
-
+        dialogueBoxUI = instance as DialogueBoxUi; 
+        //once all chars of the dialogue text are displayed in the container, we can show the next line.
+        dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine; 
     }
 
-    private DialogueObject GetDialogueObject(int conversationID, int dialogueObjectID) {
-        // Check if the conversationID exists in the dictionary
-        if (conversationDialogues.TryGetValue(conversationID, out List<DialogueObject> dialogueList)) {
-            // Use LINQ to find the first DialogueObject with the specified ID
-            return dialogueList.FirstOrDefault(dialogue => dialogue.ID == dialogueObjectID);
-        }
+    public void OnStartButtonPressed() {   
+        //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
+        currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
+        StartDialogue(currentDialogueObject);
+    }
 
-        // Return null if the conversationID is not found in the dictionary
-        return null;
+
+    private DialogueObject GetDialogueObject(int currentConversationID, int currentDialogueObjectID) {
+
+        // Check if the conversationID exists in the dictionary
+        if (conversationDialogues.TryGetValue(currentConversationID, out List<DialogueObject> dialogueList)) {
+            // Use LINQ to find the first DialogueObject with the specified ID
+            return dialogueList.FirstOrDefault(dialogueObject => dialogueObject.ID == currentDialogueObjectID);
+        }
+        return null; // Return null if the conversationID is not found in the dictionary
     }
 
     public void StartDialogue(DialogueObject currentDialogueObject) {
-        if (isDialogActive)
+        if (isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
             return;
-        ShowTextBox(currentDialogueObject);
-        isDialogActive = true;
-    }
-
-    public void ShowTextBox(DialogueObject currentDialogueObject) {
-        dialogueBoxUI.Show();
-       // dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine;
-        DisplayText(currentDialogueObject);
-        //canAdvanceLine = false;  // I HAD TO DISABLE THIS LINE AS ON THE CLOTHES EVERYWHERE DIALOG IT DOESN'T TRIGGER THE FinishedDisplaying.Invoke() ON DialogueBoxUI.cs;
-                                   // SO THEN canAdvanceLine IS NOT SET TO TRUE. DON'T KNOW WHY THIS HAPPENS. 
-    }
-
-    public void DisplayText(DialogueObject currentDialogueObject) {
-        dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, languageLocale);
+        isDialogueBeingPrinted = true;
+        canAdvanceLine = false;
+        dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, LanguageLocale);
     }
 
     public void OnTextBoxFinishedDisplayingDialogueLine() {
         canAdvanceLine = true;
+        isDialogueBeingPrinted = false;
     }
 
     public override void _UnhandledInput(InputEvent @event) {
         if (@event.IsActionPressed("advance_dialogue"))
-            if (canAdvanceLine && isDialogActive) {
-                isDialogActive = false;
+            if (canAdvanceLine && !isDialogueBeingPrinted) {
                 dialogueBoxUI.dialogueLineLabel.Text = "";
                 currentDialogueID = currentDialogueObject.DestinationDialogID;
                 currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
@@ -96,16 +73,9 @@ public partial class DialogueManager : Node {
             }
     }
 
-
-    private void OnLanguageLocaleChosen(string language) {
-        languageLocale = language;
-        GD.Print($"language on Dialogue Manager received from Main Menu: {languageLocale} ");
-    }
-
     private void LoadDialogueObjects(string filePath) {
         try {
             string jsonText = File.ReadAllText(filePath);
-
             // Deserialize JSON data and extract the required fields
             conversationDialogues = ExtractDialogueObjects(jsonText);
         } catch (IOException e) {

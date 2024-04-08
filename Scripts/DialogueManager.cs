@@ -19,6 +19,8 @@ public partial class DialogueManager : Node {
     bool isDialogueBeingPrinted = false;
     bool canAdvanceLine = false;
     public static Action StartButtonPressed;
+
+    private const int UI_BOTTOM_POSITION = 200;
     
 
     public override void _Ready() {
@@ -29,6 +31,14 @@ public partial class DialogueManager : Node {
         Node instance = scene.Instantiate();
         AddChild(instance);
         dialogueBoxUI = instance as DialogueBoxUi; 
+        // Get the screen size
+        Vector2 screenSize = GetTree().Root.Size;
+        // Calculate the position to center the dialogueBoxUI horizontally
+        float xPosition = (screenSize.X - dialogueBoxUI.Size.X)/3;
+        // Calculate the position to place the dialogueBoxUI at the bottom of the screen
+        float yPosition = (screenSize.Y - UI_BOTTOM_POSITION);
+        // Set the position of the dialogueBoxUI
+        dialogueBoxUI.Position = new Vector2(xPosition, yPosition);
         //once all chars of the dialogue text are displayed in the container, we can show the next line.
         dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine; 
     }

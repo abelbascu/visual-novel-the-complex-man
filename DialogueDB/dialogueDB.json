@@ -786,7 +786,7 @@
 			"ConditionPriority": 3,
 			"Fields": {
 			  "Title": "New Dialogue",
-			  "Pictures": "[Images\\PlayerDrityRoom.jpg]",
+			  "Pictures": "Images\\PlayerDirtyRoom.jpg",
 			  "Description": "",
 			  "Actor": "3",
 			  "Conversant": "1",

@@ -8,16 +8,13 @@ using System.Threading.Tasks;
 
 public partial class DialogueManager : Node {
 
-    private int currentConversationID = 2; //set here the conversation you want to load
+    private int currentConversationID = 2; //set here the conversation you want to load. Conversations in Chatmapper are what we could call chapters.
     public int currentDialogueID = 1; //set here the starting dialogue of the conversation
     private Dictionary<int, List<DialogueObject>> conversationDialogues;
-    public static string LanguageLocale { get; set; } = "ca";
-    private DialogueBoxUi dialogueBoxUI;
+    public static string LanguageLocale { get; set; } = "ca"; //set here the language
+    private DialogueBoxUi dialogueBoxUI; //the graphical rectangle container to display the text over
     public DialogueObject currentDialogueObject { get; private set; }
-
-    int currentLineIndex = 0;
-    bool isDialogueBeingPrinted = false;
-    bool canAdvanceLine = false;
+    bool isDialogueBeingPrinted = false; //we don't want to print a new dialogue is we are currently displaying another one
     public static Action StartButtonPressed;
 
     private const int UI_BOTTOM_POSITION = 200;
@@ -34,7 +31,7 @@ public partial class DialogueManager : Node {
         // position dialogue UI centered at the bottom
         Vector2 screenSize = GetTree().Root.Size;
         float xPosition = (screenSize.X - dialogueBoxUI.Size.X) / 3;
-        float yPosition = (screenSize.Y - UI_BOTTOM_POSITION);
+        float yPosition = screenSize.Y - UI_BOTTOM_POSITION;
         dialogueBoxUI.Position = new Vector2(xPosition, yPosition);
         //once all chars of the dialogue text are displayed in the container, we can show the next line.
         dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine;
@@ -61,18 +58,16 @@ public partial class DialogueManager : Node {
         if (isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
             return;
         isDialogueBeingPrinted = true;
-        canAdvanceLine = false;
         dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, LanguageLocale);
     }
 
     public void OnTextBoxFinishedDisplayingDialogueLine() {
-        canAdvanceLine = true;
         isDialogueBeingPrinted = false;
     }
 
     public override void _UnhandledInput(InputEvent @event) {
         if (@event.IsActionPressed("advance_dialogue"))
-            if (canAdvanceLine && !isDialogueBeingPrinted) {
+            if (!isDialogueBeingPrinted) {
                 dialogueBoxUI.dialogueLineLabel.Text = "";
                 currentDialogueID = currentDialogueObject.DestinationDialogIDs[0];
                 currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);

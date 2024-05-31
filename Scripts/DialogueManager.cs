@@ -8,19 +8,29 @@ using System.Threading.Tasks;
 
 public partial class DialogueManager : Node {
 
+    private string languageCode;
     private int currentConversationID = 2; //set here the conversation you want to load. Conversations in Chatmapper are what we could call chapters.
     public int currentDialogueID = 1; //set here the starting dialogue of the conversation
     private Dictionary<int, List<DialogueObject>> conversationDialogues;
-    public static string LanguageLocale { get; set; } = "ca"; //set here the language
+    public static string LanguageLocale { get; set; } //set here the language, if language is not recognized it will default to what's defineat in Project Settings > Locale
     private DialogueBoxUi dialogueBoxUI; //the graphical rectangle container to display the text over
     public DialogueObject currentDialogueObject { get; private set; }
     bool isDialogueBeingPrinted = false; //we don't want to print a new dialogue is we are currently displaying another one
     public static Action StartButtonPressed;
+    private const int UI_BOTTOM_POSITION = 200; //starting at the bottom of the screen, we subtract this value to position the Y screen position of the dilaogue box
 
-    private const int UI_BOTTOM_POSITION = 200;
-
-
+     
     public override void _Ready() {
+        
+        //***** SET LANGUAGE HERE *****
+        //we check what language the user has in his Windows OS
+        string currentCultureName = System.Globalization.CultureInfo.CurrentCulture.Name;
+        string[] parts = currentCultureName.Split('-');
+        languageCode = parts[0];
+        TranslationServer.SetLocale(languageCode);
+        //for testing purposes, will change the language directly here so we do not have to tinker witn Windows locale settings each time
+        languageCode = "en";
+        TranslationServer.SetLocale(languageCode);
 
         LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
         StartButtonPressed += OnStartButtonPressed;
@@ -28,7 +38,7 @@ public partial class DialogueManager : Node {
         Node instance = scene.Instantiate();
         AddChild(instance);
         dialogueBoxUI = instance as DialogueBoxUi;
-        // position dialogue UI centered at the bottom
+        // position dialogue box centered at the bottom
         Vector2 screenSize = GetTree().Root.Size;
         float xPosition = (screenSize.X - dialogueBoxUI.Size.X) / 3;
         float yPosition = screenSize.Y - UI_BOTTOM_POSITION;
@@ -40,7 +50,9 @@ public partial class DialogueManager : Node {
     public void OnStartButtonPressed() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
         currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
-        StartDialogue(currentDialogueObject);
+
+        
+        ShowDialogue(currentDialogueObject);
     }
 
 
@@ -54,7 +66,7 @@ public partial class DialogueManager : Node {
         return null; // Return null if the conversationID is not found in the dictionary
     }
 
-    public void StartDialogue(DialogueObject currentDialogueObject) {
+    public void ShowDialogue(DialogueObject currentDialogueObject) {
         if (isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
             return;
         isDialogueBeingPrinted = true;
@@ -71,7 +83,7 @@ public partial class DialogueManager : Node {
                 dialogueBoxUI.dialogueLineLabel.Text = "";
                 currentDialogueID = currentDialogueObject.DestinationDialogIDs[0];
                 currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
-                StartDialogue(currentDialogueObject);
+                ShowDialogue(currentDialogueObject);
             }
     }
 

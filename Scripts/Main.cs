@@ -1,14 +1,14 @@
 using Godot;
 using System;
 
-public partial class MainMenu : Control {
+public partial class Main : Control {
 
-    private string language = "ca";
     ConfirmationDialog confirmationDialog;
     VBoxContainer MainOptionsContainer;
 
-    // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
+
+        //displaying the UI boxes with the options
         MainOptionsContainer = GetNode<VBoxContainer>("VBoxContainer");
         Button startNewGameButton = GetNode<Button>("VBoxContainer/StartNewGameButton");
         Button loadGameButton = GetNode<Button>("VBoxContainer/LoadGameButton");
@@ -17,22 +17,18 @@ public partial class MainMenu : Control {
         Button exitGameButton = GetNode<Button>("VBoxContainer/ExitButton");
         confirmationDialog = GetNode<ConfirmationDialog>("ConfirmationDialog");
 
+        //trigger events depending on the option clicked
         startNewGameButton.Pressed += OnStartNewGameButtonPressed;
         loadGameButton.Pressed += OnLoadGameButtonPressed;
         languageButton.Pressed += OnLanguageButtonPressed;
         creditsButton.Pressed += OnCreditsButtonPressed;
         exitGameButton.Pressed += OnExitButtonPressed;
         confirmationDialog.Canceled += OnCancelButtonPressed;
-        confirmationDialog.Confirmed += OnConfirmButtonPressed;
-
-        TranslationServer.SetLocale(language); //set up language
-        GD.Print($"langauage: {language}");
+        confirmationDialog.Confirmed += OnConfirmButtonPressed;  
     }
 
     private void OnStartNewGameButtonPressed() {
-
-        DialogueManager.LanguageLocale = language;
-        //now we can start showing the first dialogue
+        
         DialogueManager.StartButtonPressed.Invoke(); 
         Hide();
     }

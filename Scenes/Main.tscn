@@ -14,7 +14,6 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 script = ExtResource("1_2ygpx")
-language = "fr"
 
 [node name="TextureRect" type="TextureRect" parent="."]
 layout_mode = 1
@@ -32,7 +31,7 @@ grow_vertical = 2
 texture = ExtResource("2_15dhf")
 expand_mode = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="MainOptionsContainer" type="VBoxContainer" parent="."]
 layout_direction = 2
 layout_mode = 1
 anchors_preset = 8
@@ -47,37 +46,44 @@ offset_bottom = 168.5
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="StartNewGameButton" type="Button" parent="VBoxContainer"]
+[node name="StartNewGameButton" type="Button" parent="MainOptionsContainer"]
 layout_mode = 2
 theme_override_colors/icon_normal_color = Color(0, 0.854902, 0, 1)
 theme_override_font_sizes/font_size = 40
 text = "START_NEW_GAME"
 
-[node name="LoadGameButton" type="Button" parent="VBoxContainer"]
+[node name="LoadGameButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "LOAD_GAME"
 
-[node name="LanguageButton" type="Button" parent="VBoxContainer"]
+[node name="LanguageButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "LANGUAGE"
+autowrap_mode = 3
 
-[node name="CreditsButton" type="Button" parent="VBoxContainer"]
+[node name="CreditsButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "CREDITS"
 
-[node name="ExitButton" type="Button" parent="VBoxContainer"]
+[node name="CreditsConfirmationDialog" type="ConfirmationDialog" parent="MainOptionsContainer/CreditsButton"]
+title = ""
+position = Vector2i(740, 500)
+size = Vector2i(500, 100)
+dialog_text = "CREDITS_INFO"
+
+[node name="ExitButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "EXIT"
 
-[node name="ConfirmationDialog" type="ConfirmationDialog" parent="."]
+[node name="ExitConfirmationDialog" type="ConfirmationDialog" parent="MainOptionsContainer/ExitButton"]
 title = ""
 position = Vector2i(760, 540)
 size = Vector2i(400, 100)
@@ -85,3 +91,49 @@ always_on_top = true
 ok_button_text = "YES"
 dialog_text = "WANT_QUIT_GAME?"
 cancel_button_text = "NO"
+
+[node name="LanguageOptionsContainer" type="VBoxContainer" parent="."]
+visible = false
+layout_direction = 2
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -202.0
+offset_top = -168.5
+offset_right = 202.0
+offset_bottom = 168.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="EnglishButton" type="Button" parent="LanguageOptionsContainer"]
+layout_mode = 2
+theme_override_colors/icon_normal_color = Color(0, 0.854902, 0, 1)
+theme_override_font_sizes/font_size = 40
+text = "ENGLISH_BUTTON"
+
+[node name="FrenchButton" type="Button" parent="LanguageOptionsContainer"]
+auto_translate_mode = 1
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "FRENCH_BUTTON"
+
+[node name="CatalanButton" type="Button" parent="LanguageOptionsContainer"]
+auto_translate_mode = 1
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "CATALAN_BUTTON"
+
+[node name="UndefinedLanguageButton1" type="Button" parent="LanguageOptionsContainer"]
+auto_translate_mode = 1
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "UNDEFINED_LANGUAGE1"
+
+[node name="GoBackButton" type="Button" parent="LanguageOptionsContainer"]
+auto_translate_mode = 1
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "GO_BACK"

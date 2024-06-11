@@ -25,10 +25,7 @@ window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/size/initial_position_type=3
 window/size/transparent=true
-window/size/window_width_override=960
-window/size/window_height_override=540
 window/stretch/mode="viewport"
-window/stretch/aspect="expand"
 
 [dotnet]
 
@@ -46,7 +43,7 @@ advance_dialogue={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://Translations/MenuUITranslations - Sheet1.ca.translation", "res://Translations/MenuUITranslations - Sheet1.csv", "res://Translations/MenuUITranslations - Sheet1.en.translation", "res://Translations/MenuUITranslations - Sheet1.fr.translation")
+locale/translations=PackedStringArray("res://Translations/MenuUITranslations - Sheet1 (1).ca.translation", "res://Translations/MenuUITranslations - Sheet1 (1).csv", "res://Translations/MenuUITranslations - Sheet1 (1).en.translation", "res://Translations/MenuUITranslations - Sheet1 (1).fr.translation")
 locale/include_text_server_data=true
 
 [rendering]

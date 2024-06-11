@@ -1,0 +1,18 @@
+key,en,fr,ca
+START_NEW_GAME,START NEW GAME,NOUVELLE PARTIE,NOVA PARTIDA
+LOAD_GAME,LOAD GAME,CHARGER_PARTIE,CARREGAR PARTIDA
+LANGUAGE,LANGUAGE,LANGUE,IDIOMA
+CREDITS,CREDITS,CRÉDITS,CRÈDITS
+EXIT,EXIT,QUITTER,SORTIR
+,,,
+WANT_QUIT_GAME?,Do you want to quit the game?,Voulez-vous quitter le jeu ?,Vols sortir del joc?
+QUIT_BUTTON,QUIT,QUITTER,SORTIR
+YES,YES,OUI,SÍ
+NO,NO,NON,NO
+ENGLISH_BUTTON,ENGLISH,ANGLAIS,ANGLÈS
+FRENCH_BUTTON,FRENCH,FRANÇOIS,FRANCÈS
+CATALAN_BUTTON,CATALAN,CATALAN,CATALÀ
+GO_BACK,GO BACK,RETOURNER,TORNAR ENRERA
+CREDITS_INFO,"Code, Story & Dialogues, Music and Graphics by Abel Bascunana Pons","Code, histoire, musique & dialogues et graphisme par Abel Bascunana Pons","Codi, História i Diàlegs, Música i Gràfics per Abel Bascunana Pons"
+OK,Ok,D'accord,Acceptar
+Cancel,Cancel,Annuler,Cancel.lar

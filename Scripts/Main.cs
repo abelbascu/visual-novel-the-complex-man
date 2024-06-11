@@ -8,39 +8,75 @@ public partial class Main : Control {
 
     [Export] public string language { get; set; } = "";
     private string previousLanguage = "";
-    ConfirmationDialog confirmationDialog;
+    ConfirmationDialog exitConfirmationDialog;
+    ConfirmationDialog creditsConfirmationDialog;
     VBoxContainer MainOptionsContainer;
-    private Dictionary<Button, string> buttonLocalizationKeys = new Dictionary<Button, string>();
+    VBoxContainer LanguageOptionsContainer;
+    private Dictionary<Button, string> buttonLocalizationKeys = new();
+    private Dictionary<Button, string> buttonLanguageKeys = new();
 
 
     public override void _Ready() {
 
         //displaying the UI boxes with the options
-        MainOptionsContainer = GetNode<VBoxContainer>("VBoxContainer");
-        Button startNewGameButton = GetNode<Button>("VBoxContainer/StartNewGameButton");
-        Button loadGameButton = GetNode<Button>("VBoxContainer/LoadGameButton");
-        Button languageButton = GetNode<Button>("VBoxContainer/LanguageButton");
-        Button creditsButton = GetNode<Button>("VBoxContainer/CreditsButton");
-        Button exitGameButton = GetNode<Button>("VBoxContainer/ExitButton");
-        confirmationDialog = GetNode<ConfirmationDialog>("ConfirmationDialog");
+        MainOptionsContainer = GetNode<VBoxContainer>("MainOptionsContainer");
+        Button startNewGameButton = GetNode<Button>("MainOptionsContainer/StartNewGameButton");
+        Button loadGameButton = GetNode<Button>("MainOptionsContainer/LoadGameButton");
+        Button languageButton = GetNode<Button>("MainOptionsContainer/LanguageButton");
+        Button creditsButton = GetNode<Button>("MainOptionsContainer/CreditsButton");
+        Button exitGameButton = GetNode<Button>("MainOptionsContainer/ExitButton");
+        exitConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/ExitButton/ExitConfirmationDialog");
+        creditsConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/CreditsButton/CreditsConfirmationDialog");
 
         //trigger events depending on the option clicked
-
         startNewGameButton.Pressed += OnStartNewGameButtonPressed;
         loadGameButton.Pressed += OnLoadGameButtonPressed;
         languageButton.Pressed += OnLanguageButtonPressed;
         creditsButton.Pressed += OnCreditsButtonPressed;
         exitGameButton.Pressed += OnExitButtonPressed;
-        confirmationDialog.Canceled += OnCancelButtonPressed;
-        confirmationDialog.Confirmed += OnConfirmButtonPressed;
+        exitConfirmationDialog.Canceled += OnExitCancelButtonPressed;
+        exitConfirmationDialog.Confirmed += OnExitConfirmButtonPressed;
+        creditsConfirmationDialog.Canceled += OnCreditsCancelOrConfirmButtonPressed;
+        creditsConfirmationDialog.Confirmed += OnCreditsCancelOrConfirmButtonPressed;
 
+        LanguageOptionsContainer = GetNode<VBoxContainer>("LanguageOptionsContainer");
+        Button englishButton = GetNode<Button>("LanguageOptionsContainer/EnglishButton");
+        Button frenchButton = GetNode<Button>("LanguageOptionsContainer/FrenchButton");
+        Button catalanButton = GetNode<Button>("LanguageOptionsContainer/CatalanButton");
+        Button goBackButton = GetNode<Button>("LanguageOptionsContainer/GoBackButton");
+        
+
+
+        englishButton.Pressed += OnEnglishButtonPressed;
+        frenchButton.Pressed += OnFrenchButtonPressed;
+        catalanButton.Pressed += OnCatalanButtonPressed;
+        goBackButton.Pressed += OnGoBackButtonPressed;
+
+
+        //we grab the locale keys before they are overwritten by the fallback locale translation,
+        //otherwise we wouldn't be able to switch to another locale as the keys would be destroyed.
+        //remember the original keys and translations for menu buttons are in a google sheet at https://docs.google.com/spreadsheets/d/1HsAar1VdxVkJbuKUa3ElxSN0yZES2YfNUrk2yA7EeMM/edit?gid=0#gid=0
+        //an example START_NEW_GAME, WANT_QUIT_GAME? are keys that have its corresponding translation columns in the google sheet. 
+        //This google sheet is exported as csv files and added to Godot's filesystem, then again added to the Localizatoin tab in project settings
         foreach (Button button in MainOptionsContainer.GetChildren()) {
             string initialText = button.Text;
+            //[button] is the button name in Godot's editor, the .Text is a key manually added that should have a match with a key in the translations file in the filesystem
             buttonLocalizationKeys[button] = initialText;
-            GD.Print($"Button: {button.Name}, Key: {initialText}");
+            GD.Print($"Button name: {button.Name}, Key: {initialText}, Locale: {TranslationServer.GetLocale()}");
         }
+
+        foreach (Button button in LanguageOptionsContainer.GetChildren()) {
+            string initialText = button.Text;
+            //[button] is the button name in Godot's editor, the .Text is a key manually added that should have a match with a key in the translations file in the filesystem
+            buttonLanguageKeys[button] = initialText;
+            GD.Print($"Button name: {button.Name}, Key: {initialText}, Locale: {TranslationServer.GetLocale()}");
+        }
+
     }
 
+  
+
+    //we constantly check if the dev (me!) changes the locale via the export variable 'language' in the editor
     public override void _Process(double delta) {
         base._Process(delta);
 
@@ -52,21 +88,37 @@ public partial class Main : Control {
         }
     }
 
+    //
     private void UpdateButtonTexts() {
         foreach (Button button in buttonLocalizationKeys.Keys) {
             string localizationKey = buttonLocalizationKeys[button];
+            //as we changed the locale in the editor and it was detected in _Process(), now we are telling Godot to get the proper translation based on the new locale
             string translatedText = TranslationServer.Translate(localizationKey);
+            //and we add the proper translation to the current button that we previously saved in a dictionary in _Ready()
             button.Text = translatedText;
-            GD.Print($"Button: {translatedText}, Key: {localizationKey}");
+            GD.Print($"Button Text: {translatedText}, Key: {localizationKey}, Locale: {TranslationServer.GetLocale()}");
         }
+
+        foreach (Button button in buttonLanguageKeys.Keys) {
+            string localizationKey = buttonLanguageKeys[button];
+            //as we changed the locale in the editor and it was detected in _Process(), now we are telling Godot to get the proper translation based on the new locale
+            string translatedText = TranslationServer.Translate(localizationKey);
+            //and we add the proper translation to the current button that we previously saved in a dictionary in _Ready()
+            button.Text = translatedText;
+            GD.Print($"Button Text: {translatedText}, Key: {localizationKey}, Locale: {TranslationServer.GetLocale()}");
+        }
+
+
+
+
     }
 
-    public override void _Notification(int what) {
-        if (what == NotificationTranslationChanged) {
-            UpdateButtonTexts();
-            GD.Print("texts being updated to new language");
-        }
-    }
+    // public override void _Notification(int what) {
+    //     if (what == NotificationTranslationChanged) {
+    //         UpdateButtonTexts();
+    //         GD.Print("texts being updated to new language");
+    //     }
+    // }
 
     private void OnStartNewGameButtonPressed() {
 
@@ -79,10 +131,13 @@ public partial class Main : Control {
     }
 
     private void OnLanguageButtonPressed() {
-
+        MainOptionsContainer.Hide();
+        LanguageOptionsContainer.Show();
     }
 
     private void OnCreditsButtonPressed() {
+        creditsConfirmationDialog.Show();
+        MainOptionsContainer.Hide();
 
     }
 
@@ -93,18 +148,46 @@ public partial class Main : Control {
 
     public void ShowConfirmationPopup() {
         MainOptionsContainer.Hide();
-        confirmationDialog.Show();
+        exitConfirmationDialog.Show();
     }
 
-    private void OnConfirmButtonPressed() {
+    //triggered by confirmationDialog.Confirmed event
+    private void OnExitConfirmButtonPressed() {
         GetTree().Quit(); // Exit the game
     }
 
-    private void OnCancelButtonPressed() {
+    //triggered by confirmationDialog.Canceled event
+    private void OnExitCancelButtonPressed() {
         // Close the confirmation popup
         GetTree().CallGroup("popups", "close_all");
         MainOptionsContainer.Show();
     }
+
+      private void OnCreditsCancelOrConfirmButtonPressed() {
+         GetTree().CallGroup("popups", "close_all");
+         MainOptionsContainer.Show();
+    }
+
+
+    private void OnEnglishButtonPressed() {
+        language = "en";
+    }
+
+    private void OnFrenchButtonPressed() {
+        language = "fr";
+    }
+
+    private void OnCatalanButtonPressed() {
+        language = "ca";
+    }
+
+    private void OnGoBackButtonPressed() {
+        LanguageOptionsContainer.Hide();
+        MainOptionsContainer.Show();
+
+    }
+
+
 
 }
 

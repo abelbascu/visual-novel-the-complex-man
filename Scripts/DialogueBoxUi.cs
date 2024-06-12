@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-public partial class DialogueBoxUi : MarginContainer {
+public partial class DialogueBoxUI : MarginContainer {
     private const float MAX_WIDTH = 800f;
     private string dialogueLineToDisplay = "";
     private int letterIndex = 0;
@@ -25,19 +25,18 @@ public partial class DialogueBoxUi : MarginContainer {
     }
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
-
-        this.dialogueLineToDisplay = GetLocaleString(dialogueObject, locale);
+        this.dialogueLineToDisplay = GetLocaleDialogue(dialogueObject, locale);
         dialogueLineLabel.Text = "";
         DisplayLetter();
     }
 
-    public string GetLocaleString(DialogueObject dialogueObj, string locale) {
+    public string GetLocaleDialogue(DialogueObject dialogueObj, string locale) {
 
         string localeCurrentDialogue = locale switch {
             "fr" => dialogueObj.FrenchText,
             "ca" => dialogueObj.CatalanText,
             // Add more cases as needed for other locales
-            _ => dialogueObj.DialogueText  // Default to the default text field
+            _ => dialogueObj.DialogueTextDefault  // Default to the default text field
         };
 
         return localeCurrentDialogue;

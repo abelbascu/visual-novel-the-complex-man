@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://8ytymk06gtxw"]
 
-[ext_resource type="Script" path="res://Scripts/DialogueBoxUi.cs" id="1_i37ha"]
+[ext_resource type="Script" path="res://Scripts/DialogueBoxUI.cs" id="1_i37ha"]
 [ext_resource type="Texture2D" uid="uid://ddqt0olom3m5a" path="res://Images/UI/dialogueBox.png" id="1_vo8kf"]
 
 [sub_resource type="SystemFont" id="SystemFont_u5emw"]
@@ -8,8 +8,8 @@
 [node name="DialogueBoxUI" type="MarginContainer"]
 offset_left = 50.0
 offset_top = 700.0
-offset_right = 82.0
-offset_bottom = 742.0
+offset_right = 250.0
+offset_bottom = 764.0
 script = ExtResource("1_i37ha")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="."]

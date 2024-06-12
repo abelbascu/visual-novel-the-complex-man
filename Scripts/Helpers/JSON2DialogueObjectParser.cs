@@ -80,7 +80,7 @@ public static class JSON2DialogueObjectParser
                                     dialogueObjects.Add(new DialogueObject {
                                         ID = dialogID,
                                         DestinationDialogIDs = destinationDialogIDs,
-                                        DialogueText = dialogueText,
+                                        DialogueTextDefault = dialogueText,
                                         CatalanText = catLocaleText,
                                         FrenchText = frLocaleText
                                     });

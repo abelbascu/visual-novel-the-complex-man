@@ -11,18 +11,21 @@ public partial class DialogueManager : Node {
     public static string languageCode = "en";
     [Export] public int currentConversationID = 2; //set here the conversation you want to load. Conversations in Chatmapper are what we could call chapters.
     [Export] public int currentDialogueID = 1; //set here the starting dialogue of the conversation
-    private Dictionary<int, List<DialogueObject>> conversationDialogues;
+    private Dictionary<int, List<DialogueObject>> conversationDialogues; //the int refers to the conversation ID, see 'currentConversationID' above.
     //public static string LanguageLocale { get; set; } //set here the language, if language is not recognized it will default to what's defineat in Project Settings > Locale
-    private DialogueBoxUi dialogueBoxUI; //the graphical rectangle container to display the text over
+    private DialogueBoxUI dialogueBoxUI; //the graphical rectangle container to display the text over
+    private PlayerChoicesBoxUI playerChoicesBoxUI; //the graphical rectangle VBoxContainer to displayer the branching player choices.
     public DialogueObject currentDialogueObject { get; private set; }
     bool isDialogueBeingPrinted = false; //we don't want to print a new dialogue is we are currently displaying another one
     public static Action StartButtonPressed;
     private const int UI_BOTTOM_POSITION = 200; //starting at the bottom of the screen, we subtract this value to position the Y screen position of the dilaogue box
+    private List<DialogueObject> playerChoicesList;
 
 
     public override void _Ready() {
         LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
         StartButtonPressed += OnStartButtonPressed;
+        playerChoicesList = new();
     }
 
     public void OnStartButtonPressed() {
@@ -31,13 +34,9 @@ public partial class DialogueManager : Node {
         currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
 
         if (currentDialogueObject.DestinationDialogIDs.Count() <= 1)
-            ShowDialogue(currentDialogueObject);
+            DisplayDialogue(currentDialogueObject);
         else
-            LoadPlayerChoices(currentDialogueObject);
-    }
-
-    public void LoadPlayerChoices(DialogueObject dialogueObj) {
-        GD.Print("HERE WE NEED TO DISPLAY THE DIFFERENT PLAYER CHOICES IN A VERTICAL BOX");
+            DisplayPlayerChoices(playerChoicesList);
     }
 
     private DialogueObject GetDialogueObject(int currentConversationID, int currentDialogueObjectID) {
@@ -49,7 +48,7 @@ public partial class DialogueManager : Node {
         return null; // Return null if the conversationID is not found in the dictionary
     }
 
-    public void ShowDialogue(DialogueObject currentDialogueObject) {
+    public void DisplayDialogue(DialogueObject currentDialogueObject) {
         if (isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
             return;
         isDialogueBeingPrinted = true;
@@ -68,7 +67,7 @@ public partial class DialogueManager : Node {
         PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
         Node instance = scene.Instantiate();
         AddChild(instance);
-        dialogueBoxUI = instance as DialogueBoxUi;
+        dialogueBoxUI = instance as DialogueBoxUI;
         // position dialogue box centered at the bottom
         Vector2 screenSize = GetTree().Root.Size;
         float xPosition = (screenSize.X - dialogueBoxUI.Size.X) / 3;
@@ -76,6 +75,28 @@ public partial class DialogueManager : Node {
         dialogueBoxUI.Position = new Vector2(xPosition, yPosition);
         //once all chars of the dialogue text are displayed in the container, we can show the next line.
         dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine;
+    }
+
+    private void DisplayplayerChoicesBoxUI() {
+        //we add the dialogueUI to the scene and display it 
+        //THIS MAY BE WRONG, SPECIALLY IS USER LOADS A PREVIOUS FILE AND IT STARTS WITH A MULTIPLE PLAYER CHOICES UI 
+        PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
+        Node instance = scene.Instantiate();
+        AddChild(instance);
+        //VBoxContainer playerChoìces = instance as VBoxContainer;
+        playerChoicesBoxUI = instance as PlayerChoicesBoxUI; 
+        // position dialogue box centered at the bottom
+        Vector2 screenSize = GetTree().Root.Size;
+        //float xPosition = (screenSize.X - playerChoicesBoxUI.Size.X) / 3;
+        //float yPosition = screenSize.Y - UI_BOTTOM_POSITION;
+        //playerChoicesBoxUI.Position = new Vector2(xPosition, yPosition);
+        //once all chars of the dialogue text are displayed in the container, we can show the next line.
+        playerChoicesBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingPlayerChoices;
+    }
+
+    // TO DO TO DO TO DO TO DO
+    private void OnTextBoxFinishedDisplayingPlayerChoices() {
+        throw new NotImplementedException();
     }
 
     public void OnTextBoxFinishedDisplayingDialogueLine() {
@@ -86,14 +107,35 @@ public partial class DialogueManager : Node {
         if (@event.IsActionPressed("advance_dialogue"))
             if (!isDialogueBeingPrinted) {
                 dialogueBoxUI.dialogueLineLabel.Text = "";
-                currentDialogueID = currentDialogueObject.DestinationDialogIDs[0];
-                currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
-
-                if (currentDialogueObject.DestinationDialogIDs.Count() <= 1)
-                    ShowDialogue(currentDialogueObject);
-                else
-                    LoadPlayerChoices(currentDialogueObject);
+                //we update the ID to the next dialogue to show
+                if (currentDialogueObject.DestinationDialogIDs.Count() <= 1) {
+                    currentDialogueID = currentDialogueObject.DestinationDialogIDs[0];
+                    currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
+                    DisplayDialogue(currentDialogueObject);
+                }
+                //if more than one destination, it's a multiple player choice
+                if (currentDialogueObject.DestinationDialogIDs.Count() > 1) {
+                    GetPlayerChoices(currentDialogueObject);
+                    DisplayPlayerChoices(playerChoicesList);
+                }
             }
+    }
+
+    public void GetPlayerChoices(DialogueObject currentDialogueObject) {
+        playerChoicesList.Clear();
+        foreach (int destinationDialogID in currentDialogueObject.DestinationDialogIDs)
+            playerChoicesList.Add(GetDialogueObject(currentConversationID, destinationDialogID));
+    }
+
+    private void DisplayPlayerChoices(List<DialogueObject> playerChoicesList) {
+
+        if (playerChoicesBoxUI == null) {
+            //before adding the dialogue text, we need to create the container box
+            DisplayplayerChoicesBoxUI();
+        }
+        foreach (var playerChoiceObject in playerChoicesList) {
+            playerChoicesBoxUI.DisplayPlayerChoice(playerChoiceObject, languageCode);
+        }
     }
 
     private void LoadDialogueObjects(string filePath) {

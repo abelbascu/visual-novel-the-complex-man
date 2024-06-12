@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=3 uid="uid://b6kee1naax88o"]
+
+[ext_resource type="Texture2D" uid="uid://ddqt0olom3m5a" path="res://Images/UI/dialogueBox.png" id="1_ipqad"]
+[ext_resource type="Script" path="res://Scenes/PlayerChoicesBoxUI.cs" id="1_ygy34"]
+
+[node name="PlayerChoicesBoxUI" type="VBoxContainer"]
+offset_right = 687.0
+offset_bottom = 413.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+script = ExtResource("1_ygy34")
+
+[node name="GlobalMarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NinePatchRect" type="NinePatchRect" parent="GlobalMarginContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("1_ipqad")
+region_rect = Rect2(0, 0, 48, 48)
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="PlayerChoicesMarginContainer" type="VBoxContainer" parent="GlobalMarginContainer"]
+layout_mode = 2

@@ -26,7 +26,7 @@ public partial class DialogueBoxUi : MarginContainer {
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
 
-        this.dialogueLineToDisplay = GetLocaleString(dialogueObject, locale);       
+        this.dialogueLineToDisplay = GetLocaleString(dialogueObject, locale);
         dialogueLineLabel.Text = "";
         DisplayLetter();
     }
@@ -43,16 +43,16 @@ public partial class DialogueBoxUi : MarginContainer {
         return localeCurrentDialogue;
     }
 
-    public void DisplayLetter() {      
-         
-               if (Size.X > MAX_WIDTH) {            
-            dialogueLineLabel.AutowrapMode = TextServer.AutowrapMode.Word;
-           // await ToSignal(this, "resized"); //wait for resizing x of DialogueBoxUI
-           // await ToSignal(this, "resized"); //wait for resizing y of DialogueBoxUI
+    public void DisplayLetter() {
 
-           float customMinX = Math.Min(Size.X, MAX_WIDTH);
-           CustomMinimumSize = new Vector2(customMinX, Size.Y);
-           Size = CustomMinimumSize;
+        if (Size.X > MAX_WIDTH) {
+            dialogueLineLabel.AutowrapMode = TextServer.AutowrapMode.Word;
+            // await ToSignal(this, "resized"); //wait for resizing x of DialogueBoxUI
+            // await ToSignal(this, "resized"); //wait for resizing y of DialogueBoxUI
+
+            float customMinX = Math.Min(Size.X, MAX_WIDTH);
+            CustomMinimumSize = new Vector2(customMinX, Size.Y);
+            Size = CustomMinimumSize;
         }
         if (letterIndex < dialogueLineToDisplay.Length) {
             dialogueLineLabel.Text += dialogueLineToDisplay[letterIndex];

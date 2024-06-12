@@ -21,34 +21,13 @@ public partial class DialogueManager : Node {
 
 
     public override void _Ready() {
-
-        //***** SET LANGUAGE HERE *****
-        //we check what language the user has in his Windows OS
-        string currentCultureName = System.Globalization.CultureInfo.CurrentCulture.Name;
-        string[] parts = currentCultureName.Split('-');
-        //languageCode = parts[0];
-        TranslationServer.SetLocale(languageCode);
-        //for testing purposes, will change the language directly here so we do not have to tinker witn Windows locale settings each time
-        //languageCode = "en";
-        //TranslationServer.SetLocale(languageCode);
-
         LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
         StartButtonPressed += OnStartButtonPressed;
-        PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
-        Node instance = scene.Instantiate();
-        AddChild(instance);
-        dialogueBoxUI = instance as DialogueBoxUi;
-        // position dialogue box centered at the bottom
-        Vector2 screenSize = GetTree().Root.Size;
-        float xPosition = (screenSize.X - dialogueBoxUI.Size.X) / 3;
-        float yPosition = screenSize.Y - UI_BOTTOM_POSITION;
-        dialogueBoxUI.Position = new Vector2(xPosition, yPosition);
-        //once all chars of the dialogue text are displayed in the container, we can show the next line.
-        dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine;
     }
 
     public void OnStartButtonPressed() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
+
         currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
 
         if (currentDialogueObject.DestinationDialogIDs.Count() <= 1)
@@ -61,9 +40,7 @@ public partial class DialogueManager : Node {
         GD.Print("HERE WE NEED TO DISPLAY THE DIFFERENT PLAYER CHOICES IN A VERTICAL BOX");
     }
 
-
     private DialogueObject GetDialogueObject(int currentConversationID, int currentDialogueObjectID) {
-
         // Check if the conversationID exists in the dictionary
         if (conversationDialogues.TryGetValue(currentConversationID, out List<DialogueObject> dialogueList)) {
             // Use LINQ to find the first DialogueObject with the specified ID
@@ -76,7 +53,29 @@ public partial class DialogueManager : Node {
         if (isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
             return;
         isDialogueBeingPrinted = true;
+
+        if (dialogueBoxUI == null) {
+            //before adding the dialogue text, we need to create the container box
+            DisplayDialogueBoxUI();
+        }
+
         dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, languageCode);
+    }
+
+    private void DisplayDialogueBoxUI() {
+        //we add the dialogueUI to the scene and display it 
+        //THIS MAY BE WRONG, SPECIALLY IS USER LOADS A PREVIOUS FILE AND IT STARTS WITH A MULTIPLE PLAYER CHOICES UI 
+        PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
+        Node instance = scene.Instantiate();
+        AddChild(instance);
+        dialogueBoxUI = instance as DialogueBoxUi;
+        // position dialogue box centered at the bottom
+        Vector2 screenSize = GetTree().Root.Size;
+        float xPosition = (screenSize.X - dialogueBoxUI.Size.X) / 3;
+        float yPosition = screenSize.Y - UI_BOTTOM_POSITION;
+        dialogueBoxUI.Position = new Vector2(xPosition, yPosition);
+        //once all chars of the dialogue text are displayed in the container, we can show the next line.
+        dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine;
     }
 
     public void OnTextBoxFinishedDisplayingDialogueLine() {
@@ -94,7 +93,6 @@ public partial class DialogueManager : Node {
                     ShowDialogue(currentDialogueObject);
                 else
                     LoadPlayerChoices(currentDialogueObject);
-
             }
     }
 
@@ -109,5 +107,4 @@ public partial class DialogueManager : Node {
             GD.PrintErr("Error parsing JSON data: " + e.Message);
         }
     }
-
 }

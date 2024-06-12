@@ -44,16 +44,23 @@ public partial class Main : Control {
         Button frenchButton = GetNode<Button>("LanguageOptionsContainer/FrenchButton");
         Button catalanButton = GetNode<Button>("LanguageOptionsContainer/CatalanButton");
         Button goBackButton = GetNode<Button>("LanguageOptionsContainer/GoBackButton");
-        
-
 
         englishButton.Pressed += OnEnglishButtonPressed;
         frenchButton.Pressed += OnFrenchButtonPressed;
         catalanButton.Pressed += OnCatalanButtonPressed;
         goBackButton.Pressed += OnGoBackButtonPressed;
 
+        //***** SET LANGUAGE HERE *****
+        //we check what language the user has in his Windows OS
+        string currentCultureName = System.Globalization.CultureInfo.CurrentCulture.Name;
+        string[] parts = currentCultureName.Split('-');
+        language = parts[0];
+        TranslationServer.SetLocale(language);
+        //for testing purposes, will change the language directly here so we do not have to tinker witn Windows locale settings each time
+        //languageCode = "en";
+        //TranslationServer.SetLocale(languageCode);
 
-        //we grab the locale keys before they are overwritten by the fallback locale translation,
+        //below, we grab the locale keys before they are overwritten by the fallback locale translation,
         //otherwise we wouldn't be able to switch to another locale as the keys would be destroyed.
         //remember the original keys and translations for menu buttons are in a google sheet at https://docs.google.com/spreadsheets/d/1HsAar1VdxVkJbuKUa3ElxSN0yZES2YfNUrk2yA7EeMM/edit?gid=0#gid=0
         //an example START_NEW_GAME, WANT_QUIT_GAME? are keys that have its corresponding translation columns in the google sheet. 
@@ -71,10 +78,8 @@ public partial class Main : Control {
             buttonLanguageKeys[button] = initialText;
             GD.Print($"Button name: {button.Name}, Key: {initialText}, Locale: {TranslationServer.GetLocale()}");
         }
-
     }
 
-  
 
     //we constantly check if the dev (me!) changes the locale via the export variable 'language' in the editor
     public override void _Process(double delta) {
@@ -88,7 +93,6 @@ public partial class Main : Control {
         }
     }
 
-    //
     private void UpdateButtonTexts() {
         foreach (Button button in buttonLocalizationKeys.Keys) {
             string localizationKey = buttonLocalizationKeys[button];
@@ -99,6 +103,7 @@ public partial class Main : Control {
             GD.Print($"Button Text: {translatedText}, Key: {localizationKey}, Locale: {TranslationServer.GetLocale()}");
         }
 
+        //for when the language options are displayed, if the user changes language, change the language locale of the buttons too
         foreach (Button button in buttonLanguageKeys.Keys) {
             string localizationKey = buttonLanguageKeys[button];
             //as we changed the locale in the editor and it was detected in _Process(), now we are telling Godot to get the proper translation based on the new locale
@@ -107,21 +112,10 @@ public partial class Main : Control {
             button.Text = translatedText;
             GD.Print($"Button Text: {translatedText}, Key: {localizationKey}, Locale: {TranslationServer.GetLocale()}");
         }
-
-
-
-
     }
 
-    // public override void _Notification(int what) {
-    //     if (what == NotificationTranslationChanged) {
-    //         UpdateButtonTexts();
-    //         GD.Print("texts being updated to new language");
-    //     }
-    // }
 
     private void OnStartNewGameButtonPressed() {
-
         DialogueManager.StartButtonPressed.Invoke();
         Hide();
     }
@@ -163,9 +157,9 @@ public partial class Main : Control {
         MainOptionsContainer.Show();
     }
 
-      private void OnCreditsCancelOrConfirmButtonPressed() {
-         GetTree().CallGroup("popups", "close_all");
-         MainOptionsContainer.Show();
+    private void OnCreditsCancelOrConfirmButtonPressed() {
+        GetTree().CallGroup("popups", "close_all");
+        MainOptionsContainer.Show();
     }
 
 

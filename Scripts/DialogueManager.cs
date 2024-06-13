@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
 
 public partial class DialogueManager : Node {
 
@@ -16,7 +17,7 @@ public partial class DialogueManager : Node {
     private DialogueBoxUI dialogueBoxUI; //the graphical rectangle container to display the text over
     private PlayerChoicesBoxUI playerChoicesBoxUI; //the graphical rectangle VBoxContainer to displayer the branching player choices.
     public DialogueObject currentDialogueObject { get; private set; }
-    bool isDialogueBeingPrinted = false; //we don't want to print a new dialogue is we are currently displaying another one
+    public bool isDialogueBeingPrinted = false; //we don't want to print a new dialogue is we are currently displaying another one
     public static Action StartButtonPressed;
     private const int UI_BOTTOM_POSITION = 200; //starting at the bottom of the screen, we subtract this value to position the Y screen position of the dilaogue box
     private List<DialogueObject> playerChoicesList;
@@ -84,7 +85,7 @@ public partial class DialogueManager : Node {
         Node instance = scene.Instantiate();
         AddChild(instance);
         //VBoxContainer playerChoìces = instance as VBoxContainer;
-        playerChoicesBoxUI = instance as PlayerChoicesBoxUI; 
+        playerChoicesBoxUI = instance as PlayerChoicesBoxUI;
         // position dialogue box centered at the bottom
         Vector2 screenSize = GetTree().Root.Size;
         //float xPosition = (screenSize.X - playerChoicesBoxUI.Size.X) / 3;
@@ -112,13 +113,25 @@ public partial class DialogueManager : Node {
                     currentDialogueID = currentDialogueObject.DestinationDialogIDs[0];
                     currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
                     DisplayDialogue(currentDialogueObject);
+                    // if (currentDialogueObject.Actor == "1") {
+                    //     GetPlayerChoices(currentDialogueObject);
+                    //     DisplayPlayerChoices(playerChoicesList);
+                    // } else
+                    //     DisplayDialogue(currentDialogueObject);
                 }
-                //if more than one destination, it's a multiple player choice
-                if (currentDialogueObject.DestinationDialogIDs.Count() > 1) {
+                //if more than one destination, it's a multiple player choice, let's ensure the current dialogue is from the player
+                else if (currentDialogueObject.DestinationDialogIDs.Count() > 1) {
                     GetPlayerChoices(currentDialogueObject);
                     DisplayPlayerChoices(playerChoicesList);
                 }
+            } else if (isDialogueBeingPrinted) {
+                DisplayDialogueNow();
             }
+    }
+
+    public void DisplayDialogueNow() {
+        isDialogueBeingPrinted = false;
+        dialogueBoxUI.StopLetterByLetterDisplay();
     }
 
     public void GetPlayerChoices(DialogueObject currentDialogueObject) {
@@ -128,7 +141,6 @@ public partial class DialogueManager : Node {
     }
 
     private void DisplayPlayerChoices(List<DialogueObject> playerChoicesList) {
-
         if (playerChoicesBoxUI == null) {
             //before adding the dialogue text, we need to create the container box
             DisplayplayerChoicesBoxUI();

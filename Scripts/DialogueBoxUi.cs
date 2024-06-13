@@ -7,8 +7,8 @@ public partial class DialogueBoxUI : MarginContainer {
     private const float MAX_WIDTH = 800f;
     private string dialogueLineToDisplay = "";
     private int letterIndex = 0;
-    private float letterTime = 0.0005f;
-    private float spaceTime = 0.0006f;
+    private float letterTime = 0.05f;
+    private float spaceTime = 0.06f;
     private float punctuationTime = 0.002f;
     public Label dialogueLineLabel;
     Timer letterDisplayTimer;
@@ -40,6 +40,17 @@ public partial class DialogueBoxUI : MarginContainer {
         };
 
         return localeCurrentDialogue;
+    }
+
+    public void StopLetterByLetterDisplay() {
+        // Stop the timer
+        letterDisplayTimer.Stop();
+        // Display the entire dialogue line
+        dialogueLineLabel.Text = dialogueLineToDisplay;
+        // Reset the letter index
+        letterIndex = 0;
+        // Invoke the FinishedDisplaying action
+        FinishedDisplaying?.Invoke();
     }
 
     public void DisplayLetter() {

@@ -3,10 +3,10 @@ using System.Text.Json;
 using System.Collections.Generic;
 
 
-public static class JSON2DialogueObjectParser
-{
+public static class JSON2DialogueObjectParser {
+
     public static Dictionary<int, List<DialogueObject>> ExtractDialogueObjects(string jsonText) {
-        
+
         // Initialize a dictionary to store dialogue rows by conversation ID
         var conversationObjectsDB = new Dictionary<int, List<DialogueObject>>();
 
@@ -30,40 +30,33 @@ public static class JSON2DialogueObjectParser
                             foreach (var dialogNode in dialogNodesElement.EnumerateArray()) {
                                 // Extract "ID" from the dialog node
                                 int dialogID = dialogNode.GetProperty("ID").GetInt32();
-                                string dialogueText = "";
+                                string dialogueText = "";                                
                                 string catLocaleText = "";
                                 string frLocaleText = "";
+                                //actor = 1 is the player, we put a high number to force error and not overlap with other actors
+                                string actor = ""; 
 
                                 // Attempt to access "Fields" property
                                 if (dialogNode.TryGetProperty("Fields", out JsonElement fieldsElement)) {
                                     // Attempt to access "Dialogue Text" property within "Fields"
-                                    if (fieldsElement.TryGetProperty("Dialogue Text", out JsonElement dialogueTextElement)) {
+                                    if (fieldsElement.TryGetProperty("Dialogue Text", out JsonElement dialogueTextElement))
                                         // Get the string value of "Dialogue Text"
                                         dialogueText = dialogueTextElement.GetString();
 
-                                    } else {
-                                        GD.PrintErr("Error: 'Dialogue Text' property not found in 'Fields'.");
-                                    }
-                                    if (fieldsElement.TryGetProperty("fr-FR", out JsonElement frenchTextElement)) {
+                                    if (fieldsElement.TryGetProperty("fr-FR", out JsonElement frenchTextElement))
                                         // Get the string value of "Dialogue Text"
                                         frLocaleText = frenchTextElement.GetString();
 
-                                    } else {
-                                        GD.PrintErr("Error: 'Dialogue Text' property not found in 'Fields'.");
-                                    }
-                                    if (fieldsElement.TryGetProperty("cat-CAT", out JsonElement catalanTextElement)) {
+                                    if (fieldsElement.TryGetProperty("cat-CAT", out JsonElement catalanTextElement))
                                         // Get the string value of "Dialogue Text"
                                         catLocaleText = catalanTextElement.GetString();
 
-                                    } else {
-                                        GD.PrintErr("Error: 'Dialogue Text' property not found in 'Fields'.");
-                                    }
-                                } else {
-                                    GD.PrintErr("Error: 'Fields' property not found in dialog node.");
+                                    if (fieldsElement.TryGetProperty("Actor", out JsonElement actorElement))
+                                        // Get the string value of "Dialogue Text"
+                                        actor = actorElement.GetString();
                                 }
 
                                 if (dialogNode.TryGetProperty("OutgoingLinks", out JsonElement outgoingLinksElement)) {
-
                                     // Check if the "OutgoingLinks" property is an array
                                     //if (outgoingLinksElement.ValueKind == JsonValueKind.Array) {
                                     List<int> destinationDialogIDs = new();
@@ -72,7 +65,7 @@ public static class JSON2DialogueObjectParser
                                     foreach (var outgoingLink in outgoingLinksElement.EnumerateArray()) {
                                         if (outgoingLink.TryGetProperty("DestinationDialogID", out JsonElement destinationDialogIDElement)) {
                                             int destinationDialogID = destinationDialogIDElement.GetInt32();
-                                            destinationDialogIDs.Add(destinationDialogID);                                       
+                                            destinationDialogIDs.Add(destinationDialogID);
                                         } else {
                                             GD.PrintErr("Error: 'DestinationDialogID' property not found in 'OutgoingLinks'.");
                                         }
@@ -82,28 +75,22 @@ public static class JSON2DialogueObjectParser
                                         DestinationDialogIDs = destinationDialogIDs,
                                         DialogueTextDefault = dialogueText,
                                         CatalanText = catLocaleText,
-                                        FrenchText = frLocaleText
+                                        FrenchText = frLocaleText,
+                                        Actor = actor
                                     });
-                                } else {
-                                    GD.PrintErr("Error: 'OutgoingLinks' property not found in dialog node.");
                                 }
+                                // Add the list of dialogue rows to the dictionary
+                                conversationObjectsDB[conversationID] = dialogueObjects;
+
                             }
-                        } else {
-                            GD.PrintErr("Error: 'DialogNodes' property not found in conversation.");
                         }
-                        // Add the list of dialogue rows to the dictionary
-                        conversationObjectsDB[conversationID] = dialogueObjects;
                     }
-                } else {
-                    GD.PrintErr("Error: 'Conversations' property not found in 'Assets'.");
-                }            
-            } else {
-                GD.PrintErr("Error: 'Assets' property not found in JSON.");
-            }          
+                }
+            }
         } catch (JsonException e) {
             GD.PrintErr("Error parsing JSON data: " + e.Message);
         }
 
-         return conversationObjectsDB;
+        return conversationObjectsDB;
     }
 }

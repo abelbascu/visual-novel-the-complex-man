@@ -7,6 +7,7 @@ public class DialogueObject
     public string DialogueTextDefault { get; set; }
     public string CatalanText {get; set;}
     public string FrenchText {get; set;}
+    public string Actor {get; set;}
 }
 
 

@@ -98,7 +98,7 @@
 				"OriginConvoID": 1,
 				"DestinationConvoID": 1,
 				"OriginDialogID": 0,
-				"DestinationDialogID": 1
+				"DestinationDialogID": 16
 			  }
 			],
 			"ConversationID": 1,
@@ -709,6 +709,45 @@
 			  "cat-CAT": ""
 			},
 			"ID": 12
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 1,
+				"DestinationConvoID": 1,
+				"OriginDialogID": 16,
+				"DestinationDialogID": 1
+			  }
+			],
+			"ConversationID": 1,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "You are not prepared to play this game... let alone finish it. Your attention span is that of a dying fish. Unless you play a game that gives you dopamine shots constantly, you are unable to push forward, and have then necessary patience and persistance. You are a drug addict. Yes, that's what you are, a drug addict, but it´s not your fault. It´s those corporations that have unlocked the secrets of the psyche to cowmilk all your savings to buy new skins and shortless shit emojis... and one day you will wake up, aged 40 years old, having spent most of your life playing one single game... that's like reading a single book in your entire life. You can´t become any wiser by just doing one of something, specially when you are now doing this something very mechanically. Your conscience is oblivious of what you are doing, that´s why you alwasy feel something is missing...",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "",
+			  "cat-CAT": ""
+			},
+			"ID": 16
 		  }
 		],
 		"NodeColor": 0,
@@ -786,7 +825,7 @@
 			"ConditionPriority": 3,
 			"Fields": {
 			  "Title": "New Dialogue",
-			  "Pictures": "Images\\PlayerDirtyRoom.jpg",
+			  "Pictures": "[Images\\PlayerDrityRoom.jpg]",
 			  "Description": "",
 			  "Actor": "3",
 			  "Conversant": "1",
@@ -866,8 +905,8 @@
 			  "Title": "New Dialogue",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "3",
+			  "Actor": "3",
+			  "Conversant": "1",
 			  "Menu Text": "",
 			  "Dialogue Text": "At least mold and other microscopic beings are delighted to have a free 24/7 mall where to fill their tiny stomachs...",
 			  "Parenthetical": "",
@@ -1089,13 +1128,21 @@
 			  "Title": "Choose Option",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "1",
+			  "Actor": "200",
 			  "Conversant": "3"
 			},
 			"ID": 8
 		  },
 		  {
-			"OutgoingLinks": [],
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 9,
+				"DestinationDialogID": 166
+			  }
+			],
 			"ConversationID": 2,
 			"IsRoot": false,
 			"IsGroup": false,
@@ -1126,7 +1173,15 @@
 			"ID": 9
 		  },
 		  {
-			"OutgoingLinks": [],
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 10,
+				"DestinationDialogID": 159
+			  }
+			],
 			"ConversationID": 2,
 			"IsRoot": false,
 			"IsGroup": false,
@@ -1140,8 +1195,8 @@
 			  "Title": "New Dialogue",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
+			  "Actor": "1",
+			  "Conversant": "3",
 			  "Menu Text": "",
 			  "Dialogue Text": "An AI engineer to rule the world and make everyone jobless, muhahaha!",
 			  "Parenthetical": "",
@@ -1218,8 +1273,8 @@
 			  "Title": "New Dialogue",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
+			  "Actor": "1",
+			  "Conversant": "3",
 			  "Menu Text": "",
 			  "Dialogue Text": "Oh well... let me retract. I'm fine with being an awesome pilot. Dodging dirty underwear on the floor is my first flight simulator parasympathetic-nerve-reflex class!",
 			  "Parenthetical": "",
@@ -1257,10 +1312,10 @@
 			  "Title": "New Dialogue",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
+			  "Actor": "1",
+			  "Conversant": "3",
 			  "Menu Text": "",
-			  "Dialogue Text": "None of this. Come on! Aren't there more options? You are breaking the fourth wall right now. The dreaded suspension of disbelief. What a pitiful narrator your are!",
+			  "Dialogue Text": "None of these boring professions. Come on! Aren't there more options? You are breaking the fourth wall right now. The dreaded suspension of disbelief. What a pitiful narrator your are!",
 			  "Parenthetical": "",
 			  "Audio Files": "[]",
 			  "Video File": "",
@@ -2979,7 +3034,7 @@
 				"OriginConvoID": 2,
 				"DestinationConvoID": 2,
 				"OriginDialogID": 58,
-				"DestinationDialogID": 29
+				"DestinationDialogID": 175
 			  }
 			],
 			"ConversationID": 2,
@@ -3206,7 +3261,15 @@
 			"ID": 63
 		  },
 		  {
-			"OutgoingLinks": [],
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 4,
+				"OriginDialogID": 64,
+				"DestinationDialogID": 0
+			  }
+			],
 			"ConversationID": 2,
 			"IsRoot": false,
 			"IsGroup": false,
@@ -3376,8 +3439,8 @@
 			  "Title": "New Dialogue",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "3",
+			  "Actor": "3",
+			  "Conversant": "1",
 			  "Menu Text": "",
 			  "Dialogue Text": "But even a few kilobytes can contain the whole Universe. Ask Mandelbrot! or la Abadia del Crimen for the Amstrad CPC! (play the VGA remake by Giner, you can save your game!).",
 			  "Parenthetical": "",
@@ -3642,7 +3705,7 @@
 				"OriginConvoID": 2,
 				"DestinationConvoID": 2,
 				"OriginDialogID": 76,
-				"DestinationDialogID": 77
+				"DestinationDialogID": 78
 			  }
 			],
 			"ConversationID": 2,
@@ -3673,614 +3736,6 @@
 			  "cat-CAT": "Jaja! No et crec. Si no em dius què passa ara, et pots anar si vols!"
 			},
 			"ID": 76
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 77,
-				"DestinationDialogID": 78
-			  },
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 77,
-				"DestinationDialogID": 79
-			  },
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 77,
-				"DestinationDialogID": 83
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": true,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Group",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "3"
-			},
-			"ID": 77
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 78,
-				"DestinationDialogID": 80
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
-			  "Menu Text": "",
-			  "Dialogue Text": "AJS;DLFAJSD A;SL ASDFLJ; LAASD;LFJ ASD;FLJ",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "AJS;DLFAJSD A;SL ASDFLJ; LAASD;LFJ ASD;FLJ",
-			  "cat-CAT": "AJS;DLFAJSD A;SL ASDFLJ; LAASD;LFJ ASD;FLJ"
-			},
-			"ID": 78
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 79,
-				"DestinationDialogID": 82
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
-			  "Menu Text": "",
-			  "Dialogue Text": "ASDLJFA;LSD ASD;LFJ AS;DLFJA;SDJ FA;KF HBNZ,XMCNVZ.",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "ASDLJFA;LSD ASD;LFJ AS;DLFJA;SDJ FA;KF HBNZ,XMCNVZ.",
-			  "cat-CAT": "ASDLJFA;LSD ASD;LFJ AS;DLFJA;SDJ FA;KF HBNZ,XMCNVZ."
-			},
-			"ID": 79
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 80,
-				"DestinationDialogID": 81
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": true,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Group",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "1"
-			},
-			"ID": 80
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 81,
-				"DestinationDialogID": 85
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "1",
-			  "Menu Text": "",
-			  "Dialogue Text": "ASDL JK ASD;LFJ ASD;LFKJ ASD;LFJ ASDF ;LKJ",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "ASDL JK ASD;LFJ ASD;LFKJ ASD;LFJ ASDF ;LKJ",
-			  "cat-CAT": "ASDL JK ASD;LFJ ASD;LFKJ ASD;LFJ ASDF ;LKJ"
-			},
-			"ID": 81
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 82,
-				"DestinationDialogID": 85
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "3",
-			  "Menu Text": "",
-			  "Dialogue Text": "ASD FOPQWEIU A;LXCV ASDFK ASDF;LJ; LKJ",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "ASD FOPQWEIU A;LXCV ASDFK ASDF;LJ; LKJ",
-			  "cat-CAT": "ASD FOPQWEIU A;LXCV ASDFK ASDF;LJ; LKJ"
-			},
-			"ID": 82
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 83,
-				"DestinationDialogID": 84
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
-			  "Menu Text": "",
-			  "Dialogue Text": "Ooookey. I apologize.",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "Oookey. Je m'excuse.",
-			  "cat-CAT": "Oki, demano disculpes."
-			},
-			"ID": 83
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 84,
-				"DestinationDialogID": 85
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
-			  "Menu Text": "",
-			  "Dialogue Text": " ASDF A;SDLFJ  A;SLDFJ ASDLKJ ASDFQWE",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "ASDF A;SDLFJ A;SLDFJ ASDLKJ ASDFQWE",
-			  "cat-CAT": "ASDF A;SDLFJ A;SLDFJ ASDLKJ ASDFQWE"
-			},
-			"ID": 84
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 85,
-				"DestinationDialogID": 86
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "3",
-			  "Menu Text": "",
-			  "Dialogue Text": "Come on, don't be an asshole, come back!",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "Allez, ne soyez pas un idiot, revenez !",
-			  "cat-CAT": "Vinga, no siguis un idiota, torna!"
-			},
-			"ID": 85
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 86,
-				"DestinationDialogID": 87
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
-			  "Menu Text": "",
-			  "Dialogue Text": "..... ... !!!!!!!!!!!!",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "..... ... !!!!!!!!!!!!",
-			  "cat-CAT": "..... ... !!!!!!!!!!!!"
-			},
-			"ID": 86
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 87,
-				"DestinationDialogID": 88
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "3",
-			  "Menu Text": "",
-			  "Dialogue Text": "Okeey, I'm really sorry. Terrribly sorry. Please come back. This is unplayable.",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "Okaaay, je suis vraiment désolé. Terriblement désolé. S'il vous plaît, revenez. C'est injouable.",
-			  "cat-CAT": "D'acord, ho sento molt. Moltíssimes disculpes. Torna, sisplau. Això és injugable."
-			},
-			"ID": 87
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 88,
-				"DestinationDialogID": 89
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
-			  "Menu Text": "",
-			  "Dialogue Text": " ADSF ASDF;LKJA AS;DLJ",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "ADSF ASDF;LKJA AS;DLJ",
-			  "cat-CAT": "ASDF ASDF;LKJA AS;DLJ"
-			},
-			"ID": 88
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 89,
-				"DestinationDialogID": 90
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "3",
-			  "Menu Text": "",
-			  "Dialogue Text": "I already said sorry. What else you want?",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "Je l'ai déjà dit désolé. Que veux-tu de plus ?",
-			  "cat-CAT": "Ja ho he dit. Què més vols?"
-			},
-			"ID": 89
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 90,
-				"DestinationDialogID": 91
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
-			  "Menu Text": "",
-			  "Dialogue Text": "SAD;LKJ ASDFL;KJA ASDFJK",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "SAD;LKJ ASDFL;KJA ASDFJK",
-			  "cat-CAT": "SAD;LKJ ASDFL;KJA ASDFJK"
-			},
-			"ID": 90
-		  },
-		  {
-			"OutgoingLinks": [
-			  {
-				"Filename": null,
-				"OriginConvoID": 2,
-				"DestinationConvoID": 2,
-				"OriginDialogID": 91,
-				"DestinationDialogID": 92
-			  }
-			],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "3",
-			  "Menu Text": "",
-			  "Dialogue Text": "To promise what? You are mumbling like a disjointed jaw grandpa.",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "Promettre quoi ? Tu marmonnes comme un grand-père désarticulé.",
-			  "cat-CAT": "Prometre què? Estàs murmurant com un avi desarticulat."
-			},
-			"ID": 91
-		  },
-		  {
-			"OutgoingLinks": [],
-			"ConversationID": 2,
-			"IsRoot": false,
-			"IsGroup": false,
-			"ConditionsString": "",
-			"UserScript": "",
-			"NodeColor": 8,
-			"DelaySimStatus": false,
-			"FalseConditionAction": 0,
-			"ConditionPriority": 3,
-			"Fields": {
-			  "Title": "New Dialogue",
-			  "Pictures": "[]",
-			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
-			  "Menu Text": "",
-			  "Dialogue Text": "ASDF JF!!!!!!!!",
-			  "Parenthetical": "",
-			  "Audio Files": "[]",
-			  "Video File": "",
-			  "Lipsync Files": "[]",
-			  "Animation Files": "[]",
-			  "Mood": "",
-			  "Notes": "",
-			  "fr-FR": "ASDF JF!!!!!!!!",
-			  "cat-CAT": "ASDF JF!!!!!!!!"
-			},
-			"ID": 92
 		  },
 		  {
 			"OutgoingLinks": [
@@ -4383,8 +3838,8 @@
 			  "Title": "New Dialogue",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "3",
+			  "Actor": "3",
+			  "Conversant": "1",
 			  "Menu Text": "",
 			  "Dialogue Text": "It's just an opinion based on observation, as a very low wage paid Narrator. Anyways, good move for them, as they will continue amassing millions of dollars, that imho, should go to hospitals to fight anorexia... and don't get me started with what they are doing with these young woman models on their fashion weeks...",
 			  "Parenthetical": "",
@@ -4468,8 +3923,8 @@
 			  "Title": "New Dialogue",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "3",
+			  "Actor": "3",
+			  "Conversant": "1",
 			  "Menu Text": "",
 			  "Dialogue Text": "How come that people nowadays don't accept wrinkles as part of their natural growing process? everyone wants to be young outside, while insisting in remaining immature inside! Just remember this every time that you see naturally beautiful women advertising a cosmetic that they never needed in the first place. It´s more a genetics gamble, as God makes all shapes and forms so there is enough variety in this world.",
 			  "Parenthetical": "",
@@ -4702,8 +4157,8 @@
 			  "Title": "New Dialogue",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "1",
-			  "Conversant": "3",
+			  "Actor": "3",
+			  "Conversant": "1",
 			  "Menu Text": "",
 			  "Dialogue Text": "Complexes are not yours, These mofos created them and put them on your system. As human beings, specially women, grow older, their surgery makes their faces turn upside down, as wrinkles, that are a natural mark of old age, want to make their way to the surface but they find artificial blockages under the skin...",
 			  "Parenthetical": "",
@@ -4733,8 +4188,8 @@
 			  "Title": "New Dialogue",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
+			  "Actor": "1",
+			  "Conversant": "3",
 			  "Menu Text": "",
 			  "Dialogue Text": "Shit, I don't want to be a surgeon anymore...",
 			  "Parenthetical": "",
@@ -4772,8 +4227,8 @@
 			  "Title": "New Dialogue",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
+			  "Actor": "1",
+			  "Conversant": "3",
 			  "Menu Text": "",
 			  "Dialogue Text": "But surgeons earn an awful lot of money, and they are exempt of responsibilities if women and up being an Ecce Homo as time passes. I'm a capitalistic type! ",
 			  "Parenthetical": "",
@@ -4889,7 +4344,7 @@
 			  "Title": "New Dialogue",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "3",
+			  "Actor": "1",
 			  "Conversant": "1",
 			  "Menu Text": "",
 			  "Dialogue Text": "Wait? No, no, I paid enough money so that you provide me with at least 20 hours gameplay with plenty of options!",
@@ -6292,8 +5747,8 @@
 			  "Title": "New Dialogue",
 			  "Pictures": "[]",
 			  "Description": "",
-			  "Actor": "3",
-			  "Conversant": "1",
+			  "Actor": "1",
+			  "Conversant": "3",
 			  "Menu Text": "",
 			  "Dialogue Text": "Continue with the story, it's getting really interesting!",
 			  "Parenthetical": "",
@@ -6853,6 +6308,1456 @@
 			  "cat-CAT": "El teu cos de sobte es torna pesat, i sues com si hagués plogut abundantment dins de la teva habitació. És tan difícil respirar que t'ofegues i caus inconscient al terra..."
 			},
 			"ID": 158
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 159,
+				"DestinationDialogID": 160
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "This is an AI generated message. The AI engineer options is not available anymore. the AI overtook that role and no humans are needed anymore.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Ceci est un message généré par une intelligence artificielle. L'option d'ingénieur en IA n'est plus disponible. L'IA a pris ce rôle et aucun humain n'est nécessaire désormais.",
+			  "cat-CAT": "Aquest és un missatge generat per una intel·ligència artificial. L'opció d'enginyer d'IA ja no està disponible. La IA ha assumit aquest rol i ja no es necessiten humans."
+			},
+			"ID": 159
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 160,
+				"DestinationDialogID": 161
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "Really? You joking?",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Vraiment ? Tu plaisantes ? ",
+			  "cat-CAT": "De veritat? Estàs bromejant?"
+			},
+			"ID": 160
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 161,
+				"DestinationDialogID": 162
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "AI never jokes. Well, Siri and Alexa make jokes, but are pretty bad.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "L'IA ne plaisante jamais. Bien que Siri et Alexa fassent des blagues, mais elles sont assez mauvaises.",
+			  "cat-CAT": "La IA mai bromeja. Bé, Siri i Alexa fan bromes, però són bastant dolentes."
+			},
+			"ID": 161
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 162,
+				"DestinationDialogID": 163
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "Can you tell a good joke?",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Peux-tu raconter une bonne blague ? ",
+			  "cat-CAT": "Pots explicar una bona broma?"
+			},
+			"ID": 162
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 163,
+				"DestinationDialogID": 164
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "Let me try... What do you call a couple of chimpanzees sharing an Amazon account? PRIME-mates.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Laissez-moi essayer... Comment appelle-t-on un couple de chimpanzés partageant un compte Amazon ? Des PRIME-mates.",
+			  "cat-CAT": "Deixa-m'ho intentar... Com s'anomena una parella de ximpanzés que comparteixen compte d'Amazon? PRIME-mates."
+			},
+			"ID": 163
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 164,
+				"DestinationDialogID": 165
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "Hahaha! that was a good one. Tell me another joke, please!",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Hahaha ! C'était une bonne ! Raconte-moi une autre blague, s'il te plaît !",
+			  "cat-CAT": "Hahaha! Aquesta ha estat bona. Explica-me'n una altra, si us plau!"
+			},
+			"ID": 164
+		  },
+		  {
+			"OutgoingLinks": [],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "Sorry, it´s time to go back to business, not joking, choose another damn profession now, we are running late!",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Désolé, il est temps de retourner aux affaires, pas de plaisanteries, choisis une autre profession maintenant, nous sommes en retard !",
+			  "cat-CAT": "Ho sento, és hora de tornar a la feina, sense més bromes, tria ara una altra professió malparida, anem molt endarrerits!"
+			},
+			"ID": 165
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 166,
+				"DestinationDialogID": 167
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "The Youtuber market is a bit saturated, you must find a good niche first!",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Le marché des YouTubeurs est un peu saturé, tu dois d'abord trouver une bonne niche !",
+			  "cat-CAT": "El mercat de youtubers està una mica saturat, primer has de trobar un bon nínxol!"
+			},
+			"ID": 166
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 167,
+				"DestinationDialogID": 168
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "What about a YT channel about snail breeding?",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Que dirais-tu d'une chaîne YouTube sur l'élevage d'escargots ?",
+			  "cat-CAT": "Què et sembla un canal de YouTube sobre cria de caragols?"
+			},
+			"ID": 167
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 168,
+				"DestinationDialogID": 169
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "This sounds disgusting, though there are some countries where they eat those eye-horned viscous creatures...",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Ça a l'air dégoûtant, bien qu'il y ait des pays où ils mangent ces créatures visqueuses à cornes...",
+			  "cat-CAT": "Això sona repugnant, encara que hi ha alguns països on mengen aquestes criatures viscoses amb banyes..."
+			},
+			"ID": 168
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 169,
+				"DestinationDialogID": 170
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "I once went to Lleida, in Catalonia, and they make a big party, with a big pan, where they cook those unfortunate snails... but I must admit that the taste really good if you soak them with allioli!",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Je suis allé une fois à Lleida, en Catalogne, et ils font une grande fête, avec une grande poêle, où ils cuisinent ces malheureux escargots... Mais je dois admettre que le goût est vraiment bon si vous les trempez dans l'allioli !",
+			  "cat-CAT": "Una vegada vaig anar a Lleida, a Catalunya, i fan una gran festa, amb una gran paella, on cuinen aquests caragols desgraciats... però he d'admetre que el gust és realment bo si els remulles amb allioli!"
+			},
+			"ID": 169
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 170,
+				"DestinationDialogID": 171
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "People from Lleida are called Lleidatans, or in ancient terms, Ilergetes. They had two guys Indibil i Mandoni, that were hitting the enemies with a spear... snails are extracted with a small spear, I guess they were the inventors of this culinary delicattessen....",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Les gens de Lleida sont appelés Lleidatans, ou dans les termes anciens, Ilergètes. Ils avaient deux gars Indibil et Mandoni, qui frappaient les ennemis avec une lance... Les escargots sont extraits avec une petite lance, je suppose qu'ils étaient les inventeurs de cette délicatesse culinaire...",
+			  "cat-CAT": "A la gent de Lleida se'ls anomena lleidatans, o en termes antics, ilergetes. Tenien dos tipus, Indibil i Mandoni, que colpejaven els enemics amb una llança... els caragols s'extreuen amb una petita llança, suposo que eren els inventors d'aquest delicatessen culinari..."
+			},
+			"ID": 170
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 171,
+				"DestinationDialogID": 172
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "That's a good story, so yeah snail breeding seems promising for a raising YT star!",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "C'est une bonne histoire, donc oui l'élevage d'escargots semble prometteur pour une future star de YouTube !",
+			  "cat-CAT": "Aquesta és una bona història, així que sí, la cria de caragols sembla prometedora per a una futura estrella de YouTube!"
+			},
+			"ID": 171
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 172,
+				"DestinationDialogID": 173
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "Well, setting up a snail farm can be costly... besides, you house would stink to snail ooze... besides, there´s not time to lose and snail breeding won´t serve the purposes of this game...",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Bon, monter une ferme d'escargots peut coûter cher... De plus, ta maison sentirait la bave d'escargot... De plus, nous n'avons pas le temps à perdre et l'élevage d'escargots ne servira pas les objectifs de ce jeu...",
+			  "cat-CAT": "Bé, muntar una granja de caragols pot ser costós... a més, la teva casa faria pudor de bava de caragol... a més, no hi ha temps a perdre i la cria de caragols no servirà per als propòsits d'aquest joc..."
+			},
+			"ID": 172
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 173,
+				"DestinationDialogID": 174
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "Why not? I want to be a snail breeder!",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Pourquoi pas ? Je veux être un éleveur d'escargots !",
+			  "cat-CAT": "Per què no? Vull ser criat de caragols!"
+			},
+			"ID": 173
+		  },
+		  {
+			"OutgoingLinks": [],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "If you want to be a snail breeder, this game should sell damn good. Then the author will have more time to cater your aspirations by adding a snail simulator... he promises that if the game makes 200K net revenue, discounted taxes from Steam and the feudal taxes from the government. But for now, please choose another profession...",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Si tu veux être éleveur d'escargots, ce jeu doit très bien se vendre. Alors l'auteur aura plus de temps pour satisfaire tes aspirations en ajoutant un simulateur d'escargot... Il promet que si le jeu rapporte 200K de revenu net, déduction faite des taxes de Steam et des taxes féodales du gouvernement. Mais pour l'instant, choisis une autre profession...",
+			  "cat-CAT": "Si vols ser criat de caragols, aquest joc hauria de vendre's molt bé. Llavors l'autor tindrà més temps per satisfer les teves aspiracions afegint un simulador de cargols... promet que si el joc obté 200.000 d'ingressos nets, descomptats els impostos de Steam i els impostos feudals del govern. Però de moment, si us plau, tria una altra professió..."
+			},
+			"ID": 174
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 175,
+				"DestinationDialogID": 176
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "Oh, you can certainly quit the game and forget about me and the mission that was put in your hands, but keep teasing me and you'll see...",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Oh, tu peux certainement quitter le jeu et m'oublier, moi et la mission qui t'a été confiée, mais continue à me taquiner et tu verras...",
+			  "cat-CAT": "Oh, pots deixar el joc amb tota seguretat i oblidar-te de mi i de la missió que t'ha estat encomanada, però si continues provocant-me, ho veuràs..."
+			},
+			"ID": 175
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 176,
+				"DestinationDialogID": 177
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "You do not scare me.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Tu ne me fais pas peur.",
+			  "cat-CAT": "No em fas por."
+			},
+			"ID": 176
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 177,
+				"DestinationDialogID": 178
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "You should.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Tu devrais.",
+			  "cat-CAT": "Hauries de fer-m'en."
+			},
+			"ID": 177
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 178,
+				"DestinationDialogID": 179
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "If you were the scarecrow of Oz Wizard, the film would have ended very badly, you don´t scare a silly crow lol.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Si tu étais l'épouvantail du Magicien d'Oz, le film se serait très mal terminé, tu ne fais pas peur à un simple corbeau !",
+			  "cat-CAT": "Si fossis l'espantaocells del Mag d'Oz, la pel·lícula hauria acabat molt malament, no fas por ni a un simple corb jajaja."
+			},
+			"ID": 178
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 179,
+				"DestinationDialogID": 180
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "Your are getting too offensive, you are earning bad karma points...",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Tu deviens trop offensant, tu accumules de mauvais points de karma...",
+			  "cat-CAT": "T'estàs tornant massa ofensiu, estàs acumulant mals punts de karma..."
+			},
+			"ID": 179
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 180,
+				"DestinationDialogID": 181
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "Really? It´s just a game. It´s you the one that put this option for me to choose!",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Vraiment ? Ce n'est qu'un jeu. C'est toi qui as mis cette option pour que je la choisisse !",
+			  "cat-CAT": "De veritat? És només un joc. Ets tu qui ha posat aquesta opció perquè jo la triï!"
+			},
+			"ID": 180
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 181,
+				"DestinationDialogID": 182
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "Well, not me. The author. He is testing how far you are from the ideal of a good Samaritan.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Eh bien, pas moi. L'auteur. Il teste à quel point tu es loin de l'idéal du bon Samaritain.",
+			  "cat-CAT": "Bé, no jo. L'autor. Està provant fins a quin punt estàs lluny de l'ideal del bon samarità."
+			},
+			"ID": 181
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 182,
+				"DestinationDialogID": 183
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "“Let him who is without sin among you be the first to throw a stone to me.”",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Que celui qui est sans péché parmi vous lui jette la première pierre.",
+			  "cat-CAT": "Que aquell qui estigui lliure de pecat entre vosaltres li llenci la primera pedra."
+			},
+			"ID": 182
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 183,
+				"DestinationDialogID": 184
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "True, the author must certainly not be a good representative of a good Samaritan either. But hey, it´s his game and if you want to know about the story ahead of you, you must face the consequences of your acts!",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "C'est vrai, l'auteur ne doit certainement pas non plus être un bon représentant du bon Samaritain. Mais hé, c'est son jeu et si tu veux connaître l'histoire qui t'attend, tu dois faire face aux conséquences de tes actes !",
+			  "cat-CAT": "És veritat, l'autor amb tota certesa no deu ser tampoc un bon representant del bon samarità. Però ei, és el seu joc i si vols conèixer la història que t'espera, has d'afrontar les conseqüències dels teus actes!"
+			},
+			"ID": 183
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 184,
+				"DestinationDialogID": 185
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "This is getting too religious. Steam is very wary of religion wars. Besides, I only have faith in Bon Jovi.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Cela devient trop religieux. Steam est très prudent avec les guerres de religion. De plus, je n'ai foi qu'en Bon Jovi.",
+			  "cat-CAT": "Això s'està tornant massa religiós. Steam és molt prudent amb les guerres de religions. A més, només tinc fe en Bon Jovi."
+			},
+			"ID": 184
+		  },
+		  {
+			"OutgoingLinks": [],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "What a bad joke. Now, we are losing a precious time. Choose a damn profession now.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Quelle mauvaise blague. Maintenant, nous perdons un temps précieux. Choisis une profession, maintenant.",
+			  "cat-CAT": "Quina broma de mal gust. Ara, estem perdent un temps preciós. Tria una professió malparida ara mateix."
+			},
+			"ID": 185
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 78,
+				"DestinationDialogID": 79
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "ASDLJFA;LSD ASD;LFJ AS;DLFJA;SDJ FA;KF HBNZ,XMCNVZ.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "ASDLJFA;LSD ASD;LFJ AS;DLFJA;SDJ FA;KF HBNZ,XMCNVZ.",
+			  "cat-CAT": "ASDLJFA;LSD ASD;LFJ AS;DLFJA;SDJ FA;KF HBNZ,XMCNVZ."
+			},
+			"ID": 78
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 79,
+				"DestinationDialogID": 80
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "Ooookey. I apologize.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Oookey. Je m'excuse.",
+			  "cat-CAT": "Oki, demano disculpes."
+			},
+			"ID": 79
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 80,
+				"DestinationDialogID": 81
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": " ASDF A;SDLFJ  A;SLDFJ ASDLKJ ASDFQWE",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "ASDF A;SDLFJ A;SLDFJ ASDLKJ ASDFQWE",
+			  "cat-CAT": "ASDF A;SDLFJ A;SLDFJ ASDLKJ ASDFQWE"
+			},
+			"ID": 80
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 81,
+				"DestinationDialogID": 83
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "Come on, don't be an asshole, come back!",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Allez, ne soyez pas un idiot, revenez !",
+			  "cat-CAT": "Vinga, no siguis un idiota, torna!"
+			},
+			"ID": 81
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 83,
+				"DestinationDialogID": 84
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "..... ... !!!!!!!!!!!!",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "..... ... !!!!!!!!!!!!",
+			  "cat-CAT": "..... ... !!!!!!!!!!!!"
+			},
+			"ID": 83
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 84,
+				"DestinationDialogID": 85
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "Okeey, I'm really sorry. Terrribly sorry. Please come back. This is unplayable.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Okaaay, je suis vraiment désolé. Terriblement désolé. S'il vous plaît, revenez. C'est injouable.",
+			  "cat-CAT": "D'acord, ho sento molt. Moltíssimes disculpes. Torna, sisplau. Això és injugable."
+			},
+			"ID": 84
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 85,
+				"DestinationDialogID": 86
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": " ADSF ASDF;LKJA AS;DLJ",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "ADSF ASDF;LKJA AS;DLJ",
+			  "cat-CAT": "ASDF ASDF;LKJA AS;DLJ"
+			},
+			"ID": 85
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 86,
+				"DestinationDialogID": 87
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "I already said sorry. What else you want?",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Je l'ai déjà dit désolé. Que veux-tu de plus ?",
+			  "cat-CAT": "Ja ho he dit. Què més vols?"
+			},
+			"ID": 86
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 87,
+				"DestinationDialogID": 88
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "SAD;LKJ ASDFL;KJA ASDFJK",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "SAD;LKJ ASDFL;KJA ASDFJK",
+			  "cat-CAT": "SAD;LKJ ASDFL;KJA ASDFJK"
+			},
+			"ID": 87
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 2,
+				"DestinationConvoID": 2,
+				"OriginDialogID": 88,
+				"DestinationDialogID": 89
+			  }
+			],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "To promise what? You are mumbling like a disjointed jaw grandpa.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "Promettre quoi ? Tu marmonnes comme un grand-père désarticulé.",
+			  "cat-CAT": "Prometre què? Estàs murmurant com un avi desarticulat."
+			},
+			"ID": 88
+		  },
+		  {
+			"OutgoingLinks": [],
+			"ConversationID": 2,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "ASDF JF!!!!!!!! The more time goes by, the more hard your mission will become. Let's move on.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "ASDF JF!!!!!!!!",
+			  "cat-CAT": "ASDF JF!!!!!!!!"
+			},
+			"ID": 89
 		  }
 		],
 		"NodeColor": 0,
@@ -8467,6 +9372,212 @@
 		  "Description": "Each time the Player gets killed, he'll appear in the Ether Limbo. He has a certain number of lives before the game is not playable anymore. ",
 		  "Actor": "1",
 		  "Conversant": "3",
+		  "Act": "",
+		  "Chapter": "",
+		  "Scene": "",
+		  "Level": "",
+		  "Mood": "",
+		  "Primary Location": "-1"
+		}
+	  },
+	  {
+		"ID": 4,
+		"DialogNodes": [
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 4,
+				"DestinationConvoID": 4,
+				"OriginDialogID": 0,
+				"DestinationDialogID": 1
+			  }
+			],
+			"ConversationID": 4,
+			"IsRoot": true,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "START",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "",
+			  "cat-CAT": ""
+			},
+			"ID": 0
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 4,
+				"DestinationConvoID": 4,
+				"OriginDialogID": 1,
+				"DestinationDialogID": 2
+			  }
+			],
+			"ConversationID": 4,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "You are now in the taxi, time to know your PoC",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "",
+			  "cat-CAT": ""
+			},
+			"ID": 1
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 4,
+				"DestinationConvoID": 4,
+				"OriginDialogID": 2,
+				"DestinationDialogID": 3
+			  }
+			],
+			"ConversationID": 4,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "PoC?",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "",
+			  "cat-CAT": ""
+			},
+			"ID": 2
+		  },
+		  {
+			"OutgoingLinks": [
+			  {
+				"Filename": null,
+				"OriginConvoID": 4,
+				"DestinationConvoID": 4,
+				"OriginDialogID": 3,
+				"DestinationDialogID": 4
+			  }
+			],
+			"ConversationID": 4,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "3",
+			  "Conversant": "1",
+			  "Menu Text": "",
+			  "Dialogue Text": "Point of Contact.",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "",
+			  "cat-CAT": ""
+			},
+			"ID": 3
+		  },
+		  {
+			"OutgoingLinks": [],
+			"ConversationID": 4,
+			"IsRoot": false,
+			"IsGroup": false,
+			"ConditionsString": "",
+			"UserScript": "",
+			"NodeColor": 8,
+			"DelaySimStatus": false,
+			"FalseConditionAction": 0,
+			"ConditionPriority": 3,
+			"Fields": {
+			  "Title": "New Dialogue",
+			  "Pictures": "[]",
+			  "Description": "",
+			  "Actor": "1",
+			  "Conversant": "3",
+			  "Menu Text": "",
+			  "Dialogue Text": "Whatever...",
+			  "Parenthetical": "",
+			  "Audio Files": "[]",
+			  "Video File": "",
+			  "Lipsync Files": "[]",
+			  "Animation Files": "[]",
+			  "Mood": "",
+			  "Notes": "",
+			  "fr-FR": "",
+			  "cat-CAT": ""
+			},
+			"ID": 4
+		  }
+		],
+		"NodeColor": 0,
+		"Fields": {
+		  "Title": "The Taxi",
+		  "Pictures": "[]",
+		  "Description": "",
+		  "Actor": "3",
+		  "Conversant": "1",
 		  "Act": "",
 		  "Chapter": "",
 		  "Scene": "",

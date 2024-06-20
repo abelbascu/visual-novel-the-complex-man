@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Timers;
 
 public partial class DialogueManager : Node {
 
@@ -29,15 +30,22 @@ public partial class DialogueManager : Node {
         playerChoicesList = new();
     }
 
+    private void LoadDialogueObjects(string filePath) {
+        try {
+            string jsonText = File.ReadAllText(filePath);
+            // Deserialize JSON data and extract the required fields
+            conversationDialogues = JSON2DialogueObjectParser.ExtractDialogueObjects(jsonText);
+        } catch (IOException e) {
+            GD.PrintErr("Error loading dialogue data: " + e.Message);
+        } catch (JsonException e) {
+            GD.PrintErr("Error parsing JSON data: " + e.Message);
+        }
+    }
+
     public void OnStartButtonPressed() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
-
         currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
-
-        if (currentDialogueObject.DestinationDialogIDs.Count() <= 1)
-            DisplayDialogue(currentDialogueObject);
-        else
-            DisplayPlayerChoices(playerChoicesList);
+        DisplayDialogueOrPlayerChoices(currentDialogueObject);
     }
 
     private DialogueObject GetDialogueObject(int currentConversationID, int currentDialogueObjectID) {
@@ -46,21 +54,78 @@ public partial class DialogueManager : Node {
             // Use LINQ to find the first DialogueObject with the specified ID
             return dialogueList.FirstOrDefault(dialogueObject => dialogueObject.ID == currentDialogueObjectID);
         }
+
         return null; // Return null if the conversationID is not found in the dictionary
+    }
+
+    public void DisplayDialogueOrPlayerChoices(DialogueObject dialogObj) {
+        // Create a set to store unique "DestinationDialogID" values
+        List<int> destinationDialogIDs = new();
+        // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
+        foreach (Dictionary<string, int> dict in currentDialogueObject.OutgoingLinks) {
+            if (dict.ContainsKey("DestinationDialogID")) {
+                destinationDialogIDs.Add(dict["DestinationDialogID"]);
+            }
+        }
+        // Check if the set contains only one unique "DestinationDialogID" value && that the Actor is NOT the player 
+        // && the dialogue is not a Group (groups are empty and only contain multiple DestinationIDs that are player choices)
+        if (destinationDialogIDs.Count == 1 && dialogObj.Actor != "1" && dialogObj.IsGroup == "false")
+            DisplayDialogue(currentDialogueObject);
+
+        else if (destinationDialogIDs.Count == 1 && dialogObj.Actor == "1" && dialogObj.IsGroup == "false") {
+            AddPlayerChoicesToList(dialogObj.ID, dialogObj);
+            DisplayPlayerChoices();
+        }
+
+        //if the dialogObect has multiple destinatioonIDs and it´s a Group, then this are multiple player choices
+        else if (destinationDialogIDs.Count >= 1 && dialogObj.IsGroup == "true") {
+            dialogObj.IsGroupParent = true;
+            foreach (int destinationDialogID in destinationDialogIDs) {
+                DialogueObject dialogObject = GetDialogueObject(dialogObj.DestinationConvoID, destinationDialogID);
+                dialogObject.IsGroupChild = true;
+                AddPlayerChoicesToList(destinationDialogIDs, dialogObj);
+            }
+            DisplayPlayerChoices();
+        }
+
+        //if the node is a NoGroupParent, meaning that it is not a GROUP node but it has branching childs, 
+        //tag it as NoGroupParent and do the same for the children as NoGroupChild
+        //NoGroupChild are exclusive, meaning that at the exact moment that a  NoGroup child player choice
+        // is clicked by the user, any other child at the same level must be removed from the PlayerChoicesList
+        //and those subpaths cannot be traversed anymore unless the player starts a new game. 
+        // the dialogObj.Actor != 1 is to ensure that the player answers are triggered by the narrator
+        else if (destinationDialogIDs.Count > 1 && dialogObj.Actor != "1" && dialogObj.IsGroup == "false") {
+            dialogObj.IsNoGroupParent = true;
+            foreach (int destinationDialogID in destinationDialogIDs) {
+                DialogueObject dialogObject = GetDialogueObject(dialogObj.DestinationConvoID, destinationDialogID);
+                dialogObject.IsNoGroupChild = true;
+                AddPlayerChoicesToList(destinationDialogIDs, dialogObj);
+            }
+        }
     }
 
     public void DisplayDialogue(DialogueObject currentDialogueObject) {
         if (isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
             return;
         isDialogueBeingPrinted = true;
-
         if (dialogueBoxUI == null) {
             //before adding the dialogue text, we need to create the container box
             DisplayDialogueBoxUI();
         }
-
         dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, languageCode);
     }
+
+    //IEnumerable<int> so we can pass a list or a single int when there is only one player choice to add to the playerChoicesList
+    public void AddPlayerChoicesToList(IEnumerable<int> destinationDialogIDs, DialogueObject dialogObj) {
+        foreach (int dialogID in destinationDialogIDs)
+            playerChoicesList.Add(GetDialogueObject(currentConversationID, dialogID));
+    }
+
+    //overload method when we only have one single player choice to add to the PlayerChoicesList
+    public void AddPlayerChoicesToList(int dialogID, DialogueObject dialogObj) {
+        AddPlayerChoicesToList(new[] { dialogID }, dialogObj);
+    }
+
 
     private void DisplayDialogueBoxUI() {
         //we add the dialogueUI to the scene and display it 
@@ -78,7 +143,18 @@ public partial class DialogueManager : Node {
         dialogueBoxUI.FinishedDisplaying += OnTextBoxFinishedDisplayingDialogueLine;
     }
 
-    private void DisplayplayerChoicesBoxUI() {
+    private void DisplayPlayerChoices() {
+        //se want to print what is already in the playerChoiceList but before we need to add new choices coming from the currentDialogueObject    
+        if (playerChoicesBoxUI == null) {
+            //before adding the dialogue text, we need to create the container box
+            DisplayPlayerChoicesBoxUI();
+        }
+        foreach (var playerChoiceObject in playerChoicesList) {
+            playerChoicesBoxUI.DisplayPlayerChoice(playerChoiceObject, languageCode);
+        }
+    }
+
+    private void DisplayPlayerChoicesBoxUI() {
         //we add the dialogueUI to the scene and display it 
         //THIS MAY BE WRONG, SPECIALLY IS USER LOADS A PREVIOUS FILE AND IT STARTS WITH A MULTIPLE PLAYER CHOICES UI 
         PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
@@ -108,8 +184,12 @@ public partial class DialogueManager : Node {
         if (@event.IsActionPressed("advance_dialogue"))
             if (!isDialogueBeingPrinted) {
                 dialogueBoxUI.dialogueLineLabel.Text = "";
+
+                int nextDialogueID = currentDialogueObject.DestinationDialogIDs[0];
+                DialogueObject nextDialogueObject = GetDialogueObject(currentConversationID, nextDialogueID);
                 //we update the ID to the next dialogue to show
-                if (currentDialogueObject.DestinationDialogIDs.Count() <= 1) {
+
+                if (currentDialogueObject.DestinationDialogIDs.Count() <= 1 && nextdi) {
                     currentDialogueID = currentDialogueObject.DestinationDialogIDs[0];
                     currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
                     DisplayDialogue(currentDialogueObject);
@@ -121,44 +201,16 @@ public partial class DialogueManager : Node {
                 }
                 //if more than one destination, it's a multiple player choice, let's ensure the current dialogue is from the player
                 else if (currentDialogueObject.DestinationDialogIDs.Count() > 1) {
-                    GetPlayerChoices(currentDialogueObject);
-                    DisplayPlayerChoices(playerChoicesList);
+                    AddPlayerChoicesToList(currentDialogueObject);
+                    DisplayPlayerChoices();
                 }
             } else if (isDialogueBeingPrinted) {
-                DisplayDialogueNow();
+                DisplayDialogueSuddenly();
             }
     }
 
-    public void DisplayDialogueNow() {
+    public void DisplayDialogueSuddenly() {
         isDialogueBeingPrinted = false;
         dialogueBoxUI.StopLetterByLetterDisplay();
-    }
-
-    public void GetPlayerChoices(DialogueObject currentDialogueObject) {
-        playerChoicesList.Clear();
-        foreach (int destinationDialogID in currentDialogueObject.DestinationDialogIDs)
-            playerChoicesList.Add(GetDialogueObject(currentConversationID, destinationDialogID));
-    }
-
-    private void DisplayPlayerChoices(List<DialogueObject> playerChoicesList) {
-        if (playerChoicesBoxUI == null) {
-            //before adding the dialogue text, we need to create the container box
-            DisplayplayerChoicesBoxUI();
-        }
-        foreach (var playerChoiceObject in playerChoicesList) {
-            playerChoicesBoxUI.DisplayPlayerChoice(playerChoiceObject, languageCode);
-        }
-    }
-
-    private void LoadDialogueObjects(string filePath) {
-        try {
-            string jsonText = File.ReadAllText(filePath);
-            // Deserialize JSON data and extract the required fields
-            conversationDialogues = JSON2DialogueObjectParser.ExtractDialogueObjects(jsonText);
-        } catch (IOException e) {
-            GD.PrintErr("Error loading dialogue data: " + e.Message);
-        } catch (JsonException e) {
-            GD.PrintErr("Error parsing JSON data: " + e.Message);
-        }
     }
 }

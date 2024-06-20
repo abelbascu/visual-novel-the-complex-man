@@ -30,11 +30,15 @@ public static class JSON2DialogueObjectParser {
                             foreach (var dialogNode in dialogNodesElement.EnumerateArray()) {
                                 // Extract "ID" from the dialog node
                                 int dialogID = dialogNode.GetProperty("ID").GetInt32();
-                                string dialogueText = "";                                
+                                string dialogueText = "";
                                 string catLocaleText = "";
                                 string frLocaleText = "";
                                 //actor = 1 is the player, we put a high number to force error and not overlap with other actors
-                                string actor = ""; 
+                                string actor = "";
+                                string isGroup = "";
+
+                                if (dialogNode.TryGetProperty("IsGroup", out JsonElement isGroupElement))
+                                    isGroup = isGroupElement.GetString();
 
                                 // Attempt to access "Fields" property
                                 if (dialogNode.TryGetProperty("Fields", out JsonElement fieldsElement)) {
@@ -59,29 +63,44 @@ public static class JSON2DialogueObjectParser {
                                 if (dialogNode.TryGetProperty("OutgoingLinks", out JsonElement outgoingLinksElement)) {
                                     // Check if the "OutgoingLinks" property is an array
                                     //if (outgoingLinksElement.ValueKind == JsonValueKind.Array) {
-                                    List<int> destinationDialogIDs = new();
+                                    List<Dictionary<string, int>> outgoingLinks = new();
                                     // Iterate over each element in the array   
 
+                                    int index = 0;
                                     foreach (var outgoingLink in outgoingLinksElement.EnumerateArray()) {
                                         if (outgoingLink.TryGetProperty("DestinationDialogID", out JsonElement destinationDialogIDElement)) {
                                             int destinationDialogID = destinationDialogIDElement.GetInt32();
-                                            destinationDialogIDs.Add(destinationDialogID);
-                                        } else {
-                                            GD.PrintErr("Error: 'DestinationDialogID' property not found in 'OutgoingLinks'.");
+                                            outgoingLinks[index]["DestinationDialogID"] = destinationDialogID;
                                         }
-                                    }
-                                    dialogueObjects.Add(new DialogueObject {
-                                        ID = dialogID,
-                                        DestinationDialogIDs = destinationDialogIDs,
-                                        DialogueTextDefault = dialogueText,
-                                        CatalanText = catLocaleText,
-                                        FrenchText = frLocaleText,
-                                        Actor = actor
-                                    });
-                                }
-                                // Add the list of dialogue rows to the dictionary
-                                conversationObjectsDB[conversationID] = dialogueObjects;
+                                        if (outgoingLink.TryGetProperty("DestinationConvoID", out JsonElement destinationConvoIDElement)) {
+                                            int destinationConvoID = destinationConvoIDElement.GetInt32();
+                                            outgoingLinks[index]["DestinationConvoID"] = destinationConvoID;
+                                        }
+                                        if (outgoingLink.TryGetProperty("OriginDialogID", out JsonElement originDialogIDElement)) {
+                                            int originDialogID = originDialogIDElement.GetInt32();
+                                            outgoingLinks[index]["OriginDialogID"] = originDialogID;
+                                        }
+                                        if (outgoingLink.TryGetProperty("OriginConvoID", out JsonElement originConvoIDElement)) {
+                                            int originConvoID = originConvoIDElement.GetInt32();
+                                            outgoingLinks[index]["OriginConvoID"] = originConvoID;
+                                        }
 
+                                        dialogueObjects.Add(new DialogueObject {
+                                            ID = dialogID,
+                                            IsGroup = isGroup,
+                                            OutgoingLinks = outgoingLinks,
+                                            DialogueTextDefault = dialogueText,
+                                            CatalanText = catLocaleText,
+                                            FrenchText = frLocaleText,
+                                            Actor = actor
+                                        });
+
+                                        index++;
+                                    }
+                                    // Add the list of dialogue rows to the dictionary
+                                    conversationObjectsDB[conversationID] = dialogueObjects;
+
+                                }
                             }
                         }
                     }

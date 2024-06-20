@@ -35,10 +35,15 @@ public static class JSON2DialogueObjectParser {
                                 string frLocaleText = "";
                                 //actor = 1 is the player, we put a high number to force error and not overlap with other actors
                                 string actor = "";
-                                string isGroup = "";
+                                bool isGroup = false;
 
-                                if (dialogNode.TryGetProperty("IsGroup", out JsonElement isGroupElement))
-                                    isGroup = isGroupElement.GetString();
+                                if (dialogNode.TryGetProperty("IsGroup", out JsonElement isGroupElement)) {
+                                    if (isGroupElement.ValueKind == JsonValueKind.False) {
+                                        isGroup = false;
+                                    } else if (isGroupElement.ValueKind == JsonValueKind.True) {
+                                        isGroup = true;
+                                    } 
+                                }
 
                                 // Attempt to access "Fields" property
                                 if (dialogNode.TryGetProperty("Fields", out JsonElement fieldsElement)) {
@@ -97,12 +102,16 @@ public static class JSON2DialogueObjectParser {
 
                                         index++;
                                     }
+                                    //THIS IS AN UNNECESSARY OPERATION AS IT IS OVERWRITTING conversationObjectsDB[conversationID] FOR EACH NEW dialogueObjects.  
+                                    //NEEDS TO BE PUT IN AN OUTER CLOSE TO DO THE OPERATION ONLY ONCE!!!!!!
                                     // Add the list of dialogue rows to the dictionary
                                     conversationObjectsDB[conversationID] = dialogueObjects;
 
                                 }
                             }
                         }
+
+
                     }
                 }
             }

@@ -14,7 +14,7 @@ public partial class PlayerChoicesBoxUI : VBoxContainer {
 
     public void DisplayPlayerChoice(DialogueObject playerChoiceObject, string languageCode) {
         this.playerChoiceToDisplay = GetLocalePlayerChoice(playerChoiceObject, languageCode);
-        Button dialogueChoice = new Button();
+        PlayerChoiceButton dialogueChoice = new();
         dialogueChoicesContainer.AddChild(dialogueChoice);
         dialogueChoice.Text = "";
         dialogueChoice.Text = playerChoiceToDisplay;

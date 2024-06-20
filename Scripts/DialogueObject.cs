@@ -11,7 +11,7 @@ public class DialogueObject
     public int OriginConvoID {get; set;}
     public int DestinationConvoID {get; set;}
     public int OriginDialogID {get; set;}
-    public string IsGroup {get; set;}
+    public bool IsGroup = false;
     public bool IsGroupParent = false;
     public bool IsGroupChild = false;
     public bool IsNoGroupParent = false; 

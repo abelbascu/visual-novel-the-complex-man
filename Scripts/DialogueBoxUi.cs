@@ -15,6 +15,7 @@ public partial class DialogueBoxUI : MarginContainer {
 
     public Action FinishedDisplaying;
     public Action DialogueBoxUIWasResized;
+    public Action LabelPressed;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
@@ -22,6 +23,29 @@ public partial class DialogueBoxUI : MarginContainer {
         dialogueLineLabel = GetNode<Label>("MarginContainer/DialogueLineLabel");
         letterDisplayTimer = GetNode<Timer>("LetterDisplayTimer");
         letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;
+        // Make sure the Label can receive input
+        dialogueLineLabel.MouseFilter = Control.MouseFilterEnum.Stop;
+        // Change cursor on hover
+        dialogueLineLabel.MouseDefaultCursorShape = Control.CursorShape.PointingHand;
+
+        LabelPressed += OnDialogueBoxUIPressed;
+    }
+
+    public void OnDialogueBoxUIPressed() {
+        var dialogueManager = GetNode<DialogueManager>("/root/DialogueManager");
+        dialogueManager.OnDialogueBoxUIPressed();
+    }
+
+    public override void _GuiInput(InputEvent @event) {
+        if (@event is InputEventMouseButton mouseEvent &&
+            mouseEvent.ButtonIndex == MouseButton.Left &&
+            mouseEvent.Pressed) {
+            // Check if the click is within the bounds of the Label
+            if (dialogueLineLabel.GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
+                LabelPressed.Invoke();
+                GD.Print("Label area clicked!");
+            }
+        }
     }
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
@@ -33,7 +57,7 @@ public partial class DialogueBoxUI : MarginContainer {
     public string GetLocaleDialogue(DialogueObject dialogueObj, string locale) {
 
         string localeCurrentDialogue = locale switch {
-            "fr" => dialogueObj.FrenchText,
+            "f  " => dialogueObj.FrenchText,
             "ca" => dialogueObj.CatalanText,
             // Add more cases as needed for other locales
             _ => dialogueObj.DialogueTextDefault  // Default to the default text field

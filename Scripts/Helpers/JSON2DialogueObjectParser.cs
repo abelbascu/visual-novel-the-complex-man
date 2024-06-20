@@ -42,7 +42,7 @@ public static class JSON2DialogueObjectParser {
                                         isGroup = false;
                                     } else if (isGroupElement.ValueKind == JsonValueKind.True) {
                                         isGroup = true;
-                                    } 
+                                    }
                                 }
 
                                 // Attempt to access "Fields" property
@@ -73,48 +73,51 @@ public static class JSON2DialogueObjectParser {
 
                                     int index = 0;
                                     foreach (var outgoingLink in outgoingLinksElement.EnumerateArray()) {
+
+                                        Dictionary<string, int> outgoingLinkDict = new Dictionary<string, int>();
+
                                         if (outgoingLink.TryGetProperty("DestinationDialogID", out JsonElement destinationDialogIDElement)) {
                                             int destinationDialogID = destinationDialogIDElement.GetInt32();
-                                            outgoingLinks[index]["DestinationDialogID"] = destinationDialogID;
+                                            outgoingLinkDict["DestinationDialogID"] = destinationDialogID;
                                         }
                                         if (outgoingLink.TryGetProperty("DestinationConvoID", out JsonElement destinationConvoIDElement)) {
                                             int destinationConvoID = destinationConvoIDElement.GetInt32();
-                                            outgoingLinks[index]["DestinationConvoID"] = destinationConvoID;
+                                            outgoingLinkDict["DestinationConvoID"] = destinationConvoID;
                                         }
                                         if (outgoingLink.TryGetProperty("OriginDialogID", out JsonElement originDialogIDElement)) {
                                             int originDialogID = originDialogIDElement.GetInt32();
-                                            outgoingLinks[index]["OriginDialogID"] = originDialogID;
+                                            outgoingLinkDict["OriginDialogID"] = originDialogID;
                                         }
                                         if (outgoingLink.TryGetProperty("OriginConvoID", out JsonElement originConvoIDElement)) {
                                             int originConvoID = originConvoIDElement.GetInt32();
-                                            outgoingLinks[index]["OriginConvoID"] = originConvoID;
+                                            outgoingLinkDict["OriginConvoID"] = originConvoID;
                                         }
 
-                                        dialogueObjects.Add(new DialogueObject {
-                                            ID = dialogID,
-                                            IsGroup = isGroup,
-                                            OutgoingLinks = outgoingLinks,
-                                            DialogueTextDefault = dialogueText,
-                                            CatalanText = catLocaleText,
-                                            FrenchText = frLocaleText,
-                                            Actor = actor
-                                        });
-
-                                        index++;
+                                        outgoingLinks.Add(outgoingLinkDict);
                                     }
-                                    //THIS IS AN UNNECESSARY OPERATION AS IT IS OVERWRITTING conversationObjectsDB[conversationID] FOR EACH NEW dialogueObjects.  
-                                    //NEEDS TO BE PUT IN AN OUTER CLOSE TO DO THE OPERATION ONLY ONCE!!!!!!
-                                    // Add the list of dialogue rows to the dictionary
-                                    conversationObjectsDB[conversationID] = dialogueObjects;
+
+                                    dialogueObjects.Add(new DialogueObject {
+                                        ID = dialogID,
+                                        IsGroup = isGroup,
+                                        OutgoingLinks = outgoingLinks,
+                                        DialogueTextDefault = dialogueText,
+                                        CatalanText = catLocaleText,
+                                        FrenchText = frLocaleText,
+                                        Actor = actor
+                                    });
 
                                 }
+                                //THIS IS AN UNNECESSARY OPERATION AS IT IS OVERWRITTING conversationObjectsDB[conversationID] FOR EACH NEW dialogueObjects.  
+                                //NEEDS TO BE PUT IN AN OUTER CLOSE TO DO THE OPERATION ONLY ONCE!!!!!!
+                                // Add the list of dialogue rows to the dictionary
+                                conversationObjectsDB[conversationID] = dialogueObjects;
+
                             }
                         }
-
-
                     }
                 }
             }
+
         } catch (JsonException e) {
             GD.PrintErr("Error parsing JSON data: " + e.Message);
         }

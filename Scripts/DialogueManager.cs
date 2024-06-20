@@ -46,7 +46,7 @@ public partial class DialogueManager : Node {
     public void OnStartButtonPressed() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
         currentDialogueObject = GetDialogueObject(currentConversationID, currentDialogueID);
-        DisplayDialogueOrPlayerChoices(currentDialogueObject);
+        DisplayDialogueOrPlayerChoice(currentDialogueObject);
     }
 
     private DialogueObject GetDialogueObject(int currentConversationID, int currentDialogueObjectID) {
@@ -71,53 +71,6 @@ public partial class DialogueManager : Node {
             DisplayPlayerChoices();
         }
     }
-
-
-    //     public void DisplayDialogueOrPlayerChoices(DialogueObject dialogObj) {
-    //     // Create a set to store unique "DestinationDialogID" values
-    //     List<int> destinationDialogIDs = new();
-    //     // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
-    //     foreach (Dictionary<string, int> dict in currentDialogueObject.OutgoingLinks) {
-    //         if (dict.ContainsKey("DestinationDialogID")) {
-    //             destinationDialogIDs.Add(dict["DestinationDialogID"]);
-    //         }
-    //     }
-    //     // Check if the set contains only one unique "DestinationDialogID" value && that the Actor is NOT the player 
-    //     // && the dialogue is not a Group (groups are empty and only contain multiple DestinationIDs that are player choices)
-    //     if (destinationDialogIDs.Count == 1 && dialogObj.Actor != "1" && dialogObj.IsGroup == "false")
-    //         DisplayDialogue(currentDialogueObject);
-
-    //     else if (destinationDialogIDs.Count == 1 && dialogObj.Actor == "1" && dialogObj.IsGroup == "false") {
-    //         AddPlayerChoicesToList(dialogObj.ID, dialogObj);
-    //         DisplayPlayerChoices();
-    //     }
-    //if the dialogObect has multiple destinatioonIDs and it´s a Group, then this are multiple player choices
-    // else if (destinationDialogIDs.Count >= 1 && currentDialogueObject.IsGroup == "true") {
-    //     currentDialogueObject.IsGroupParent = true;
-    //     foreach (int destinationDialogID in destinationDialogIDs) {
-    //         DialogueObject dialogObject = GetDialogueObject(currentDialogueObject.DestinationConvoID, destinationDialogID);
-    //         dialogObject.IsGroupChild = true;
-    //         AddPlayerChoicesToList(destinationDialogIDs, dialogObject);
-    //     }
-    //     DisplayPlayerChoices();
-    // }
-
-    // //if the node is a NoGroupParent, meaning that it is not a GROUP node but it has branching childs, 
-    // //tag it as NoGroupParent and do the same for the children as NoGroupChild
-    // //NoGroupChild are exclusive, meaning that at the exact moment that a  NoGroup child player choice
-    // // is clicked by the user, any other child at the same level must be removed from the PlayerChoicesList
-    // //and those subpaths cannot be traversed anymore unless the player starts a new game. 
-    // // the dialogObj.Actor != 1 is to ensure that the player answers are triggered by the narrator
-    // else if (destinationDialogIDs.Count > 1 && dialogObj.Actor != "1" && dialogObj.IsGroup == "false") {
-    //     dialogObj.IsNoGroupParent = true;
-    //     foreach (int destinationDialogID in destinationDialogIDs) {
-    //         DialogueObject dialogObject = GetDialogueObject(dialogObj.DestinationConvoID, destinationDialogID);
-    //         dialogObject.IsNoGroupChild = true;
-    //         AddPlayerChoicesToList(destinationDialogIDs, dialogObj);
-    //     }
-    //     DisplayPlayerChoices();
-    // }
-    // }
 
     public void DisplayDialogue(DialogueObject currentDialogueObject) {
         if (isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
@@ -199,85 +152,90 @@ public partial class DialogueManager : Node {
         playerChoicesList.Remove(dialogObj);
     }
 
-    public override void _UnhandledInput(InputEvent @event) {
+    public void OnDialogueBoxUIPressed() {
 
         DialogueObject nextDialogObject = new();
-
         List<int> destinationDialogIDs = new();
+
+        if (!isDialogueBeingPrinted) {
+            dialogueBoxUI.dialogueLineLabel.Text = "";
+        } else DisplayDialogueSuddenly();
+
         // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
         foreach (Dictionary<string, int> dict in currentDialogueObject.OutgoingLinks) {
             if (dict.ContainsKey("DestinationDialogID")) {
                 destinationDialogIDs.Add(dict["DestinationDialogID"]);
             }
         }
-        if (@event.IsActionPressed("advance_dialogue")) {
-            if (!isDialogueBeingPrinted) {
-                dialogueBoxUI.dialogueLineLabel.Text = "";
-            } else DisplayDialogueSuddenly();
 
-            //always that the user clicks on a player choice, we know it is always Actor = "1" and that must be stored in the PlayerCHoicesList
-            //so as it has already been displayed and now we move on to the next dialogue or choices to show, let's remove it first so it's not displayed again
-            //when player choices are displayed again 
-            if (currentDialogueObject.Actor == "1") {
-                RemoveFromPlayerChoicesToList(currentDialogueObject);
-            }
+        //here we get the nextDialogueObject to display, but we still don't know if it's a Narrator, single Player choice, Group Node or No Group node
+        if (destinationDialogIDs.Count == 1) {
+            // Get the only DestinationDialogID from the OutgoingLinks
+            int destinationDialogID = currentDialogueObject.OutgoingLinks.First(dict => dict.ContainsKey("DestinationDialogID"))["DestinationDialogID"];
+            nextDialogObject = GetDialogueObject(currentDialogueObject.DestinationConvoID, destinationDialogID);
+        }
 
-            if (destinationDialogIDs.Count == 1) {
-                // Get the only DestinationDialogID from the OutgoingLinks
-                int destinationDialogID = currentDialogueObject.OutgoingLinks.First(dict => dict.ContainsKey("DestinationDialogID"))["DestinationDialogID"];
-                nextDialogObject = GetDialogueObject(currentDialogueObject.DestinationConvoID, destinationDialogID);
-                //DisplayDialogueOrPlayerChoice(nextDialogObject);
-            }
+        //it's a Group Node?
+        if (nextDialogObject.IsGroup == true) {
+            AddGroupPlayerChoicesToList(nextDialogObject);
+            DisplayPlayerChoices();
+        }
 
-            if (nextDialogObject.IsGroup == true) {
-                List<int> nextDestinationDialogIDs = new();
-                // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
-                foreach (Dictionary<string, int> dict in nextDialogObject.OutgoingLinks) {
-                    if (dict.ContainsKey("DestinationDialogID")) {
-                        nextDestinationDialogIDs.Add(dict["DestinationDialogID"]);
-                    }
-                }
-                foreach (int destinationDialogID in destinationDialogIDs) {
-                    DialogueObject dialogObject = GetDialogueObject(currentDialogueObject.DestinationConvoID, destinationDialogID);
-                    dialogObject.IsGroupChild = true;
-                    AddPlayerChoicesToList(destinationDialogIDs, dialogObject);
-                }
-                
-                DisplayPlayerChoices();
-            }
-
-            //if the dialogObect has multiple destinatioonIDs and it´s a Group, then this are multiple player choices
-            if (destinationDialogIDs.Count >= 1 && currentDialogueObject.IsGroup == true) {
-                currentDialogueObject.IsGroupParent = true;
-                foreach (int destinationDialogID in destinationDialogIDs) {
-                    DialogueObject dialogObject = GetDialogueObject(currentDialogueObject.DestinationConvoID, destinationDialogID);
-                    dialogObject.IsGroupChild = true;
-                    AddPlayerChoicesToList(destinationDialogIDs, dialogObject);
-                }
-                DisplayPlayerChoices();
-            }
-
-            //if the node is a NoGroupParent, meaning that it is not a GROUP node but it has branching childs, 
-            //tag it as NoGroupParent and do the same for the children as NoGroupChild
-            //NoGroupChild are exclusive, meaning that at the exact moment that a  NoGroup child player choice
-            // is clicked by the user, any other child at the same level must be removed from the PlayerChoicesList
-            //and those subpaths cannot be traversed anymore unless the player starts a new game. 
-            // the dialogObj.Actor != 1 is to ensure that the player answers are triggered by the narrator
-            else if (destinationDialogIDs.Count > 1 && dialogObj.Actor != "1" && dialogObj.IsGroup == "false") {
-                dialogObj.IsNoGroupParent = true;
-                foreach (int destinationDialogID in destinationDialogIDs) {
-                    DialogueObject dialogObject = GetDialogueObject(dialogObj.DestinationConvoID, destinationDialogID);
-                    dialogObject.IsNoGroupChild = true;
-                    AddPlayerChoicesToList(destinationDialogIDs, dialogObj);
-                }
-                DisplayPlayerChoices();
-            }
-
-
-
-
+        //if the node is a NoGroupParent, meaning that it is not a GROUP node but it has branching childs, 
+        //tag it as NoGroupParent and do the same for the children as NoGroupChild
+        //NoGroupChild are exclusive, meaning that at the exact moment that a  NoGroup child player choice
+        // is clicked by the user, any other child at the same level must be removed from the PlayerChoicesList
+        //and those subpaths cannot be traversed anymore unless the player starts a new game. 
+        // the dialogObj.Actor != 1 is to ensure that the player answers are triggered by the narrator
+        else if (destinationDialogIDs.Count > 1 && nextDialogObject.Actor != "1" && nextDialogObject.IsGroup == false) {
+            AddNoGroupPlayerChoicesToList(nextDialogObject);
+            DisplayPlayerChoices();
         }
     }
+
+    public void AddGroupPlayerChoicesToList(DialogueObject nextDialogueObject) {
+        List<int> nextDestinationDialogIDs = new();
+        nextDialogueObject.IsGroupParent = true;
+        // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
+        foreach (Dictionary<string, int> dict in nextDialogueObject.OutgoingLinks) {
+            if (dict.ContainsKey("DestinationDialogID")) {
+                nextDestinationDialogIDs.Add(dict["DestinationDialogID"]);
+            }
+        }
+        foreach (int destinationDialogID in nextDestinationDialogIDs) {
+            DialogueObject dialogObject = GetDialogueObject(nextDialogueObject.DestinationConvoID, destinationDialogID);
+            dialogObject.IsGroupChild = true;
+            AddPlayerChoicesToList(nextDestinationDialogIDs, dialogObject);
+        }
+    }
+
+    public void AddNoGroupPlayerChoicesToList(DialogueObject nextDialogueObject) {
+        List<int> nextDestinationDialogIDs = new();
+        nextDialogueObject.IsNoGroupParent = true;
+        // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
+        foreach (Dictionary<string, int> dict in nextDialogueObject.OutgoingLinks) {
+            if (dict.ContainsKey("DestinationDialogID")) {
+                nextDestinationDialogIDs.Add(dict["DestinationDialogID"]);
+            }
+        }
+     
+        foreach (int destinationDialogID in nextDestinationDialogIDs) {
+            DialogueObject dialogObject = GetDialogueObject(nextDialogueObject.DestinationConvoID, destinationDialogID);
+            dialogObject.IsNoGroupChild = true;
+            AddPlayerChoicesToList(nextDestinationDialogIDs, dialogObject);
+        }
+    }
+
+    public void OnPlayerChoicePressed() {
+
+        //always that the user clicks on a player choice, we know it is always Actor = "1" and that must be stored in the PlayerCHoicesList
+        //so as it has already been displayed and now we move on to the next dialogue or choices to show, let's remove it first so it's not displayed again
+        //when player choices are displayed again 
+        if (currentDialogueObject.Actor == "1") {
+            RemoveFromPlayerChoicesToList(currentDialogueObject);
+        }
+    }
+
     public void DisplayDialogueSuddenly() {
         isDialogueBeingPrinted = false;
         dialogueBoxUI.StopLetterByLetterDisplay();

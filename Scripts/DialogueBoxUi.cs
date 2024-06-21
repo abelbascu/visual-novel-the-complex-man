@@ -13,7 +13,7 @@ public partial class DialogueBoxUI : MarginContainer {
     public Label dialogueLineLabel;
     Timer letterDisplayTimer;
 
-    public Action FinishedDisplaying;
+    public Action FinishedDisplayingDialogueLine;
     public Action DialogueBoxUIWasResized;
     //public Action LabelPressed;
 
@@ -83,7 +83,7 @@ public partial class DialogueBoxUI : MarginContainer {
         // Reset the letter index
         letterIndex = 0;
         // Invoke the FinishedDisplaying action
-        FinishedDisplaying?.Invoke();
+        FinishedDisplayingDialogueLine?.Invoke();
     }
 
     public void DisplayLetter() {
@@ -103,7 +103,7 @@ public partial class DialogueBoxUI : MarginContainer {
             GD.Print($"letterIndex = {letterIndex}\ndialogueLineToDisplay.Length = {dialogueLineToDisplay.Length} ");
         } else {
             GD.Print($"dialogueLineLabel.Size: {dialogueLineLabel.Size}");
-            FinishedDisplaying.Invoke();
+            FinishedDisplayingDialogueLine.Invoke();
             letterIndex = 0;
             return;
         }

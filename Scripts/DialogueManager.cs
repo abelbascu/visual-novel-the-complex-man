@@ -81,6 +81,11 @@ public partial class DialogueManager : Node {
             //before adding the dialogue text, we need to create the container box
             DisplayDialogueBoxUI();
         }
+        if (dialogueBoxUI != null) 
+            dialogueBoxUI.Show();
+        if(playerChoicesBoxUI != null)
+            playerChoicesBoxUI.Hide();
+    
         dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, languageCode);
     }
 
@@ -121,9 +126,12 @@ public partial class DialogueManager : Node {
             //before adding the dialogue text, we need to create the container box
             DisplayPlayerChoicesBoxUI();
         }
-
         foreach (var playerChoiceObject in playerChoicesList) {
             isPlayerChoiceBeingPrinted = true;
+            if (playerChoicesBoxUI != null) {
+                playerChoicesBoxUI.Show();
+                dialogueBoxUI.Hide();
+            }
             playerChoicesBoxUI.DisplayPlayerChoice(playerChoiceObject, languageCode);
         }
     }
@@ -210,7 +218,7 @@ public partial class DialogueManager : Node {
 
     public void OnPlayerButtonUIPressed(DialogueObject playerChoiceObject) {
         //we need to remove first the dialogObject on playerChoicesList with the same ID as playerChoiceObject.ID
-         playerChoicesList.RemoveAll(dialogObj => dialogObj.ID == playerChoiceObject.ID);
+        playerChoicesList.RemoveAll(dialogObj => dialogObj.ID == playerChoiceObject.ID);
 
         currentDialogueObject = playerChoiceObject;
         DialogueObject nextDialogObject = new();

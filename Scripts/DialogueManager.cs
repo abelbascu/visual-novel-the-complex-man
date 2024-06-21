@@ -94,6 +94,12 @@ public partial class DialogueManager : Node {
         AddPlayerChoicesToList(new[] { dialogID }, dialogObj);
     }
 
+    public void AddPlayerChoicesToList(DialogueObject dialogObject) {
+        playerChoicesList.Add(dialogObject);
+    }
+
+
+
 
     private void DisplayDialogueBoxUI() {
         //we add the dialogueUI to the scene and display it 
@@ -159,7 +165,10 @@ public partial class DialogueManager : Node {
 
         if (!isDialogueBeingPrinted) {
             dialogueBoxUI.dialogueLineLabel.Text = "";
-        } else DisplayDialogueSuddenly();
+        } else {
+            DisplayDialogueSuddenly();
+            return;
+        }
 
         // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
         foreach (Dictionary<string, int> dict in currentDialogueObject.OutgoingLinks) {
@@ -172,7 +181,9 @@ public partial class DialogueManager : Node {
         if (destinationDialogIDs.Count == 1) {
             // Get the only DestinationDialogID from the OutgoingLinks
             int destinationDialogID = currentDialogueObject.OutgoingLinks.First(dict => dict.ContainsKey("DestinationDialogID"))["DestinationDialogID"];
-            nextDialogObject = GetDialogueObject(currentDialogueObject.DestinationConvoID, destinationDialogID);
+            int destinationConvoID = currentDialogueObject.OutgoingLinks.First(dict => dict.ContainsKey("DestinationConvoID"))["DestinationConvoID"];
+            nextDialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
+            DisplayDialogueOrPlayerChoice(nextDialogObject);
         }
 
         //it's a Group Node?
@@ -194,35 +205,31 @@ public partial class DialogueManager : Node {
     }
 
     public void AddGroupPlayerChoicesToList(DialogueObject nextDialogueObject) {
-        List<int> nextDestinationDialogIDs = new();
+
         nextDialogueObject.IsGroupParent = true;
+
         // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
         foreach (Dictionary<string, int> dict in nextDialogueObject.OutgoingLinks) {
-            if (dict.ContainsKey("DestinationDialogID")) {
-                nextDestinationDialogIDs.Add(dict["DestinationDialogID"]);
+            if (dict.TryGetValue("DestinationDialogID", out int destinationDialogID) &&
+                dict.TryGetValue("DestinationConvoID", out int destinationConvoID)) {
+                DialogueObject dialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
+                dialogObject.IsGroupChild = true;
+                AddPlayerChoicesToList(dialogObject);
             }
-        }
-        foreach (int destinationDialogID in nextDestinationDialogIDs) {
-            DialogueObject dialogObject = GetDialogueObject(nextDialogueObject.DestinationConvoID, destinationDialogID);
-            dialogObject.IsGroupChild = true;
-            AddPlayerChoicesToList(nextDestinationDialogIDs, dialogObject);
         }
     }
 
     public void AddNoGroupPlayerChoicesToList(DialogueObject nextDialogueObject) {
-        List<int> nextDestinationDialogIDs = new();
+
         nextDialogueObject.IsNoGroupParent = true;
         // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
         foreach (Dictionary<string, int> dict in nextDialogueObject.OutgoingLinks) {
-            if (dict.ContainsKey("DestinationDialogID")) {
-                nextDestinationDialogIDs.Add(dict["DestinationDialogID"]);
+            if (dict.TryGetValue("DestinationDialogID", out int destinationDialogID) &&
+                dict.TryGetValue("DestinationConvoID", out int destinationConvoID)) {
+                DialogueObject dialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
+                dialogObject.IsNoGroupChild = true;
+                AddPlayerChoicesToList(dialogObject);
             }
-        }
-     
-        foreach (int destinationDialogID in nextDestinationDialogIDs) {
-            DialogueObject dialogObject = GetDialogueObject(nextDialogueObject.DestinationConvoID, destinationDialogID);
-            dialogObject.IsNoGroupChild = true;
-            AddPlayerChoicesToList(nextDestinationDialogIDs, dialogObject);
         }
     }
 

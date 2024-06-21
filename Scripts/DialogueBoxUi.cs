@@ -7,15 +7,15 @@ public partial class DialogueBoxUI : MarginContainer {
     private const float MAX_WIDTH = 800f;
     private string dialogueLineToDisplay = "";
     private int letterIndex = 0;
-    private float letterTime = 0.05f;
-    private float spaceTime = 0.06f;
-    private float punctuationTime = 0.002f;
+    private float letterTime = 0.00005f;
+    private float spaceTime = 0.00006f;
+    private float punctuationTime = 0.000002f;
     public Label dialogueLineLabel;
     Timer letterDisplayTimer;
 
     public Action FinishedDisplaying;
     public Action DialogueBoxUIWasResized;
-    public Action LabelPressed;
+    //public Action LabelPressed;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
@@ -27,26 +27,35 @@ public partial class DialogueBoxUI : MarginContainer {
         dialogueLineLabel.MouseFilter = Control.MouseFilterEnum.Stop;
         // Change cursor on hover
         dialogueLineLabel.MouseDefaultCursorShape = Control.CursorShape.PointingHand;
+        //dialogueLineLabel.GuiInput += OnLabelGuiInput;
 
-        LabelPressed += OnDialogueBoxUIPressed;
+        //LabelPressed += OnDialogueBoxUIPressed;
     }
 
-    public void OnDialogueBoxUIPressed() {
-        var dialogueManager = GetNode<DialogueManager>("/root/DialogueManager");
-        dialogueManager.OnDialogueBoxUIPressed();
-    }
+//     private void OnLabelGuiInput(InputEvent @event)
+// {
+//     if (@event is InputEventMouseButton mouseEvent &&
+//         mouseEvent.ButtonIndex == MouseButton.Left &&
+//         mouseEvent.Pressed)
+//     {
+//        LabelPressed.Invoke();
+//     }
+// }
 
-    public override void _GuiInput(InputEvent @event) {
-        if (@event is InputEventMouseButton mouseEvent &&
-            mouseEvent.ButtonIndex == MouseButton.Left &&
-            mouseEvent.Pressed) {
-            // Check if the click is within the bounds of the Label
-            if (dialogueLineLabel.GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
-                LabelPressed.Invoke();
-                GD.Print("Label area clicked!");
-            }
-        }
-    }
+// public override void _ExitTree()
+// {
+//     base._ExitTree();
+//     if (dialogueLineLabel != null)
+//     {
+//         dialogueLineLabel.GuiInput -= OnLabelGuiInput;
+//     }
+// }
+
+    // public void OnDialogueBoxUIPressed() {
+    //     var dialogueManager = GetNode<DialogueManager>("/root/DialogueManager");
+    //     dialogueManager.OnDialogueBoxUIPressed();
+    // }
+
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
         this.dialogueLineToDisplay = GetLocaleDialogue(dialogueObject, locale);

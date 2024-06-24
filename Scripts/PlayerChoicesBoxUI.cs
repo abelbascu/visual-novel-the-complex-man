@@ -33,4 +33,5 @@ public partial class PlayerChoicesBoxUI : VBoxContainer {
         };
         return localeCurrentDialogue;
     }
+
 }

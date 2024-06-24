@@ -19,6 +19,7 @@ public partial class DialogueManager : Node {
     //public static string LanguageLocale { get; set; } //set here the language, if language is not recognized it will default to what's defineat in Project Settings > Locale
     private DialogueBoxUI dialogueBoxUI; //the graphical rectangle container to display the text over
     private PlayerChoicesBoxUI playerChoicesBoxUI; //the graphical rectangle VBoxContainer to displayer the branching player choices.
+    private VBoxContainer dialogueChoicesMarginContainer;
     public DialogueObject currentDialogueObject { get; private set; }
     public bool isDialogueBeingPrinted = false; //we don't want to print a new dialogue is we are currently displaying another one
     public bool isPlayerChoiceBeingPrinted = false;
@@ -81,11 +82,11 @@ public partial class DialogueManager : Node {
             //before adding the dialogue text, we need to create the container box
             DisplayDialogueBoxUI();
         }
-        if (dialogueBoxUI != null) 
+        if (dialogueBoxUI != null)
             dialogueBoxUI.Show();
-        if(playerChoicesBoxUI != null)
+        if (playerChoicesBoxUI != null)
             playerChoicesBoxUI.Hide();
-    
+
         dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, languageCode);
     }
 
@@ -132,7 +133,26 @@ public partial class DialogueManager : Node {
                 playerChoicesBoxUI.Show();
                 dialogueBoxUI.Hide();
             }
-            playerChoicesBoxUI.DisplayPlayerChoice(playerChoiceObject, languageCode);
+
+            var existingButtons = dialogueChoicesMarginContainer.GetChildren()
+                .OfType<PlayerChoiceButton>()
+                .ToList();
+
+            // Check if a button with the same ID already exists
+            bool buttonExists = false;
+
+            foreach (var button in existingButtons) {
+                if (button.HasMatchingDialogueObject(playerChoiceObject)) {
+                    buttonExists = true;
+                    break;
+                }
+            }
+
+            // If the button doesn't exist, create and add it
+            if (!buttonExists) {
+                //I NEED TO CREATE THIS CODE - if(playerChoiceObject.ID is not found on any playerChoiceButton.ID inside dialogueChoicesContainer as a child, then we can add it and display it)
+                playerChoicesBoxUI.DisplayPlayerChoice(playerChoiceObject, languageCode);
+            }
         }
     }
 
@@ -147,10 +167,12 @@ public partial class DialogueManager : Node {
         // position dialogue box centered at the bottom
         Vector2 screenSize = GetTree().Root.Size;
         float xPosition = (screenSize.X - playerChoicesBoxUI.Size.X) / 3;
-        float yPosition = screenSize.Y - UI_BOTTOM_POSITION;
+        float yPosition = screenSize.Y - UI_BOTTOM_POSITION - 100 - 200;
         playerChoicesBoxUI.Position = new Vector2(xPosition, yPosition);
         //once all chars of the dialogue text are displayed in the container, we can show the next line.
         playerChoicesBoxUI.FinishedDisplayingPlayerChoice += OnTextBoxFinishedDisplayingPlayerChoices;
+
+        dialogueChoicesMarginContainer = playerChoicesBoxUI.GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
     }
 
     // TO DO TO DO TO DO TO DO
@@ -187,21 +209,27 @@ public partial class DialogueManager : Node {
         if (destinationDialogIDs.Count == 1) {
             var linkDict = currentDialogueObject.OutgoingLinks.FirstOrDefault(dict =>
                 dict.ContainsKey("DestinationDialogID") && dict.ContainsKey("DestinationConvoID"));
+                
 
             if (linkDict != null) {
                 int destinationDialogID = linkDict["DestinationDialogID"];
                 int destinationConvoID = linkDict["DestinationConvoID"];
                 nextDialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
+                currentConversationID = destinationConvoID;               
+            }
+
+            if (nextDialogObject.IsGroup == true) {
+                nextDialogObject.IsGroupParent = true;
+                AddGroupPlayerChoicesToList(nextDialogObject);
+                DisplayPlayerChoices();
+            } else {
                 DisplayDialogueOrPlayerChoice(nextDialogObject);
                 currentDialogueObject = nextDialogObject;
+                
             }
         }
         //it's a Group Node?
-        if (nextDialogObject.IsGroup == true) {
-            nextDialogObject.IsGroupParent = true;
-            AddGroupPlayerChoicesToList(nextDialogObject);
-            DisplayPlayerChoices();
-        }
+
 
         //if the node is a NoGroupParent, meaning that it is not a GROUP node but it has branching childs, 
         //tag it as NoGroupParent and do the same for the children as NoGroupChild
@@ -219,6 +247,7 @@ public partial class DialogueManager : Node {
     public void OnPlayerButtonUIPressed(DialogueObject playerChoiceObject) {
         //we need to remove first the dialogObject on playerChoicesList with the same ID as playerChoiceObject.ID
         playerChoicesList.RemoveAll(dialogObj => dialogObj.ID == playerChoiceObject.ID);
+
 
         currentDialogueObject = playerChoiceObject;
         DialogueObject nextDialogObject = new();

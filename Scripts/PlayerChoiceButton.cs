@@ -28,4 +28,9 @@ public partial class PlayerChoiceButton : Button {
             QueueFree();
         }
     }
+
+        public bool HasMatchingDialogueObject(DialogueObject otherDialogueObject)
+    {
+        return this.dialogueObject.ID == otherDialogueObject.ID;
+    }
 }

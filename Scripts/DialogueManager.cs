@@ -344,36 +344,21 @@ public partial class DialogueManager : Node {
 
     public void RemoveAllNoGroupChildrenFromPlayerChoicesList(DialogueObject playerChoiceObject) {
 
-        int? originID = null;
+        List<DialogueObject> objectsToRemove = new List<DialogueObject>();
 
-        // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
-        foreach (Dictionary<string, int> dict in playerChoiceObject.OutgoingLinks) {
-            if (dict.ContainsKey("OriginDialogID"))
-                originID = dict["OriginDialogID"];
-            break;
+        if (playerChoiceObject.NoGroupParentID.HasValue) {
+            foreach (DialogueObject dialogObj in playerChoicesList) {
+                if (dialogObj.NoGroupParentID == playerChoiceObject.NoGroupParentID)
+                    objectsToRemove.Add(dialogObj);
+            }
         }
 
+        foreach (var obj in objectsToRemove) {
+            playerChoicesList.Remove(obj);
 
-        if (originID.HasValue) {
-            List<DialogueObject> objectsToRemove = new List<DialogueObject>();
-
-            foreach (DialogueObject dialogObj in playerChoicesList) {
-                foreach (Dictionary<string, int> dict in dialogObj.OutgoingLinks) {
-                    if (dict.ContainsKey("OriginDialogID")) {
-                        if (dict["OriginDialogID"] == originID.Value) {
-                            objectsToRemove.Add(dialogObj);
-                            break;  // No need to check other links for this dialogObj
-                        }
-                    }
-                }
-            }
-
-            foreach (var obj in objectsToRemove) {
-                playerChoicesList.Remove(obj);
-
-            }
         }
     }
+
 
 
     public void RemoveAllNoGroupChildrenFromPlayerChoicesBoxUI(DialogueObject playerChoiceObject) {

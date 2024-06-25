@@ -16,7 +16,7 @@ public class DialogueObject
     public bool IsGroupChild = false;
     public bool IsNoGroupParent = false; 
     public bool IsNoGroupChild = false;
-    public int? NoGroupParent = null;
+    public int? NoGroupParentID = null;
     
 }
 

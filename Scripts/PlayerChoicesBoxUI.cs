@@ -64,15 +64,8 @@ public partial class PlayerChoicesBoxUI : VBoxContainer {
 
         foreach (PlayerChoiceButton child in dialogueChoicesContainer.GetChildren()) {
             if (child is PlayerChoiceButton button) {
-                foreach (Dictionary<string, int> dict in child.dialogueObject.OutgoingLinks) {
-                    if (dict.ContainsKey("OriginDialogID")) {
-                        if (dict["OriginDialogID"] == dialogueObject.ID) {
-                            buttonsToRemove.Add(child);
-                            break;  // No need to check other links for this dialogObj
-                        }
-                    }
-                }
-
+                if (child.dialogueObject.NoGroupParentID == dialogueObject.NoGroupParentID)
+                    buttonsToRemove.Add(child);
             }
         }
 

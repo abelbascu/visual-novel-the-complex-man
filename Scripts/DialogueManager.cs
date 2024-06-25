@@ -220,7 +220,12 @@ public partial class DialogueManager : Node {
                 int destinationConvoID = linkDict["DestinationConvoID"];
                 nextDialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
                 //DO WE NEED TO PUT THE LINE BELOW IN MORE PLACES TO GET THE CONVOID RIGHT IN ALL INSTANCES??
-                currentConversationID = destinationConvoID;
+                if (currentConversationID != destinationConvoID) {
+                    currentConversationID = destinationConvoID;
+                    playerChoicesList.Clear();
+                    playerChoicesBoxUI.RemoveAllPlayerChoiceButtons();
+                }
+
             }
 
             if (nextDialogObject.IsGroup == true) {
@@ -233,8 +238,6 @@ public partial class DialogueManager : Node {
 
             }
         }
-        //it's a Group Node?
-
 
         //if the node is a NoGroupParent, meaning that it is not a GROUP node but it has branching childs, 
         //tag it as NoGroupParent and do the same for the children as NoGroupChild
@@ -312,6 +315,12 @@ public partial class DialogueManager : Node {
                 int destinationDialogID = linkDict["DestinationDialogID"];
                 int destinationConvoID = linkDict["DestinationConvoID"];
                 nextDialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
+                if (currentConversationID != destinationConvoID) {
+                    currentConversationID = destinationConvoID;
+                    playerChoicesList.Clear();
+                    playerChoicesBoxUI.RemoveAllPlayerChoiceButtons();
+                }
+
 
                 if (nextDialogObject.IsGroup == false) {
                     DisplayDialogueOrPlayerChoice(nextDialogObject);
@@ -358,8 +367,6 @@ public partial class DialogueManager : Node {
 
         }
     }
-
-
 
     public void RemoveAllNoGroupChildrenFromPlayerChoicesBoxUI(DialogueObject playerChoiceObject) {
 

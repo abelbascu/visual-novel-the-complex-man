@@ -74,6 +74,15 @@ public partial class PlayerChoicesBoxUI : VBoxContainer {
             button.QueueFree();
         }
     }
+
+    public void RemoveAllPlayerChoiceButtons() {
+        foreach (PlayerChoiceButton child in dialogueChoicesContainer.GetChildren()) {
+            if (child is PlayerChoiceButton button)
+                dialogueChoicesContainer.RemoveChild(child);
+        }
+    }
+
 }
+
 
 

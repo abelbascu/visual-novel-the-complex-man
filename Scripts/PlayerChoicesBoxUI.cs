@@ -16,12 +16,23 @@ public partial class PlayerChoicesBoxUI : VBoxContainer {
         this.playerChoiceToDisplay = GetLocalePlayerChoice(playerChoiceObject, languageCode);
         //when we create the button, we also pass the dialogueObject in the constructor 
         //we'll need it when the player clicks the button to show a next dialogue or player choices.
-        PlayerChoiceButton dialogueChoice = new (playerChoiceObject);
-        dialogueChoicesContainer.AddChild(dialogueChoice);
-        dialogueChoice.Text = "";
-        dialogueChoice.Text = playerChoiceToDisplay;
-        FinishedDisplayingPlayerChoice.Invoke();
 
+        // Check if a button with this DialogueObject already exists
+        PlayerChoiceButton existingButton = FindExistingButton(playerChoiceObject);
+
+        if (existingButton != null) {
+            // Move existing button to the top
+            dialogueChoicesContainer.MoveChild(existingButton, 0);
+            
+        } else {
+            // Create new button and add it at the top
+            PlayerChoiceButton dialogueChoice = new(playerChoiceObject);
+            dialogueChoicesContainer.AddChild(dialogueChoice);
+            dialogueChoicesContainer.MoveChild(dialogueChoice, 0);
+            dialogueChoice.Text = playerChoiceToDisplay;
+        }
+
+        FinishedDisplayingPlayerChoice.Invoke();
     }
 
     public string GetLocalePlayerChoice(DialogueObject playerChoiceObj, string locale) {
@@ -32,6 +43,15 @@ public partial class PlayerChoicesBoxUI : VBoxContainer {
             _ => playerChoiceObj.DialogueTextDefault  // Default to the default text field
         };
         return localeCurrentDialogue;
+    }
+
+    private PlayerChoiceButton FindExistingButton(DialogueObject dialogueObject) {
+        foreach (var child in dialogueChoicesContainer.GetChildren()) {
+            if (child is PlayerChoiceButton button && button.HasMatchingDialogueObject(dialogueObject)) {
+                return button;
+            }
+        }
+        return null;
     }
 
 }

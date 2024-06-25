@@ -92,8 +92,12 @@ public partial class DialogueManager : Node {
 
     //IEnumerable<int> so we can pass a list or a single int when there is only one player choice to add to the playerChoicesList
     public void AddPlayerChoicesToList(IEnumerable<int> destinationDialogIDs, DialogueObject dialogObj) {
-        foreach (int dialogID in destinationDialogIDs)
-            playerChoicesList.Add(GetDialogueObject(currentConversationID, dialogID));
+
+        List<int> destinationIDsList = destinationDialogIDs.ToList();
+
+        for (int i = destinationDialogIDs.Count() - 1; i >= 0; i--)
+            playerChoicesList.Insert(0, GetDialogueObject(currentConversationID, destinationIDsList[i]));
+
     }
 
     //overload method when we only have one single player choice to add to the PlayerChoicesList
@@ -102,7 +106,7 @@ public partial class DialogueManager : Node {
     }
 
     public void AddPlayerChoicesToList(DialogueObject dialogObject) {
-        playerChoicesList.Add(dialogObject);
+        playerChoicesList.Insert(0, dialogObject);
     }
 
     private void DisplayDialogueBoxUI() {
@@ -144,6 +148,7 @@ public partial class DialogueManager : Node {
             foreach (var button in existingButtons) {
                 if (button.HasMatchingDialogueObject(playerChoiceObject)) {
                     buttonExists = true;
+                    isPlayerChoiceBeingPrinted = false;
                     break;
                 }
             }
@@ -209,13 +214,14 @@ public partial class DialogueManager : Node {
         if (destinationDialogIDs.Count == 1) {
             var linkDict = currentDialogueObject.OutgoingLinks.FirstOrDefault(dict =>
                 dict.ContainsKey("DestinationDialogID") && dict.ContainsKey("DestinationConvoID"));
-                
+
 
             if (linkDict != null) {
                 int destinationDialogID = linkDict["DestinationDialogID"];
                 int destinationConvoID = linkDict["DestinationConvoID"];
                 nextDialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
-                currentConversationID = destinationConvoID;               
+                //DO WE NEED TO PUT THE LINE BELOW IN MORE PLACES TO GET THE CONVOID RIGHT IN ALL INSTANCES??
+                currentConversationID = destinationConvoID;
             }
 
             if (nextDialogObject.IsGroup == true) {
@@ -225,7 +231,7 @@ public partial class DialogueManager : Node {
             } else {
                 DisplayDialogueOrPlayerChoice(nextDialogObject);
                 currentDialogueObject = nextDialogObject;
-                
+
             }
         }
         //it's a Group Node?
@@ -237,9 +243,9 @@ public partial class DialogueManager : Node {
         // is clicked by the user, any other child at the same level must be removed from the PlayerChoicesList
         //and those subpaths cannot be traversed anymore unless the player starts a new game. 
         // the dialogObj.Actor != 1 is to ensure that the player answers are triggered by the narrator
-        else if (destinationDialogIDs.Count > 1 && nextDialogObject.Actor != "1" && nextDialogObject.IsGroup == false) {
-            nextDialogObject.IsNoGroupParent = true;
-            AddNoGroupPlayerChoicesToList(nextDialogObject);
+        else if (destinationDialogIDs.Count > 1 && currentDialogueObject.IsGroup == false) {
+            //nextDialogObject.IsNoGroupParent = true;
+            AddNoGroupPlayerChoicesToList(currentDialogueObject);
             DisplayPlayerChoices();
         }
     }
@@ -288,9 +294,9 @@ public partial class DialogueManager : Node {
         // is clicked by the user, any other child at the same level must be removed from the PlayerChoicesList
         //and those subpaths cannot be traversed anymore unless the player starts a new game. 
         // the dialogObj.Actor != 1 is to ensure that the player answers are triggered by the narrator
-        else if (destinationDialogIDs.Count > 1 && nextDialogObject.Actor != "1" && nextDialogObject.IsGroup == false) {
+        else if (destinationDialogIDs.Count > 1 && currentDialogueObject.IsGroup == false) {
             nextDialogObject.IsNoGroupParent = true;
-            AddNoGroupPlayerChoicesToList(nextDialogObject);
+            AddNoGroupPlayerChoicesToList(currentDialogueObject);
             DisplayPlayerChoices();
         }
     }
@@ -308,10 +314,10 @@ public partial class DialogueManager : Node {
         }
     }
 
-    public void AddNoGroupPlayerChoicesToList(DialogueObject nextDialogueObject) {
-        nextDialogueObject.IsNoGroupParent = true;
+    public void AddNoGroupPlayerChoicesToList(DialogueObject currentDialogueObject) {
+        currentDialogueObject.IsNoGroupParent = true;
         // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
-        foreach (Dictionary<string, int> dict in nextDialogueObject.OutgoingLinks) {
+        foreach (Dictionary<string, int> dict in currentDialogueObject.OutgoingLinks) {
             if (dict.TryGetValue("DestinationDialogID", out int destinationDialogID) &&
                 dict.TryGetValue("DestinationConvoID", out int destinationConvoID)) {
                 DialogueObject dialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);

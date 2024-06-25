@@ -215,7 +215,6 @@ public partial class DialogueManager : Node {
             var linkDict = currentDialogueObject.OutgoingLinks.FirstOrDefault(dict =>
                 dict.ContainsKey("DestinationDialogID") && dict.ContainsKey("DestinationConvoID"));
 
-
             if (linkDict != null) {
                 int destinationDialogID = linkDict["DestinationDialogID"];
                 int destinationConvoID = linkDict["DestinationConvoID"];
@@ -250,10 +249,42 @@ public partial class DialogueManager : Node {
         }
     }
 
+
+    public void AddGroupPlayerChoicesToList(DialogueObject nextDialogueObject) {
+        nextDialogueObject.IsGroupParent = true;
+        // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
+        foreach (Dictionary<string, int> dict in nextDialogueObject.OutgoingLinks) {
+            if (dict.TryGetValue("DestinationDialogID", out int destinationDialogID) &&
+                dict.TryGetValue("DestinationConvoID", out int destinationConvoID)) {
+                DialogueObject dialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
+                dialogObject.IsGroupChild = true;
+                AddPlayerChoicesToList(dialogObject);
+            }
+        }
+    }
+
+    public void AddNoGroupPlayerChoicesToList(DialogueObject currentDialogueObject) {
+        currentDialogueObject.IsNoGroupParent = true;
+        // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
+        foreach (Dictionary<string, int> dict in currentDialogueObject.OutgoingLinks) {
+            if (dict.TryGetValue("DestinationDialogID", out int destinationDialogID) &&
+                dict.TryGetValue("DestinationConvoID", out int destinationConvoID)) {
+                DialogueObject dialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
+                dialogObject.IsNoGroupChild = true;
+
+                //we'll need the parent ID to remove any NoGroup subpaths 
+                //if the button with this dialogObject is pressed by the player
+                dialogObject.NoGroupParentID = dict["OriginDialogID"];
+
+                AddPlayerChoicesToList(dialogObject);
+            }
+        }
+    }
+
+
     public void OnPlayerButtonUIPressed(DialogueObject playerChoiceObject) {
         //we need to remove first the dialogObject on playerChoicesList with the same ID as playerChoiceObject.ID
         playerChoicesList.RemoveAll(dialogObj => dialogObj.ID == playerChoiceObject.ID);
-
 
         currentDialogueObject = playerChoiceObject;
         DialogueObject nextDialogObject = new();
@@ -267,6 +298,10 @@ public partial class DialogueManager : Node {
             if (dict.ContainsKey("DestinationDialogID")) {
                 destinationDialogIDs.Add(dict["DestinationDialogID"]);
             }
+        }
+
+        if (playerChoiceObject.IsNoGroupChild == true) {
+            RemoveAllNoGroupChildrenFromSameNoGroupParent(playerChoiceObject);
         }
         //here we get the nextDialogueObject to display, but we still don't know if it's a Narrator, single Player choice, Group Node or No Group node
         if (destinationDialogIDs.Count == 1) {
@@ -301,30 +336,49 @@ public partial class DialogueManager : Node {
         }
     }
 
-    public void AddGroupPlayerChoicesToList(DialogueObject nextDialogueObject) {
-        nextDialogueObject.IsGroupParent = true;
+    public void RemoveAllNoGroupChildrenFromSameNoGroupParent(DialogueObject playerChoiceObject) {
+
+        RemoveAllNoGroupChildrenFromPlayerChoicesList(playerChoiceObject);
+        RemoveAllNoGroupChildrenFromPlayerChoicesBoxUI(playerChoiceObject);
+    }
+
+    public void RemoveAllNoGroupChildrenFromPlayerChoicesList(DialogueObject playerChoiceObject) {
+
+        int? originID = null;
+
         // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
-        foreach (Dictionary<string, int> dict in nextDialogueObject.OutgoingLinks) {
-            if (dict.TryGetValue("DestinationDialogID", out int destinationDialogID) &&
-                dict.TryGetValue("DestinationConvoID", out int destinationConvoID)) {
-                DialogueObject dialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
-                dialogObject.IsGroupChild = true;
-                AddPlayerChoicesToList(dialogObject);
+        foreach (Dictionary<string, int> dict in playerChoiceObject.OutgoingLinks) {
+            if (dict.ContainsKey("OriginDialogID"))
+                originID = dict["OriginDialogID"];
+            break;
+        }
+
+
+        if (originID.HasValue) {
+            List<DialogueObject> objectsToRemove = new List<DialogueObject>();
+
+            foreach (DialogueObject dialogObj in playerChoicesList) {
+                foreach (Dictionary<string, int> dict in dialogObj.OutgoingLinks) {
+                    if (dict.ContainsKey("OriginDialogID")) {
+                        if (dict["OriginDialogID"] == originID.Value) {
+                            objectsToRemove.Add(dialogObj);
+                            break;  // No need to check other links for this dialogObj
+                        }
+                    }
+                }
+            }
+
+            foreach (var obj in objectsToRemove) {
+                playerChoicesList.Remove(obj);
+
             }
         }
     }
 
-    public void AddNoGroupPlayerChoicesToList(DialogueObject currentDialogueObject) {
-        currentDialogueObject.IsNoGroupParent = true;
-        // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
-        foreach (Dictionary<string, int> dict in currentDialogueObject.OutgoingLinks) {
-            if (dict.TryGetValue("DestinationDialogID", out int destinationDialogID) &&
-                dict.TryGetValue("DestinationConvoID", out int destinationConvoID)) {
-                DialogueObject dialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
-                dialogObject.IsNoGroupChild = true;
-                AddPlayerChoicesToList(dialogObject);
-            }
-        }
+
+    public void RemoveAllNoGroupChildrenFromPlayerChoicesBoxUI(DialogueObject playerChoiceObject) {
+
+        playerChoicesBoxUI.RewmoveAllNoGroupChildrenWithSameOriginID(playerChoiceObject);
     }
 
     public void OnPlayerChoicePressed() {

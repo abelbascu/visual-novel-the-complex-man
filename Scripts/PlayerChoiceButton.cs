@@ -2,7 +2,7 @@ using Godot;
 
 public partial class PlayerChoiceButton : Button {
 
-    private DialogueObject dialogueObject;
+    public DialogueObject dialogueObject {get; private set;}
     private VBoxContainer parentContainer;
 
     public override void _Ready() {

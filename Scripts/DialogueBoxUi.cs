@@ -32,30 +32,6 @@ public partial class DialogueBoxUI : MarginContainer {
         //LabelPressed += OnDialogueBoxUIPressed;
     }
 
-//     private void OnLabelGuiInput(InputEvent @event)
-// {
-//     if (@event is InputEventMouseButton mouseEvent &&
-//         mouseEvent.ButtonIndex == MouseButton.Left &&
-//         mouseEvent.Pressed)
-//     {
-//        LabelPressed.Invoke();
-//     }
-// }
-
-// public override void _ExitTree()
-// {
-//     base._ExitTree();
-//     if (dialogueLineLabel != null)
-//     {
-//         dialogueLineLabel.GuiInput -= OnLabelGuiInput;
-//     }
-// }
-
-    // public void OnDialogueBoxUIPressed() {
-    //     var dialogueManager = GetNode<DialogueManager>("/root/DialogueManager");
-    //     dialogueManager.OnDialogueBoxUIPressed();
-    // }
-
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
         this.dialogueLineToDisplay = GetLocaleDialogue(dialogueObject, locale);

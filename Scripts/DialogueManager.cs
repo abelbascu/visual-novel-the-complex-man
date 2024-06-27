@@ -10,7 +10,7 @@ public partial class DialogueManager : Node {
     //-------------------------------------------------------------------config variables---------------------------------------------------------------------------------
     public static string languageCode = "en";
     [Export] public int currentConversationID = 2; //set here the conversation you want to load. Conversations in Chatmapper are what we could call chapters.
-    [Export] public int currentDialogueID = 157; //set here the starting dialogue of the conversation
+    [Export] public int currentDialogueID = 7; //set here the starting dialogue of the conversation
     private const int UI_BOTTOM_POSITION = 200; //starting at the bottom of the screen, we subtract this value to position the Y screen position of the dilaogue box  
 
     //-----------------------------------------------------------------dependency variables------------------------------------------------------------------------------
@@ -131,7 +131,8 @@ public partial class DialogueManager : Node {
                 //ensure the container is visible
                 playerChoicesBoxUI.Show();
                 //let's hide the dialogue box, that's used to displaye narrator/NPC texts, not the player's
-                dialogueBoxUI.Hide();
+                if (dialogueBoxUI != null)
+                    dialogueBoxUI.Hide();
             }
 
             var existingButtons = dialogueChoicesMarginContainer.GetChildren()
@@ -164,7 +165,7 @@ public partial class DialogueManager : Node {
         // position dialogue box centered at the bottom
         Vector2 screenSize = GetTree().Root.Size;
         float xPosition = (screenSize.X - playerChoicesBoxUI.Size.X) / 3;
-        float yPosition = screenSize.Y - UI_BOTTOM_POSITION - 100 - 200;
+        float yPosition = screenSize.Y - UI_BOTTOM_POSITION - 50;
         playerChoicesBoxUI.Position = new Vector2(xPosition, yPosition);
         //once all chars of the dialogue text are displayed in the container, we can show the next line.
         playerChoicesBoxUI.FinishedDisplayingPlayerChoice += OnTextBoxFinishedDisplayingPlayerChoices;
@@ -196,7 +197,7 @@ public partial class DialogueManager : Node {
             DisplayDialogueSuddenly();
             return;
         }
-       
+
         //if we reached a dead end path, show again the playerChoices so the player can choose another path
         //dead end paths maybe be there to provide contexts, make jokes, give hints, etc.
         if (currentDialogueObject.OutgoingLinks.Count == 0) {
@@ -217,17 +218,16 @@ public partial class DialogueManager : Node {
 
             if (linkDict != null) {
                 int destinationDialogID = linkDict["DestinationDialogID"];
-                int destinationConvoID = linkDict["DestinationConvoID"]; 
-                if(destinationDialogID == 0)
-                        destinationDialogID = 1;
+                int destinationConvoID = linkDict["DestinationConvoID"];
+                if (destinationDialogID == 0)
+                    destinationDialogID = 1;
                 nextDialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
                 //first, if the dialogue that we clicked take us to another new conversation, let's reset the player choices list and buttons on the VBox
                 if (currentConversationID != destinationConvoID) {
                     currentConversationID = destinationConvoID;
                     playerChoicesList.Clear();
-                    if(playerChoicesBoxUI != null)
+                    if (playerChoicesBoxUI != null)
                         playerChoicesBoxUI.RemoveAllPlayerChoiceButtons();
-                    //if we change conversation and we start on the first node ID 0, we just jump node 0 that is the title header node in ChatMapper                 
                 }
             }
 
@@ -310,6 +310,12 @@ public partial class DialogueManager : Node {
 
         if (playerChoiceObject.IsNoGroupChild == true) {
             RemoveAllNoGroupChildrenFromSameNoGroupParent(playerChoiceObject);
+        }
+        //if we reach a node where the user can't go back, let's remove all unselected player choices to force him to go that path   
+        if (playerChoiceObject.IsNoTurningBackPath == true) {
+            playerChoicesList.Clear();
+            if (playerChoicesBoxUI != null)
+                playerChoicesBoxUI.RemoveAllPlayerChoiceButtons();
         }
         //here we get the nextDialogueObject to display, but we still don't know if it's a Narrator, single Player choice, Group Node or No Group node
         if (destinationDialogIDs.Count == 1) {

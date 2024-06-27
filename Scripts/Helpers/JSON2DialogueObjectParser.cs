@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using System.Text.Json;
 using System.Collections.Generic;
 
@@ -36,6 +37,7 @@ public static class JSON2DialogueObjectParser {
                                 //actor = 1 is the player, we put a high number to force error and not overlap with other actors
                                 string actor = "";
                                 bool isGroup = false;
+                                bool isNoTurningBackPath = false;
 
                                 if (dialogNode.TryGetProperty("IsGroup", out JsonElement isGroupElement)) {
                                     if (isGroupElement.ValueKind == JsonValueKind.False) {
@@ -63,6 +65,18 @@ public static class JSON2DialogueObjectParser {
                                     if (fieldsElement.TryGetProperty("Actor", out JsonElement actorElement))
                                         // Get the string value of "Dialogue Text"
                                         actor = actorElement.GetString();
+
+                                    if (fieldsElement.TryGetProperty("IsNoTurningBackPath", out JsonElement isNoTurningBackPathElement)) {
+                                        if (isNoTurningBackPathElement.ValueKind == JsonValueKind.String) {
+                                            string value = isNoTurningBackPathElement.GetString();
+                                            isNoTurningBackPath = value.Equals("True", StringComparison.OrdinalIgnoreCase);
+                                        } else if (isNoTurningBackPathElement.ValueKind == JsonValueKind.True) {
+                                            isNoTurningBackPath = true;
+                                        } else if (isNoTurningBackPathElement.ValueKind == JsonValueKind.False) {
+                                            isNoTurningBackPath = false;
+                                        }
+                                    }
+
                                 }
 
                                 if (dialogNode.TryGetProperty("OutgoingLinks", out JsonElement outgoingLinksElement)) {
@@ -103,7 +117,8 @@ public static class JSON2DialogueObjectParser {
                                         DialogueTextDefault = dialogueText,
                                         CatalanText = catLocaleText,
                                         FrenchText = frLocaleText,
-                                        Actor = actor
+                                        Actor = actor,
+                                        IsNoTurningBackPath = isNoTurningBackPath
                                     });
 
                                 }
@@ -124,4 +139,5 @@ public static class JSON2DialogueObjectParser {
 
         return conversationObjectsDB;
     }
-}
+};
+

@@ -17,6 +17,9 @@ public class DialogueObject
     public bool IsNoGroupParent = false; 
     public bool IsNoGroupChild = false;
     public int? NoGroupParentID = null;
+    //if the player selects this choice, all the unvisited playerChoices will be deleted.
+    //and the player can only follow the current path, until a sure dead, change of conversation, etc.
+    public bool IsNoTurningBackPath = false;
     
 }
 

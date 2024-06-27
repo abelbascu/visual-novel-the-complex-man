@@ -4,10 +4,11 @@
 [ext_resource type="Script" path="res://Scripts/PlayerChoicesBoxUI.cs" id="1_ygy34"]
 
 [node name="PlayerChoicesBoxUI" type="VBoxContainer"]
-offset_right = 687.0
-offset_bottom = 413.0
-grow_horizontal = 2
-grow_vertical = 2
+offset_left = 68.0
+offset_top = 697.0
+offset_right = 1868.0
+offset_bottom = 997.0
+size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_ygy34")
 

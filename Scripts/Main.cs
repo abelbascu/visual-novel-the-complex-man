@@ -100,7 +100,7 @@ public partial class Main : Control {
             string translatedText = TranslationServer.Translate(localizationKey);
             //and we add the proper translation to the current button that we previously saved in a dictionary in _Ready()
             button.Text = translatedText;
-            GD.Print($"Button Text: {translatedText}, Key: {localizationKey}, Locale: {TranslationServer.GetLocale()}");
+            //GD.Print($"Button Text: {translatedText}, Key: {localizationKey}, Locale: {TranslationServer.GetLocale()}");
         }
 
         //for when the language options are displayed, if the user changes language, change the language locale of the buttons too
@@ -110,7 +110,7 @@ public partial class Main : Control {
             string translatedText = TranslationServer.Translate(localizationKey);
             //and we add the proper translation to the current button that we previously saved in a dictionary in _Ready()
             button.Text = translatedText;
-            GD.Print($"Button Text: {translatedText}, Key: {localizationKey}, Locale: {TranslationServer.GetLocale()}");
+            //GD.Print($"Button Text: {translatedText}, Key: {localizationKey}, Locale: {TranslationServer.GetLocale()}");
         }
     }
 

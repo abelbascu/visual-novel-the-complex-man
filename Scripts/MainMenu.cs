@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Diagnostics.SymbolStore;
 
-public partial class Main : Control {
+public partial class MainMenu : Control {
 
     [Export] public string language { get; set; } = "";
     private string previousLanguage = "";
@@ -50,6 +50,12 @@ public partial class Main : Control {
         catalanButton.Pressed += OnCatalanButtonPressed;
         goBackButton.Pressed += OnGoBackButtonPressed;
 
+        AnchorRight = 1;
+        AnchorBottom = 1;
+        OffsetRight = 0;
+        OffsetBottom = 0;
+    
+
         //***** SET LANGUAGE HERE *****
         //we check what language the user has in his Windows OS
         string currentCultureName = System.Globalization.CultureInfo.CurrentCulture.Name;
@@ -78,6 +84,7 @@ public partial class Main : Control {
             buttonLanguageKeys[button] = initialText;
             GD.Print($"Button name: {button.Name}, Key: {initialText}, Locale: {TranslationServer.GetLocale()}");
         }
+
     }
 
 

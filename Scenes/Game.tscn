@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://cvocyopgp11fy"]
+
+[ext_resource type="PackedScene" uid="uid://dl6434d1nw4pd" path="res://Scenes/GameManager.tscn" id="1_osvxv"]
+[ext_resource type="PackedScene" uid="uid://r3pxhv2eilfb" path="res://Scenes/DialogueManager.tscn" id="2_8t2uu"]
+
+[node name="Game" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GameManager" parent="." instance=ExtResource("1_osvxv")]
+
+[node name="DialogueManager" parent="GameManager" instance=ExtResource("2_8t2uu")]

@@ -85,7 +85,6 @@ public static class JSON2DialogueObjectParser {
                                     List<Dictionary<string, int>> outgoingLinks = new();
                                     // Iterate over each element in the array   
 
-                                    int index = 0;
                                     foreach (var outgoingLink in outgoingLinksElement.EnumerateArray()) {
 
                                         Dictionary<string, int> outgoingLinkDict = new Dictionary<string, int>();

@@ -2,5 +2,7 @@
 
 [ext_resource type="Script" path="res://GameManager.cs" id="1_2d6sb"]
 
-[node name="GameManager" type="Node2D"]
+[node name="GameManager" type="Control"]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_2d6sb")

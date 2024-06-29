@@ -2,7 +2,7 @@ using Godot;
 using System;
 
 
-public partial class GameManager : Node2D {
+public partial class GameManager : Control {
     public static GameManager Instance { get; private set; }
 
     public DialogueManager DialogueManager { get; private set; }
@@ -24,6 +24,14 @@ public partial class GameManager : Node2D {
     }
 
     public override void _Ready() {
+
+        // Make GameManager fill its parent
+        AnchorRight = 1;
+        AnchorBottom = 1;
+
+        // Ignore mouse input if it doesn't need to interact directly
+        MouseFilter = MouseFilterEnum.Ignore;
+
         if (Instance == null) {
             Instance = this;
             InitializeManagers();

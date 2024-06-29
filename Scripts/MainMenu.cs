@@ -14,6 +14,7 @@ public partial class MainMenu : Control {
     VBoxContainer LanguageOptionsContainer;
     private Dictionary<Button, string> buttonLocalizationKeys = new();
     private Dictionary<Button, string> buttonLanguageKeys = new();
+    public Action StartButtonPressed;
 
 
     public override void _Ready() {
@@ -123,7 +124,7 @@ public partial class MainMenu : Control {
 
 
     private void OnStartNewGameButtonPressed() {
-        DialogueManager.StartButtonPressed.Invoke();
+        StartButtonPressed?.Invoke();
         Hide();
     }
 

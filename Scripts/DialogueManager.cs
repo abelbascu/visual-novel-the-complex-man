@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
+using System.Dynamic;
 
 public partial class DialogueManager : Node {
 
@@ -27,7 +28,26 @@ public partial class DialogueManager : Node {
     public static Action StartButtonPressed;
 
 
-    public override void _Ready() {
+    public static DialogueManager Instance {get; private set;}
+
+    public override void _EnterTree() {
+        base._EnterTree();
+
+        if(Instance == null)
+        {
+            Instance = this;
+        }
+        else{
+            QueueFree();
+        }
+    }
+
+    public override void _ExitTree() {
+        base._ExitTree();
+    }
+
+
+    public override void _Ready() { 
         LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
         StartButtonPressed += OnStartButtonPressed;
         playerChoicesList = new();

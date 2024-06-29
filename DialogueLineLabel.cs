@@ -29,7 +29,7 @@ public partial class DialogueLineLabel : Label {
     }
 
 	public void OnLabelPressed() {
-		var dialogueManager = GetNode<DialogueManager>("/root/DialogueManager");
+		var dialogueManager = DialogueManager.Instance;
         dialogueManager.OnDialogueBoxUIPressed();
 	}
 }

@@ -15,7 +15,7 @@ public partial class PlayerChoiceButton : Button {
     }
 
     private void OnButtonPressed() {
-        var dialogueManager = GetNode<DialogueManager>("/root/DialogueManager");
+        var dialogueManager = DialogueManager.Instance;
         dialogueManager.OnPlayerButtonUIPressed(dialogueObject);
         // Remove the button from its parent container
         CallDeferred("RemoveButton");

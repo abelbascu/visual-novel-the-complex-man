@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/DialogueBoxUI.cs" id="1_i37ha"]
 [ext_resource type="Texture2D" uid="uid://ddqt0olom3m5a" path="res://Images/UI/dialogueBox.png" id="1_vo8kf"]
-[ext_resource type="Script" path="res://DialogueLineLabel.cs" id="3_gs1qn"]
+[ext_resource type="Script" path="res://Scripts/DialogueLineLabel.cs" id="3_gs1qn"]
 
 [sub_resource type="SystemFont" id="SystemFont_u5emw"]
 

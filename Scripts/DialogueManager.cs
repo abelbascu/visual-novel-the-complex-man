@@ -18,14 +18,18 @@ public partial class DialogueManager : Control {
     public List<DialogueObject> playerChoicesList;
     //----------------------------------------------------------------------bools----------------------------------------------------------------------------------------
     public bool isDialogueBeingPrinted = false; //we don't want to print a new dialogue is we are currently displaying another one
-    public bool isPlayerChoiceBeingPrinted = false;
+    public bool IsPlayerChoiceBeingPrinted {get; private set;}
     //------------------------------------------------------------------event handlers-----------------------------------------------------------------------------------
     //---------------------------------------------------------------------singleton--------------------------------------------------------------------------------------
     public static DialogueManager Instance { get; private set; }
 
+    public void SetIsPlayerChoiceBeingPrinted(bool isPrinting)
+    {
+        IsPlayerChoiceBeingPrinted = isPrinting;
+    }
+     
     public override void _EnterTree() {
         base._EnterTree();
-
         if (Instance == null) {
             Instance = this;
         } else {
@@ -37,18 +41,13 @@ public partial class DialogueManager : Control {
         base._ExitTree();
     }
 
-
     public override void _Ready() {
-
         // Make GameManager fill its parent
         AnchorRight = 1;
         AnchorBottom = 1;
-
         // Ignore mouse input if it doesn't need to interact directly
         MouseFilter = MouseFilterEnum.Ignore;
-
         LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
-
         playerChoicesList = new();
     }
 
@@ -67,13 +66,25 @@ public partial class DialogueManager : Control {
     public DialogueObject GetDialogueObject(int currentConversationID, int currentDialogueObjectID) {
         // Check if the conversationID exists in the dictionary
         if (conversationDialogues.TryGetValue(currentConversationID, out List<DialogueObject> dialogueList)) {
-            // Use LINQ to find the first DialogueObject with the specified ID
+            // find the first DialogueObject with the specified ID, IDs are unique
             return dialogueList.FirstOrDefault(dialogueObject => dialogueObject.ID == currentDialogueObjectID);
         }
-
-        return null; // Return null if the conversationID is not found in the dictionary
+        return null; 
     }
 
+    public void DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) {
+        // Narrator or NPC won't ever have multiple choices, so we can display the dialogue now.
+         bool isDialogueOrPlayerChoice = dialogObj.Actor == "1";
+        
+        if (isDialogueOrPlayerChoice) {
+            UIManager.Instance.DisplayDialogue(dialogObj);
+            currentDialogueObject = dialogObj;
+            //if it's the player, we need to add first the choice to the list and VBox   
+        } else {
+            AddPlayerChoicesToList(dialogObj.ID, dialogObj);
+            UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
+        }
+    }
 
     //IEnumerable<int> so we can pass a list or a single int when there is only one player choice to add to the playerChoicesList
     public void AddPlayerChoicesToList(IEnumerable<int> destinationDialogIDs, DialogueObject dialogObj) {
@@ -91,10 +102,8 @@ public partial class DialogueManager : Control {
         playerChoicesList.Insert(0, dialogObject);
     }
 
-
-    // TO DO TO DO TO DO TO DO
     public void OnTextBoxFinishedDisplayingPlayerChoices() {
-        isPlayerChoiceBeingPrinted = false;
+        IsPlayerChoiceBeingPrinted = false;
     }
 
     public void OnTextBoxFinishedDisplayingDialogueLine() {
@@ -120,7 +129,7 @@ public partial class DialogueManager : Control {
         //if we reached a dead end path, show again the playerChoices so the player can choose another path
         //dead end paths maybe be there to provide contexts, make jokes, give hints, etc.
         if (currentDialogueObject.OutgoingLinks.Count == 0) {
-            UIManager.Instance.DisplayPlayerChoices();
+            UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
         }
 
         // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
@@ -155,11 +164,11 @@ public partial class DialogueManager : Control {
             if (nextDialogObject.IsGroup == true) {
                 nextDialogObject.IsGroupParent = true;
                 AddGroupPlayerChoicesToList(nextDialogObject);
-                UIManager.Instance.DisplayPlayerChoices();
+                UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
             } else {
-                UIManager.Instance.DisplayDialogueOrPlayerChoice(nextDialogObject);
-                currentDialogueObject = nextDialogObject;
 
+                DisplayDialogueOrPlayerChoice(nextDialogObject);
+                currentDialogueObject = nextDialogObject;
             }
         }
 
@@ -172,10 +181,9 @@ public partial class DialogueManager : Control {
         else if (destinationDialogIDs.Count > 1 && currentDialogueObject.IsGroup == false) {
             //nextDialogObject.IsNoGroupParent = true;
             AddNoGroupPlayerChoicesToList(currentDialogueObject);
-            UIManager.Instance.DisplayPlayerChoices();
+            UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
         }
     }
-
 
     public void AddGroupPlayerChoicesToList(DialogueObject nextDialogueObject) {
         nextDialogueObject.IsGroupParent = true;
@@ -198,28 +206,23 @@ public partial class DialogueManager : Control {
                 dict.TryGetValue("DestinationConvoID", out int destinationConvoID)) {
                 DialogueObject dialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
                 dialogObject.IsNoGroupChild = true;
-
                 //we'll need the parent ID to remove any NoGroup subpaths 
                 //if the button with this dialogObject is pressed by the player
                 dialogObject.NoGroupParentID = dict["OriginDialogID"];
-
                 AddPlayerChoicesToList(dialogObject);
             }
         }
     }
 
-
     public void OnPlayerButtonUIPressed(DialogueObject playerChoiceObject) {
         //we need to remove first the dialogObject on playerChoicesList with the same ID as playerChoiceObject.ID
         playerChoicesList.RemoveAll(dialogObj => dialogObj.ID == playerChoiceObject.ID);
-
         currentDialogueObject = playerChoiceObject;
         DialogueObject nextDialogObject = new();
         List<int> destinationDialogIDs = new();
 
-        if (isPlayerChoiceBeingPrinted)
+        if (IsPlayerChoiceBeingPrinted)
             return;
-
         // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
         foreach (Dictionary<string, int> dict in playerChoiceObject.OutgoingLinks) {
             if (dict.ContainsKey("DestinationDialogID")) {
@@ -250,14 +253,12 @@ public partial class DialogueManager : Control {
                     playerChoicesList.Clear();
                     UIManager.Instance.playerChoicesBoxUI.RemoveAllPlayerChoiceButtons();
                 }
-
-
                 if (nextDialogObject.IsGroup == false) {
-                    UIManager.Instance.DisplayDialogueOrPlayerChoice(nextDialogObject);
+                    DisplayDialogueOrPlayerChoice(nextDialogObject);
                     currentDialogueObject = nextDialogObject;
                 } else if (nextDialogObject.IsGroup == true) {
                     AddGroupPlayerChoicesToList(nextDialogObject);
-                    UIManager.Instance.DisplayPlayerChoices();
+                    UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
                 }
             }
         }
@@ -271,35 +272,27 @@ public partial class DialogueManager : Control {
         else if (destinationDialogIDs.Count > 1 && currentDialogueObject.IsGroup == false) {
             nextDialogObject.IsNoGroupParent = true;
             AddNoGroupPlayerChoicesToList(currentDialogueObject);
-            UIManager.Instance.DisplayPlayerChoices();
+            UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
         }
     }
 
     public void RemoveAllNoGroupChildrenFromSameNoGroupParent(DialogueObject playerChoiceObject) {
-
         RemoveAllNoGroupChildrenFromPlayerChoicesList(playerChoiceObject);
         RemoveAllNoGroupChildrenFromPlayerChoicesBoxUI(playerChoiceObject);
     }
 
     public void RemoveAllNoGroupChildrenFromPlayerChoicesList(DialogueObject playerChoiceObject) {
-
         List<DialogueObject> objectsToRemove = new List<DialogueObject>();
-
         if (playerChoiceObject.NoGroupParentID.HasValue) {
             foreach (DialogueObject dialogObj in playerChoicesList) {
                 if (dialogObj.NoGroupParentID == playerChoiceObject.NoGroupParentID)
                     objectsToRemove.Add(dialogObj);
-            }
-        }
-
-        foreach (var obj in objectsToRemove) {
+            }  }
+        foreach (var obj in objectsToRemove) 
             playerChoicesList.Remove(obj);
-
-        }
     }
 
     public void RemoveAllNoGroupChildrenFromPlayerChoicesBoxUI(DialogueObject playerChoiceObject) {
-
         UIManager.Instance.playerChoicesBoxUI.RewmoveAllNoGroupChildrenWithSameOriginID(playerChoiceObject);
     }
 

@@ -16,17 +16,12 @@ public partial class UIManager : Control {
     private MainMenu mainMenu;
 
 
-    // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
         mainMenu = GetNode<MainMenu>("MainMenu");
         mainMenu.StartButtonPressed += OnStartButtonPressed;
 
-		//  // Ignore mouse input if it doesn't need to interact directly
+        //  // Ignore mouse input if it doesn't need to interact directly
         // MouseFilter = MouseFilterEnum.Ignore;
-    }
-
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta) {
     }
 
     public override void _EnterTree() {
@@ -37,7 +32,6 @@ public partial class UIManager : Control {
             Instance.QueueFree();
         }
     }
-
 
     public void DisplayDialogue(DialogueObject currentDialogueObject) {
         if (DialogueManager.Instance.isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
@@ -55,6 +49,34 @@ public partial class UIManager : Control {
         dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, DialogueManager.languageCode);
     }
 
+    public void DisplayPlayerChoices(List<DialogueObject> playerChoices, Action<bool> setIsPlayerChoiceBeingPrinted) {
+        if (playerChoicesBoxUI == null) {
+            //before adding the player choices, we need to create the container VBox
+            DisplayPlayerChoicesBoxUI();
+        }
+        if (playerChoicesBoxUI != null) {
+            //ensure the container is visible
+            playerChoicesBoxUI.Show();
+            //let's hide the dialogue box, that's used to displaye narrator/NPC texts, not the player's
+            if (dialogueBoxUI != null)
+                dialogueBoxUI.Hide();
+        }
+        foreach (var playerChoiceObject in playerChoices) {
+            if (!ButtonExistsForPlayerChoice(playerChoiceObject)) {
+                 setIsPlayerChoiceBeingPrinted(true);
+                playerChoicesBoxUI.DisplayPlayerChoice(playerChoiceObject, DialogueManager.languageCode);             
+            }
+        }
+    }
+
+    public bool ButtonExistsForPlayerChoice(DialogueObject playerChoiceObject) {
+        var existingButtons = dialogueChoicesMarginContainer.GetChildren()
+            .OfType<PlayerChoiceButton>()
+            .ToList();
+
+        return existingButtons.Any(button => button.HasMatchingDialogueObject(playerChoiceObject));
+    }
+
     public void DisplayDialogueBoxUI() {
         PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
         Node instance = scene.Instantiate();
@@ -67,44 +89,6 @@ public partial class UIManager : Control {
         dialogueBoxUI.Position = new Vector2(xPosition, yPosition);
         //once all chars of the dialogue text are displayed in the container, we can show the next dialogue.
         dialogueBoxUI.FinishedDisplayingDialogueLine += DialogueManager.Instance.OnTextBoxFinishedDisplayingDialogueLine;
-    }
-
-
-    public void DisplayPlayerChoices() {
-        if (playerChoicesBoxUI == null) {
-            //before adding the player choices, we need to create the container VBox
-            DisplayPlayerChoicesBoxUI();
-        }
-
-        foreach (var playerChoiceObject in DialogueManager.Instance.playerChoicesList) {
-            DialogueManager.Instance.isPlayerChoiceBeingPrinted = true;
-            if (playerChoicesBoxUI != null) {
-                //ensure the container is visible
-                playerChoicesBoxUI.Show();
-                //let's hide the dialogue box, that's used to displaye narrator/NPC texts, not the player's
-                if (dialogueBoxUI != null)
-                    dialogueBoxUI.Hide();
-            }
-
-            var existingButtons = dialogueChoicesMarginContainer.GetChildren()
-                .OfType<PlayerChoiceButton>()
-                .ToList();
-
-            // Check if a button with the same ID already exists
-            bool buttonExists = false;
-            foreach (var button in existingButtons) {
-                if (button.HasMatchingDialogueObject(playerChoiceObject)) {
-                    buttonExists = true;
-                    DialogueManager.Instance.isPlayerChoiceBeingPrinted = false;
-                    break;
-                }
-            }
-
-            // If the button doesn't exist, create and add it
-            if (!buttonExists) {
-                playerChoicesBoxUI.DisplayPlayerChoice(playerChoiceObject, DialogueManager.languageCode);
-            }
-        }
     }
 
     public void DisplayPlayerChoicesBoxUI() {
@@ -124,31 +108,9 @@ public partial class UIManager : Control {
         dialogueChoicesMarginContainer = playerChoicesBoxUI.GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
     }
 
-
     public void OnStartButtonPressed() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
         DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject(DialogueManager.Instance.currentConversationID, DialogueManager.Instance.currentDialogueID);
-        DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
+        DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
     }
-
-
-    public void DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) {
-        // Narrator or NPC won't ever have multiple choices, so we can display the dialogue now.
-        if (dialogObj.Actor != "1") {
-            DisplayDialogue(dialogObj);
-            DialogueManager.Instance.currentDialogueObject = dialogObj;
-            //if it's the player, we need to add first the choice to the list and VBox   
-        } else if (dialogObj.Actor == "1") {
-            DialogueManager.Instance.AddPlayerChoicesToList(dialogObj.ID, dialogObj);
-            DisplayPlayerChoices();
-        }
-    }
-
-
-
-
-
-
-
-
 }

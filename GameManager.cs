@@ -35,7 +35,6 @@ public partial class GameManager : Control {
         if (Instance == null) {
             Instance = this;
             InitializeManagers();
-            LoadMainMenu();
         } else {
             QueueFree();
         }
@@ -43,26 +42,5 @@ public partial class GameManager : Control {
 
     private void InitializeManagers() {
         DialogueManager = GetNode<DialogueManager>("DialogueManager");
-        mainMenuPackedScene = GD.Load<PackedScene>("res://Scenes/MainMenu.tscn");
-
     }
-
-    private void LoadMainMenu() {
-        if (mainMenuScene != null) {
-            mainMenuScene.QueueFree();
-        }
-
-        mainMenuScene = mainMenuPackedScene.Instantiate() as Control;
-
-        if (mainMenuScene != null) {
-            var gameNode = GetParent();
-            gameNode.CallDeferred(Node.MethodName.AddChild, mainMenuScene);
-            GD.Print("Main menu loaded successfully"); // Debug print
-        } else {
-            GD.PrintErr("Failed to instantiate MainMenu scene"); // Error print
-        }
-    }
-
-
 }
-// ... other GameManager methods ...

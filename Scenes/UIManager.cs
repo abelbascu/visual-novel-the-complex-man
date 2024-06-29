@@ -20,6 +20,9 @@ public partial class UIManager : Control {
     public override void _Ready() {
         mainMenu = GetNode<MainMenu>("MainMenu");
         mainMenu.StartButtonPressed += OnStartButtonPressed;
+
+		//  // Ignore mouse input if it doesn't need to interact directly
+        // MouseFilter = MouseFilterEnum.Ignore;
     }
 
     // Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -125,7 +128,7 @@ public partial class UIManager : Control {
     public void OnStartButtonPressed() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
         DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject(DialogueManager.Instance.currentConversationID, DialogueManager.Instance.currentDialogueID);
-        UIManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
+        DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
     }
 
 

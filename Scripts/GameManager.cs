@@ -6,7 +6,7 @@ public partial class GameManager : Control {
     public static GameManager Instance { get; private set; }
 
     public DialogueManager DialogueManager { get; private set; }
-    // public PlayerStateManager PlayerStateManager { get; private set; }
+    //public PlayerStateManager PlayerStateManager { get; private set; }
     // public MediaManager MediaManager { get; private set; }
     // public MinigameManager MinigameManager { get; private set; }
     // public AchievementsManager AchievementsManager { get; private set; }

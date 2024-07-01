@@ -38,6 +38,8 @@ public static class JSON2DialogueObjectParser {
                                 string actor = "";
                                 bool isGroup = false;
                                 bool isNoTurningBackPath = false;
+                                string visualPath = "";
+                                int visualType = 0;
 
                                 if (dialogNode.TryGetProperty("IsGroup", out JsonElement isGroupElement)) {
                                     if (isGroupElement.ValueKind == JsonValueKind.False) {
@@ -65,6 +67,24 @@ public static class JSON2DialogueObjectParser {
                                     if (fieldsElement.TryGetProperty("Actor", out JsonElement actorElement))
                                         // Get the string value of "Dialogue Text"
                                         actor = actorElement.GetString();
+
+                                    if (fieldsElement.TryGetProperty("VisualPath", out JsonElement visualPathElement))
+                                        // Get the string value of "Dialogue Text"
+                                        visualPath = visualPathElement.GetString();           
+
+                                    if (fieldsElement.TryGetProperty("VisualType", out JsonElement visualTypeElement)) {
+                                        try {
+                                            visualType = visualTypeElement.GetInt32();
+                                        } catch (InvalidOperationException) {
+                                            // If we can't get it as an int, try parsing it as a string
+                                            if (int.TryParse(visualTypeElement.GetString(), out int result)) {
+                                                visualType = result;
+                                            } else {
+                                                GD.PrintErr($"Invalid VisualType for DialogID {dialogID}: {visualTypeElement}");
+                                                visualType = 0; // Or some default value
+                                            }
+                                        }
+                                    }
 
                                     if (fieldsElement.TryGetProperty("IsNoTurningBackPath", out JsonElement isNoTurningBackPathElement)) {
                                         if (isNoTurningBackPathElement.ValueKind == JsonValueKind.String) {
@@ -117,7 +137,9 @@ public static class JSON2DialogueObjectParser {
                                         CatalanText = catLocaleText,
                                         FrenchText = frLocaleText,
                                         Actor = actor,
-                                        IsNoTurningBackPath = isNoTurningBackPath
+                                        IsNoTurningBackPath = isNoTurningBackPath,
+                                        VisualPath = visualPath,
+                                        VisualType = visualType
                                     });
 
                                 }

@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://bmwup57o25dyn"]
+
+[ext_resource type="Script" path="res://Scripts/VisualManager.cs" id="1_b1v8p"]
+
+[node name="VisualManager" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_b1v8p")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0

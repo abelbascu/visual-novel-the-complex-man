@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cb18mj0u1ug"
-path="res://.godot/imported/PlayerDirtyRoom.jpg-c40e782b7e3b6d7d58d3818df648508d.ctex"
+path="res://.godot/imported/PlayerDirtyRoom.jpg-c69fb8d703968faf77b17a906cab9c14.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://VIsuals/DialogueOrPlayerChoice/PlayerDirtyRoom.jpg"
-dest_files=["res://.godot/imported/PlayerDirtyRoom.jpg-c40e782b7e3b6d7d58d3818df648508d.ctex"]
+source_file="res://Visuals/DialogueOrPlayerChoice/PlayerDirtyRoom.jpg"
+dest_files=["res://.godot/imported/PlayerDirtyRoom.jpg-c69fb8d703968faf77b17a906cab9c14.ctex"]
 
 [params]
 

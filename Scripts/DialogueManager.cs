@@ -11,23 +11,22 @@ public partial class DialogueManager : Control {
     //-------------------------------------------------------------------config variables---------------------------------------------------------------------------------
     public static string languageCode = "en";
     [Export] public int currentConversationID = 2; //set here the conversation you want to load. Conversations in Chatmapper are what we could call chapters.
-    [Export] public int currentDialogueID = 2; //set here the starting dialogue of the conversation
+    [Export] public int currentDialogueID = 1; //set here the starting dialogue of the conversation
     //-----------------------------------------------------------------dependency variables------------------------------------------------------------------------------
     private Dictionary<int, List<DialogueObject>> conversationDialogues; //the int refers to the conversation ID, see 'currentConversationID' above.
     public DialogueObject currentDialogueObject { get; set; }
     public List<DialogueObject> playerChoicesList;
     //----------------------------------------------------------------------bools----------------------------------------------------------------------------------------
     public bool isDialogueBeingPrinted = false; //we don't want to print a new dialogue is we are currently displaying another one
-    public bool IsPlayerChoiceBeingPrinted {get; private set;}
+    public bool IsPlayerChoiceBeingPrinted { get; private set; }
     //------------------------------------------------------------------event handlers-----------------------------------------------------------------------------------
     //---------------------------------------------------------------------singleton--------------------------------------------------------------------------------------
     public static DialogueManager Instance { get; private set; }
 
-    public void SetIsPlayerChoiceBeingPrinted(bool isPrinting)
-    {
+    public void SetIsPlayerChoiceBeingPrinted(bool isPrinting) {
         IsPlayerChoiceBeingPrinted = isPrinting;
     }
-     
+
     public override void _EnterTree() {
         base._EnterTree();
         if (Instance == null) {
@@ -69,11 +68,16 @@ public partial class DialogueManager : Control {
             // find the first DialogueObject with the specified ID, IDs are unique
             return dialogueList.FirstOrDefault(dialogueObject => dialogueObject.ID == currentDialogueObjectID);
         }
-        return null; 
+        return null;
     }
 
     public void DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) {
         // Narrator or NPC won't ever have multiple choices, so we can display the dialogue now.     
+
+        if (!string.IsNullOrEmpty(dialogObj.VisualPath)) {
+            VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, (VisualManager.VisualType)dialogObj.VisualType);
+        }
+
         if (dialogObj.Actor != "1") {
             UIManager.Instance.DisplayDialogue(dialogObj);
             currentDialogueObject = dialogObj;
@@ -285,8 +289,9 @@ public partial class DialogueManager : Control {
             foreach (DialogueObject dialogObj in playerChoicesList) {
                 if (dialogObj.NoGroupParentID == playerChoiceObject.NoGroupParentID)
                     objectsToRemove.Add(dialogObj);
-            }  }
-        foreach (var obj in objectsToRemove) 
+            }
+        }
+        foreach (var obj in objectsToRemove)
             playerChoicesList.Remove(obj);
     }
 

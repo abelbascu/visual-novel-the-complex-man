@@ -20,8 +20,25 @@ public partial class UIManager : Control {
         mainMenu = GetNode<MainMenu>("MainMenu");
         mainMenu.StartButtonPressed += OnStartButtonPressed;
 
-        //  // Ignore mouse input if it doesn't need to interact directly
+        CallDeferred(nameof(SetupNodeOrder));
+
+
         // MouseFilter = MouseFilterEnum.Ignore;
+    }
+
+    private void SetupNodeOrder() {
+        // Ensure VisualsManager is below UI elements in the scene tree
+        var visualManager = GetNode<VisualManager>("../VisualManager");
+        GetParent().MoveChild(visualManager, 0);
+
+        // Set VisualManager to fill the entire screen
+        visualManager.AnchorRight = 1;
+        visualManager.AnchorBottom = 1;
+        visualManager.GrowHorizontal = GrowDirection.Both;
+        visualManager.GrowVertical = GrowDirection.Both;
+
+        // Move this UIManager to be the last child (top layer)
+        GetParent().MoveChild(this, GetParent().GetChildCount() - 1);
     }
 
     public override void _EnterTree() {
@@ -63,8 +80,8 @@ public partial class UIManager : Control {
         }
         foreach (var playerChoiceObject in playerChoices) {
             if (!ButtonExistsForPlayerChoice(playerChoiceObject)) {
-                 setIsPlayerChoiceBeingPrinted(true);
-                playerChoicesBoxUI.DisplayPlayerChoice(playerChoiceObject, DialogueManager.languageCode);             
+                setIsPlayerChoiceBeingPrinted(true);
+                playerChoicesBoxUI.DisplayPlayerChoice(playerChoiceObject, DialogueManager.languageCode);
             }
         }
     }

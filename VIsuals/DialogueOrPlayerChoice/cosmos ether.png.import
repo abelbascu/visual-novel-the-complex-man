@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bf2g14vt6hibs"
-path="res://.godot/imported/cosmos ether.png-439e2bc4dd94af99661e8ce639ecf256.ctex"
+path="res://.godot/imported/cosmos ether.png-22c0d3bff18f9819419191fe05d2547e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://VIsuals/DialogueOrPlayerChoice/cosmos ether.png"
-dest_files=["res://.godot/imported/cosmos ether.png-439e2bc4dd94af99661e8ce639ecf256.ctex"]
+source_file="res://Visuals/DialogueOrPlayerChoice/cosmos ether.png"
+dest_files=["res://.godot/imported/cosmos ether.png-22c0d3bff18f9819419191fe05d2547e.ctex"]
 
 [params]
 

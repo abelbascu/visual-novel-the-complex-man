@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://cvocyopgp11fy"]
+[gd_scene load_steps=6 format=3 uid="uid://cvocyopgp11fy"]
 
 [ext_resource type="PackedScene" uid="uid://dl6434d1nw4pd" path="res://Scenes/GameManager.tscn" id="1_osvxv"]
 [ext_resource type="PackedScene" uid="uid://r3pxhv2eilfb" path="res://Scenes/DialogueManager.tscn" id="2_8t2uu"]
 [ext_resource type="PackedScene" uid="uid://bauqxmelp0rdi" path="res://Scenes/UIManager.tscn" id="3_dlnf0"]
 [ext_resource type="PackedScene" uid="uid://c8t14jwiqekss" path="res://Scenes/MainMenu.tscn" id="4_bo2ho"]
+[ext_resource type="PackedScene" uid="uid://bmwup57o25dyn" path="res://Scenes/VisualManager.tscn" id="5_leafw"]
 
 [node name="Game" type="Control"]
 layout_mode = 3
@@ -33,3 +34,5 @@ grow_vertical = 2
 
 [node name="MainMenu" parent="GameManager/UiManager" instance=ExtResource("4_bo2ho")]
 layout_mode = 1
+
+[node name="VisualManager" parent="GameManager" instance=ExtResource("5_leafw")]

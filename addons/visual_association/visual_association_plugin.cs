@@ -182,123 +182,106 @@ public partial class visual_association_plugin : EditorPlugin {
         }
     }
 
- private void UpdateDialogue(int index, string visualPath, int visualType)
-{
-    int dialogueIndex = 0;
+    private void UpdateDialogue(int index, string visualPath, int visualType) {
+        int dialogueIndex = 0;
 
-    foreach (var conversation in conversationObjectsDB)
-    {
-        foreach (var dialogue in conversation.Value)
-        {
-            if (dialogueIndex == index)
-            {
-                dialogue.VisualPath = visualPath;
-                dialogue.VisualType = visualType;
-                GD.Print($"Updated dialogue {dialogue.ID} with VisualPath: {visualPath}, VisualType: {visualType}");
-                return;
-            }
-            dialogueIndex++;
-        }
-    }
-}
-
-    private void SaveDialoguesToJson()
-{
-    string projectRoot = ProjectSettings.GlobalizePath("res://");
-    string fullPath = Path.Combine(projectRoot, JSON_PATH.TrimStart("res://".ToCharArray()));
-    GD.Print($"Attempting to save JSON to: {fullPath}");
-
-    try
-    {
-        string jsonString = File.ReadAllText(fullPath);
-        using var jsonDocument = JsonDocument.Parse(jsonString);
-        var root = jsonDocument.RootElement;
-
-        var conversationsArray = root.GetProperty("Assets").GetProperty("Conversations");
-        var updatedConversations = new List<object>();
-
-        for (int i = 0; i < conversationsArray.GetArrayLength(); i++)
-        {
-            var conversation = conversationsArray[i];
-            int conversationId = conversation.GetProperty("ID").GetInt32();
-
-            if (conversationObjectsDB.TryGetValue(conversationId, out var dialogues))
-            {
-                var dialogNodesArray = conversation.GetProperty("DialogNodes");
-                var updatedDialogNodes = new List<object>();
-
-                for (int j = 0; j < dialogNodesArray.GetArrayLength(); j++)
-                {
-                    var dialogNode = dialogNodesArray[j];
-                    int dialogId = dialogNode.GetProperty("ID").GetInt32();
-
-                    var dialogue = dialogues.Find(d => d.ID == dialogId);
-                    if (dialogue != null)
-                    {
-                        var fields = dialogNode.GetProperty("Fields");
-                        var updatedFields = new Dictionary<string, object>();
-                        foreach (var field in fields.EnumerateObject())
-                        {
-                            updatedFields[field.Name] = field.Value.GetRawText();
-                        }
-
-                        // Update VisualPath and VisualType
-                        updatedFields["VisualPath"] = dialogue.VisualPath ?? "";
-                        updatedFields["VisualType"] = dialogue.VisualType.ToString();
-
-                        var updatedDialogNode = new
-                        {
-                            OutgoingLinks = dialogue.OutgoingLinks,
-                            ConversationID = conversationId,
-                            IsRoot = dialogNode.TryGetProperty("IsRoot", out var isRoot) ? isRoot.GetBoolean() : false,
-                            IsGroup = dialogue.IsGroup,
-                            Fields = updatedFields,
-                            ID = dialogId
-                        };
-
-                        updatedDialogNodes.Add(updatedDialogNode);
-                    }
-                    else
-                    {
-                        updatedDialogNodes.Add(JsonSerializer.Deserialize<object>(dialogNode.GetRawText()));
-                    }
+        foreach (var conversation in conversationObjectsDB) {
+            foreach (var dialogue in conversation.Value) {
+                if (dialogueIndex == index) {
+                    dialogue.VisualPath = visualPath;
+                    dialogue.VisualType = visualType;
+                    GD.Print($"Updated dialogue {dialogue.ID} with VisualPath: {visualPath}, VisualType: {visualType}");
+                    return;
                 }
-
-                var updatedConversation = new
-                {
-                    ID = conversationId,
-                    DialogNodes = updatedDialogNodes
-                };
-
-                updatedConversations.Add(updatedConversation);
-            }
-            else
-            {
-                updatedConversations.Add(JsonSerializer.Deserialize<object>(conversation.GetRawText()));
+                dialogueIndex++;
             }
         }
-
-        var updatedAssets = new
-        {
-            Conversations = updatedConversations
-        };
-
-        var updatedRoot = new
-        {
-            Assets = updatedAssets
-        };
-
-        var options = new JsonSerializerOptions { WriteIndented = true };
-        string updatedJsonString = JsonSerializer.Serialize(updatedRoot, options);
-        File.WriteAllText(fullPath, updatedJsonString);
-        GD.Print("JSON file updated successfully.");
     }
-    catch (Exception e)
-    {
-        GD.PrintErr($"Error updating JSON file: {e.Message}");
-        GD.PrintErr(e.StackTrace);
+
+    private void SaveDialoguesToJson() {
+        string projectRoot = ProjectSettings.GlobalizePath("res://");
+        string fullPath = Path.Combine(projectRoot, JSON_PATH.TrimStart("res://".ToCharArray()));
+        GD.Print($"Attempting to save JSON to: {fullPath}");
+
+        try {
+            string jsonString = File.ReadAllText(fullPath);
+            using var jsonDocument = JsonDocument.Parse(jsonString);
+            var root = jsonDocument.RootElement;
+
+            var conversationsArray = root.GetProperty("Assets").GetProperty("Conversations");
+            var updatedConversations = new List<object>();
+
+            for (int i = 0; i < conversationsArray.GetArrayLength(); i++) {
+                var conversation = conversationsArray[i];
+                int conversationId = conversation.GetProperty("ID").GetInt32();
+
+                if (conversationObjectsDB.TryGetValue(conversationId, out var dialogues)) {
+                    var dialogNodesArray = conversation.GetProperty("DialogNodes");
+                    var updatedDialogNodes = new List<object>();
+
+                    for (int j = 0; j < dialogNodesArray.GetArrayLength(); j++) {
+                        var dialogNode = dialogNodesArray[j];
+                        int dialogId = dialogNode.GetProperty("ID").GetInt32();
+
+                        var dialogue = dialogues.Find(d => d.ID == dialogId);
+                        if (dialogue != null) {
+                            var fields = dialogNode.GetProperty("Fields");
+                            var updatedFields = new Dictionary<string, object>();
+                            foreach (var field in fields.EnumerateObject()) {
+                                // Deserialize the field value to remove extra quotes
+                                updatedFields[field.Name] = JsonSerializer.Deserialize<object>(field.Value.GetRawText());
+                            }
+
+                            // Update VisualPath and VisualType
+                            updatedFields["VisualPath"] = dialogue.VisualPath ?? "";
+                            updatedFields["VisualType"] = dialogue.VisualType;
+
+                            var updatedDialogNode = new {
+                                OutgoingLinks = JsonSerializer.Deserialize<object>(dialogNode.GetProperty("OutgoingLinks").GetRawText()),
+                                ConversationID = conversationId,
+                                IsRoot = dialogNode.TryGetProperty("IsRoot", out var isRoot) ? isRoot.GetBoolean() : false,
+                                IsGroup = dialogue.IsGroup,
+                                Fields = updatedFields,
+                                ID = dialogId
+                            };
+
+                            updatedDialogNodes.Add(updatedDialogNode);
+                        } else {
+                            updatedDialogNodes.Add(JsonSerializer.Deserialize<object>(dialogNode.GetRawText()));
+                        }
+                    }
+
+                    var updatedConversation = new {
+                        ID = conversationId,
+                        DialogNodes = updatedDialogNodes
+                    };
+
+                    updatedConversations.Add(updatedConversation);
+                } else {
+                    updatedConversations.Add(JsonSerializer.Deserialize<object>(conversation.GetRawText()));
+                }
+            }
+
+            var updatedAssets = new {
+                Conversations = updatedConversations
+            };
+
+            var updatedRoot = new {
+                Assets = updatedAssets
+            };
+
+            var options = new JsonSerializerOptions {
+                WriteIndented = true,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            };
+            string updatedJsonString = JsonSerializer.Serialize(updatedRoot, options);
+            File.WriteAllText(fullPath, updatedJsonString);
+            GD.Print("JSON file updated successfully.");
+        } catch (Exception e) {
+            GD.PrintErr($"Error updating JSON file: {e.Message}");
+            GD.PrintErr(e.StackTrace);
+        }
     }
-}
     // private Dictionary<int, List<DialogueObject>> LoadDialoguesFromJson() {
     //     string jsonString = File.ReadAllText(JSON_PATH);
     //     return JSON2DialogueObjectParser.ExtractDialogueObjects(jsonString);

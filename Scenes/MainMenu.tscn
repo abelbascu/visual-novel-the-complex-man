@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://c8t14jwiqekss"]
 
 [ext_resource type="Script" path="res://Scripts/MainMenu.cs" id="1_2ygpx"]
-[ext_resource type="Texture2D" uid="uid://bf2g14vt6hibs" path="res://VIsuals/DialogueOrPlayerChoice/cosmos ether.png" id="2_15dhf"]
+[ext_resource type="Texture2D" uid="uid://bf2g14vt6hibs" path="res://Visuals/DialogueOrPlayerChoice/cosmos ether.png" id="2_15dhf"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3

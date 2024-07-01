@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bf2g14vt6hibs"
-path="res://.godot/imported/cosmos ether.png-5046845a07fa17d26abadf31ab552d11.ctex"
+uid="uid://cb18mj0u1ug"
+path="res://.godot/imported/PlayerDirtyRoom.jpg-c40e782b7e3b6d7d58d3818df648508d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Images/Dialogue Pictures/cosmos ether.png"
-dest_files=["res://.godot/imported/cosmos ether.png-5046845a07fa17d26abadf31ab552d11.ctex"]
+source_file="res://VIsuals/DialogueOrPlayerChoice/PlayerDirtyRoom.jpg"
+dest_files=["res://.godot/imported/PlayerDirtyRoom.jpg-c40e782b7e3b6d7d58d3818df648508d.ctex"]
 
 [params]
 

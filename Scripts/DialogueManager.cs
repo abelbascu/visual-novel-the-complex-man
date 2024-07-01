@@ -73,10 +73,8 @@ public partial class DialogueManager : Control {
     }
 
     public void DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) {
-        // Narrator or NPC won't ever have multiple choices, so we can display the dialogue now.
-         bool isDialogueOrPlayerChoice = dialogObj.Actor == "1";
-        
-        if (isDialogueOrPlayerChoice) {
+        // Narrator or NPC won't ever have multiple choices, so we can display the dialogue now.     
+        if (dialogObj.Actor != "1") {
             UIManager.Instance.DisplayDialogue(dialogObj);
             currentDialogueObject = dialogObj;
             //if it's the player, we need to add first the choice to the list and VBox   

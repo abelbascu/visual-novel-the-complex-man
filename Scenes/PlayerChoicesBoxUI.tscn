@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://b6kee1naax88o"]
 
-[ext_resource type="Texture2D" uid="uid://ddqt0olom3m5a" path="res://Images/UI/dialogueBox.png" id="1_ipqad"]
+[ext_resource type="Texture2D" uid="uid://ddqt0olom3m5a" path="res://VIsuals/UI/dialogueBox.png" id="1_ipqad"]
 [ext_resource type="Script" path="res://Scripts/PlayerChoicesBoxUI.cs" id="1_ygy34"]
 
 [node name="PlayerChoicesBoxUI" type="VBoxContainer"]

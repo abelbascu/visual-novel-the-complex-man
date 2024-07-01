@@ -20,6 +20,8 @@ public class DialogueObject
     //if the player selects this choice, all the unvisited playerChoices will be deleted.
     //and the player can only follow the current path, until a sure dead, change of conversation, etc.
     public bool IsNoTurningBackPath = false;
+    public string VisualPath { get; set; }
+    public int VisualType { get; set; }
     
 }
 

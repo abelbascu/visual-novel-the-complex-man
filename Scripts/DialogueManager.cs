@@ -11,7 +11,7 @@ public partial class DialogueManager : Control {
     //-------------------------------------------------------------------config variables---------------------------------------------------------------------------------
     public static string languageCode = "en";
     [Export] public int currentConversationID = 2; //set here the conversation you want to load. Conversations in Chatmapper are what we could call chapters.
-    [Export] public int currentDialogueID = 7; //set here the starting dialogue of the conversation
+    [Export] public int currentDialogueID = 2; //set here the starting dialogue of the conversation
     //-----------------------------------------------------------------dependency variables------------------------------------------------------------------------------
     private Dictionary<int, List<DialogueObject>> conversationDialogues; //the int refers to the conversation ID, see 'currentConversationID' above.
     public DialogueObject currentDialogueObject { get; set; }

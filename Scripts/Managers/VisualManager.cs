@@ -18,8 +18,8 @@ public partial class VisualManager : Control {
     public override void _Ready() {
         AnchorRight = 1;
         AnchorBottom = 1;
-        GrowHorizontal = GrowDirection.Both;
-        GrowVertical = GrowDirection.Both;
+       // GrowHorizontal = GrowDirection.Both;
+      //  GrowVertical = GrowDirection.Both;
 
         MouseFilter = MouseFilterEnum.Ignore;
 
@@ -35,8 +35,8 @@ public partial class VisualManager : Control {
         fullScreenImage.AnchorsPreset = (int)Control.LayoutPreset.FullRect;
 
         // Set the expansion and stretch modes
-        fullScreenImage.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
-        fullScreenImage.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
+      //  fullScreenImage.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+      //  fullScreenImage.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
     }
 
 
@@ -55,14 +55,14 @@ public partial class VisualManager : Control {
     }
 
     private void DisplayImage(string imagePath) {
-        var texture = ResourceLoader.Load<Texture2D>(imagePath);
-        fullScreenImage.Texture = texture;
-        fullScreenImage.Show();
+        // var texture = ResourceLoader.Load<Texture2D>(imagePath);
+        // fullScreenImage.Texture = texture;
+        // fullScreenImage.Show();
 
-        fullScreenImage.AnchorRight = 1;
-        fullScreenImage.AnchorBottom = 1;
-        fullScreenImage.GrowHorizontal = GrowDirection.Both;
-        fullScreenImage.GrowVertical = GrowDirection.Both;
+        // fullScreenImage.AnchorRight = 1;
+        // fullScreenImage.AnchorBottom = 1;
+        // fullScreenImage.GrowHorizontal = GrowDirection.Both;
+        // fullScreenImage.GrowVertical = GrowDirection.Both;
 
     }
 

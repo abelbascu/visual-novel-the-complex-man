@@ -14,7 +14,7 @@ size_flags_horizontal = 4
 size_flags_vertical = 8
 script = ExtResource("1_2ygpx")
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="BackgroundImage" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5

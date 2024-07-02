@@ -32,6 +32,15 @@ public partial class DialogueBoxUI : MarginContainer {
         //LabelPressed += OnDialogueBoxUIPressed;
     }
 
+   public void SetMargins(int left, int top, int right, int bottom)
+    {
+        AddThemeConstantOverride("margin_left", left);
+        AddThemeConstantOverride("margin_top", top);
+        AddThemeConstantOverride("margin_right", right);
+        AddThemeConstantOverride("margin_bottom", bottom);
+    }
+
+
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
         this.dialogueLineToDisplay = GetLocaleDialogue(dialogueObject, locale);

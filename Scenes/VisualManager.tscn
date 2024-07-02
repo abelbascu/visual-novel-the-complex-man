@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://bmwup57o25dyn"]
+[gd_scene load_steps=5 format=3 uid="uid://bmwup57o25dyn"]
 
-[ext_resource type="Script" path="res://Scripts/VisualManager.cs" id="1_b1v8p"]
+[ext_resource type="Script" path="res://Scripts/Managers/VisualManager.cs" id="1_b1v8p"]
+[ext_resource type="Texture2D" uid="uid://k7238j4uxopf" path="res://Visuals/UI/whitebackground.png" id="2_rsw5s"]
+[ext_resource type="Texture2D" uid="uid://cfut78364am7t" path="res://Visuals/menu-three-outlined-rounded-lines-symbol.png" id="3_3r4bp"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_w2emj"]
 
 [node name="VisualManager" type="Control"]
 layout_mode = 3
@@ -11,3 +15,21 @@ script = ExtResource("1_b1v8p")
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+offset_left = 1760.0
+offset_top = 64.0
+offset_right = 2360.0
+offset_bottom = 603.0
+scale = Vector2(0.188222, 0.250117)
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer"]
+material = SubResource("CanvasItemMaterial_w2emj")
+layout_mode = 2
+texture = ExtResource("2_rsw5s")
+
+[node name="TextureButton" type="TextureButton" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+texture_normal = ExtResource("3_3r4bp")

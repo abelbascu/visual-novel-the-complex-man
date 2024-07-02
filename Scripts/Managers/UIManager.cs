@@ -19,10 +19,7 @@ public partial class UIManager : Control {
     public override void _Ready() {
         mainMenu = GetNode<MainMenu>("MainMenu");
         mainMenu.StartButtonPressed += OnStartButtonPressed;
-
         CallDeferred(nameof(SetupNodeOrder));
-
-
         // MouseFilter = MouseFilterEnum.Ignore;
     }
 
@@ -30,12 +27,6 @@ public partial class UIManager : Control {
         // Ensure VisualsManager is below UI elements in the scene tree
         var visualManager = GetNode<VisualManager>("../VisualManager");
         GetParent().MoveChild(visualManager, 0);
-
-        // Set VisualManager to fill the entire screen
-        visualManager.AnchorRight = 1;
-        visualManager.AnchorBottom = 1;
-        visualManager.GrowHorizontal = GrowDirection.Both;
-        visualManager.GrowVertical = GrowDirection.Both;
 
         // Move this UIManager to be the last child (top layer)
         GetParent().MoveChild(this, GetParent().GetChildCount() - 1);
@@ -100,10 +91,44 @@ public partial class UIManager : Control {
         AddChild(instance);
         dialogueBoxUI = instance as DialogueBoxUI;
         // position dialogue box centered at the bottom
+
         Vector2 screenSize = GetTree().Root.Size;
         float xPosition = (screenSize.X - dialogueBoxUI.Size.X) / 3;
         float yPosition = screenSize.Y - UI_BOTTOM_POSITION;
         dialogueBoxUI.Position = new Vector2(xPosition, yPosition);
+
+        // // Set anchors
+        // dialogueBoxUI.AnchorBottom = 1;
+        // dialogueBoxUI.AnchorRight = 1;
+        // dialogueBoxUI.AnchorTop = 1;
+        // dialogueBoxUI.AnchorLeft = 0;
+
+
+        // Set anchors
+        //dialogueBoxUI.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+
+        // Set margins
+        // dialogueBoxUI.SetMargins(
+        //     left: 100,
+        //     top: 100,  // Adjust this value as needed
+        //     right: 100,
+        //     bottom: UI_BOTTOM_POSITION
+        // );
+
+        // Set size flags
+     //   dialogueBoxUI.SetHSizeFlags(Control.SizeFlags.ExpandFill);
+     //   dialogueBoxUI.SetVSizeFlags(Control.SizeFlags.ExpandFill);
+
+        // Ensure the dialogue box is visible
+        dialogueBoxUI.Visible = true;
+ 
+        // Set size flags
+        dialogueBoxUI.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        dialogueBoxUI.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+
+        // Ensure the dialogue box is visible
+        dialogueBoxUI.Visible = true;
+
         //once all chars of the dialogue text are displayed in the container, we can show the next dialogue.
         dialogueBoxUI.FinishedDisplayingDialogueLine += DialogueManager.Instance.OnTextBoxFinishedDisplayingDialogueLine;
     }

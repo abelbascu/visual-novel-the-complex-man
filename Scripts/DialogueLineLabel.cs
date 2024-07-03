@@ -29,7 +29,6 @@ public partial class DialogueLineLabel : Label {
     }
 
 	public void OnLabelPressed() {
-		var dialogueManager = DialogueManager.Instance;
-        dialogueManager.OnDialogueBoxUIPressed();
+        DialogueManager.Instance.OnDialogueBoxUIPressed();
 	}
 }

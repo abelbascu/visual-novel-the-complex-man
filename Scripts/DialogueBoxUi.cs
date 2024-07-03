@@ -47,6 +47,9 @@ public partial class DialogueBoxUI : MarginContainer {
 
     public void StopLetterByLetterDisplay() {
         letterDisplayTimer.Stop();
+        //for whatever reason, the line [dialogueLineLabel.Text = dialogueLineToDisplay;]
+        //won't work if i do not add this line before
+        dialogueLineLabel.Text = "";
         dialogueLineLabel.Text = dialogueLineToDisplay;
         letterIndex = 0;
         FinishedDisplayingDialogueLine?.Invoke();

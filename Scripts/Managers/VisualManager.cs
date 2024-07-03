@@ -16,13 +16,8 @@ public partial class VisualManager : Control {
     }
 
     public override void _Ready() {
-       // AnchorRight = 1;
-       // AnchorBottom = 1;
-       // GrowHorizontal = GrowDirection.Both;
-      //  GrowVertical = GrowDirection.Both;
 
         MouseFilter = MouseFilterEnum.Ignore;
-
         fullScreenImage = GetNode<TextureRect>("TextureRect");
         SetupBackgroundImage();
         // videoPlayer = GetNode<VideoStreamPlayer>("VideoPlayer");
@@ -33,7 +28,6 @@ public partial class VisualManager : Control {
         fullScreenImage.AnchorRight = 1;
         fullScreenImage.AnchorBottom = 1;
         fullScreenImage.AnchorsPreset = (int)Control.LayoutPreset.FullRect;
-
         // Set the expansion and stretch modes
       //  fullScreenImage.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
       //  fullScreenImage.StretchMode = TextureRect.StretchModeEnum.KeepAspectCovered;
@@ -58,12 +52,6 @@ public partial class VisualManager : Control {
         var texture = ResourceLoader.Load<Texture2D>(imagePath);
         fullScreenImage.Texture = texture;
         fullScreenImage.Show();
-
-        // fullScreenImage.AnchorRight = 1;
-        // fullScreenImage.AnchorBottom = 1;
-        // fullScreenImage.GrowHorizontal = GrowDirection.Both;
-        // fullScreenImage.GrowVertical = GrowDirection.Both;
-
     }
 
     // private void PlayCutscene(string videoPath)

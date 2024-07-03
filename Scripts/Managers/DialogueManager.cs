@@ -45,7 +45,7 @@ public partial class DialogueManager : Control {
         AnchorRight = 1;
         AnchorBottom = 1;
         // Ignore mouse input if it doesn't need to interact directly
-        MouseFilter = MouseFilterEnum.Ignore;
+        //MouseFilter = MouseFilterEnum.Ignore;
         LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
         playerChoicesList = new();
     }

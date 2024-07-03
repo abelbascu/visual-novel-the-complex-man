@@ -27,14 +27,6 @@ public partial class DialogueBoxUI : MarginContainer {
         dialogueLineLabel.MouseDefaultCursorShape = Control.CursorShape.PointingHand;
     }
 
-   public void SetMargins(int left, int top, int right, int bottom)
-    {
-        // AddThemeConstantOverride("margin_left", left);
-        // AddThemeConstantOverride("margin_top", top);
-        // AddThemeConstantOverride("margin_right", right);
-        // AddThemeConstantOverride("margin_bottom", bottom);
-    }
-
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
         this.dialogueLineToDisplay = GetLocaleDialogue(dialogueObject, locale);
         dialogueLineLabel.Text = "";
@@ -54,32 +46,22 @@ public partial class DialogueBoxUI : MarginContainer {
     }
 
     public void StopLetterByLetterDisplay() {
-        // Stop the timer
         letterDisplayTimer.Stop();
-        // Display the entire dialogue line
         dialogueLineLabel.Text = dialogueLineToDisplay;
-        // Reset the letter index
         letterIndex = 0;
-        // Invoke the FinishedDisplaying action
         FinishedDisplayingDialogueLine?.Invoke();
     }
 
     public void DisplayLetter() {
 
-        //if (Size.X > MAX_WIDTH) {
-            dialogueLineLabel.AutowrapMode = TextServer.AutowrapMode.Word;
-            // await ToSignal(this, "resized"); //wait for resizing x of DialogueBoxUI
-            // await ToSignal(this, "resized"); //wait for resizing y of DialogueBoxUI
-     //       float customMinX = Math.Min(Size.X, MAX_WIDTH);
-     //       CustomMinimumSize = new Vector2(customMinX, Size.Y);
-    //        Size = CustomMinimumSize;
-   //     }
+        dialogueLineLabel.AutowrapMode = TextServer.AutowrapMode.Word;
+
         if (letterIndex < dialogueLineToDisplay.Length) {
             dialogueLineLabel.Text += dialogueLineToDisplay[letterIndex];
             letterIndex++;
-            GD.Print($"letterIndex = {letterIndex}\ndialogueLineToDisplay.Length = {dialogueLineToDisplay.Length} ");
+            //GD.Print($"letterIndex = {letterIndex}\ndialogueLineToDisplay.Length = {dialogueLineToDisplay.Length} ");
         } else {
-            GD.Print($"dialogueLineLabel.Size: {dialogueLineLabel.Size}");
+            //GD.Print($"dialogueLineLabel.Size: {dialogueLineLabel.Size}");
             FinishedDisplayingDialogueLine.Invoke();
             letterIndex = 0;
             return;

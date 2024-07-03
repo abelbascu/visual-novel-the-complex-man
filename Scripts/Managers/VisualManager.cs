@@ -16,8 +16,8 @@ public partial class VisualManager : Control {
     }
 
     public override void _Ready() {
-        AnchorRight = 1;
-        AnchorBottom = 1;
+       // AnchorRight = 1;
+       // AnchorBottom = 1;
        // GrowHorizontal = GrowDirection.Both;
       //  GrowVertical = GrowDirection.Both;
 
@@ -55,9 +55,9 @@ public partial class VisualManager : Control {
     }
 
     private void DisplayImage(string imagePath) {
-        // var texture = ResourceLoader.Load<Texture2D>(imagePath);
-        // fullScreenImage.Texture = texture;
-        // fullScreenImage.Show();
+        var texture = ResourceLoader.Load<Texture2D>(imagePath);
+        fullScreenImage.Texture = texture;
+        fullScreenImage.Show();
 
         // fullScreenImage.AnchorRight = 1;
         // fullScreenImage.AnchorBottom = 1;

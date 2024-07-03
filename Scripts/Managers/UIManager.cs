@@ -21,7 +21,7 @@ public partial class UIManager : Control {
         mainMenu.StartButtonPressed += OnStartButtonPressed;
         dialogueBoxUI = GetNode<DialogueBoxUI>("DialogueBoxUI");
         CallDeferred(nameof(SetupNodeOrder));
-        // MouseFilter = MouseFilterEnum.Ignore;
+        MouseFilter = MouseFilterEnum.Ignore;
     }
 
     private void SetupNodeOrder() {
@@ -47,16 +47,13 @@ public partial class UIManager : Control {
             return;
         DialogueManager.Instance.isDialogueBeingPrinted = true;
         if (dialogueBoxUI == null) {
-            //before adding the dialogue text, we need to create the container box
             DisplayDialogueBoxUI();
         }
         if (dialogueBoxUI != null)   
-            //dialogueBoxUI.SetAnchorsPreset(Control.LayoutPreset.CenterBottom);
             dialogueBoxUI.Show();
         if (playerChoicesBoxUI != null)
             playerChoicesBoxUI.Hide();
 
-         //dialogueBoxUI.SetAnchorsPreset(Control.LayoutPreset.CenterBottom);
         dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, DialogueManager.languageCode);
     }
 

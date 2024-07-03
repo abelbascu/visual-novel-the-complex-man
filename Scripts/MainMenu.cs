@@ -18,7 +18,7 @@ public partial class MainMenu : Control {
 
 
     public override void _Ready() {
-
+        this.Show();
         //displaying the UI boxes with the options
         MainOptionsContainer = GetNode<VBoxContainer>("MainOptionsContainer");
         Button startNewGameButton = GetNode<Button>("MainOptionsContainer/StartNewGameButton");

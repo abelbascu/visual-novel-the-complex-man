@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3 uid="uid://c77p3prgew061"]
+
+[ext_resource type="Texture2D" uid="uid://k7238j4uxopf" path="res://Visuals/UI/whitebackground.png" id="1_gafqm"]
+[ext_resource type="Texture2D" uid="uid://cfut78364am7t" path="res://Visuals/menu-three-outlined-rounded-lines-symbol.png" id="2_pmig6"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_w2emj"]
+
+[node name="InGameMenuButton" type="MarginContainer"]
+offset_left = 1760.0
+offset_top = 64.0
+offset_right = 2360.0
+offset_bottom = 603.0
+scale = Vector2(0.188222, 0.250117)
+
+[node name="TextureRect" type="TextureRect" parent="."]
+material = SubResource("CanvasItemMaterial_w2emj")
+layout_mode = 2
+texture = ExtResource("1_gafqm")
+
+[node name="TextureButton" type="TextureButton" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+texture_normal = ExtResource("2_pmig6")

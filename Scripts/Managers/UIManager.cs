@@ -19,6 +19,7 @@ public partial class UIManager : Control {
     public override void _Ready() {
         mainMenu = GetNode<MainMenu>("MainMenu");
         mainMenu.StartButtonPressed += OnStartButtonPressed;
+        dialogueBoxUI = GetNode<DialogueBoxUI>("DialogueBoxUI");
         CallDeferred(nameof(SetupNodeOrder));
         // MouseFilter = MouseFilterEnum.Ignore;
     }
@@ -49,11 +50,13 @@ public partial class UIManager : Control {
             //before adding the dialogue text, we need to create the container box
             DisplayDialogueBoxUI();
         }
-        if (dialogueBoxUI != null)
+        if (dialogueBoxUI != null)   
+            //dialogueBoxUI.SetAnchorsPreset(Control.LayoutPreset.CenterBottom);
             dialogueBoxUI.Show();
         if (playerChoicesBoxUI != null)
             playerChoicesBoxUI.Hide();
 
+         //dialogueBoxUI.SetAnchorsPreset(Control.LayoutPreset.CenterBottom);
         dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, DialogueManager.languageCode);
     }
 
@@ -65,6 +68,7 @@ public partial class UIManager : Control {
         if (playerChoicesBoxUI != null) {
             //ensure the container is visible
             playerChoicesBoxUI.Show();
+            //dialogueBoxUI.AnchorBottom = 1;      
             //let's hide the dialogue box, that's used to displaye narrator/NPC texts, not the player's
             if (dialogueBoxUI != null)
                 dialogueBoxUI.Hide();
@@ -86,20 +90,20 @@ public partial class UIManager : Control {
     }
 
     public void DisplayDialogueBoxUI() {
-        PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
-        Node instance = scene.Instantiate();
-        AddChild(instance);
-        dialogueBoxUI = instance as DialogueBoxUI;
+        // PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
+        // Node instance = scene.Instantiate();
+        // AddChild(instance);
+        // dialogueBoxUI = instance as DialogueBoxUI;
         // position dialogue box centered at the bottom
 
-        Vector2 screenSize = GetTree().Root.Size;
-        float xPosition = (screenSize.X - dialogueBoxUI.Size.X) / 3;
-        float yPosition = screenSize.Y - UI_BOTTOM_POSITION;
-        dialogueBoxUI.Position = new Vector2(xPosition, yPosition);
+        // Vector2 screenSize = GetTree().Root.Size;
+        // float xPosition = (screenSize.X - dialogueBoxUI.Size.X) / 3;
+        // float yPosition = screenSize.Y - UI_BOTTOM_POSITION;
+        // dialogueBoxUI.Position = new Vector2(xPosition, yPosition);
 
         // // Set anchors
-        // dialogueBoxUI.AnchorBottom = 1;
-        // dialogueBoxUI.AnchorRight = 1;
+        //dialogueBoxUI.AnchorBottom = 1;
+        dialogueBoxUI.SetAnchorsPreset(LayoutPreset.CenterBottom);
         // dialogueBoxUI.AnchorTop = 1;
         // dialogueBoxUI.AnchorLeft = 0;
 
@@ -116,12 +120,12 @@ public partial class UIManager : Control {
         // );
 
         // Set size flags
-     //   dialogueBoxUI.SetHSizeFlags(Control.SizeFlags.ExpandFill);
-     //   dialogueBoxUI.SetVSizeFlags(Control.SizeFlags.ExpandFill);
+        //   dialogueBoxUI.SetHSizeFlags(Control.SizeFlags.ExpandFill);
+        //   dialogueBoxUI.SetVSizeFlags(Control.SizeFlags.ExpandFill);
 
         // Ensure the dialogue box is visible
         dialogueBoxUI.Visible = true;
- 
+
         // Set size flags
         dialogueBoxUI.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         dialogueBoxUI.SizeFlagsVertical = Control.SizeFlags.ExpandFill;

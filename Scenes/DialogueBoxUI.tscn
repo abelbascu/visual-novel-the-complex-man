@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://Scripts/DialogueLineLabel.cs" id="3_gs1qn"]
 
 [sub_resource type="SystemFont" id="SystemFont_u5emw"]
+subpixel_positioning = 0
 
 [node name="DialogueBoxUI" type="MarginContainer"]
 offset_left = 50.0

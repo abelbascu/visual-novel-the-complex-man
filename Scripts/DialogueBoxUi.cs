@@ -15,11 +15,9 @@ public partial class DialogueBoxUI : MarginContainer {
 
     public Action FinishedDisplayingDialogueLine;
     public Action DialogueBoxUIWasResized;
-    //public Action LabelPressed;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
-        Show(); //make the dialogue box visible
         dialogueLineLabel = GetNode<Label>("MarginContainer/DialogueLineLabel");
         letterDisplayTimer = GetNode<Timer>("LetterDisplayTimer");
         letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;
@@ -27,20 +25,15 @@ public partial class DialogueBoxUI : MarginContainer {
         dialogueLineLabel.MouseFilter = Control.MouseFilterEnum.Stop;
         // Change cursor on hover
         dialogueLineLabel.MouseDefaultCursorShape = Control.CursorShape.PointingHand;
-        //dialogueLineLabel.GuiInput += OnLabelGuiInput;
-
-        //LabelPressed += OnDialogueBoxUIPressed;
     }
 
    public void SetMargins(int left, int top, int right, int bottom)
     {
-        AddThemeConstantOverride("margin_left", left);
-        AddThemeConstantOverride("margin_top", top);
-        AddThemeConstantOverride("margin_right", right);
-        AddThemeConstantOverride("margin_bottom", bottom);
+        // AddThemeConstantOverride("margin_left", left);
+        // AddThemeConstantOverride("margin_top", top);
+        // AddThemeConstantOverride("margin_right", right);
+        // AddThemeConstantOverride("margin_bottom", bottom);
     }
-
-
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
         this.dialogueLineToDisplay = GetLocaleDialogue(dialogueObject, locale);
@@ -73,15 +66,14 @@ public partial class DialogueBoxUI : MarginContainer {
 
     public void DisplayLetter() {
 
-        if (Size.X > MAX_WIDTH) {
+        //if (Size.X > MAX_WIDTH) {
             dialogueLineLabel.AutowrapMode = TextServer.AutowrapMode.Word;
             // await ToSignal(this, "resized"); //wait for resizing x of DialogueBoxUI
             // await ToSignal(this, "resized"); //wait for resizing y of DialogueBoxUI
-
-            float customMinX = Math.Min(Size.X, MAX_WIDTH);
-            CustomMinimumSize = new Vector2(customMinX, Size.Y);
-            Size = CustomMinimumSize;
-        }
+     //       float customMinX = Math.Min(Size.X, MAX_WIDTH);
+     //       CustomMinimumSize = new Vector2(customMinX, Size.Y);
+    //        Size = CustomMinimumSize;
+   //     }
         if (letterIndex < dialogueLineToDisplay.Length) {
             dialogueLineLabel.Text += dialogueLineToDisplay[letterIndex];
             letterIndex++;

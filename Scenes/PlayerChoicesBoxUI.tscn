@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://b6kee1naax88o"]
 
-[ext_resource type="Texture2D" uid="uid://ddqt0olom3m5a" path="res://Visuals/UI/dialogueBox.png" id="1_ipqad"]
 [ext_resource type="Script" path="res://Scripts/PlayerChoicesBoxUI.cs" id="1_ygy34"]
+[ext_resource type="Texture2D" uid="uid://uxrr37wkeudc" path="res://Visuals/UI/dialogue box UI bckg transparent.png" id="2_db4gy"]
 
 [node name="PlayerChoicesBoxUI" type="VBoxContainer"]
 offset_left = 68.0
@@ -19,12 +19,12 @@ size_flags_vertical = 3
 [node name="NinePatchRect" type="NinePatchRect" parent="GlobalMarginContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-texture = ExtResource("1_ipqad")
-region_rect = Rect2(0, 0, 48, 48)
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
+texture = ExtResource("2_db4gy")
+region_rect = Rect2(-4.38165, -2.12771, 585.274, 294.515)
+patch_margin_left = 196
+patch_margin_top = 87
+patch_margin_right = 175
+patch_margin_bottom = 93
 
 [node name="PlayerChoicesMarginContainer" type="VBoxContainer" parent="GlobalMarginContainer"]
 layout_mode = 2

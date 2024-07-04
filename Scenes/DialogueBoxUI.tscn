@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://8ytymk06gtxw"]
 
 [ext_resource type="Script" path="res://Scripts/DialogueBoxUI.cs" id="1_i37ha"]
-[ext_resource type="Texture2D" uid="uid://ddqt0olom3m5a" path="res://Visuals/UI/dialogueBox.png" id="1_vo8kf"]
+[ext_resource type="Texture2D" uid="uid://uxrr37wkeudc" path="res://Visuals/UI/dialogue box UI bckg transparent.png" id="2_ehe5o"]
 [ext_resource type="Script" path="res://Scripts/DialogueLineLabel.cs" id="3_gs1qn"]
 
 [sub_resource type="SystemFont" id="SystemFont_u5emw"]
@@ -21,12 +21,12 @@ script = ExtResource("1_i37ha")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="."]
 layout_mode = 2
-texture = ExtResource("1_vo8kf")
-region_rect = Rect2(0, 0, 48, 48)
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
+texture = ExtResource("2_ehe5o")
+region_rect = Rect2(-1.46834, 0.5, 578.923, 289.226)
+patch_margin_left = 222
+patch_margin_top = 79
+patch_margin_right = 205
+patch_margin_bottom = 120
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
@@ -38,7 +38,7 @@ theme_override_constants/margin_bottom = 10
 [node name="DialogueLineLabel" type="Label" parent="MarginContainer"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = SubResource("SystemFont_u5emw")
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 3

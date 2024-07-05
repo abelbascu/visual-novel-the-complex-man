@@ -1,19 +1,25 @@
 using Godot;
 using System;
 
-public partial class DialogueLineLabel : Label {
+public partial class DialogueLineLabel : RichTextLabel {
 
-	public Action LabelPressed;
+    public Action LabelPressed;
 
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
 
-		LabelPressed += OnLabelPressed;
-    }
+        LabelPressed += OnLabelPressed;
 
-    // Called every frame. 'delta' is the elapsed time since the previous frame.
-    public override void _Process(double delta) {
+        BbcodeEnabled = true;
+        FitContent = true;
+        ScrollActive = false;
+
+        SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        SizeFlagsVertical = SizeFlags.ExpandFill;
+
+        AddThemeConstantOverride("line_separation", 8);
+        AddThemeFontSizeOverride("normal_font_size", 32);
     }
 
     public override void _GuiInput(InputEvent @event) {
@@ -21,14 +27,19 @@ public partial class DialogueLineLabel : Label {
             mouseEvent.ButtonIndex == MouseButton.Left &&
             mouseEvent.Pressed) {
             // Check if the click is within the bounds of the Label
-            if (this.GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
-                LabelPressed.Invoke();
-                GD.Print("Label area clicked!");
-            }
+            // if (this.GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
+            LabelPressed.Invoke();
+            GD.Print("Label area clicked!");
+            //}
         }
     }
 
-	public void OnLabelPressed() {
+    public void OnLabelPressed() {
         DialogueManager.Instance.OnDialogueBoxUIPressed();
-	}
+    }
+
+    public void SetText(string text)
+    {
+        Text = $"[left]{text}[/left]";
+    }
 }

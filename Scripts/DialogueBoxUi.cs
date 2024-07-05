@@ -10,7 +10,7 @@ public partial class DialogueBoxUI : MarginContainer {
     private float letterTime = 0.00005f;
     private float spaceTime = 0.00006f;
     private float punctuationTime = 0.000002f;
-    public Label dialogueLineLabel;
+    public DialogueLineLabel dialogueLineLabel;
     Timer letterDisplayTimer;
 
     public Action FinishedDisplayingDialogueLine;
@@ -18,18 +18,21 @@ public partial class DialogueBoxUI : MarginContainer {
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
-        dialogueLineLabel = GetNode<Label>("MarginContainer/DialogueLineLabel");
+        dialogueLineLabel = GetNode<DialogueLineLabel>("MarginContainer/DialogueLineLabel");
         letterDisplayTimer = GetNode<Timer>("LetterDisplayTimer");
         letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;
-        // Make sure the Label can receive input
-        dialogueLineLabel.MouseFilter = Control.MouseFilterEnum.Stop;
-        // Change cursor on hover
-        dialogueLineLabel.MouseDefaultCursorShape = Control.CursorShape.PointingHand;
+        
+        // // Make sure the Label can receive input
+        // dialogueLineLabel.MouseFilter = Control.MouseFilterEnum.Stop;
+        // // Change cursor on hover
+        // dialogueLineLabel.MouseDefaultCursorShape = Control.CursorShape.PointingHand;
+        // dialogueLineLabel.AddThemeConstantOverride("line_spacing", 2); 
     }
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
         this.dialogueLineToDisplay = GetLocaleDialogue(dialogueObject, locale);
-        dialogueLineLabel.Text = "";
+        //dialogueLineLabel.Text = "";
+        dialogueLineLabel.Clear();
         DisplayLetter();
     }
 
@@ -60,7 +63,7 @@ public partial class DialogueBoxUI : MarginContainer {
         dialogueLineLabel.AutowrapMode = TextServer.AutowrapMode.Word;
 
         if (letterIndex < dialogueLineToDisplay.Length) {
-            dialogueLineLabel.Text += dialogueLineToDisplay[letterIndex];
+            dialogueLineLabel.AppendText(dialogueLineToDisplay[letterIndex].ToString());
             letterIndex++;
             //GD.Print($"letterIndex = {letterIndex}\ndialogueLineToDisplay.Length = {dialogueLineToDisplay.Length} ");
         } else {

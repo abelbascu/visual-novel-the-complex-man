@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://uxrr37wkeudc"
-path="res://.godot/imported/dialogue box UI bckg transparent.png-f1e3e81ca3d9d50e92a5bcd7c245edf3.ctex"
+uid="uid://dvmxcg1hidawy"
+path="res://.godot/imported/dialogue box UI bckg transparent resized.png-1b57b2018300dc3418e51d019dab717e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Visuals/UI/dialogue box UI bckg transparent.png"
-dest_files=["res://.godot/imported/dialogue box UI bckg transparent.png-f1e3e81ca3d9d50e92a5bcd7c245edf3.ctex"]
+source_file="res://Visuals/dialogue box UI bckg transparent resized.png"
+dest_files=["res://.godot/imported/dialogue box UI bckg transparent resized.png-1b57b2018300dc3418e51d019dab717e.ctex"]
 
 [params]
 

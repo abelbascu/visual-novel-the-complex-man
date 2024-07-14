@@ -8,12 +8,24 @@ using System.Linq;
 public partial class PlayerChoicesBoxUI : VBoxContainer {
     private string playerChoiceToDisplay = "";
     public Action FinishedDisplayingPlayerChoice;
-    public VBoxContainer dialogueChoicesContainer;
+    public VBoxContainer playerChoicesContainer;
+    private PackedScene playerChoiceButtonScene;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
         Show(); //make the dialogue box visible
-        dialogueChoicesContainer = GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
+        playerChoicesContainer = GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
+        playerChoiceButtonScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoiceButton.tscn");
+
+        // Anchor to bottom
+        AnchorTop = 1;
+        AnchorBottom = 1;
+        GrowVertical = GrowDirection.Begin;
+
+        // Set a maximum height (adjust as needed)
+        CustomMinimumSize = new Vector2(0, 400);
+
+
     }
 
     public void DisplayPlayerChoice(DialogueObject playerChoiceObject, string languageCode) {
@@ -26,18 +38,43 @@ public partial class PlayerChoicesBoxUI : VBoxContainer {
 
         if (existingButton != null) {
             // Move existing button to the top
-            dialogueChoicesContainer.MoveChild(existingButton, 0);
+            playerChoicesContainer.MoveChild(existingButton, 0);
+            existingButton.SetText(playerChoiceToDisplay);
 
         } else {
             // Create new button and add it at the top
-            PlayerChoiceButton dialogueChoice = new(playerChoiceObject);
-            dialogueChoicesContainer.AddChild(dialogueChoice);
-            dialogueChoicesContainer.MoveChild(dialogueChoice, 0);
-            dialogueChoice.Text = playerChoiceToDisplay;
+            //PlayerChoiceButton dialogueChoice = new(playerChoiceObject);
+            PlayerChoiceButton playerChoiceButton = playerChoiceButtonScene.Instantiate<PlayerChoiceButton>();
+            playerChoiceButton.SetDialogueObject(playerChoiceObject);
+
+            playerChoiceButton.SetText(playerChoiceToDisplay);
+            playerChoicesContainer.AddChild(playerChoiceButton);
+
+            playerChoicesContainer.MoveChild(playerChoiceButton, 0);
+
+
+
+            //playerChoiceButton.SetText(playerChoiceToDisplay);
+
+            // CustomizeButtonAppearance(playerChoiceButton);
+            // Ensure proper vertical layout
+            playerChoicesContainer.CustomMinimumSize = new Vector2(playerChoicesContainer.CustomMinimumSize.X, 0);
+            playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkEnd;
+
         }
 
-        FinishedDisplayingPlayerChoice.Invoke();
+        FinishedDisplayingPlayerChoice?.Invoke();
     }
+
+
+    //     private void CustomizeButtonAppearance(PlayerChoiceButton button)
+    // {
+    //     // Remove background
+    //     button.Flat = true;
+    //     // Add hover effect
+    //     button.MouseEntered += () => button.Scale = new Vector2(1.1f, 1.1f);
+    //     button.MouseExited += () => button.Scale = Vector2.One;
+    // }
 
     public string GetLocalePlayerChoice(DialogueObject playerChoiceObj, string locale) {
         string localeCurrentDialogue = locale switch {
@@ -50,7 +87,7 @@ public partial class PlayerChoicesBoxUI : VBoxContainer {
     }
 
     private PlayerChoiceButton FindExistingButton(DialogueObject dialogueObject) {
-        foreach (var child in dialogueChoicesContainer.GetChildren()) {
+        foreach (var child in playerChoicesContainer.GetChildren()) {
             if (child is PlayerChoiceButton button && button.HasMatchingDialogueObject(dialogueObject)) {
                 return button;
             }
@@ -62,7 +99,7 @@ public partial class PlayerChoicesBoxUI : VBoxContainer {
 
         List<PlayerChoiceButton> buttonsToRemove = new List<PlayerChoiceButton>();
 
-        foreach (PlayerChoiceButton child in dialogueChoicesContainer.GetChildren()) {
+        foreach (PlayerChoiceButton child in playerChoicesContainer.GetChildren()) {
             if (child is PlayerChoiceButton button) {
                 if (child.dialogueObject.NoGroupParentID == dialogueObject.NoGroupParentID)
                     buttonsToRemove.Add(child);
@@ -70,15 +107,15 @@ public partial class PlayerChoicesBoxUI : VBoxContainer {
         }
 
         foreach (var button in buttonsToRemove) {
-            dialogueChoicesContainer.RemoveChild(button);
+            playerChoicesContainer.RemoveChild(button);
             button.QueueFree();
         }
     }
 
     public void RemoveAllPlayerChoiceButtons() {
-        foreach (PlayerChoiceButton child in dialogueChoicesContainer.GetChildren()) {
+        foreach (PlayerChoiceButton child in playerChoicesContainer.GetChildren()) {
             if (child is PlayerChoiceButton button)
-                dialogueChoicesContainer.RemoveChild(child);
+                playerChoicesContainer.RemoveChild(child);
         }
     }
 

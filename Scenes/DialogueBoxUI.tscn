@@ -5,6 +5,8 @@
 [ext_resource type="Script" path="res://Scripts/DialogueLineLabel.cs" id="3_gs1qn"]
 
 [sub_resource type="SystemFont" id="SystemFont_6a7m0"]
+fallbacks = Array[Font]([null])
+subpixel_positioning = 0
 
 [node name="DialogueBoxUI" type="MarginContainer"]
 anchors_preset = -1
@@ -34,7 +36,7 @@ patch_margin_bottom = 67
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
-theme_override_constants/margin_left = 10
+theme_override_constants/margin_left = 40
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10

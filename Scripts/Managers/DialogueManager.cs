@@ -296,7 +296,7 @@ public partial class DialogueManager : Control {
     }
 
     public void RemoveAllNoGroupChildrenFromPlayerChoicesBoxUI(DialogueObject playerChoiceObject) {
-        UIManager.Instance.playerChoicesBoxUI.RewmoveAllNoGroupChildrenWithSameOriginID(playerChoiceObject);
+        UIManager.Instance.playerChoicesBoxUI.RemoveAllNoGroupChildrenWithSameOriginID(playerChoiceObject);
     }
 
     public void OnPlayerChoicePressed() {

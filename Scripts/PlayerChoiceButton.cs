@@ -1,81 +1,62 @@
 using Godot;
 
-public partial class PlayerChoiceButton : TextureButton {
-
+public partial class PlayerChoiceButton : TextureButton
+{
     public DialogueObject dialogueObject { get; private set; }
-    private VBoxContainer parentContainer;
     private RichTextLabel textLabel;
-
     private Tween currentTween;
 
-    public override void _Ready() {
-
-        Pressed += OnButtonPressed;
-
-        parentContainer = GetParent<VBoxContainer>();
-
-        // Ensure the button can receive input
-        MouseFilter = MouseFilterEnum.Stop;
-        FocusMode = FocusModeEnum.All;
-
-        // Connect to gui_input instead of Pressed
-        GuiInput += OnGuiInput;
-
-        // Create and add RichTextLabel
-        textLabel = new RichTextLabel {
+    public override void _Ready()
+    {
+        textLabel = new RichTextLabel
+        {
             BbcodeEnabled = true,
             FitContent = true,
             AutowrapMode = TextServer.AutowrapMode.WordSmart,
             AnchorRight = 1,
             AnchorBottom = 1,
-            MouseFilter = Control.MouseFilterEnum.Pass // Ignore mouse events
+            MouseFilter = Control.MouseFilterEnum.Pass,
         };
         AddChild(textLabel);
 
-        // Remove background
-        TextureNormal = null;
+   
+        SizeFlagsHorizontal = SizeFlags.Fill;
+        SizeFlagsVertical = SizeFlags.ShrinkCenter;
 
-        // Add hover effect
         MouseEntered += OnMouseEntered;
         MouseExited += OnMouseExited;
+        Pressed += OnButtonPressed;
 
-        // Additional customization
-        CustomMinimumSize = new Vector2(200, 0); // Set minimum width, let height adjust
+        TextureNormal = null; // Remove background
     }
 
-    private void OnGuiInput(InputEvent @event) {
-        if (@event is InputEventMouseButton mouseEvent &&
-            mouseEvent.ButtonIndex == MouseButton.Left &&
-            mouseEvent.Pressed) {
-            GD.Print("Button clicked");
-            OnButtonPressed();
-        }
-    }
-
-    public void SetDialogueObject(DialogueObject dialogObj) {
+    public void SetDialogueObject(DialogueObject dialogObj)
+    {
         this.dialogueObject = dialogObj;
     }
 
-    public void SetText(string text) {
+    public void SetText(string text)
+    {
         textLabel.Text = $"[left]{text}[/left]";
+        CustomMinimumSize = new Vector2(20, textLabel.Size.Y);
     }
 
-    private void OnButtonPressed() {
+        private void AdjustSize()
+    {
+       
+        CustomMinimumSize = new Vector2(200, textLabel.Size.Y);
+        Size = CustomMinimumSize;
+    }
+
+    private void OnButtonPressed()
+    {
         var dialogueManager = DialogueManager.Instance;
         dialogueManager.OnPlayerButtonUIPressed(dialogueObject);
-        // Remove the button from its parent container
-        CallDeferred("RemoveButton");
-
+        QueueFree();
     }
 
-    private void RemoveButton() {
-        if (parentContainer != null) {
-            parentContainer.RemoveChild(this);
-            QueueFree();
-        }
-    }
-
-    public bool HasMatchingDialogueObject(DialogueObject otherDialogueObject) {
+    public bool HasMatchingDialogueObject(DialogueObject otherDialogueObject)
+    {
         return this.dialogueObject.ID == otherDialogueObject.ID;
     }
 
@@ -89,7 +70,7 @@ public partial class PlayerChoiceButton : TextureButton {
         ScaleTo(Vector2.One);
     }
 
-        private void ScaleTo(Vector2 targetScale)
+    private void ScaleTo(Vector2 targetScale)
     {
         if (currentTween != null && currentTween.IsValid())
         {

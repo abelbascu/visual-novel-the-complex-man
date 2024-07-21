@@ -15,9 +15,14 @@ public partial class PlayerChoicesBoxUI : VBoxContainer
         playerChoiceButtonScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoiceButton.tscn");
 
           // Set up anchors and offsets
+        //AnchorBottom = 1;
+        //AnchorTop = 1;
+        //OffsetTop = -400; // Adjust this value as needed for your minimum height
         AnchorBottom = 1;
-        AnchorTop = 1;
-        OffsetTop = -400; // Adjust this value as needed for your minimum height
+        
+
+         GrowVertical = GrowDirection.Begin;
+        GrowHorizontal = GrowDirection.Both;
         playerChoicesContainer.AddThemeConstantOverride("separation", 5);
 
           // Ensure content starts from the top

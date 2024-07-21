@@ -19,7 +19,15 @@ public partial class PlayerChoiceButton : TextureButton
         };
         AddChild(textLabel);
 
-   
+        // Set font and font size
+        var fontName = "Open Sans";
+        var fontSize = 24;
+        var font = new SystemFont();
+        font.FontNames = new string[] { fontName };
+        font.Oversampling = 1.0f; // Adjust if needed for better rendering
+        textLabel.AddThemeFontOverride("normal_font", font);
+        textLabel.AddThemeFontSizeOverride("normal_font_size", fontSize);
+
         SizeFlagsHorizontal = SizeFlags.Fill;
         SizeFlagsVertical = SizeFlags.ShrinkCenter;
 
@@ -41,9 +49,9 @@ public partial class PlayerChoiceButton : TextureButton
         CustomMinimumSize = new Vector2(20, textLabel.Size.Y);
     }
 
-        private void AdjustSize()
+    private void AdjustSize()
     {
-       
+
         CustomMinimumSize = new Vector2(200, textLabel.Size.Y);
         Size = CustomMinimumSize;
     }

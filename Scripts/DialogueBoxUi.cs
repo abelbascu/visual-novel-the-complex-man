@@ -21,12 +21,6 @@ public partial class DialogueBoxUI : MarginContainer {
         dialogueLineLabel = GetNode<DialogueLineLabel>("MarginContainer/DialogueLineLabel");
         letterDisplayTimer = GetNode<Timer>("LetterDisplayTimer");
         letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;
-        
-        // // Make sure the Label can receive input
-        // dialogueLineLabel.MouseFilter = Control.MouseFilterEnum.Stop;
-        // // Change cursor on hover
-        // dialogueLineLabel.MouseDefaultCursorShape = Control.CursorShape.PointingHand;
-        // dialogueLineLabel.AddThemeConstantOverride("line_spacing", 2); 
     }
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {

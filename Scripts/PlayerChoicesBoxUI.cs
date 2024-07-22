@@ -11,15 +11,15 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         Show();
         playerChoicesContainer = GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
         playerChoiceButtonScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoiceButton.tscn");
-        // Set up anchors and offsets
-        //AnchorBottom = 1;
+
         SetAnchorsAndOffsetsPreset(LayoutPreset.CenterBottom, resizeMode: LayoutPresetMode.KeepWidth);
-        //AnchorTop = 1;
-        //OffsetTop = -400; // Adjust this value as needed for your minimum height
-        playerChoicesContainer.AddThemeConstantOverride("separation", 5);
-        // Center horizontally and position at bottom
-        // Center horizontally and position at bottom
-        // LayoutPreset = LayoutPreset.CenterBottom;
+
+        // Ensure buttons are aligned to the top
+        playerChoicesContainer.Alignment = BoxContainer.AlignmentMode.Begin;
+        playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
+        playerChoicesContainer.AddThemeConstantOverride("separation", 20);
+
+        GrowVertical = GrowDirection.Begin;
 
         // Ensure the content starts from the top of this control
         AddThemeConstantOverride("margin_top", 0);
@@ -28,7 +28,6 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         // Ensure content starts from the top
         var globalMarginContainer = GetNode<MarginContainer>("GlobalMarginContainer");
         globalMarginContainer.AddThemeConstantOverride("margin_top", 0);
-        //globalMarginContainer.AddThemeConstantOverride("margin_bottom", 0);
     }
 
     public void DisplayPlayerChoice(DialogueObject playerChoiceObject, string languageCode) {

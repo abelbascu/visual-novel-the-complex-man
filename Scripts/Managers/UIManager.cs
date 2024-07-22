@@ -73,24 +73,20 @@ public partial class UIManager : Control {
             //let's hide the dialogue box, that's used to displaye narrator/NPC texts, not the player's
             if (dialogueBoxUI != null)
                 dialogueBoxUI.Hide();
+
+            setIsPlayerChoiceBeingPrinted(true);
+            playerChoicesBoxUI.DisplayPlayerChoices(playerChoices, DialogueManager.languageCode);
+            setIsPlayerChoiceBeingPrinted(false);
         }
-        foreach (var playerChoiceObject in playerChoices) {
-            if (!ButtonExistsForPlayerChoice(playerChoiceObject)) {
-                setIsPlayerChoiceBeingPrinted(true);
-                playerChoicesBoxUI.DisplayPlayerChoice(playerChoiceObject, DialogueManager.languageCode);
-            }
-        }
-         setIsPlayerChoiceBeingPrinted(false);
-        
     }
 
-    public bool ButtonExistsForPlayerChoice(DialogueObject playerChoiceObject) {
-        var existingButtons = dialogueChoicesMarginContainer.GetChildren()
-            .OfType<PlayerChoiceButton>()
-            .ToList();
+    // public bool ButtonExistsForPlayerChoice(DialogueObject playerChoiceObject) {
+    //     var existingButtons = dialogueChoicesMarginContainer.GetChildren()
+    //         .OfType<PlayerChoiceButton>()
+    //         .ToList();
 
-        return existingButtons.Any(button => button.HasMatchingDialogueObject(playerChoiceObject));
-    }
+    //     return existingButtons.Any(button => button.HasMatchingDialogueObject(playerChoiceObject));
+    // }
 
     public void DisplayDialogueBoxUI() {
 

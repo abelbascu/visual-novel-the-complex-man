@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class PlayerChoicesBoxUI : MarginContainer {
     public Action FinishedDisplayingPlayerChoice;
@@ -30,22 +31,30 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         globalMarginContainer.AddThemeConstantOverride("margin_top", 0);
     }
 
-    public void DisplayPlayerChoice(DialogueObject playerChoiceObject, string languageCode) {
-        string playerChoiceToDisplay = GetLocalePlayerChoice(playerChoiceObject, languageCode);
+    public void DisplayPlayerChoices(List<DialogueObject> playerChoices, string languageCode) {
 
-        PlayerChoiceButton existingButton = FindExistingButton(playerChoiceObject);
+        RemoveAllPlayerChoiceButtons();
 
-        if (existingButton != null) {
-            playerChoicesContainer.MoveChild(existingButton, 0);
-            existingButton.SetText(playerChoiceToDisplay);
-        } else {
-            PlayerChoiceButton playerChoiceButton = playerChoiceButtonScene.Instantiate<PlayerChoiceButton>();
-            playerChoiceButton.SetDialogueObject(playerChoiceObject);
-            playerChoicesContainer.AddChild(playerChoiceButton);
-            playerChoiceButton.SetText(playerChoiceToDisplay);
+        foreach (var playerChoiceObject in playerChoices) {
+            if (!ButtonExistsForPlayerChoice(playerChoiceObject)) {
+
+                string playerChoiceToDisplay = GetLocalePlayerChoice(playerChoiceObject, languageCode);
+                PlayerChoiceButton playerChoiceButton = playerChoiceButtonScene.Instantiate<PlayerChoiceButton>();
+                playerChoiceButton.SetDialogueObject(playerChoiceObject);
+                playerChoicesContainer.AddChild(playerChoiceButton);
+                playerChoiceButton.SetText(playerChoiceToDisplay);
+            }
         }
 
         FinishedDisplayingPlayerChoice?.Invoke();
+    }
+
+    public bool ButtonExistsForPlayerChoice(DialogueObject playerChoiceObject) {
+        var existingButtons = playerChoicesContainer.GetChildren()
+            .OfType<PlayerChoiceButton>()
+            .ToList();
+
+        return existingButtons.Any(button => button.HasMatchingDialogueObject(playerChoiceObject));
     }
 
 

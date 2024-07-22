@@ -90,9 +90,12 @@ public partial class DialogueManager : Control {
 
     //IEnumerable<int> so we can pass a list or a single int when there is only one player choice to add to the playerChoicesList
     public void AddPlayerChoicesToList(IEnumerable<int> destinationDialogIDs, DialogueObject dialogObj) {
-        List<int> destinationIDsList = destinationDialogIDs.ToList();
-        for (int i = destinationDialogIDs.Count() - 1; i >= 0; i--)
-            playerChoicesList.Insert(0, GetDialogueObject(currentConversationID, destinationIDsList[i]));
+        List<DialogueObject> newChoices = new List<DialogueObject>();
+        foreach (int id in destinationDialogIDs) {
+            newChoices.Add(GetDialogueObject(currentConversationID, id));
+        }
+        // Insert the new choices at the beginning of the list, maintaining their original order
+        playerChoicesList.InsertRange(0, newChoices);
     }
 
     //overload method when we only have one single player choice to add to the PlayerChoicesList
@@ -189,19 +192,27 @@ public partial class DialogueManager : Control {
 
     public void AddGroupPlayerChoicesToList(DialogueObject nextDialogueObject) {
         nextDialogueObject.IsGroupParent = true;
+        List<int> destinationDialogIDs = new List<int>();
+
         // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
         foreach (Dictionary<string, int> dict in nextDialogueObject.OutgoingLinks) {
+
             if (dict.TryGetValue("DestinationDialogID", out int destinationDialogID) &&
                 dict.TryGetValue("DestinationConvoID", out int destinationConvoID)) {
                 DialogueObject dialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
                 dialogObject.IsGroupChild = true;
-                AddPlayerChoicesToList(dialogObject);
+                destinationDialogIDs.Add(destinationDialogID);
             }
+        }
+
+        if (destinationDialogIDs.Count > 0) {
+            AddPlayerChoicesToList(destinationDialogIDs, nextDialogueObject);
         }
     }
 
     public void AddNoGroupPlayerChoicesToList(DialogueObject currentDialogueObject) {
         currentDialogueObject.IsNoGroupParent = true;
+        List<int> destinationDialogIDs = new List<int>();
         // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
         foreach (Dictionary<string, int> dict in currentDialogueObject.OutgoingLinks) {
             if (dict.TryGetValue("DestinationDialogID", out int destinationDialogID) &&
@@ -211,8 +222,12 @@ public partial class DialogueManager : Control {
                 //we'll need the parent ID to remove any NoGroup subpaths 
                 //if the button with this dialogObject is pressed by the player
                 dialogObject.NoGroupParentID = dict["OriginDialogID"];
-                AddPlayerChoicesToList(dialogObject);
+                destinationDialogIDs.Add(destinationDialogID);
             }
+        }
+
+        if (destinationDialogIDs.Count > 0) {
+            AddPlayerChoicesToList(destinationDialogIDs, currentDialogueObject);
         }
     }
 

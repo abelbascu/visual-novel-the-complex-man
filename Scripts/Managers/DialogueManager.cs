@@ -129,7 +129,7 @@ public partial class DialogueManager : Control {
         }
 
         //if we reached a dead end path, show again the playerChoices so the player can choose another path
-        //dead end paths maybe be there to provide contexts, make jokes, give hints, etc.
+        //dead end paths can be used to provide contexts, make jokes, give hints, etc.
         if (currentDialogueObject.OutgoingLinks.Count == 0) {
             UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
         }

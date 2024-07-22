@@ -68,7 +68,7 @@ public partial class DialogueBoxUI : MarginContainer {
             //GD.Print($"letterIndex = {letterIndex}\ndialogueLineToDisplay.Length = {dialogueLineToDisplay.Length} ");
         } else {
             //GD.Print($"dialogueLineLabel.Size: {dialogueLineLabel.Size}");
-            FinishedDisplayingDialogueLine.Invoke();
+            FinishedDisplayingDialogueLine?.Invoke();
             letterIndex = 0;
             return;
         }

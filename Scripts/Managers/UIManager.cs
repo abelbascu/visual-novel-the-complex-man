@@ -20,8 +20,12 @@ public partial class UIManager : Control {
         mainMenu = GetNode<MainMenu>("MainMenu");
         mainMenu.StartButtonPressed += OnStartButtonPressed;
         dialogueBoxUI = GetNode<DialogueBoxUI>("DialogueBoxUI");
+        playerChoicesBoxUI = GetNode<PlayerChoicesBoxUI>("PlayerChoicesBoxUI");
+        playerChoicesBoxUI.Hide();
         CallDeferred(nameof(SetupNodeOrder));
         MouseFilter = MouseFilterEnum.Ignore;
+        dialogueChoicesMarginContainer = playerChoicesBoxUI.GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
+
     }
 
     private void SetupNodeOrder() {
@@ -49,7 +53,7 @@ public partial class UIManager : Control {
         if (dialogueBoxUI == null) {
             DisplayDialogueBoxUI();
         }
-        if (dialogueBoxUI != null)   
+        if (dialogueBoxUI != null)
             dialogueBoxUI.Show();
         if (playerChoicesBoxUI != null)
             playerChoicesBoxUI.Hide();
@@ -76,6 +80,8 @@ public partial class UIManager : Control {
                 playerChoicesBoxUI.DisplayPlayerChoice(playerChoiceObject, DialogueManager.languageCode);
             }
         }
+         setIsPlayerChoiceBeingPrinted(false);
+        
     }
 
     public bool ButtonExistsForPlayerChoice(DialogueObject playerChoiceObject) {
@@ -91,11 +97,6 @@ public partial class UIManager : Control {
         dialogueBoxUI.SetAnchorsPreset(LayoutPreset.CenterBottom);
         // Ensure the dialogue box is visible
         dialogueBoxUI.Visible = true;
-        // Set size flags
-       // dialogueBoxUI.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-       // dialogueBoxUI.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-        // Ensure the dialogue box is visible
-        dialogueBoxUI.Visible = true;
         //once all chars of the dialogue text are displayed in the container, we can show the next dialogue.
         dialogueBoxUI.FinishedDisplayingDialogueLine += DialogueManager.Instance.OnTextBoxFinishedDisplayingDialogueLine;
     }
@@ -106,15 +107,9 @@ public partial class UIManager : Control {
         AddChild(instance);
         //VBoxContainer playerChoìces = instance as VBoxContainer;
         playerChoicesBoxUI = instance as PlayerChoicesBoxUI;
-        // position dialogue box centered at the bottom
-        Vector2 screenSize = GetTree().Root.Size;
-        float xPosition = (screenSize.X - playerChoicesBoxUI.Size.X) / 3;
-        float yPosition = screenSize.Y - UI_BOTTOM_POSITION - 50;
-        playerChoicesBoxUI.Position = new Vector2(xPosition, yPosition);
+        playerChoicesBoxUI.Show();
         //once all chars of the dialogue text are displayed in the container, we can show the next line.
         playerChoicesBoxUI.FinishedDisplayingPlayerChoice += DialogueManager.Instance.OnTextBoxFinishedDisplayingPlayerChoices;
-
-        dialogueChoicesMarginContainer = playerChoicesBoxUI.GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
     }
 
     public void OnStartButtonPressed() {

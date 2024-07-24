@@ -2,20 +2,17 @@ using Godot;
 
 public partial class PlayerChoiceButton : MarginContainer {
     public DialogueObject dialogueObject { get; private set; }
+    private TextureButton button;
     private RichTextLabel textLabel;
     private Color normalColor = Colors.White;
     private Color hoverColor = Colors.Yellow;
-    private ColorRect background;
-    private const float BUTTON_WIDTH = 780; // Adjust as needed
+    private const float BUTTON_WIDTH = 700; // Adjust as needed
     private const float SINGLE_LINE_HEIGHT = 40; // Adjust based on your font size
-    private bool isHovered = false;
 
     public override void _Ready() {
         // Set up the MarginContainer (this)
         SizeFlagsHorizontal = SizeFlags.Fill;
         SizeFlagsVertical = SizeFlags.ShrinkCenter;
-
-        MouseFilter = MouseFilterEnum.Stop;
 
         // Set up margins
         AddThemeConstantOverride("margin_left", 10);
@@ -23,24 +20,35 @@ public partial class PlayerChoiceButton : MarginContainer {
         AddThemeConstantOverride("margin_top", 5);
         AddThemeConstantOverride("margin_bottom", 5);
 
-        // Create and add background ColorRect
-        background = new ColorRect {
-            Color = new Color(0.2f, 0.2f, 0.2f, 0.5f), // Semi-transparent dark gray
+        // Create and add TextureButton
+        button = new TextureButton {
             SizeFlagsHorizontal = SizeFlags.Fill,
-            SizeFlagsVertical = SizeFlags.Fill
+            SizeFlagsVertical = SizeFlags.ShrinkCenter,
+            CustomMinimumSize = new Vector2(BUTTON_WIDTH, SINGLE_LINE_HEIGHT) // Set initial minimum size
+
         };
-        AddChild(background);
+        AddChild(button);
+
+        var styleBox = new StyleBoxFlat {
+            BgColor = new Color(0.2f, 0.2f, 0.2f, 1f), // Semi-transparent dark gray
+            CornerRadiusTopLeft = 5,
+            CornerRadiusTopRight = 5,
+            CornerRadiusBottomRight = 5,
+            CornerRadiusBottomLeft = 5
+        };
+
+        button.AddThemeStyleboxOverride("normal", styleBox);
 
         // Create and add RichTextLabel
         textLabel = new RichTextLabel {
             FitContent = true,
             AutowrapMode = TextServer.AutowrapMode.WordSmart,
             SizeFlagsHorizontal = SizeFlags.Fill,
-            SizeFlagsVertical = SizeFlags.Fill,
+            SizeFlagsVertical = SizeFlags.ShrinkCenter,
             MouseFilter = MouseFilterEnum.Ignore, // Allow events to pass through
             CustomMinimumSize = new Vector2(BUTTON_WIDTH, 0)
         };
-        AddChild(textLabel);
+        button.AddChild(textLabel);
 
         // Set font and size
         var fontName = "Open Sans";
@@ -55,9 +63,9 @@ public partial class PlayerChoiceButton : MarginContainer {
         textLabel.AddThemeColorOverride("default_color", normalColor);
 
         // Set up the button-like behavior
-        MouseEntered += OnMouseEntered;
-        MouseExited += OnMouseExited;
-        //GuiInput += OnGuiInput;
+        button.MouseEntered += OnMouseEntered;
+        button.MouseExited += OnMouseExited;
+        button.Pressed += OnButtonPressed;
     }
 
     public void SetText(string text) {
@@ -69,6 +77,8 @@ public partial class PlayerChoiceButton : MarginContainer {
         float contentHeight = textLabel.GetContentHeight();
         float buttonHeight = contentHeight > SINGLE_LINE_HEIGHT ? contentHeight : SINGLE_LINE_HEIGHT;
         CustomMinimumSize = new Vector2(BUTTON_WIDTH, buttonHeight + GetThemeConstant("margin_top") + GetThemeConstant("margin_bottom"));
+      // Update the button's size to match the content
+        button.CustomMinimumSize = new Vector2(BUTTON_WIDTH, buttonHeight);
     }
 
     public void SetDialogueObject(DialogueObject dialogObj) {
@@ -80,39 +90,21 @@ public partial class PlayerChoiceButton : MarginContainer {
     }
 
     private void OnMouseEntered() {
-         isHovered = true;
         Scale = new Vector2(1.005f, 1.005f);
         textLabel.AddThemeColorOverride("default_color", hoverColor);
+        var styleBox = (StyleBoxFlat)button.GetThemeStylebox("normal");
+        styleBox.BgColor = new Color(0.3f, 0.3f, 0.3f, 0.7f);
     }
 
     private void OnMouseExited() {
-        isHovered = false;
         Scale = Vector2.One;
         textLabel.AddThemeColorOverride("default_color", normalColor);
+        var styleBox = (StyleBoxFlat)button.GetThemeStylebox("normal");
+        styleBox.BgColor = new Color(0.2f, 0.2f, 0.2f, 0.5f);
     }
 
-    public override void _GuiInput(InputEvent @event) {
-        if (@event is InputEventMouseButton mouseEvent &&
-            mouseEvent.ButtonIndex == MouseButton.Left &&
-            mouseEvent.Pressed) {
-            OnButtonPressed();
-        } else if (@event is InputEventMouseMotion) {
-            // Check if the mouse is still inside the button
-            var localMousePos = GetLocalMousePosition();
-            if (GetRect().HasPoint(localMousePos)) {
-                if (!isHovered) {
-                    OnMouseEntered();
-                }
-            } else {
-                if (isHovered) {
-                    OnMouseExited();
-                }
-            }
-        }
+    private void OnButtonPressed() {
+        var dialogueManager = DialogueManager.Instance;
+        dialogueManager.OnPlayerButtonUIPressed(dialogueObject);
     }
-
-        private void OnButtonPressed() {
-            var dialogueManager = DialogueManager.Instance;
-            dialogueManager.OnPlayerButtonUIPressed(dialogueObject);
-        }
-    }
+}

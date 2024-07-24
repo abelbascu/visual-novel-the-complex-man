@@ -28,7 +28,9 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
 
         // Ensure buttons are aligned to the top
        playerChoicesContainer.Alignment = BoxContainer.AlignmentMode.Begin;
-       playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
+       //playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
+       playerChoicesContainer.SizeFlagsHorizontal = SizeFlags.Fill;
+        playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkEnd;
         playerChoicesContainer.AddThemeConstantOverride("separation", 20);
 
       SizeFlagsVertical = SizeFlags.ShrinkEnd;

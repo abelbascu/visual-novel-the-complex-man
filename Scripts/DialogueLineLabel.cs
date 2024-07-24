@@ -4,6 +4,7 @@ using System;
 public partial class DialogueLineLabel : RichTextLabel {
 
     public Action LabelPressed;
+     private const int LINE_SEPARATION = 5;
 
 
     // Called when the node enters the scene tree for the first time.
@@ -18,8 +19,8 @@ public partial class DialogueLineLabel : RichTextLabel {
         SizeFlagsHorizontal = SizeFlags.ExpandFill;
         SizeFlagsVertical = SizeFlags.ExpandFill;
 
-        AddThemeConstantOverride("line_separation", 8);
-        AddThemeFontSizeOverride("normal_font_size", 32);
+        AddThemeConstantOverride("line_separation", LINE_SEPARATION);
+        AddThemeFontSizeOverride("normal_font_size", 28);
     }
 
     public override void _GuiInput(InputEvent @event) {

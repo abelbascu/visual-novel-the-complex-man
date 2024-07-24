@@ -1,4 +1,5 @@
 using Godot;
+using System;
 
 public partial class PlayerChoiceButton : MarginContainer {
     public DialogueObject dialogueObject { get; private set; }
@@ -8,6 +9,7 @@ public partial class PlayerChoiceButton : MarginContainer {
     private Color hoverColor = Colors.Yellow;
     private const float BUTTON_WIDTH = 700; // Adjust as needed
     private const float SINGLE_LINE_HEIGHT = 40; // Adjust based on your font size
+    private const int LINE_SEPARATION = 5;
 
     public override void _Ready() {
         // Set up the MarginContainer (this)
@@ -58,14 +60,20 @@ public partial class PlayerChoiceButton : MarginContainer {
         font.Oversampling = 1.0f;
         textLabel.AddThemeFontOverride("normal_font", font);
         textLabel.AddThemeFontSizeOverride("normal_font_size", fontSize);
-
         // Set initial text color
         textLabel.AddThemeColorOverride("default_color", normalColor);
+        textLabel.AddThemeConstantOverride("line_separation", LINE_SEPARATION);
 
         // Set up the button-like behavior
         button.MouseEntered += OnMouseEntered;
         button.MouseExited += OnMouseExited;
         button.Pressed += OnButtonPressed;
+    }
+
+
+    public void OnParentSizeChanged(Vector2 newSize)
+    {
+        CallDeferred(nameof(UpdateSize));
     }
 
     public void SetText(string text) {
@@ -74,11 +82,21 @@ public partial class PlayerChoiceButton : MarginContainer {
     }
 
     private void UpdateSize() {
-        float contentHeight = textLabel.GetContentHeight();
-        float buttonHeight = contentHeight > SINGLE_LINE_HEIGHT ? contentHeight : SINGLE_LINE_HEIGHT;
-        CustomMinimumSize = new Vector2(BUTTON_WIDTH, buttonHeight + GetThemeConstant("margin_top") + GetThemeConstant("margin_bottom"));
-      // Update the button's size to match the content
-        button.CustomMinimumSize = new Vector2(BUTTON_WIDTH, buttonHeight);
+
+      // Update RichTextLabel width to match parent, there seems to be a bug where its customMinimumSize gets preference over its size
+        textLabel.CustomMinimumSize = new Vector2(Size.X - GetThemeConstant("margin_left") - GetThemeConstant("margin_right"), 0);
+
+        // Force the RichTextLabel to update its size
+        textLabel.Size = Vector2.Zero;
+        var contentSize = textLabel.GetMinimumSize();
+        
+        float buttonHeight = Math.Max(contentSize.Y, SINGLE_LINE_HEIGHT);
+        CustomMinimumSize = new Vector2(0, buttonHeight + GetThemeConstant("margin_top") + GetThemeConstant("margin_bottom"));
+        
+        // Update the button's size to match the content
+        button.CustomMinimumSize = new Vector2(0, buttonHeight);
+
+
     }
 
     public void SetDialogueObject(DialogueObject dialogObj) {

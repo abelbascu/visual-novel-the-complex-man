@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 public partial class PlayerChoicesBoxUI : MarginContainer {
+    public Action<Vector2> SizeChanged;
     public Action FinishedDisplayingPlayerChoice;
     public VBoxContainer playerChoicesContainer;
     private PackedScene playerChoiceButtonScene;
@@ -21,24 +22,24 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         AnchorLeft = 0.5f;
         AnchorRight = 0.5f;
 
-    //Set offsets to define the initial size
-     OffsetLeft = -800;  // Half of the desired width
-    OffsetRight = 800;  // Half of the desired width
-    OffsetTop = -200;   // Initial height, will grow as needed
+        //Set offsets to define the initial size
+        OffsetLeft = -800;  // Half of the desired width
+        OffsetRight = 800;  // Half of the desired width
+        OffsetTop = -200;   // Initial height, will grow as needed
 
         // Ensure buttons are aligned to the top
-       playerChoicesContainer.Alignment = BoxContainer.AlignmentMode.Begin;
-       //playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
-       playerChoicesContainer.SizeFlagsHorizontal = SizeFlags.Fill;
+        playerChoicesContainer.Alignment = BoxContainer.AlignmentMode.Begin;
+        //playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
+        playerChoicesContainer.SizeFlagsHorizontal = SizeFlags.Fill;
         playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkEnd;
         playerChoicesContainer.AddThemeConstantOverride("separation", 20);
 
-      SizeFlagsVertical = SizeFlags.ShrinkEnd;
+        SizeFlagsVertical = SizeFlags.ShrinkEnd;
 
         GrowVertical = GrowDirection.Begin;
 
-        
-           // Ensure the PlayerChoicesBoxUI can grow
+
+        // Ensure the PlayerChoicesBoxUI can grow
         //SizeFlagsVertical = SizeFlags.ShrinkEnd;
 
         // Ensure the content starts from the top of this control
@@ -51,6 +52,12 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         // // Ensure content starts from the top
         // var globalMarginContainer = GetNode<MarginContainer>("GlobalMarginContainer");
         // globalMarginContainer.AddThemeConstantOverride("margin_top", 0);
+
+        Resized += () => OnResized();
+    }
+
+    public void OnResized() {
+        SizeChanged.Invoke(Size);
     }
 
     public void DisplayPlayerChoices(List<DialogueObject> playerChoices, string languageCode) {
@@ -59,13 +66,13 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
 
         foreach (var playerChoiceObject in playerChoices) {
             if (!ButtonExistsForPlayerChoice(playerChoiceObject)) {
-
                 string playerChoiceToDisplay = GetLocalePlayerChoice(playerChoiceObject, languageCode);
                 PlayerChoiceButton playerChoiceButton = playerChoiceButtonScene.Instantiate<PlayerChoiceButton>();
                 playerChoiceButton.SetDialogueObject(playerChoiceObject);
                 playerChoicesContainer.AddChild(playerChoiceButton);
                 playerChoiceButton.SetText(playerChoiceToDisplay);
-                
+
+                SizeChanged += playerChoiceButton.OnParentSizeChanged;
             }
         }
 
@@ -115,7 +122,8 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
 
     public void RemoveAllPlayerChoiceButtons() {
         foreach (Node child in playerChoicesContainer.GetChildren()) {
-            if (child is PlayerChoiceButton) {
+            if (child is PlayerChoiceButton button) {
+                SizeChanged -= button.OnParentSizeChanged;
                 playerChoicesContainer.RemoveChild(child);
                 child.QueueFree();
             }

@@ -7,6 +7,7 @@
 [sub_resource type="SystemFont" id="SystemFont_6a7m0"]
 fallbacks = Array[Font]([null])
 subpixel_positioning = 0
+msdf_size = 28
 
 [node name="DialogueBoxUI" type="MarginContainer"]
 anchors_preset = -1

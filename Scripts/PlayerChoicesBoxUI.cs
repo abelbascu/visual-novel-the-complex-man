@@ -6,12 +6,35 @@ using System.Linq;
 public partial class PlayerChoicesBoxUI : MarginContainer {
     public Action<Vector2> SizeChanged;
     public Action FinishedDisplayingPlayerChoice;
+    private MarginContainer globalMarginContainer;
     public VBoxContainer playerChoicesContainer;
     private PackedScene playerChoiceButtonScene;
 
     public override void _Ready() {
         Show();
-        playerChoicesContainer = GetNode<VBoxContainer>("PlayerChoicesMarginContainer");
+
+        // Create and add GlobalMarginContainer
+        globalMarginContainer = new MarginContainer();
+        AddChild(globalMarginContainer);
+
+        // Set up GlobalMarginContainer with padding
+        globalMarginContainer.AddThemeConstantOverride("margin_left", 20);
+        globalMarginContainer.AddThemeConstantOverride("margin_right", 20);
+        globalMarginContainer.AddThemeConstantOverride("margin_top", 20);
+        globalMarginContainer.AddThemeConstantOverride("margin_bottom", 20);
+
+        // Set GlobalMarginContainer to fill the entire PlayerChoicesBoxUI
+        globalMarginContainer.AnchorRight = 1;
+        globalMarginContainer.AnchorBottom = 1;
+        globalMarginContainer.SizeFlagsHorizontal = SizeFlags.Fill;
+        globalMarginContainer.SizeFlagsVertical = SizeFlags.Fill;
+        globalMarginContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
+
+
+
+        playerChoicesContainer = new VBoxContainer();
+        globalMarginContainer.AddChild(playerChoicesContainer);
+        //playerChoicesContainer = GetNode<VBoxContainer>("PlayerChoicesMarginContainer");
         playerChoiceButtonScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoiceButton.tscn");
 
         SetAnchorsAndOffsetsPreset(LayoutPreset.CenterBottom);
@@ -44,10 +67,10 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
 
         // Ensure the content starts from the top of this control
         // Add margins to the PlayerChoicesBoxUI
-        AddThemeConstantOverride("margin_left", 5);
-        AddThemeConstantOverride("margin_right", 5);
-        AddThemeConstantOverride("margin_top", 5);
-        AddThemeConstantOverride("margin_bottom", 5);
+        AddThemeConstantOverride("margin_left", 30);
+        AddThemeConstantOverride("margin_right", 30);
+        AddThemeConstantOverride("margin_top", 30);
+        AddThemeConstantOverride("margin_bottom", 30);
 
         // // Ensure content starts from the top
         // var globalMarginContainer = GetNode<MarginContainer>("GlobalMarginContainer");

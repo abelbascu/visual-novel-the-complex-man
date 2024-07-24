@@ -34,4 +34,5 @@ patch_margin_bottom = 72
 [node name="PlayerChoicesMarginContainer" type="VBoxContainer" parent="."]
 custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
-size_flags_vertical = 8
+size_flags_vertical = 0
+theme_override_constants/separation = 0

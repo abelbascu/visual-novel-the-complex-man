@@ -10,7 +10,7 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
 
     public override void _Ready() {
         Show();
-        playerChoicesContainer = GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
+        playerChoicesContainer = GetNode<VBoxContainer>("PlayerChoicesMarginContainer");
         playerChoiceButtonScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoiceButton.tscn");
 
         SetAnchorsAndOffsetsPreset(LayoutPreset.CenterBottom);
@@ -48,9 +48,9 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         AddThemeConstantOverride("margin_top", 5);
         AddThemeConstantOverride("margin_bottom", 5);
 
-        // Ensure content starts from the top
-        var globalMarginContainer = GetNode<MarginContainer>("GlobalMarginContainer");
-        globalMarginContainer.AddThemeConstantOverride("margin_top", 0);
+        // // Ensure content starts from the top
+        // var globalMarginContainer = GetNode<MarginContainer>("GlobalMarginContainer");
+        // globalMarginContainer.AddThemeConstantOverride("margin_top", 0);
     }
 
     public void DisplayPlayerChoices(List<DialogueObject> playerChoices, string languageCode) {

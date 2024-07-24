@@ -13,18 +13,38 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         playerChoicesContainer = GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
         playerChoiceButtonScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoiceButton.tscn");
 
-        SetAnchorsAndOffsetsPreset(LayoutPreset.CenterBottom, resizeMode: LayoutPresetMode.KeepWidth);
+        SetAnchorsAndOffsetsPreset(LayoutPreset.CenterBottom);
+
+        //Set anchors to allow the container to grow
+        AnchorTop = 1;
+        AnchorBottom = 1;
+        AnchorLeft = 0.5f;
+        AnchorRight = 0.5f;
+
+    //Set offsets to define the initial size
+     OffsetLeft = -800;  // Half of the desired width
+    OffsetRight = 800;  // Half of the desired width
+    OffsetTop = -200;   // Initial height, will grow as needed
 
         // Ensure buttons are aligned to the top
-        playerChoicesContainer.Alignment = BoxContainer.AlignmentMode.Begin;
-        playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
+       playerChoicesContainer.Alignment = BoxContainer.AlignmentMode.Begin;
+       playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
         playerChoicesContainer.AddThemeConstantOverride("separation", 20);
+
+      SizeFlagsVertical = SizeFlags.ShrinkEnd;
 
         GrowVertical = GrowDirection.Begin;
 
+        
+           // Ensure the PlayerChoicesBoxUI can grow
+        //SizeFlagsVertical = SizeFlags.ShrinkEnd;
+
         // Ensure the content starts from the top of this control
-        AddThemeConstantOverride("margin_top", 0);
-        AddThemeConstantOverride("margin_bottom", 0);
+        // Add margins to the PlayerChoicesBoxUI
+        AddThemeConstantOverride("margin_left", 5);
+        AddThemeConstantOverride("margin_right", 5);
+        AddThemeConstantOverride("margin_top", 5);
+        AddThemeConstantOverride("margin_bottom", 5);
 
         // Ensure content starts from the top
         var globalMarginContainer = GetNode<MarginContainer>("GlobalMarginContainer");
@@ -43,6 +63,7 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
                 playerChoiceButton.SetDialogueObject(playerChoiceObject);
                 playerChoicesContainer.AddChild(playerChoiceButton);
                 playerChoiceButton.SetText(playerChoiceToDisplay);
+                
             }
         }
 

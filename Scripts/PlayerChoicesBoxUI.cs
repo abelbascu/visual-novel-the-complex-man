@@ -9,9 +9,16 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
     private MarginContainer globalMarginContainer;
     public VBoxContainer playerChoicesContainer;
     private PackedScene playerChoiceButtonScene;
+    private NinePatchRect backgroundRect;
 
     public override void _Ready() {
         Show();
+
+        backgroundRect = GetNode<NinePatchRect>("NinePatchRect"); // Adjust the path if needed
+        if (backgroundRect != null) {
+            // Set the alpha to 0.5 (adjust this value to change transparency)
+            backgroundRect.Modulate = new Color(backgroundRect.Modulate, 0.9f);
+        }
 
         // Create and add GlobalMarginContainer
         globalMarginContainer = new MarginContainer();
@@ -30,11 +37,8 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         globalMarginContainer.SizeFlagsVertical = SizeFlags.Fill;
         globalMarginContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
 
-
-
         playerChoicesContainer = new VBoxContainer();
         globalMarginContainer.AddChild(playerChoicesContainer);
-        //playerChoicesContainer = GetNode<VBoxContainer>("PlayerChoicesMarginContainer");
         playerChoiceButtonScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoiceButton.tscn");
 
         SetAnchorsAndOffsetsPreset(LayoutPreset.CenterBottom);
@@ -52,29 +56,18 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
 
         // Ensure buttons are aligned to the top
         playerChoicesContainer.Alignment = BoxContainer.AlignmentMode.Begin;
-        //playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
         playerChoicesContainer.SizeFlagsHorizontal = SizeFlags.Fill;
         playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkEnd;
         playerChoicesContainer.AddThemeConstantOverride("separation", 20);
 
         SizeFlagsVertical = SizeFlags.ShrinkEnd;
-
         GrowVertical = GrowDirection.Begin;
 
-
-        // Ensure the PlayerChoicesBoxUI can grow
-        //SizeFlagsVertical = SizeFlags.ShrinkEnd;
-
-        // Ensure the content starts from the top of this control
         // Add margins to the PlayerChoicesBoxUI
         AddThemeConstantOverride("margin_left", 30);
         AddThemeConstantOverride("margin_right", 30);
         AddThemeConstantOverride("margin_top", 30);
         AddThemeConstantOverride("margin_bottom", 30);
-
-        // // Ensure content starts from the top
-        // var globalMarginContainer = GetNode<MarginContainer>("GlobalMarginContainer");
-        // globalMarginContainer.AddThemeConstantOverride("margin_top", 0);
 
         Resized += () => OnResized();
     }
@@ -106,7 +99,6 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         var existingButtons = playerChoicesContainer.GetChildren()
             .OfType<PlayerChoiceButton>()
             .ToList();
-
         return existingButtons.Any(button => button.HasMatchingDialogueObject(playerChoiceObject));
     }
 

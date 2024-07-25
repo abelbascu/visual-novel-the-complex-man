@@ -10,6 +10,9 @@ public partial class PlayerChoiceButton : MarginContainer {
     private const float BUTTON_WIDTH = 700; // Adjust as needed
     private const float SINGLE_LINE_HEIGHT = 40; // Adjust based on your font size
     private const int LINE_SEPARATION = 5;
+    private StyleBoxFlat normalStyleBox;
+    private StyleBoxFlat hoverStyleBox;
+
 
     public override void _Ready() {
         // Set up the MarginContainer (this)
@@ -31,7 +34,7 @@ public partial class PlayerChoiceButton : MarginContainer {
         };
         AddChild(button);
 
-        var styleBox = new StyleBoxFlat {
+        normalStyleBox = new StyleBoxFlat {
             BgColor = new Color(0.2f, 0.2f, 0.2f, 1f), // Semi-transparent dark gray
             CornerRadiusTopLeft = 5,
             CornerRadiusTopRight = 5,
@@ -39,7 +42,15 @@ public partial class PlayerChoiceButton : MarginContainer {
             CornerRadiusBottomLeft = 5
         };
 
-        button.AddThemeStyleboxOverride("normal", styleBox);
+        hoverStyleBox = new StyleBoxFlat {
+            BgColor = new Color(1f, 1f, 0.3f, 1f), // Lighter, more opaque on hover
+            CornerRadiusTopLeft = 5,
+            CornerRadiusTopRight = 5,
+            CornerRadiusBottomRight = 5,
+            CornerRadiusBottomLeft = 5
+        };
+
+        button.AddThemeStyleboxOverride("normal", normalStyleBox);
 
         // Create and add RichTextLabel
         textLabel = new RichTextLabel {
@@ -71,8 +82,7 @@ public partial class PlayerChoiceButton : MarginContainer {
     }
 
 
-    public void OnParentSizeChanged(Vector2 newSize)
-    {
+    public void OnParentSizeChanged(Vector2 newSize) {
         CallDeferred(nameof(UpdateSize));
     }
 
@@ -83,20 +93,18 @@ public partial class PlayerChoiceButton : MarginContainer {
 
     private void UpdateSize() {
 
-      // Update RichTextLabel width to match parent, there seems to be a bug where its customMinimumSize gets preference over its size
+        // Update RichTextLabel width to match parent, there seems to be a bug where its customMinimumSize gets preference over its size
         textLabel.CustomMinimumSize = new Vector2(Size.X - GetThemeConstant("margin_left") - GetThemeConstant("margin_right"), 0);
 
         // Force the RichTextLabel to update its size
         textLabel.Size = Vector2.Zero;
         var contentSize = textLabel.GetMinimumSize();
-        
+
         float buttonHeight = Math.Max(contentSize.Y, SINGLE_LINE_HEIGHT);
         CustomMinimumSize = new Vector2(0, buttonHeight + GetThemeConstant("margin_top") + GetThemeConstant("margin_bottom"));
-        
+
         // Update the button's size to match the content
         button.CustomMinimumSize = new Vector2(0, buttonHeight);
-
-
     }
 
     public void SetDialogueObject(DialogueObject dialogObj) {
@@ -110,15 +118,17 @@ public partial class PlayerChoiceButton : MarginContainer {
     private void OnMouseEntered() {
         Scale = new Vector2(1.005f, 1.005f);
         textLabel.AddThemeColorOverride("default_color", hoverColor);
-        var styleBox = (StyleBoxFlat)button.GetThemeStylebox("normal");
-        styleBox.BgColor = new Color(0.3f, 0.3f, 0.3f, 0.7f);
+        button.AddThemeStyleboxOverride("normal", hoverStyleBox);
+        //var styleBox = (StyleBoxFlat)button.GetThemeStylebox("normal");
+        // styleBox.BgColor = new Color(0.3f, 0.3f, 0.3f, 0.7f);
     }
 
     private void OnMouseExited() {
         Scale = Vector2.One;
         textLabel.AddThemeColorOverride("default_color", normalColor);
-        var styleBox = (StyleBoxFlat)button.GetThemeStylebox("normal");
-        styleBox.BgColor = new Color(0.2f, 0.2f, 0.2f, 0.5f);
+        button.AddThemeStyleboxOverride("normal", normalStyleBox);
+        //var styleBox = (StyleBoxFlat)button.GetThemeStylebox("normal");
+        //styleBox.BgColor = new Color(0.2f, 0.2f, 0.2f, 0.5f);
     }
 
     private void OnButtonPressed() {

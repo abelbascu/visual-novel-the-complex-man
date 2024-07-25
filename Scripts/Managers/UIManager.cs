@@ -25,14 +25,12 @@ public partial class UIManager : Control {
         CallDeferred(nameof(SetupNodeOrder));
         MouseFilter = MouseFilterEnum.Ignore;
         dialogueChoicesMarginContainer = playerChoicesBoxUI.GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
-
     }
 
     private void SetupNodeOrder() {
         // Ensure VisualsManager is below UI elements in the scene tree
         var visualManager = GetNode<VisualManager>("../VisualManager");
         GetParent().MoveChild(visualManager, 0);
-
         // Move this UIManager to be the last child (top layer)
         GetParent().MoveChild(this, GetParent().GetChildCount() - 1);
     }
@@ -68,8 +66,7 @@ public partial class UIManager : Control {
         }
         if (playerChoicesBoxUI != null) {
             //ensure the container is visible
-            playerChoicesBoxUI.Show();
-            //dialogueBoxUI.AnchorBottom = 1;      
+            playerChoicesBoxUI.Show();    
             //let's hide the dialogue box, that's used to displaye narrator/NPC texts, not the player's
             if (dialogueBoxUI != null)
                 dialogueBoxUI.Hide();
@@ -80,17 +77,7 @@ public partial class UIManager : Control {
         }
     }
 
-    // public bool ButtonExistsForPlayerChoice(DialogueObject playerChoiceObject) {
-    //     var existingButtons = dialogueChoicesMarginContainer.GetChildren()
-    //         .OfType<PlayerChoiceButton>()
-    //         .ToList();
-
-    //     return existingButtons.Any(button => button.HasMatchingDialogueObject(playerChoiceObject));
-    // }
-
     public void DisplayDialogueBoxUI() {
-
-        dialogueBoxUI.SetAnchorsPreset(LayoutPreset.CenterBottom);
         // Ensure the dialogue box is visible
         dialogueBoxUI.Visible = true;
         //once all chars of the dialogue text are displayed in the container, we can show the next dialogue.

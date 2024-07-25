@@ -12,12 +12,20 @@ public partial class DialogueBoxUI : MarginContainer {
     private float punctuationTime = 0.000002f;
     public DialogueLineLabel dialogueLineLabel;
     Timer letterDisplayTimer;
+    NinePatchRect backgroundRect;
 
     public Action FinishedDisplayingDialogueLine;
     public Action DialogueBoxUIWasResized;
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
+
+          backgroundRect = GetNode<NinePatchRect>("NinePatchRect"); // Adjust the path if needed
+        if (backgroundRect != null) {
+            // Set the alpha to 0.5 (adjust this value to change transparency)
+            backgroundRect.Modulate = new Color(backgroundRect.Modulate, 0.9f);
+        }
+
         dialogueLineLabel = GetNode<DialogueLineLabel>("MarginContainer/DialogueLineLabel");
         letterDisplayTimer = GetNode<Timer>("LetterDisplayTimer");
         letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;

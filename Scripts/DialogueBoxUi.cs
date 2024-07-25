@@ -13,6 +13,7 @@ public partial class DialogueBoxUI : MarginContainer {
     public DialogueLineLabel dialogueLineLabel;
     Timer letterDisplayTimer;
     NinePatchRect backgroundRect;
+    public MarginContainer innerMarginContainer;
 
     public Action FinishedDisplayingDialogueLine;
     public Action DialogueBoxUIWasResized;
@@ -30,7 +31,8 @@ public partial class DialogueBoxUI : MarginContainer {
         letterDisplayTimer = GetNode<Timer>("LetterDisplayTimer");
         letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;
 
-        AddThemeConstantOverride("margin_top", 40);
+        innerMarginContainer =  GetNode<MarginContainer>("MarginContainer");
+        innerMarginContainer.AddThemeConstantOverride("margin_top", 25);
     }
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {

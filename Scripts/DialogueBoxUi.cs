@@ -29,6 +29,8 @@ public partial class DialogueBoxUI : MarginContainer {
         dialogueLineLabel = GetNode<DialogueLineLabel>("MarginContainer/DialogueLineLabel");
         letterDisplayTimer = GetNode<Timer>("LetterDisplayTimer");
         letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;
+
+        AddThemeConstantOverride("margin_top", 40);
     }
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {

@@ -3,7 +3,7 @@ using System;
 
 public partial class PlayerChoiceButton : MarginContainer {
     public DialogueObject dialogueObject { get; private set; }
-    private TextureButton button;
+    private Button button;
     private RichTextLabel textLabel;
     private Color normalColor = Colors.White;
     private Color hoverColor = Colors.Yellow;
@@ -26,7 +26,7 @@ public partial class PlayerChoiceButton : MarginContainer {
         AddThemeConstantOverride("margin_bottom", 5);
 
         // Create and add TextureButton
-        button = new TextureButton {
+        button = new Button {
             SizeFlagsHorizontal = SizeFlags.Fill,
             SizeFlagsVertical = SizeFlags.ShrinkCenter,
             CustomMinimumSize = new Vector2(BUTTON_WIDTH, SINGLE_LINE_HEIGHT) // Set initial minimum size
@@ -35,7 +35,7 @@ public partial class PlayerChoiceButton : MarginContainer {
         AddChild(button);
 
         normalStyleBox = new StyleBoxFlat {
-            BgColor = new Color(0.2f, 0.2f, 0.2f, 1f), // Semi-transparent dark gray
+            BgColor = new Color(0, 0, 0, 0), // Fully transparent
             CornerRadiusTopLeft = 5,
             CornerRadiusTopRight = 5,
             CornerRadiusBottomRight = 5,
@@ -43,7 +43,7 @@ public partial class PlayerChoiceButton : MarginContainer {
         };
 
         hoverStyleBox = new StyleBoxFlat {
-            BgColor = new Color(1f, 1f, 0.3f, 1f), // Lighter, more opaque on hover
+            BgColor = new Color(0f, 0.3f, 0.3f, 0.3f), // Lighter, more opaque on hover
             CornerRadiusTopLeft = 5,
             CornerRadiusTopRight = 5,
             CornerRadiusBottomRight = 5,
@@ -51,6 +51,7 @@ public partial class PlayerChoiceButton : MarginContainer {
         };
 
         button.AddThemeStyleboxOverride("normal", normalStyleBox);
+        button.AddThemeStyleboxOverride("hover", hoverStyleBox);
 
         // Create and add RichTextLabel
         textLabel = new RichTextLabel {
@@ -118,7 +119,7 @@ public partial class PlayerChoiceButton : MarginContainer {
     private void OnMouseEntered() {
         Scale = new Vector2(1.005f, 1.005f);
         textLabel.AddThemeColorOverride("default_color", hoverColor);
-        button.AddThemeStyleboxOverride("normal", hoverStyleBox);
+      //  button.AddThemeStyleboxOverride("normal", hoverStyleBox);
         //var styleBox = (StyleBoxFlat)button.GetThemeStylebox("normal");
         // styleBox.BgColor = new Color(0.3f, 0.3f, 0.3f, 0.7f);
     }
@@ -126,7 +127,7 @@ public partial class PlayerChoiceButton : MarginContainer {
     private void OnMouseExited() {
         Scale = Vector2.One;
         textLabel.AddThemeColorOverride("default_color", normalColor);
-        button.AddThemeStyleboxOverride("normal", normalStyleBox);
+       // button.AddThemeStyleboxOverride("normal", normalStyleBox);
         //var styleBox = (StyleBoxFlat)button.GetThemeStylebox("normal");
         //styleBox.BgColor = new Color(0.2f, 0.2f, 0.2f, 0.5f);
     }

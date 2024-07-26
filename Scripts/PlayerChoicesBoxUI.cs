@@ -10,7 +10,7 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
     public VBoxContainer playerChoicesContainer;
     private PackedScene playerChoiceButtonScene;
     private NinePatchRect backgroundRect;
-    
+
 
 
     public override void _Ready() {

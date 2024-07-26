@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 public partial class UIManager : Control {
 
@@ -17,6 +18,14 @@ public partial class UIManager : Control {
     private MainMenu mainMenu;
     public PackedScene playerChoicesBoxUIScene;
     public PlayerChoicesBoxUI playerChoicesBoxUI;
+    private const float ANCHOR_LEFT_PERCENTAGE = 0.08f;
+    private const float ANCHOR_RIGHT_PERCENTAGE = 0.925f;
+    private const float ANCHOR_TOP_PERCENTAGE = 1f;
+    private const float ANCHOR_BOTTOM_PERCENTAGE = 1f;
+    private const int OFFSET_LEFT = 0;
+    private const int OFFSET_RIGHT = 0;
+    private const int OFFSET_TOP = 200;
+    private const int OFFSET_BOTTOM = 0;
 
 
     public override void _Ready() {
@@ -29,39 +38,37 @@ public partial class UIManager : Control {
         MouseFilter = MouseFilterEnum.Ignore;
         //dialogueChoicesMarginContainer = playerChoicesBoxUI.GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
 
+        //Set up PlayerChoicesBoxUI
         playerChoicesBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
         playerChoicesBoxUI = playerChoicesBoxUIScene.Instantiate<PlayerChoicesBoxUI>();
         AddChild(playerChoicesBoxUI);
         playerChoicesBoxUI.Hide();
-
         // Set anchors to stretch horizontally
-        playerChoicesBoxUI.AnchorLeft = 0.08f;
-        playerChoicesBoxUI.AnchorRight = 0.925f;
-        playerChoicesBoxUI.AnchorTop = 1f;
-        playerChoicesBoxUI.AnchorBottom = 1f;
-
+        playerChoicesBoxUI.AnchorLeft = ANCHOR_LEFT_PERCENTAGE;
+        playerChoicesBoxUI.AnchorRight = ANCHOR_RIGHT_PERCENTAGE;
+        playerChoicesBoxUI.AnchorTop = ANCHOR_TOP_PERCENTAGE;
+        playerChoicesBoxUI.AnchorBottom = ANCHOR_BOTTOM_PERCENTAGE;
         // Reset offsets
-        playerChoicesBoxUI.OffsetLeft = 0;
-        playerChoicesBoxUI.OffsetRight = 0;
-        playerChoicesBoxUI.OffsetTop = -200;  // Adjust this value to set the initial height
-        playerChoicesBoxUI.OffsetBottom = 0;
+        playerChoicesBoxUI.OffsetLeft = OFFSET_LEFT;
+        playerChoicesBoxUI.OffsetRight = OFFSET_RIGHT;
+        playerChoicesBoxUI.OffsetTop = OFFSET_TOP;  // Adjust this value to set the initial height
+        playerChoicesBoxUI.OffsetBottom = OFFSET_BOTTOM;
 
+        //Set up DialogueBoxUI
         dialogueBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
         dialogueBoxUI = dialogueBoxUIScene.Instantiate<DialogueBoxUI>();
         AddChild(dialogueBoxUI);
         dialogueBoxUI.Hide();
-
         // Set anchors to stretch horizontally
-        dialogueBoxUI.AnchorLeft = 0.08f;
-        dialogueBoxUI.AnchorRight = 0.925f;
-        dialogueBoxUI.AnchorTop = 1f;
-        dialogueBoxUI.AnchorBottom = 1f;
-
+        dialogueBoxUI.AnchorLeft = ANCHOR_LEFT_PERCENTAGE;
+        dialogueBoxUI.AnchorRight = ANCHOR_RIGHT_PERCENTAGE;
+        dialogueBoxUI.AnchorTop = ANCHOR_TOP_PERCENTAGE;
+        dialogueBoxUI.AnchorBottom = ANCHOR_BOTTOM_PERCENTAGE;
         // Reset offsets
-        dialogueBoxUI.OffsetLeft = 0;
-        dialogueBoxUI.OffsetRight = 0;
-        dialogueBoxUI.OffsetTop = -200;  // Adjust this value to set the initial height
-        dialogueBoxUI.OffsetBottom = 0;
+        dialogueBoxUI.OffsetLeft = OFFSET_LEFT;
+        dialogueBoxUI.OffsetRight = OFFSET_RIGHT;
+        dialogueBoxUI.OffsetTop = OFFSET_TOP;  // Adjust this value to set the initial height
+        dialogueBoxUI.OffsetBottom = OFFSET_BOTTOM;
     }
 
     private void SetupNodeOrder() {

@@ -21,7 +21,7 @@ public partial class DialogueBoxUI : MarginContainer {
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
 
-          backgroundRect = GetNode<NinePatchRect>("NinePatchRect"); // Adjust the path if needed
+        backgroundRect = GetNode<NinePatchRect>("NinePatchRect"); // Adjust the path if needed
         if (backgroundRect != null) {
             // Set the alpha to 0.5 (adjust this value to change transparency)
             backgroundRect.Modulate = new Color(backgroundRect.Modulate, 0.9f);
@@ -31,8 +31,37 @@ public partial class DialogueBoxUI : MarginContainer {
         letterDisplayTimer = GetNode<Timer>("LetterDisplayTimer");
         letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;
 
-        innerMarginContainer =  GetNode<MarginContainer>("MarginContainer");
+        //Set anchors to allow the container to grow
+        AnchorTop = 1;
+        AnchorBottom = 1;
+        AnchorLeft = 0.5f;
+        AnchorRight = 0.5f;
+
+        //Set offsets to define the initial size
+        OffsetLeft = -800;  // Half of the desired width
+        OffsetRight = 800;  // Half of the desired width
+        OffsetTop = -200;   // Initial height, will grow as needed
+
+        AddThemeConstantOverride("margin_left", 40);
+        AddThemeConstantOverride("margin_top", 40);
+        AddThemeConstantOverride("margin_right", 40);
+        AddThemeConstantOverride("margin_bottom", 40);
+
+        innerMarginContainer = GetNode<MarginContainer>("MarginContainer");
+        innerMarginContainer.AddThemeConstantOverride("margin_left", 40);
         innerMarginContainer.AddThemeConstantOverride("margin_top", 25);
+        innerMarginContainer.AddThemeConstantOverride("margin_right", 40);
+        innerMarginContainer.AddThemeConstantOverride("margin_bottom", 25);
+
+        // Set GlobalMarginContainer to fill the entire DialogueBoxUI
+        innerMarginContainer.AnchorRight = 1;
+        innerMarginContainer.AnchorBottom = 1;
+        innerMarginContainer.SizeFlagsHorizontal = SizeFlags.Fill;
+        innerMarginContainer.SizeFlagsVertical = SizeFlags.Fill;
+        innerMarginContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
+
+
+
     }
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {

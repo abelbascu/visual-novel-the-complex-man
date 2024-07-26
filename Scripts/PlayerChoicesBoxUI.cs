@@ -25,10 +25,10 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         AddChild(globalMarginContainer);
 
         // Set up GlobalMarginContainer with padding
-        globalMarginContainer.AddThemeConstantOverride("margin_left", 20);
-        globalMarginContainer.AddThemeConstantOverride("margin_right", 20);
-        globalMarginContainer.AddThemeConstantOverride("margin_top", 20);
-        globalMarginContainer.AddThemeConstantOverride("margin_bottom", 20);
+        globalMarginContainer.AddThemeConstantOverride("margin_left", 40);
+        globalMarginContainer.AddThemeConstantOverride("margin_right", 40);
+        globalMarginContainer.AddThemeConstantOverride("margin_top", 25);
+        globalMarginContainer.AddThemeConstantOverride("margin_bottom", 25);
 
         // Set GlobalMarginContainer to fill the entire PlayerChoicesBoxUI
         globalMarginContainer.AnchorRight = 1;
@@ -64,10 +64,10 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         GrowVertical = GrowDirection.Begin;
 
         // Add margins to the PlayerChoicesBoxUI
-        AddThemeConstantOverride("margin_left", 30);
-        AddThemeConstantOverride("margin_right", 30);
-        AddThemeConstantOverride("margin_top", 30);
-        AddThemeConstantOverride("margin_bottom", 30);
+        AddThemeConstantOverride("margin_left", 40);
+        AddThemeConstantOverride("margin_right", 40);
+        AddThemeConstantOverride("margin_top", 40);
+        AddThemeConstantOverride("margin_bottom", 40);
 
         Resized += () => OnResized();
     }
@@ -109,15 +109,6 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
             "ca" => playerChoiceObj.CatalanText,
             _ => playerChoiceObj.DialogueTextDefault
         };
-    }
-
-    private PlayerChoiceButton FindExistingButton(DialogueObject dialogueObject) {
-        foreach (var child in playerChoicesContainer.GetChildren()) {
-            if (child is PlayerChoiceButton button && button.HasMatchingDialogueObject(dialogueObject)) {
-                return button;
-            }
-        }
-        return null;
     }
 
     public void RemoveAllNoGroupChildrenWithSameOriginID(DialogueObject dialogueObject) {

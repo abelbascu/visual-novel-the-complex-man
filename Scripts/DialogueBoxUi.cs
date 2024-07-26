@@ -31,16 +31,19 @@ public partial class DialogueBoxUI : MarginContainer {
         letterDisplayTimer = GetNode<Timer>("LetterDisplayTimer");
         letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;
 
-        //Set anchors to allow the container to grow
-        AnchorTop = 1;
-        AnchorBottom = 1;
-        AnchorLeft = 0.5f;
-        AnchorRight = 0.5f;
+        //We are doing the comments below in the UIManager as delegating the position to the children gives issues
+        //maybe becasue they do not have all the necessary info from the parent?
 
-        //Set offsets to define the initial size
-        OffsetLeft = -800;  // Half of the desired width
-        OffsetRight = 800;  // Half of the desired width
-        OffsetTop = -200;   // Initial height, will grow as needed
+        // //Set anchors to allow the container to grow
+        // AnchorLeft = 0.08f;
+        // AnchorRight = 0.925f;
+        // AnchorTop = 1;
+        // AnchorBottom = 1;
+
+        // //Set offsets to define the initial size
+        // OffsetLeft = -800;  // Half of the desired width
+        // OffsetRight = 800;  // Half of the desired width
+        // OffsetTop = -200;   // Initial height, will grow as needed
 
         AddThemeConstantOverride("margin_left", 40);
         AddThemeConstantOverride("margin_top", 40);
@@ -59,9 +62,6 @@ public partial class DialogueBoxUI : MarginContainer {
         innerMarginContainer.SizeFlagsHorizontal = SizeFlags.Fill;
         innerMarginContainer.SizeFlagsVertical = SizeFlags.Fill;
         innerMarginContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
-
-
-
     }
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {

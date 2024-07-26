@@ -94,7 +94,10 @@ public partial class PlayerChoiceButton : MarginContainer {
 
     private void UpdateSize() {
 
-        // Update RichTextLabel width to match parent, there seems to be a bug where its customMinimumSize gets preference over its size
+        // We update the RichTextLabel width to match the parent-s texture button. There seems to be a bug where its customMinimumSize 
+        //gets preference over its size so we need to update the customMinimumSize to the new size of the parent TextureButton, 
+        //that autosizes each time that the PlayerChoicesBoxUI needs to display a different number of PlayerChoiceButtons.
+
         textLabel.CustomMinimumSize = new Vector2(Size.X - GetThemeConstant("margin_left") - GetThemeConstant("margin_right"), 0);
 
         // Force the RichTextLabel to update its size

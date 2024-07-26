@@ -8,23 +8,60 @@ using System.Linq;
 public partial class UIManager : Control {
 
     public static UIManager Instance { get; private set; }
+    public PackedScene dialogueBoxUIScene;
     public DialogueBoxUI dialogueBoxUI; //the graphical rectangle container to display the text over
     private VBoxContainer dialogueChoicesMarginContainer;
-    public PlayerChoicesBoxUI playerChoicesBoxUI; //the graphical rectangle VBoxContainer to displayer the branching player choices.
+    //public PlayerChoicesBoxUI playerChoicesBoxUI; //the graphical rectangle VBoxContainer to displayer the branching player choices.
     public static Action StartButtonPressed;
     private const int UI_BOTTOM_POSITION = 200; //starting at the bottom of the screen, we subtract this value to position the Y screen position of the dilaogue box  
     private MainMenu mainMenu;
+    public PackedScene playerChoicesBoxUIScene;
+    public PlayerChoicesBoxUI playerChoicesBoxUI;
 
 
     public override void _Ready() {
         mainMenu = GetNode<MainMenu>("MainMenu");
         mainMenu.StartButtonPressed += OnStartButtonPressed;
         dialogueBoxUI = GetNode<DialogueBoxUI>("DialogueBoxUI");
-        playerChoicesBoxUI = GetNode<PlayerChoicesBoxUI>("PlayerChoicesBoxUI");
-        playerChoicesBoxUI.Hide();
+        //playerChoicesBoxUI = GetNode<PlayerChoicesBoxUI>("PlayerChoicesBoxUI");
+        //playerChoicesBoxUI.Hide();
         CallDeferred(nameof(SetupNodeOrder));
         MouseFilter = MouseFilterEnum.Ignore;
-        dialogueChoicesMarginContainer = playerChoicesBoxUI.GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
+        //dialogueChoicesMarginContainer = playerChoicesBoxUI.GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
+
+        playerChoicesBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
+        playerChoicesBoxUI = playerChoicesBoxUIScene.Instantiate<PlayerChoicesBoxUI>();
+        AddChild(playerChoicesBoxUI);
+        playerChoicesBoxUI.Hide();
+
+        // Set anchors to stretch horizontally
+        playerChoicesBoxUI.AnchorLeft = 0.08f;
+        playerChoicesBoxUI.AnchorRight = 0.925f;
+        playerChoicesBoxUI.AnchorTop = 1f;
+        playerChoicesBoxUI.AnchorBottom = 1f;
+
+        // Reset offsets
+        playerChoicesBoxUI.OffsetLeft = 0;
+        playerChoicesBoxUI.OffsetRight = 0;
+        playerChoicesBoxUI.OffsetTop = -200;  // Adjust this value to set the initial height
+        playerChoicesBoxUI.OffsetBottom = 0;
+
+        dialogueBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
+        dialogueBoxUI = dialogueBoxUIScene.Instantiate<DialogueBoxUI>();
+        AddChild(dialogueBoxUI);
+        dialogueBoxUI.Hide();
+
+        // Set anchors to stretch horizontally
+        dialogueBoxUI.AnchorLeft = 0.08f;
+        dialogueBoxUI.AnchorRight = 0.925f;
+        dialogueBoxUI.AnchorTop = 1f;
+        dialogueBoxUI.AnchorBottom = 1f;
+
+        // Reset offsets
+        dialogueBoxUI.OffsetLeft = 0;
+        dialogueBoxUI.OffsetRight = 0;
+        dialogueBoxUI.OffsetTop = -200;  // Adjust this value to set the initial height
+        dialogueBoxUI.OffsetBottom = 0;
     }
 
     private void SetupNodeOrder() {
@@ -66,7 +103,7 @@ public partial class UIManager : Control {
         }
         if (playerChoicesBoxUI != null) {
             //ensure the container is visible
-            playerChoicesBoxUI.Show();    
+            playerChoicesBoxUI.Show();
             //let's hide the dialogue box, that's used to displaye narrator/NPC texts, not the player's
             if (dialogueBoxUI != null)
                 dialogueBoxUI.Hide();

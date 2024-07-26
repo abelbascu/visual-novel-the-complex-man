@@ -1,9 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://bauqxmelp0rdi"]
+[gd_scene load_steps=3 format=3 uid="uid://bauqxmelp0rdi"]
 
 [ext_resource type="Script" path="res://Scripts/Managers/UIManager.cs" id="1_rn3fk"]
 [ext_resource type="PackedScene" uid="uid://c8t14jwiqekss" path="res://Scenes/MainMenu.tscn" id="2_xic3a"]
-[ext_resource type="PackedScene" uid="uid://8ytymk06gtxw" path="res://Scenes/DialogueBoxUI.tscn" id="3_vlq3l"]
-[ext_resource type="PackedScene" uid="uid://b6kee1naax88o" path="res://Scenes/PlayerChoicesBoxUI.tscn" id="4_0xi7m"]
 
 [node name="UiManager" type="Control"]
 layout_mode = 3
@@ -16,28 +14,3 @@ script = ExtResource("1_rn3fk")
 
 [node name="MainMenu" parent="." instance=ExtResource("2_xic3a")]
 layout_mode = 1
-
-[node name="DialogueBoxUI" parent="." instance=ExtResource("3_vlq3l")]
-visible = false
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.9
-offset_left = -149.5
-offset_top = -98.0
-offset_right = 149.5
-metadata/_edit_use_anchors_ = true
-
-[node name="PlayerChoicesBoxUI" parent="." instance=ExtResource("4_0xi7m")]
-visible = false
-layout_mode = 0
-anchors_preset = 0
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 1800.0
-offset_bottom = 300.0
-grow_horizontal = 1
-grow_vertical = 1

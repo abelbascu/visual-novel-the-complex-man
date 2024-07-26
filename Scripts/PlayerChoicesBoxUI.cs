@@ -10,17 +10,47 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
     public VBoxContainer playerChoicesContainer;
     private PackedScene playerChoiceButtonScene;
     private NinePatchRect backgroundRect;
+    
+
 
     public override void _Ready() {
         Show();
 
         backgroundRect = GetNode<NinePatchRect>("NinePatchRect"); // Adjust the path if needed
         if (backgroundRect != null) {
-            // Set the alpha to 0.5 (adjust this value to change transparency)
+            // adjust this value to change transparency
             backgroundRect.Modulate = new Color(backgroundRect.Modulate, 0.9f);
         }
 
-        // Create and add GlobalMarginContainer
+        //We are doing the comments below in the UIManager as delegating the position to the children gives issues
+        //maybe becasue they do not have all the necessary info from the parent?
+
+        //----------------------FIRST, SET UP THE MAIN MARGIN CONTAINER-------------------------
+        //Set anchors to allow the container to grow
+        // AnchorLeft = 0.08f;
+        // AnchorRight = 0.925f;
+        // AnchorTop = 1;
+        // AnchorBottom = 1;
+
+        // Reset offsets
+        // OffsetLeft = 0;
+        // OffsetRight = 0;
+        // OffsetTop = -200;  // Adjust this value to set the initial height
+        // OffsetBottom = 0;
+
+        SetAnchorsAndOffsetsPreset(LayoutPreset.CenterBottom);
+        SizeFlagsVertical = SizeFlags.ShrinkEnd;
+        GrowVertical = GrowDirection.Begin;
+
+        // Add margins to the PlayerChoicesBoxUI
+        AddThemeConstantOverride("margin_left", 40);
+        AddThemeConstantOverride("margin_right", 40);
+        AddThemeConstantOverride("margin_top", 40);
+        AddThemeConstantOverride("margin_bottom", 40);
+
+        //----------------------SECOND, CREATE & SET UP AN INNER MARGIN CONTAINER-------------------------
+
+        // Create and add GlobalMarginContainer to control padding better
         globalMarginContainer = new MarginContainer();
         AddChild(globalMarginContainer);
 
@@ -37,43 +67,26 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         globalMarginContainer.SizeFlagsVertical = SizeFlags.Fill;
         globalMarginContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
 
+        //----------------------THIRD AND LAST, CREATE & SET UP A VBOXCONTAINER -------------------------
+        //---------- this VBoxContainer stores the playerChoiceButton, aka the player choices------------
+
         playerChoicesContainer = new VBoxContainer();
         globalMarginContainer.AddChild(playerChoicesContainer);
         playerChoiceButtonScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoiceButton.tscn");
-
-        SetAnchorsAndOffsetsPreset(LayoutPreset.CenterBottom);
-
-        //Set anchors to allow the container to grow
-        AnchorTop = 1;
-        AnchorBottom = 1;
-        AnchorLeft = 0.5f;
-        AnchorRight = 0.5f;
-
-        //Set offsets to define the initial size
-        OffsetLeft = -800;  // Half of the desired width
-        OffsetRight = 800;  // Half of the desired width
-        OffsetTop = -200;   // Initial height, will grow as needed
 
         // Ensure buttons are aligned to the top
         playerChoicesContainer.Alignment = BoxContainer.AlignmentMode.Begin;
         playerChoicesContainer.SizeFlagsHorizontal = SizeFlags.Fill;
         playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkEnd;
+
+        //The space between the BoxContainer's elements, in pixels.
         playerChoicesContainer.AddThemeConstantOverride("separation", 20);
-
-        SizeFlagsVertical = SizeFlags.ShrinkEnd;
-        GrowVertical = GrowDirection.Begin;
-
-        // Add margins to the PlayerChoicesBoxUI
-        AddThemeConstantOverride("margin_left", 40);
-        AddThemeConstantOverride("margin_right", 40);
-        AddThemeConstantOverride("margin_top", 40);
-        AddThemeConstantOverride("margin_bottom", 40);
 
         Resized += () => OnResized();
     }
 
     public void OnResized() {
-        SizeChanged.Invoke(Size);
+        SizeChanged?.Invoke(Size);
     }
 
     public void DisplayPlayerChoices(List<DialogueObject> playerChoices, string languageCode) {

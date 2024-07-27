@@ -21,6 +21,8 @@ public partial class DialogueBoxUI : MarginContainer {
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
 
+        MouseFilter = MouseFilterEnum.Ignore;
+
         backgroundRect = GetNode<NinePatchRect>("NinePatchRect"); // Adjust the path if needed
         if (backgroundRect != null) {
             // Set the alpha to 0.5 (adjust this value to change transparency)
@@ -30,6 +32,8 @@ public partial class DialogueBoxUI : MarginContainer {
         dialogueLineLabel = GetNode<DialogueLineLabel>("MarginContainer/DialogueLineLabel");
         letterDisplayTimer = GetNode<Timer>("LetterDisplayTimer");
         letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;
+
+        dialogueLineLabel.MouseFilter = MouseFilterEnum.Stop;
 
         //We are doing the comments below in the UIManager as delegating the position to the children gives issues
         //maybe becasue they do not have all the necessary info from the parent?
@@ -56,17 +60,23 @@ public partial class DialogueBoxUI : MarginContainer {
         innerMarginContainer.AddThemeConstantOverride("margin_right", 40);
         innerMarginContainer.AddThemeConstantOverride("margin_bottom", 25);
 
+        innerMarginContainer.MouseFilter = MouseFilterEnum.Ignore;
+
         // Set GlobalMarginContainer to fill the entire DialogueBoxUI
         innerMarginContainer.AnchorRight = 1;
         innerMarginContainer.AnchorBottom = 1;
         innerMarginContainer.SizeFlagsHorizontal = SizeFlags.Fill;
         innerMarginContainer.SizeFlagsVertical = SizeFlags.Fill;
         innerMarginContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
+
+        //we need to know if all the chars of the dialogue text have been displayed, so we can clean the current text
+        //and display the next one or the player choices. 
+        FinishedDisplayingDialogueLine += DialogueManager.Instance.OnTextBoxFinishedDisplayingDialogueLine;
     }
 
     public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
         this.dialogueLineToDisplay = GetLocaleDialogue(dialogueObject, locale);
-        //dialogueLineLabel.Text = "";
+        // dialogueLineLabel.Text = "";
         dialogueLineLabel.Clear();
         DisplayLetter();
     }
@@ -103,8 +113,12 @@ public partial class DialogueBoxUI : MarginContainer {
             //GD.Print($"letterIndex = {letterIndex}\ndialogueLineToDisplay.Length = {dialogueLineToDisplay.Length} ");
         } else {
             //GD.Print($"dialogueLineLabel.Size: {dialogueLineLabel.Size}");
-            FinishedDisplayingDialogueLine?.Invoke();
+            dialogueLineLabel.Text = "";
+            dialogueLineLabel.Text = dialogueLineToDisplay;
             letterIndex = 0;
+            
+            FinishedDisplayingDialogueLine?.Invoke();
+
             return;
         }
 

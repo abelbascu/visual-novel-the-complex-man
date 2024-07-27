@@ -4,11 +4,14 @@ using System;
 public partial class DialogueLineLabel : RichTextLabel {
 
     public Action LabelPressed;
-     private const int LINE_SEPARATION = 5;
+    private const int LINE_SEPARATION = 5;
 
 
     // Called when the node enters the scene tree for the first time.
     public override void _Ready() {
+
+        MouseFilter = MouseFilterEnum.Stop;
+        SetProcessInput(true);
 
         LabelPressed += OnLabelPressed;
 
@@ -25,12 +28,14 @@ public partial class DialogueLineLabel : RichTextLabel {
 
     public override void _GuiInput(InputEvent @event) {
         if (@event is InputEventMouseButton mouseEvent &&
-            mouseEvent.ButtonIndex == MouseButton.Left &&
+            (mouseEvent.ButtonIndex == MouseButton.Left ||
+            mouseEvent.ButtonIndex == MouseButton.Right) &&
             mouseEvent.Pressed) {
             // Check if the click is within the bounds of the Label
             // if (this.GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
             LabelPressed.Invoke();
             GD.Print("Label area clicked!");
+            GetViewport().SetInputAsHandled(); // Prevent the click from propagating
             //}
         }
     }
@@ -39,8 +44,7 @@ public partial class DialogueLineLabel : RichTextLabel {
         DialogueManager.Instance.OnDialogueBoxUIPressed();
     }
 
-    public void SetText(string text)
-    {
+    public void SetText(string text) {
         Text = $"[left]{text}[/left]";
     }
 }

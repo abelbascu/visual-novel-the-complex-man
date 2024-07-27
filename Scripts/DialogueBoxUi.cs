@@ -35,20 +35,6 @@ public partial class DialogueBoxUI : MarginContainer {
 
         dialogueLineLabel.MouseFilter = MouseFilterEnum.Stop;
 
-        //We are doing the comments below in the UIManager as delegating the position to the children gives issues
-        //maybe becasue they do not have all the necessary info from the parent?
-
-        // //Set anchors to allow the container to grow
-        // AnchorLeft = 0.08f;
-        // AnchorRight = 0.925f;
-        // AnchorTop = 1;
-        // AnchorBottom = 1;
-
-        // //Set offsets to define the initial size
-        // OffsetLeft = -800;  // Half of the desired width
-        // OffsetRight = 800;  // Half of the desired width
-        // OffsetTop = -200;   // Initial height, will grow as needed
-
         AddThemeConstantOverride("margin_left", 40);
         AddThemeConstantOverride("margin_top", 40);
         AddThemeConstantOverride("margin_right", 40);

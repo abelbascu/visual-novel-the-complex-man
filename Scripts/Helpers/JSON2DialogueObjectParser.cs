@@ -53,25 +53,15 @@ public static class JSON2DialogueObjectParser {
                                 if (dialogNode.TryGetProperty("Fields", out JsonElement fieldsElement)) {
                                     // Attempt to access "Dialogue Text" property within "Fields"
                                     if (fieldsElement.TryGetProperty("Dialogue Text", out JsonElement dialogueTextElement))
-                                        // Get the string value of "Dialogue Text"
                                         dialogueText = dialogueTextElement.GetString();
-
                                     if (fieldsElement.TryGetProperty("fr-FR", out JsonElement frenchTextElement))
-                                        // Get the string value of "Dialogue Text"
                                         frLocaleText = frenchTextElement.GetString();
-
                                     if (fieldsElement.TryGetProperty("cat-CAT", out JsonElement catalanTextElement))
-                                        // Get the string value of "Dialogue Text"
                                         catLocaleText = catalanTextElement.GetString();
-
                                     if (fieldsElement.TryGetProperty("Actor", out JsonElement actorElement))
-                                        // Get the string value of "Dialogue Text"
                                         actor = actorElement.GetString();
-
                                     if (fieldsElement.TryGetProperty("VisualPath", out JsonElement visualPathElement))
-                                        // Get the string value of "Dialogue Text"
                                         visualPath = visualPathElement.GetString();           
-
                                     if (fieldsElement.TryGetProperty("VisualType", out JsonElement visualTypeElement)) {
                                         try {
                                             visualType = visualTypeElement.GetInt32();

@@ -41,11 +41,12 @@ public partial class DialogueManager : Control {
     }
 
     public override void _Ready() {
+
+        // Ignore mouse input if it doesn't need to interact directly
+        MouseFilter = MouseFilterEnum.Ignore;
         // Make GameManager fill its parent
         AnchorRight = 1;
         AnchorBottom = 1;
-        // Ignore mouse input if it doesn't need to interact directly
-        //MouseFilter = MouseFilterEnum.Ignore;
         LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
         playerChoicesList = new();
     }
@@ -115,7 +116,7 @@ public partial class DialogueManager : Control {
         isDialogueBeingPrinted = false;
     }
 
-    public void RemoveFromPlayerChoicesToList(DialogueObject dialogObj) {
+    public void RemoveFromPlayerChoicesList(DialogueObject dialogObj) {
         playerChoicesList.Remove(dialogObj);
     }
 
@@ -319,7 +320,7 @@ public partial class DialogueManager : Control {
         //so as it has already been displayed and now we move on to the next dialogue or choices to show, let's remove it first so it's not displayed again
         //when player choices are displayed again 
         if (currentDialogueObject.Actor == "1") {
-            RemoveFromPlayerChoicesToList(currentDialogueObject);
+            RemoveFromPlayerChoicesList(currentDialogueObject);
         }
     }
 

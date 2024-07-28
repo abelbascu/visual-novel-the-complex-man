@@ -6,7 +6,6 @@ public partial class GameManager : Control {
     public static GameManager Instance { get; private set; }
     public DialogueManager DialogueManager { get; private set; }
     public UIManager UIManager { get; private set; }
-    //public static Action StartButtonPressed;
 
     //public PlayerStateManager PlayerStateManager { get; private set; }
     // public MediaManager MediaManager { get; private set; }
@@ -35,19 +34,22 @@ public partial class GameManager : Control {
 
         if (Instance == null) {
             Instance = this;
-            InitializeManagers();
+            GameInit();
         } else {
             QueueFree();
         }
     }
 
-    private void InitializeManagers() {
+    private void GameInit() {
         // Note: Despite being displayed as "UIManager" in the Godot editor,
         // the actual node name is "UiManager" (with a lowercase 'i'). This seems to be a Godot bug.
         UIManager = GetNodeOrNull<UIManager>("UiManager");
         DialogueManager = GetNodeOrNull<DialogueManager>("DialogueManager");
         mainMenu = UIManager.GetNodeOrNull<MainMenu>("MainMenu");
-        mainMenu.StartButtonPressed += OnStartButtonPressed;
+        mainMenu.StartNewGameButtonPressed += OnStartButtonPressed;
+        //first thing that happens in the game is displaying the Main Menu
+        mainMenu.DisplayMainMenuOptionsOnly();
+        mainMenu.Show();
     }
 
     public void OnStartButtonPressed() {

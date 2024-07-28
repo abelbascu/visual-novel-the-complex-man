@@ -12,7 +12,6 @@ public partial class UIManager : Control {
     public PackedScene dialogueBoxUIScene;
     public DialogueBoxUI dialogueBoxUI; //the graphical rectangle container to display the text over
     private VBoxContainer dialogueChoicesMarginContainer;
-    //public PlayerChoicesBoxUI playerChoicesBoxUI; //the graphical rectangle VBoxContainer to displayer the branching player choices.
     private const int UI_BOTTOM_POSITION = 200; //starting at the bottom of the screen, we subtract this value to position the Y screen position of the dilaogue box  
     public PackedScene playerChoicesBoxUIScene;
     public PlayerChoicesBoxUI playerChoicesBoxUI;
@@ -24,16 +23,19 @@ public partial class UIManager : Control {
     private const int OFFSET_RIGHT = 0;
     private const int OFFSET_TOP = 200;
     private const int OFFSET_BOTTOM = 0;
+    public MainMenu mainMenu;
 
 
     public override void _Ready() {
+
+        mainMenu = GetNode<MainMenu>("MainMenu");
+        mainMenu.Hide();
+
         dialogueBoxUI = GetNode<DialogueBoxUI>("DialogueBoxUI");
         //playerChoicesBoxUI = GetNode<PlayerChoicesBoxUI>("PlayerChoicesBoxUI");
         //playerChoicesBoxUI.Hide();
         CallDeferred(nameof(SetupNodeOrder));
         MouseFilter = MouseFilterEnum.Ignore;
-        //dialogueChoicesMarginContainer = playerChoicesBoxUI.GetNode<VBoxContainer>("GlobalMarginContainer/PlayerChoicesMarginContainer");
-
         //Set up PlayerChoicesBoxUI
         playerChoicesBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
         playerChoicesBoxUI = playerChoicesBoxUIScene.Instantiate<PlayerChoicesBoxUI>();
@@ -49,7 +51,6 @@ public partial class UIManager : Control {
         playerChoicesBoxUI.OffsetRight = OFFSET_RIGHT;
         playerChoicesBoxUI.OffsetTop = OFFSET_TOP;  // Adjust this value to set the initial height
         playerChoicesBoxUI.OffsetBottom = OFFSET_BOTTOM;
-
         //Set up DialogueBoxUI
         dialogueBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
         dialogueBoxUI = dialogueBoxUIScene.Instantiate<DialogueBoxUI>();
@@ -65,6 +66,11 @@ public partial class UIManager : Control {
         dialogueBoxUI.OffsetRight = OFFSET_RIGHT;
         dialogueBoxUI.OffsetTop = OFFSET_TOP;  // Adjust this value to set the initial height
         dialogueBoxUI.OffsetBottom = OFFSET_BOTTOM;
+    }
+
+    public void DisplayMainMenu()
+    {
+        mainMenu.Show();
     }
 
     private void SetupNodeOrder() {

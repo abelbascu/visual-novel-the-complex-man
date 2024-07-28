@@ -14,18 +14,29 @@ public partial class MainMenu : Control {
     VBoxContainer LanguageOptionsContainer;
     private Dictionary<Button, string> buttonLocalizationKeys = new();
     private Dictionary<Button, string> buttonLanguageKeys = new();
-    public Action StartButtonPressed;
-
+    public Action StartNewGameButtonPressed;
+    Button startNewGameButton;
+    Button saveGameButton;
+    Button continueGameButton;
+    Button loadGameButton;
+    Button languageButton;
+    Button creditsButton;
+    Button exitGameButton;
+    Button settingsButton;
 
     public override void _Ready() {
         this.Show();
         //displaying the UI boxes with the options
         MainOptionsContainer = GetNode<VBoxContainer>("MainOptionsContainer");
-        Button startNewGameButton = GetNode<Button>("MainOptionsContainer/StartNewGameButton");
-        Button loadGameButton = GetNode<Button>("MainOptionsContainer/LoadGameButton");
-        Button languageButton = GetNode<Button>("MainOptionsContainer/LanguageButton");
-        Button creditsButton = GetNode<Button>("MainOptionsContainer/CreditsButton");
-        Button exitGameButton = GetNode<Button>("MainOptionsContainer/ExitButton");
+        startNewGameButton = GetNode<Button>("MainOptionsContainer/StartNewGameButton");
+        saveGameButton = GetNode<Button>("MainOptionsContainer/SaveGameButton"); ;
+        continueGameButton = GetNode<Button>("MainOptionsContainer/ContinueButton"); ;
+        loadGameButton = GetNode<Button>("MainOptionsContainer/LoadGameButton");
+        languageButton = GetNode<Button>("MainOptionsContainer/LanguageButton");
+        settingsButton = GetNode<Button>("MainOptionsContainer/SettingsButton"); ;
+        creditsButton = GetNode<Button>("MainOptionsContainer/CreditsButton");
+        exitGameButton = GetNode<Button>("MainOptionsContainer/ExitButton");
+
         exitConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/ExitButton/ExitConfirmationDialog");
         creditsConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/CreditsButton/CreditsConfirmationDialog");
 
@@ -55,7 +66,7 @@ public partial class MainMenu : Control {
         AnchorBottom = 1;
         OffsetRight = 0;
         OffsetBottom = 0;
-    
+
 
         //***** SET LANGUAGE HERE *****
         //we check what language the user has in his Windows OS
@@ -122,9 +133,22 @@ public partial class MainMenu : Control {
         }
     }
 
+    public void DisplayMainMenuOptionsOnly() {
+        startNewGameButton.Show();
+        saveGameButton.Hide();
+        continueGameButton.Hide();
+    }
+
+    public void DisplayInGameMenuOptionsOnly() {
+        saveGameButton.Show();
+        continueGameButton.Show();
+        startNewGameButton.Hide();
+    }
+
+
 
     private void OnStartNewGameButtonPressed() {
-        StartButtonPressed?.Invoke();
+        StartNewGameButtonPressed?.Invoke();
         Hide();
     }
 

@@ -88,55 +88,12 @@ public partial class UIManager : Control {
         }
     }
 
-    public void DisplayDialogue(DialogueObject currentDialogueObject) {
-        if (DialogueManager.Instance.isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
-            return;
-        DialogueManager.Instance.isDialogueBeingPrinted = true;
-        if (dialogueBoxUI == null) {
-            DisplayDialogueBoxUI();
-        }
-        if (dialogueBoxUI != null)
-            dialogueBoxUI.Show();
-        if (playerChoicesBoxUI != null)
-            playerChoicesBoxUI.Hide();
-
-        dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, DialogueManager.languageCode);
+    public DialogueBoxUI GetDialogueBoxUI() {
+            return dialogueBoxUI;
     }
 
-    public void DisplayPlayerChoices(List<DialogueObject> playerChoices, Action<bool> setIsPlayerChoiceBeingPrinted) {
-        if (playerChoicesBoxUI == null) {
-            //before adding the player choices, we need to create the container VBox
-            DisplayPlayerChoicesBoxUI();
-        }
-        if (playerChoicesBoxUI != null) {
-            //ensure the container is visible
-            playerChoicesBoxUI.Show();
-            //let's hide the dialogue box, that's used to displaye narrator/NPC texts, not the player's
-            if (dialogueBoxUI != null)
-                dialogueBoxUI.Hide();
-
-            setIsPlayerChoiceBeingPrinted(true);
-            playerChoicesBoxUI.DisplayPlayerChoices(playerChoices, DialogueManager.languageCode);
-            setIsPlayerChoiceBeingPrinted(false);
-        }
-    }
-
-    public void DisplayDialogueBoxUI() {
-        // Ensure the dialogue box is visible
-        dialogueBoxUI.Visible = true;
-        //once all chars of the dialogue text are displayed in the container, we can show the next dialogue.
-        dialogueBoxUI.FinishedDisplayingDialogueLine += DialogueManager.Instance.OnTextBoxFinishedDisplayingDialogueLine;
-    }
-
-    public void DisplayPlayerChoicesBoxUI() {
-        PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
-        Node instance = scene.Instantiate();
-        AddChild(instance);
-        //VBoxContainer playerChoìces = instance as VBoxContainer;
-        playerChoicesBoxUI = instance as PlayerChoicesBoxUI;
-        playerChoicesBoxUI.Show();
-        //once all chars of the dialogue text are displayed in the container, we can show the next line.
-        playerChoicesBoxUI.FinishedDisplayingPlayerChoice += DialogueManager.Instance.OnTextBoxFinishedDisplayingPlayerChoices;
+    public PlayerChoicesBoxUI GetPlayerChoicesBoxUI() {
+        return playerChoicesBoxUI;
     }
 
     public void OnStartButtonPressed() {

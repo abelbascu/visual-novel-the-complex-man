@@ -21,6 +21,9 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="UiManager" parent="GameManager" instance=ExtResource("3_dlnf0")]
+layout_mode = 1
+
 [node name="VisualManager" parent="GameManager" instance=ExtResource("5_leafw")]
 layout_mode = 1
 anchors_preset = 15
@@ -30,6 +33,3 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="DialogueManager" parent="GameManager" instance=ExtResource("2_8t2uu")]
-
-[node name="UiManager" parent="GameManager" instance=ExtResource("3_dlnf0")]
-layout_mode = 1

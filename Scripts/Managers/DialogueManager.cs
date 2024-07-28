@@ -22,6 +22,9 @@ public partial class DialogueManager : Control {
     //------------------------------------------------------------------event handlers-----------------------------------------------------------------------------------
     //---------------------------------------------------------------------singleton--------------------------------------------------------------------------------------
     public static DialogueManager Instance { get; private set; }
+    DialogueBoxUI dialogueBoxUI;
+    PlayerChoicesBoxUI playerChoicesBoxUI;
+
 
     public void SetIsPlayerChoiceBeingPrinted(bool isPrinting) {
         IsPlayerChoiceBeingPrinted = isPrinting;
@@ -42,6 +45,10 @@ public partial class DialogueManager : Control {
 
     public override void _Ready() {
 
+        //We have a dependency with the UIManager. 
+        //We try to wait for the UIManager to enter the tree.
+        CallDeferred(nameof(InitializeUI));
+
         // Ignore mouse input if it doesn't need to interact directly
         MouseFilter = MouseFilterEnum.Ignore;
         // Make GameManager fill its parent
@@ -49,6 +56,16 @@ public partial class DialogueManager : Control {
         AnchorBottom = 1;
         LoadDialogueObjects("C:/PROJECTS/GODOT/visual-novel-the-complex-man/DialogueDB/dialogueDB.json");
         playerChoicesList = new();
+    }
+
+    private void InitializeUI() {
+        if (UIManager.Instance == null) {
+            // If UIManager is not ready, try again in the next frame
+            CallDeferred(nameof(InitializeUI));
+            return;
+        }
+            dialogueBoxUI = UIManager.Instance.GetDialogueBoxUI();
+            playerChoicesBoxUI = UIManager.Instance.GetPlayerChoicesBoxUI();       
     }
 
     private void LoadDialogueObjects(string filePath) {
@@ -80,13 +97,65 @@ public partial class DialogueManager : Control {
         }
 
         if (dialogObj.Actor != "1") {
-            UIManager.Instance.DisplayDialogue(dialogObj);
+            DisplayDialogue(dialogObj);
             currentDialogueObject = dialogObj;
             //if it's the player, we need to add first the choice to the list and VBox   
         } else {
             AddPlayerChoicesToList(dialogObj.ID, dialogObj);
-            UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
+            DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
         }
+    }
+
+
+    public void DisplayDialogue(DialogueObject currentDialogueObject) {
+        if (DialogueManager.Instance.isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
+            return;
+        DialogueManager.Instance.isDialogueBeingPrinted = true;
+        if (dialogueBoxUI == null) {
+            DisplayDialogueBoxUI();
+        }
+        if (dialogueBoxUI != null)
+            dialogueBoxUI.Show();
+        if (playerChoicesBoxUI != null)
+            playerChoicesBoxUI.Hide();
+
+        dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, DialogueManager.languageCode);
+    }
+
+    public void DisplayPlayerChoices(List<DialogueObject> playerChoices, Action<bool> setIsPlayerChoiceBeingPrinted) {
+        if (playerChoicesBoxUI == null) {
+            //before adding the player choices, we need to create the container VBox
+            DisplayPlayerChoicesBoxUI();
+        }
+        if (playerChoicesBoxUI != null) {
+            //ensure the container is visible
+            playerChoicesBoxUI.Show();
+            //let's hide the dialogue box, that's used to displaye narrator/NPC texts, not the player's
+            if (dialogueBoxUI != null)
+                dialogueBoxUI.Hide();
+
+            setIsPlayerChoiceBeingPrinted(true);
+            playerChoicesBoxUI.DisplayPlayerChoices(playerChoices, DialogueManager.languageCode);
+            setIsPlayerChoiceBeingPrinted(false);
+        }
+    }
+
+    public void DisplayDialogueBoxUI() {
+        // Ensure the dialogue box is visible
+        dialogueBoxUI.Visible = true;
+        //once all chars of the dialogue text are displayed in the container, we can show the next dialogue.
+        dialogueBoxUI.FinishedDisplayingDialogueLine += DialogueManager.Instance.OnTextBoxFinishedDisplayingDialogueLine;
+    }
+
+    public void DisplayPlayerChoicesBoxUI() {
+        PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
+        Node instance = scene.Instantiate();
+        AddChild(instance);
+        //VBoxContainer playerChoìces = instance as VBoxContainer;
+        playerChoicesBoxUI = instance as PlayerChoicesBoxUI;
+        playerChoicesBoxUI.Show();
+        //once all chars of the dialogue text are displayed in the container, we can show the next line.
+        playerChoicesBoxUI.FinishedDisplayingPlayerChoice += DialogueManager.Instance.OnTextBoxFinishedDisplayingPlayerChoices;
     }
 
     //IEnumerable<int> so we can pass a list or a single int when there is only one player choice to add to the playerChoicesList
@@ -135,7 +204,7 @@ public partial class DialogueManager : Control {
         //if we reached a dead end path, show again the playerChoices so the player can choose another path
         //dead end paths can be used to provide contexts, make jokes, give hints, etc.
         if (currentDialogueObject.OutgoingLinks.Count == 0) {
-            UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
+            DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
         }
 
         // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
@@ -170,7 +239,7 @@ public partial class DialogueManager : Control {
             if (nextDialogObject.IsGroup == true) {
                 nextDialogObject.IsGroupParent = true;
                 AddGroupPlayerChoicesToList(nextDialogObject);
-                UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
+                DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
             } else {
 
                 DisplayDialogueOrPlayerChoice(nextDialogObject);
@@ -187,7 +256,7 @@ public partial class DialogueManager : Control {
         else if (destinationDialogIDs.Count > 1 && currentDialogueObject.IsGroup == false) {
             //nextDialogObject.IsNoGroupParent = true;
             AddNoGroupPlayerChoicesToList(currentDialogueObject);
-            UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
+            DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
         }
     }
 
@@ -276,7 +345,7 @@ public partial class DialogueManager : Control {
                     currentDialogueObject = nextDialogObject;
                 } else if (nextDialogObject.IsGroup == true) {
                     AddGroupPlayerChoicesToList(nextDialogObject);
-                    UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
+                    DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
                 }
             }
         }
@@ -290,7 +359,7 @@ public partial class DialogueManager : Control {
         else if (destinationDialogIDs.Count > 1 && currentDialogueObject.IsGroup == false) {
             nextDialogObject.IsNoGroupParent = true;
             AddNoGroupPlayerChoicesToList(currentDialogueObject);
-            UIManager.Instance.DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
+            DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
         }
     }
 

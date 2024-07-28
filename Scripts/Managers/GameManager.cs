@@ -4,8 +4,9 @@ using System;
 
 public partial class GameManager : Control {
     public static GameManager Instance { get; private set; }
-
     public DialogueManager DialogueManager { get; private set; }
+    public UIManager UIManager {get; private set; }
+    
     //public PlayerStateManager PlayerStateManager { get; private set; }
     // public MediaManager MediaManager { get; private set; }
     // public MinigameManager MinigameManager { get; private set; }
@@ -41,6 +42,7 @@ public partial class GameManager : Control {
     }
 
     private void InitializeManagers() {
+        UIManager = GetNode<UIManager>("UIManager");
         DialogueManager = GetNode<DialogueManager>("DialogueManager");
     }
 }

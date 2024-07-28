@@ -13,9 +13,7 @@ public partial class UIManager : Control {
     public DialogueBoxUI dialogueBoxUI; //the graphical rectangle container to display the text over
     private VBoxContainer dialogueChoicesMarginContainer;
     //public PlayerChoicesBoxUI playerChoicesBoxUI; //the graphical rectangle VBoxContainer to displayer the branching player choices.
-    public static Action StartButtonPressed;
     private const int UI_BOTTOM_POSITION = 200; //starting at the bottom of the screen, we subtract this value to position the Y screen position of the dilaogue box  
-    private MainMenu mainMenu;
     public PackedScene playerChoicesBoxUIScene;
     public PlayerChoicesBoxUI playerChoicesBoxUI;
     private const float ANCHOR_LEFT_PERCENTAGE = 0.08f;
@@ -29,8 +27,6 @@ public partial class UIManager : Control {
 
 
     public override void _Ready() {
-        mainMenu = GetNode<MainMenu>("MainMenu");
-        mainMenu.StartButtonPressed += OnStartButtonPressed;
         dialogueBoxUI = GetNode<DialogueBoxUI>("DialogueBoxUI");
         //playerChoicesBoxUI = GetNode<PlayerChoicesBoxUI>("PlayerChoicesBoxUI");
         //playerChoicesBoxUI.Hide();
@@ -94,11 +90,5 @@ public partial class UIManager : Control {
 
     public PlayerChoicesBoxUI GetPlayerChoicesBoxUI() {
         return playerChoicesBoxUI;
-    }
-
-    public void OnStartButtonPressed() {
-        //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
-        DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject(DialogueManager.Instance.currentConversationID, DialogueManager.Instance.currentDialogueID);
-        DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
     }
 }

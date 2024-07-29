@@ -155,15 +155,11 @@ public partial class MainMenu : Control {
         mainMenuBackgroundImage.Texture = null;
         //put overlay to prevent reading input from other UI elements
         UIManager.Instance.menuOverlay.Visible = true;
-        // Ensure the menu is on top of the overlay
-        UIManager.Instance.UpdateUILayout();
         Show();
     }
 
     public void CloseInGameMenu() {
         UIManager.Instance.menuOverlay.Visible = false;
-        // Ensure the menu is on top of the overlay
-        UIManager.Instance.UpdateUILayout();
         Hide();
     }
 

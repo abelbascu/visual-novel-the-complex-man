@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://b6kee1naax88o"]
 
 [ext_resource type="Script" path="res://Scripts/PlayerChoicesBoxUI.cs" id="1_ygy34"]
-[ext_resource type="Texture2D" uid="uid://dvmxcg1hidawy" path="res://Visuals/dialogue box UI bckg transparent resized.png" id="2_xdqji"]
+[ext_resource type="Texture2D" uid="uid://dvmxcg1hidawy" path="res://Visuals/UI/dialogue box UI bckg transparent resized.png" id="2_xdqji"]
 
 [node name="PlayerChoicesBoxUI" type="MarginContainer"]
 anchors_preset = 7

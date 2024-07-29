@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dvmxcg1hidawy"
-path="res://.godot/imported/dialogue box UI bckg transparent resized.png-1b57b2018300dc3418e51d019dab717e.ctex"
+uid="uid://dsdb86xtawq4c"
+path="res://.godot/imported/ingame menu icon hover.png-e1bd4a876a334b31b742f4b19a5c7c11.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Visuals/dialogue box UI bckg transparent resized.png"
-dest_files=["res://.godot/imported/dialogue box UI bckg transparent resized.png-1b57b2018300dc3418e51d019dab717e.ctex"]
+source_file="res://Visuals/UI/ingame menu icon hover.png"
+dest_files=["res://.godot/imported/ingame menu icon hover.png-e1bd4a876a334b31b742f4b19a5c7c11.ctex"]
 
 [params]
 

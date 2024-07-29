@@ -24,18 +24,21 @@ public partial class UIManager : Control {
     private const int OFFSET_TOP = 200;
     private const int OFFSET_BOTTOM = 0;
     public MainMenu mainMenu;
+    public InGameMenuButton inGameMenuButton;
+    public Control menuOverlay;
+
 
 
     public override void _Ready() {
 
+        MouseFilter = MouseFilterEnum.Ignore;
+
         mainMenu = GetNode<MainMenu>("MainMenu");
         mainMenu.Hide();
 
-        dialogueBoxUI = GetNode<DialogueBoxUI>("DialogueBoxUI");
-        //playerChoicesBoxUI = GetNode<PlayerChoicesBoxUI>("PlayerChoicesBoxUI");
-        //playerChoicesBoxUI.Hide();
-        CallDeferred(nameof(SetupNodeOrder));
-        MouseFilter = MouseFilterEnum.Ignore;
+        inGameMenuButton = GetNode<InGameMenuButton>("InGameMenuButton");
+        inGameMenuButton.Hide();
+
         //Set up PlayerChoicesBoxUI
         playerChoicesBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
         playerChoicesBoxUI = playerChoicesBoxUIScene.Instantiate<PlayerChoicesBoxUI>();
@@ -51,6 +54,7 @@ public partial class UIManager : Control {
         playerChoicesBoxUI.OffsetRight = OFFSET_RIGHT;
         playerChoicesBoxUI.OffsetTop = OFFSET_TOP;  // Adjust this value to set the initial height
         playerChoicesBoxUI.OffsetBottom = OFFSET_BOTTOM;
+        
         //Set up DialogueBoxUI
         dialogueBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
         dialogueBoxUI = dialogueBoxUIScene.Instantiate<DialogueBoxUI>();
@@ -66,11 +70,25 @@ public partial class UIManager : Control {
         dialogueBoxUI.OffsetRight = OFFSET_RIGHT;
         dialogueBoxUI.OffsetTop = OFFSET_TOP;  // Adjust this value to set the initial height
         dialogueBoxUI.OffsetBottom = OFFSET_BOTTOM;
-    }
 
-    public void DisplayMainMenu()
-    {
-        mainMenu.Show();
+        // Overlay mask to filter out input when inggame menu is open
+        menuOverlay = new Control {
+            Name = "MenuOverlay",
+            MouseFilter = MouseFilterEnum.Stop,
+            Visible = false,
+            AnchorRight = 1,
+            AnchorBottom = 1,
+            GrowHorizontal = GrowDirection.Both,
+            GrowVertical = GrowDirection.Both
+        };
+
+        CallDeferred(nameof(SetupNodeOrder));
+        CallDeferred(nameof(EnsureOverlayOnTop));
+
+        // Set up input handling for the overlay
+        menuOverlay.Connect("gui_input", new Callable(this, nameof(OnOverlayGuiInput)));
+
+        AddChild(menuOverlay);
     }
 
     private void SetupNodeOrder() {
@@ -79,6 +97,31 @@ public partial class UIManager : Control {
         GetParent().MoveChild(visualManager, 0);
         // Move this UIManager to be the last child (top layer)
         GetParent().MoveChild(this, GetParent().GetChildCount() - 1);
+    }
+
+    private void OnOverlayGuiInput(InputEvent @event) {
+        // Consume all input events to ensure no other UI elements are clickable
+        // this is for when the ingame menu is open
+        GetViewport().SetInputAsHandled();
+    }
+
+    private void EnsureOverlayOnTop() {
+        // Move the overlay to be the last child (on top of other UI elements)
+        MoveChild(menuOverlay, GetChildCount() - 1);
+
+        // Ensure the ingame menu and the ingame menu icon are on top of the overlay
+            MoveChild(inGameMenuButton, GetChildCount() - 1);      
+            MoveChild(mainMenu, GetChildCount() - 1);
+        
+    }
+
+    // Call this method whenever you show or hide UI elements
+    public void UpdateUILayout() {
+        EnsureOverlayOnTop();
+    }
+
+    public void DisplayMainMenu() {
+        mainMenu.Show();
     }
 
     public override void _EnterTree() {
@@ -91,7 +134,7 @@ public partial class UIManager : Control {
     }
 
     public DialogueBoxUI GetDialogueBoxUI() {
-            return dialogueBoxUI;
+        return dialogueBoxUI;
     }
 
     public PlayerChoicesBoxUI GetPlayerChoicesBoxUI() {

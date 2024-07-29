@@ -23,8 +23,14 @@ public partial class MainMenu : Control {
     Button creditsButton;
     Button exitGameButton;
     Button settingsButton;
+    public TextureRect mainMenuBackgroundImage;
+
 
     public override void _Ready() {
+
+
+        mainMenuBackgroundImage = GetNode<TextureRect>("BackgroundImage");
+
         this.Show();
         //displaying the UI boxes with the options
         MainOptionsContainer = GetNode<VBoxContainer>("MainOptionsContainer");
@@ -42,6 +48,7 @@ public partial class MainMenu : Control {
 
         //trigger events depending on the option clicked
         startNewGameButton.Pressed += OnStartNewGameButtonPressed;
+        continueGameButton.Pressed += OnContinueButtonPressed;
         loadGameButton.Pressed += OnLoadGameButtonPressed;
         languageButton.Pressed += OnLanguageButtonPressed;
         creditsButton.Pressed += OnCreditsButtonPressed;
@@ -133,23 +140,41 @@ public partial class MainMenu : Control {
         }
     }
 
-    public void DisplayMainMenuOptionsOnly() {
+    public void DisplayMainMenu() {
         startNewGameButton.Show();
         saveGameButton.Hide();
         continueGameButton.Hide();
+        mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/DialogueOrPlayerChoice/cosmos ether.png");
+        Show();
     }
 
-    public void DisplayInGameMenuOptionsOnly() {
+    public void DisplayInGameMenu() {
         saveGameButton.Show();
         continueGameButton.Show();
         startNewGameButton.Hide();
+        mainMenuBackgroundImage.Texture = null;
+        //put overlay to prevent reading input from other UI elements
+        UIManager.Instance.menuOverlay.Visible = true;
+        // Ensure the menu is on top of the overlay
+        UIManager.Instance.UpdateUILayout();
+        Show();
     }
 
+    public void CloseInGameMenu() {
+        UIManager.Instance.menuOverlay.Visible = false;
+        // Ensure the menu is on top of the overlay
+        UIManager.Instance.UpdateUILayout();
+        Hide();
+    }
 
 
     private void OnStartNewGameButtonPressed() {
         StartNewGameButtonPressed?.Invoke();
         Hide();
+    }
+
+    private void OnContinueButtonPressed() {
+        CloseInGameMenu();
     }
 
     private void OnLoadGameButtonPressed() {

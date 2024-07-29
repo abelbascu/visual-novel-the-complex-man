@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://bauqxmelp0rdi"]
+[gd_scene load_steps=4 format=3 uid="uid://bauqxmelp0rdi"]
 
 [ext_resource type="Script" path="res://Scripts/Managers/UIManager.cs" id="1_rn3fk"]
 [ext_resource type="PackedScene" uid="uid://c8t14jwiqekss" path="res://Scenes/MainMenu.tscn" id="2_xic3a"]
+[ext_resource type="PackedScene" uid="uid://c77p3prgew061" path="res://Scenes/InGameMenuButton.tscn" id="3_j7bll"]
 
 [node name="UiManager" type="Control"]
 layout_mode = 3
@@ -14,3 +15,8 @@ script = ExtResource("1_rn3fk")
 
 [node name="MainMenu" parent="." instance=ExtResource("2_xic3a")]
 layout_mode = 1
+
+[node name="InGameMenuButton" parent="." instance=ExtResource("3_j7bll")]
+layout_mode = 1
+offset_top = 61.0
+offset_bottom = 600.0

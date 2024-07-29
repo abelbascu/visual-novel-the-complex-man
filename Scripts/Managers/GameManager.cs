@@ -41,19 +41,20 @@ public partial class GameManager : Control {
     }
 
     private void GameInit() {
-        // Note: Despite being displayed as "UIManager" in the Godot editor,
-        // the actual node name is "UiManager" (with a lowercase 'i'). This seems to be a Godot bug.
+        // Note: Despite being displayed as "UIManager" in the Godot editor, the actual internal
+        // node name is "UiManager" (with a lowercase 'i'). This seems to be a Godot bug.
         UIManager = GetNodeOrNull<UIManager>("UiManager");
         DialogueManager = GetNodeOrNull<DialogueManager>("DialogueManager");
         mainMenu = UIManager.GetNodeOrNull<MainMenu>("MainMenu");
         mainMenu.StartNewGameButtonPressed += OnStartButtonPressed;
         //first thing that happens in the game is displaying the Main Menu
-        mainMenu.DisplayMainMenuOptionsOnly();
+        mainMenu.DisplayMainMenu();
         mainMenu.Show();
     }
 
     public void OnStartButtonPressed() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
+        UIManager.Instance.inGameMenuButton.Show();
         DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject(DialogueManager.Instance.currentConversationID, DialogueManager.Instance.currentDialogueID);
         DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
     }

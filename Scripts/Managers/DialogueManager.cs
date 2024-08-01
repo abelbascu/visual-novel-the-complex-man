@@ -13,7 +13,7 @@ public partial class DialogueManager : Control {
     [Export] public int currentConversationID = 2; //set here the conversation you want to load. Conversations in Chatmapper are what we could call chapters.
     [Export] public int currentDialogueID = 1; //set here the starting dialogue of the conversation
     //-----------------------------------------------------------------dependency variables------------------------------------------------------------------------------
-    private Dictionary<int, List<DialogueObject>> conversationDialogues; //the int refers to the conversation ID, see 'currentConversationID' above.
+    public  Dictionary<int, List<DialogueObject>> conversationDialogues; //the int refers to the conversation ID, see 'currentConversationID' above.
     public DialogueObject currentDialogueObject { get; set; }
     public List<DialogueObject> playerChoicesList;
     //----------------------------------------------------------------------bools----------------------------------------------------------------------------------------

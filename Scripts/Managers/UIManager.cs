@@ -26,6 +26,7 @@ public partial class UIManager : Control {
     public MainMenu mainMenu;
     public InGameMenuButton inGameMenuButton;
     public Control menuOverlay;
+    public SaveGameScreen saveGameScreen;
 
 
     public override void _Ready() {
@@ -37,6 +38,9 @@ public partial class UIManager : Control {
 
         inGameMenuButton = GetNode<InGameMenuButton>("InGameMenuButton");
         inGameMenuButton.Hide();
+
+        saveGameScreen = GetNode<SaveGameScreen>("SaveGameScreen");
+        saveGameScreen.Hide();
 
         //Set up PlayerChoicesBoxUI
         playerChoicesBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
@@ -112,6 +116,7 @@ public partial class UIManager : Control {
         //for whatever reason i need to put this line last for the ingame menu button to work
         //if i put it between the menuOverlay and mainMenu lines, it doesn't work.
         MoveChild(inGameMenuButton, GetChildCount() - 1);
+        MoveChild(saveGameScreen, GetChildCount() - 1);
 
     }
 

@@ -48,7 +48,7 @@ public partial class VisualManager : Control {
         }
     }
 
-    private void DisplayImage(string imagePath) {
+    public void DisplayImage(string imagePath) {
         var texture = ResourceLoader.Load<Texture2D>(imagePath);
         fullScreenImage.Texture = texture;
         fullScreenImage.Show();

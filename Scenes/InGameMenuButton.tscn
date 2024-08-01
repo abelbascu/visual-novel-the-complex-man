@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://c77p3prgew061"]
 
-[ext_resource type="Script" path="res://Scenes/InGameMenuButton.cs" id="1_6s4mo"]
+[ext_resource type="Script" path="res://Scripts/InGameMenuButton.cs" id="1_6s4mo"]
 [ext_resource type="Texture2D" uid="uid://b284hkhwxeorc" path="res://Visuals/UI/ingame menu icon.png" id="1_drbph"]
 [ext_resource type="Texture2D" uid="uid://dsdb86xtawq4c" path="res://Visuals/UI/ingame menu icon hover.png" id="2_75nc4"]
 

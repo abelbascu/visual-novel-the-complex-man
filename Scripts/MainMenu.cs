@@ -15,6 +15,8 @@ public partial class MainMenu : Control {
     private Dictionary<Button, string> buttonLocalizationKeys = new();
     private Dictionary<Button, string> buttonLanguageKeys = new();
     public Action StartNewGameButtonPressed;
+    public Action SaveGameButtonPressed;
+    public Action LoadGameButtonPressed;
     Button startNewGameButton;
     Button saveGameButton;
     Button continueGameButton;
@@ -49,6 +51,7 @@ public partial class MainMenu : Control {
         //trigger events depending on the option clicked
         startNewGameButton.Pressed += OnStartNewGameButtonPressed;
         continueGameButton.Pressed += OnContinueButtonPressed;
+        saveGameButton.Pressed += OnSaveGameButtonPressed;
         loadGameButton.Pressed += OnLoadGameButtonPressed;
         languageButton.Pressed += OnLanguageButtonPressed;
         creditsButton.Pressed += OnCreditsButtonPressed;
@@ -163,6 +166,16 @@ public partial class MainMenu : Control {
         Hide();
     }
 
+    private void OnSaveGameButtonPressed() {
+       // SaveGameButtonPressed.Invoke();
+        UIManager.Instance.saveGameScreen.Show();
+    }
+
+       private void OnLoadGameButtonPressed() {
+       // LoadGameButtonPressed.Invoke();
+        UIManager.Instance.saveGameScreen.Show();
+        Hide();
+    }
 
     private void OnStartNewGameButtonPressed() {
         StartNewGameButtonPressed?.Invoke();
@@ -171,10 +184,6 @@ public partial class MainMenu : Control {
 
     private void OnContinueButtonPressed() {
         CloseInGameMenu();
-    }
-
-    private void OnLoadGameButtonPressed() {
-
     }
 
     private void OnLanguageButtonPressed() {

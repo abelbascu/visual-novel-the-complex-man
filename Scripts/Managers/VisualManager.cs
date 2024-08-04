@@ -4,7 +4,9 @@ using System;
 public partial class VisualManager : Control {
     public static VisualManager Instance { get; private set; }
 
-    private TextureRect fullScreenImage;
+    public TextureRect fullScreenImage;
+    public string VisualPath;
+    public VisualType visualType;
     // private VideoStreamPlayer videoPlayer;
 
     public override void _EnterTree() {
@@ -37,7 +39,8 @@ public partial class VisualManager : Control {
 
     public void DisplayVisual(string visualPath, VisualType type) {
         HideAllVisuals();
-
+        this.VisualPath = visualPath;
+        this.visualType = type;
         switch (type) {
             case VisualType.Image:
                 DisplayImage(visualPath);

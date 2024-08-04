@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.IO;
 
 public partial class SaveGameSlot : HBoxContainer {
     public Action<int> SaveRequested;
@@ -11,6 +12,7 @@ public partial class SaveGameSlot : HBoxContainer {
     private RichTextLabel gameCompletedPercentageLabel;
     private TextureRect screenshotTexture;
     private Button actionButton;
+    private MarginContainer marginContainer;
 
     private int slotNumber;
     private string saveFilePath;
@@ -22,22 +24,53 @@ public partial class SaveGameSlot : HBoxContainer {
         gameCompletedPercentageLabel = GetNode<RichTextLabel>("MarginContainer/HBoxContainer/VBoxContainer2/MarginContainer2/GameCompletedPercent");
         screenshotTexture = GetNode<TextureRect>("MarginContainer2/HBoxContainer/TextureRect");
         actionButton = GetNode<Button>("MarginContainer2/HBoxContainer/Button");
+        marginContainer = GetNode<MarginContainer>("MarginContainer");
 
         actionButton.Pressed += OnActionButtonPressed;
+
+        // Create a custom container with border
+        // var borderedContainer = new BorderedMarginContainer
+        // {
+        //     BorderColor = Colors.Red,
+        //     BorderWidth = 2
+        // };
+
+        // // Replace the MarginContainer with the BorderedMarginContainer
+        // marginContainer.ReplaceBy(borderedContainer);
+        // borderedContainer.AddChild(marginContainer);
+
+
+        // // Create a new ColorRect node
+        // var borderRect = new ColorRect();
+
+        // // Add the ColorRect as a child of the MarginContainer
+        // marginContainer.AddChild(borderRect);
+
+        // // Make the ColorRect fill the entire MarginContainer
+        // borderRect.SetAnchorsPreset(Control.LayoutPreset.FullRect);
     }
 
-    public void SetLoadSlotData(GameStateManager.GameState gameState, int number) {
+    public void SetLoadSlotData(GameStateManager.GameState gameState, int number, bool isLoadScreen) {
         slotNumber = number;
-        saveFilePath = $"user://saves/save_{slotNumber:D}.save";
+        saveFilePath = Path.Combine(OS.GetUserDataDir(), "saves", $"save_{slotNumber:D3}.sav");
+
+        // Normalize the path to ensure consistent slash direction
+        saveFilePath = Path.GetFullPath(saveFilePath);
 
         titleLabel.Text = $"Game Save {slotNumber}";
         dateLabel.Text = gameState.SaveTime.ToString("MMM d, yyyy - h:mm:ss tt");
         timePlayedLabel.Text = $"Time Played: {FormatTimeSpan(gameState.TimePlayed)}";
         gameCompletedPercentageLabel.Text = $"Dialogues: {gameState.DialoguesVisitedPercentage:F1}%";
 
-        screenshotTexture.Texture = ImageTexture.CreateFromImage(gameState.Screenshot);
+        if (gameState.Screenshot != null) {
+            var imageTexture = ImageTexture.CreateFromImage(gameState.Screenshot);
+            screenshotTexture.Texture = imageTexture;
+        } else {
+            screenshotTexture.Texture = null;
+        }
 
-        actionButton.Text = "Load Game";
+        actionButton.Text = isLoadScreen ? "Load Game" : "Save Game";
+        actionButton.Visible = isLoadScreen || gameState == null;
     }
 
     public void SetSaveEmptySlot(int number) {

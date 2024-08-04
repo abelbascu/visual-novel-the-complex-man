@@ -168,12 +168,13 @@ public partial class MainMenu : Control {
 
     private void OnSaveGameButtonPressed() {
        // SaveGameButtonPressed.Invoke();
-        UIManager.Instance.saveGameScreen.Show();
+        UIManager.Instance.saveGameScreen.ShowScreen(false);
+        
     }
 
        private void OnLoadGameButtonPressed() {
        // LoadGameButtonPressed.Invoke();
-        UIManager.Instance.saveGameScreen.Show();
+        UIManager.Instance.saveGameScreen.ShowScreen(true);
         Hide();
     }
 

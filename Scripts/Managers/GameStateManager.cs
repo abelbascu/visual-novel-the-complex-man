@@ -15,7 +15,8 @@ public partial class GameStateManager : Node {
     private const string PersistentDataFile = "persistent_data.dat";
 
     public class GameState {
-        public DialogueObject CurrentDialogueObject {get; set;}
+        public int SlotNumber {get; set;}
+        public DialogueObject CurrentDialogueObject { get; set; }
         public int CurrentDialogueObjectID { get; set; }
         public int CurrentConversationID { get; set; }
         public string LanguageCode { get; set; }
@@ -24,6 +25,8 @@ public partial class GameStateManager : Node {
         public TimeSpan TimePlayed { get; set; }
         public float DialoguesVisitedPercentage { get; set; }
         public Image Screenshot { get; set; }
+        public string VisualPath {get; set;}
+        public VisualManager.VisualType VisualType;
     }
 
     public class PersistentData {
@@ -69,12 +72,14 @@ public partial class GameStateManager : Node {
             CurrentDialogueObject = DialogueManager.Instance.currentDialogueObject,
             CurrentDialogueObjectID = DialogueManager.Instance.currentDialogueObject.ID,
             CurrentConversationID = DialogueManager.Instance.currentConversationID,
-            LanguageCode = DialogueManager.languageCode,
+            LanguageCode = TranslationServer.GetLocale(),
             PlayerChoicesList = DialogueManager.Instance.playerChoicesList.Select(d => d.ID).ToList(),
             SaveTime = DateTime.Now,
             TimePlayed = GetCurrentPlayTime(),
             DialoguesVisitedPercentage = CalculateDialoguesVisitedPercentage(),
-            Screenshot = CaptureScreenshot()
+            Screenshot = CaptureScreenshot(),
+            VisualPath = VisualManager.Instance.VisualPath,
+            VisualType = VisualManager.Instance.visualType
         };
         string saveFilePath = GetNextSaveFilePath();
         SaveGameState(gameState, saveFilePath);
@@ -106,7 +111,7 @@ public partial class GameStateManager : Node {
         int saveNumber = 1;
         string filePath;
         do {
-            filePath = Path.Combine(saveDirectoryPath, $"save_{saveNumber:DS}{SaveFileExtension}");
+            filePath = Path.Combine(saveDirectoryPath, $"save_{saveNumber:D3}{SaveFileExtension}");
             saveNumber++;
         } while (File.Exists(filePath));
 
@@ -120,6 +125,9 @@ public partial class GameStateManager : Node {
         foreach (string filePath in Directory.GetFiles(saveDirectoryPath, $"*{SaveFileExtension}")) {
             var gameState = LoadGameState(filePath);
             if (gameState != null) {
+                string fileName = Path.GetFileNameWithoutExtension(filePath);
+                int slotNumber = int.Parse(fileName.Substring(5)); // Assuming "save_" prefix
+                gameState.SlotNumber = slotNumber;
                 savedGames.Add(gameState);
             }
         }
@@ -135,11 +143,16 @@ public partial class GameStateManager : Node {
     }
 
     private GameState LoadGameState(string filePath) {
+
+        // Normalize the path to ensure consistent slash direction
+        filePath = Path.GetFullPath(filePath);
+
         if (File.Exists(filePath)) {
             var encryptedData = File.ReadAllBytes(filePath);
             var json = DecryptData(encryptedData);
             return JsonSerializer.Deserialize<GameState>(json);
         }
+        GD.Print($"File not found: {filePath}");
         return null;
     }
 
@@ -148,7 +161,11 @@ public partial class GameStateManager : Node {
         DialogueManager.Instance.currentConversationID = gameState.CurrentConversationID;
         DialogueManager.languageCode = gameState.LanguageCode;
         DialogueManager.Instance.playerChoicesList = gameState.PlayerChoicesList.Select(id => DialogueManager.Instance.GetDialogueObject(gameState.CurrentConversationID, id)).ToList();
-        VisualManager.Instance.DisplayImage(gameState.CurrentDialogueObject.VisualPath);
+        //VisualManager.Instance.DisplayImage(DialogueManager.Instance.currentDialogueObject.VisualPath);
+        UIManager.Instance.inGameMenuButton.Show();
+        VisualManager.Instance.VisualPath = gameState.VisualPath;
+        VisualManager.Instance.visualType = gameState.VisualType;
+        DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
 
         SetCurrentPlayTime(gameState.TimePlayed);
     }

@@ -95,6 +95,10 @@ public partial class DialogueManager : Control {
         if (!string.IsNullOrEmpty(dialogObj.VisualPath)) {
             VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, (VisualManager.VisualType)dialogObj.VisualType);
         }
+        else
+        {
+            VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath, VisualManager.Instance.visualType);
+        }
 
         if (dialogObj.Actor != "1") {
             DisplayDialogue(dialogObj);

@@ -13,9 +13,13 @@ public partial class GameStateManager : Node {
     private const string SaveFileExtension = ".sav";
     private const string SaveDirectory = "saves";
     private const string PersistentDataFile = "persistent_data.dat";
+    private const string AutosavePrefix = "autosave_";
+    private const int AutosaveInterval = 10; // 5 minutes in seconds
+    private float timeSinceLastAutosave = 0;
+    private bool autosaveEnabled = true;
 
     public class GameState {
-        public int SlotNumber {get; set;}
+        public int SlotNumber { get; set; }
         public DialogueObject CurrentDialogueObject { get; set; }
         public int CurrentDialogueObjectID { get; set; }
         public int CurrentConversationID { get; set; }
@@ -25,8 +29,9 @@ public partial class GameStateManager : Node {
         public TimeSpan TimePlayed { get; set; }
         public float DialoguesVisitedPercentage { get; set; }
         public Image Screenshot { get; set; }
-        public string VisualPath {get; set;}
+        public string VisualPath { get; set; }
         public VisualManager.VisualType VisualType;
+        public bool IsAutosave { get; set; }
     }
 
     public class PersistentData {
@@ -52,6 +57,32 @@ public partial class GameStateManager : Node {
         LoadPersistentData();
     }
 
+    public override void _Process(double delta) {
+        if (autosaveEnabled) {
+            timeSinceLastAutosave += (float)delta;
+            if (timeSinceLastAutosave >= AutosaveInterval) {
+                Autosave();
+                timeSinceLastAutosave = 0;
+            }
+        }
+    }
+
+    public void ToggleAutosave(bool enable) {
+        autosaveEnabled = enable;
+        if (enable) {
+            timeSinceLastAutosave = 0; // Reset the timer when enabling
+        }
+    }
+
+    private void Autosave() {
+        var gameState = CreateGameState();
+        gameState.IsAutosave = true;
+        string autosavePath = GetNextAutosaveFilePath();
+        SaveGameState(gameState, autosavePath);
+        GD.Print("Autosave completed: " + autosavePath);
+    }
+
+
     public void LoadPersistentData() {
         string persistentDataPath = Path.Combine(OS.GetUserDataDir(), PersistentDataFile);
         if (File.Exists(persistentDataPath)) {
@@ -67,8 +98,25 @@ public partial class GameStateManager : Node {
         }
     }
 
-    public void SaveGame() {
-        var gameState = new GameState {
+
+    private int GetNextSaveNumber() {
+        string saveDirectoryPath = Path.Combine(OS.GetUserDataDir(), SaveDirectory);
+        var allSaves = Directory.GetFiles(saveDirectoryPath, $"*{SaveFileExtension}");
+        return allSaves.Length + 1;
+    }
+
+    public void SaveGame(bool isAutosave = false) {
+        var gameState = CreateGameState();
+        gameState.IsAutosave = isAutosave;
+        string prefix = isAutosave ? AutosavePrefix : "save_";
+        string saveFilePath = GetNextFilePath(prefix);
+        gameState.SlotNumber = int.Parse(Path.GetFileNameWithoutExtension(saveFilePath).Substring(prefix.Length));
+        SaveGameState(gameState, saveFilePath);
+        UpdatePersistentData(gameState);
+    }
+
+    private GameState CreateGameState() {
+        return new GameState {
             CurrentDialogueObject = DialogueManager.Instance.currentDialogueObject,
             CurrentDialogueObjectID = DialogueManager.Instance.currentDialogueObject.ID,
             CurrentConversationID = DialogueManager.Instance.currentConversationID,
@@ -81,9 +129,6 @@ public partial class GameStateManager : Node {
             VisualPath = VisualManager.Instance.VisualPath,
             VisualType = VisualManager.Instance.visualType
         };
-        string saveFilePath = GetNextSaveFilePath();
-        SaveGameState(gameState, saveFilePath);
-        UpdatePersistentData(gameState);
     }
 
     private void SaveGameState(GameState gameState, string filePath) {
@@ -107,17 +152,28 @@ public partial class GameStateManager : Node {
     }
 
     private string GetNextSaveFilePath() {
-        string saveDirectoryPath = Path.Combine(OS.GetUserDataDir(), SaveDirectory);
-        int saveNumber = 1;
-        string filePath;
-        do {
-            filePath = Path.Combine(saveDirectoryPath, $"save_{saveNumber:D3}{SaveFileExtension}");
-            saveNumber++;
-        } while (File.Exists(filePath));
-
-        return filePath;
+        return GetNextFilePath("save_");
     }
 
+    private string GetNextAutosaveFilePath() {
+        return GetNextFilePath(AutosavePrefix);
+    }
+
+    private string GetNextFilePath(string prefix) {
+        string saveDirectoryPath = Path.Combine(OS.GetUserDataDir(), SaveDirectory);
+        var allSaves = Directory.GetFiles(saveDirectoryPath, $"*{SaveFileExtension}");
+        int highestNumber = 0;
+
+        foreach (var save in allSaves) {
+            string fileName = Path.GetFileNameWithoutExtension(save);
+            if (int.TryParse(fileName.Substring(fileName.LastIndexOf('_') + 1), out int number)) {
+                highestNumber = Math.Max(highestNumber, number);
+            }
+        }
+
+        int nextNumber = highestNumber + 1;
+        return Path.Combine(saveDirectoryPath, $"{prefix}{nextNumber:D3}{SaveFileExtension}");
+    }
 
     public List<GameState> GetSavedGames() {
         var savedGames = new List<GameState>();
@@ -126,11 +182,12 @@ public partial class GameStateManager : Node {
             var gameState = LoadGameState(filePath);
             if (gameState != null) {
                 string fileName = Path.GetFileNameWithoutExtension(filePath);
-                int slotNumber = int.Parse(fileName.Substring(5)); // Assuming "save_" prefix
-                gameState.SlotNumber = slotNumber;
+                gameState.IsAutosave = fileName.StartsWith(AutosavePrefix);
+                gameState.SlotNumber = int.Parse(fileName.Substring(fileName.LastIndexOf('_') + 1));
                 savedGames.Add(gameState);
             }
         }
+
 
         return savedGames.OrderByDescending(g => g.SaveTime).ToList();
     }

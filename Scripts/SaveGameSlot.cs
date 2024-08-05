@@ -13,11 +13,15 @@ public partial class SaveGameSlot : HBoxContainer {
     private TextureRect screenshotTexture;
     private Button actionButton;
     private MarginContainer marginContainer;
-
     private int slotNumber;
     private string saveFilePath;
 
+    private bool isMouseOver = false;
+
     public override void _Ready() {
+
+        MouseFilter = MouseFilterEnum.Stop;
+
         titleLabel = GetNode<RichTextLabel>("MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/GameSaveTitle");
         dateLabel = GetNode<RichTextLabel>("MarginContainer/HBoxContainer/VBoxContainer2/MarginContainer/GameSaveDate");
         timePlayedLabel = GetNode<RichTextLabel>("MarginContainer/HBoxContainer/VBoxContainer/MarginContainer2/TimePlayed");
@@ -27,37 +31,18 @@ public partial class SaveGameSlot : HBoxContainer {
         marginContainer = GetNode<MarginContainer>("MarginContainer");
 
         actionButton.Pressed += OnActionButtonPressed;
-
-        // Create a custom container with border
-        // var borderedContainer = new BorderedMarginContainer
-        // {
-        //     BorderColor = Colors.Red,
-        //     BorderWidth = 2
-        // };
-
-        // // Replace the MarginContainer with the BorderedMarginContainer
-        // marginContainer.ReplaceBy(borderedContainer);
-        // borderedContainer.AddChild(marginContainer);
-
-
-        // // Create a new ColorRect node
-        // var borderRect = new ColorRect();
-
-        // // Add the ColorRect as a child of the MarginContainer
-        // marginContainer.AddChild(borderRect);
-
-        // // Make the ColorRect fill the entire MarginContainer
-        // borderRect.SetAnchorsPreset(Control.LayoutPreset.FullRect);
     }
 
     public void SetLoadSlotData(GameStateManager.GameState gameState, int number, bool isLoadScreen) {
         slotNumber = number;
+        string prefix = gameState.IsAutosave ? "autosave_" : "save_";
         saveFilePath = Path.Combine(OS.GetUserDataDir(), "saves", $"save_{slotNumber:D3}.sav");
 
         // Normalize the path to ensure consistent slash direction
         saveFilePath = Path.GetFullPath(saveFilePath);
 
-        titleLabel.Text = $"Game Save {slotNumber}";
+        string autosaveLabel = gameState.IsAutosave ? " (Autosaved)" : "";
+        titleLabel.Text = $"Game Save {slotNumber}{autosaveLabel}";
         dateLabel.Text = gameState.SaveTime.ToString("MMM d, yyyy - h:mm:ss tt");
         timePlayedLabel.Text = $"Time Played: {FormatTimeSpan(gameState.TimePlayed)}";
         gameCompletedPercentageLabel.Text = $"Dialogues: {gameState.DialoguesVisitedPercentage:F1}%";

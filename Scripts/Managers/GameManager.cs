@@ -50,6 +50,7 @@ public partial class GameManager : Control {
         //first thing that happens in the game is displaying the Main Menu
         mainMenu.DisplayMainMenu();
         mainMenu.Show();
+        GameStateManager.Instance.ToggleAutosave(false);
     }
 
     public void OnStartButtonPressed() {
@@ -57,5 +58,6 @@ public partial class GameManager : Control {
         UIManager.Instance.inGameMenuButton.Show();
         DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject(DialogueManager.Instance.currentConversationID, DialogueManager.Instance.currentDialogueID);
         DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
+        GameStateManager.Instance.ToggleAutosave(true);
     }
 }

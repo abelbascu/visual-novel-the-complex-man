@@ -2,11 +2,14 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public partial class SaveGameScreen : Control {
+public partial class SaveGameScreen : MarginContainer {
     private PackedScene saveGameSlotScene;
     private ScrollContainer scrollContainer;
     private VBoxContainer slotsContainer;
     private MarginContainer marginContainer;
+    private Button goBackButton;
+    private RichTextLabel noSavesLabel;
+
 
     public override void _Ready() {
         saveGameSlotScene = GD.Load<PackedScene>("res://Scenes/SaveGameSlot.tscn");
@@ -14,50 +17,90 @@ public partial class SaveGameScreen : Control {
         slotsContainer = GetNode<VBoxContainer>("MarginContainer/ScrollContainer/VBoxContainer");
         marginContainer = GetNode<MarginContainer>("MarginContainer");
 
-        //PopulateSaveSlots();
-
         // Set size flags to prevent expansion
-        marginContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
-        marginContainer.SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
+        marginContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        marginContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+
+        goBackButton = GetNode<Button>("GoBackButton");
+        goBackButton.Pressed += () => OnGoBackButtonPressed();
     }
 
+    private void CreateNoSavesLabel() {
+        noSavesLabel = new RichTextLabel {
+            BbcodeEnabled = true,
+            Text = "[center]No saved games yet. Please save a game first.[/center]",
+            FitContent = false,
+            Name = "NoSavesLabel",
+            Visible = false
+        };
 
-    public void ShowScreen(bool isLoadScreen)
-{
-    // Clear existing slots
-    foreach (Node child in slotsContainer.GetChildren())
-    {
-        child.QueueFree();
+        noSavesLabel.AddThemeFontSizeOverride("normal_font_size", 40);
+        noSavesLabel.AddThemeColorOverride("default_color", Colors.White);
+        noSavesLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        noSavesLabel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+        noSavesLabel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.Center);
+
+        //noSavesLabel.AnchorRight = 1;
+        //noSavesLabel.AnchorBottom = 1;
+
+       // noSavesLabel.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+
+        noSavesLabel.CustomMinimumSize = new Vector2(400, 500);
+
+
+        slotsContainer.AddChild(noSavesLabel);
     }
 
-    // Populate with appropriate slots
-    PopulateSaveSlots(isLoadScreen);
+    private void OnGoBackButtonPressed() {
+        Hide();
+        //UIManager.Instance.
+    }
 
-    // Make the screen visible
-    Visible = true;
-}
+    public void ShowScreen(bool isLoadScreen) {
+        // Clear existing slots
+        foreach (Node child in slotsContainer.GetChildren()) {
+            child.QueueFree();
+        }
+        CreateNoSavesLabel();
 
-    private void PopulateSaveSlots(bool isLoadScreen) {
+        // Populate with appropriate slots
+        PopulateSaveOrLoadSlots(isLoadScreen);
+
+        Show();
+    }
+
+    private void PopulateSaveOrLoadSlots(bool isLoadScreen) {
         List<GameStateManager.GameState> saveGames = GameStateManager.Instance.GetSavedGames();
 
-        //it's the Save screen, not the Load screen
-        if(!isLoadScreen)
-        AddSaveSlot(null, saveGames.Count + 1, isLoadScreen);
+        foreach (Node child in slotsContainer.GetChildren()) {
+            if (child != noSavesLabel) {
+                child.QueueFree();
+            }
+        }
 
-        for (int i = 0; i < saveGames.Count; i++) {
-            AddSaveSlot(saveGames[i], saveGames[i].SlotNumber, isLoadScreen);
+        if (saveGames.Count == 0 && isLoadScreen) {
+            noSavesLabel.Visible = true;
+
+        } else {
+
+            noSavesLabel.Visible = false;
+            //it's the Save screen, not the Load screen
+            if (!isLoadScreen)
+                AddSaveOrLoadSlot(null, saveGames.Count + 1, isLoadScreen);
+
+            for (int i = 0; i < saveGames.Count; i++) {
+                AddSaveOrLoadSlot(saveGames[i], saveGames[i].SlotNumber, isLoadScreen);
+            }
         }
     }
 
-    private void AddSaveSlot(GameStateManager.GameState gameState, int slotNumber, bool isLoadScreen) {
+    private void AddSaveOrLoadSlot(GameStateManager.GameState gameState, int slotNumber, bool isLoadScreen) {
         var slotInstance = saveGameSlotScene.Instantiate<SaveGameSlot>();
         slotsContainer.AddChild(slotInstance);
 
         if (gameState != null) {
             slotInstance.SetLoadSlotData(gameState, slotNumber, isLoadScreen);
-        } 
-        else if (!isLoadScreen)
-        {
+        } else if (!isLoadScreen) {
             slotInstance.SetSaveEmptySlot(slotNumber);
         }
 
@@ -73,6 +116,10 @@ public partial class SaveGameScreen : Control {
     private void OnLoadRequested(string saveFilePath) {
         UIManager.Instance.menuOverlay.Visible = false;
         GameStateManager.Instance.LoadGame(saveFilePath);
+        if (UIManager.Instance.mainMenu.IsVisibleInTree()) {
+            UIManager.Instance.mainMenu.CloseMainMenu();
+            GameStateManager.Instance.ToggleAutosave(true);
+        }
 
         //QueueFree();
         Hide();
@@ -82,7 +129,7 @@ public partial class SaveGameScreen : Control {
         foreach (Node child in slotsContainer.GetChildren()) {
             child.QueueFree();
         }
-        PopulateSaveSlots(false);
+        PopulateSaveOrLoadSlots(false);
     }
 
 

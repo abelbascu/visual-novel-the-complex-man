@@ -26,6 +26,8 @@ public partial class MainMenu : Control {
     Button exitGameButton;
     Button settingsButton;
     public TextureRect mainMenuBackgroundImage;
+    public const bool LOAD_SCREEN = true;
+    public const bool SAVE_SCREEN = false;
 
 
     public override void _Ready() {
@@ -148,6 +150,7 @@ public partial class MainMenu : Control {
         saveGameButton.Hide();
         continueGameButton.Hide();
         mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/DialogueOrPlayerChoice/cosmos ether.png");
+        GameStateManager.Instance.ToggleAutosave(false);
         Show();
     }
 
@@ -158,24 +161,31 @@ public partial class MainMenu : Control {
         mainMenuBackgroundImage.Texture = null;
         //put overlay to prevent reading input from other UI elements
         UIManager.Instance.menuOverlay.Visible = true;
+        GameStateManager.Instance.ToggleAutosave(false);
         Show();
     }
 
     public void CloseInGameMenu() {
         UIManager.Instance.menuOverlay.Visible = false;
+        GameStateManager.Instance.ToggleAutosave(true);
+        Hide();
+    }
+
+    public void CloseMainMenu()
+    {
         Hide();
     }
 
     private void OnSaveGameButtonPressed() {
        // SaveGameButtonPressed.Invoke();
-        UIManager.Instance.saveGameScreen.ShowScreen(false);
+        UIManager.Instance.saveGameScreen.ShowScreen(SAVE_SCREEN);
         
     }
 
        private void OnLoadGameButtonPressed() {
        // LoadGameButtonPressed.Invoke();
-        UIManager.Instance.saveGameScreen.ShowScreen(true);
-        Hide();
+        UIManager.Instance.saveGameScreen.ShowScreen(LOAD_SCREEN);
+        //Hide();
     }
 
     private void OnStartNewGameButtonPressed() {

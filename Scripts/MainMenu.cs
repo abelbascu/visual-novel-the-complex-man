@@ -8,7 +8,8 @@ public partial class MainMenu : Control {
 
     [Export] public string language { get; set; } = "";
     private string previousLanguage = "";
-    ConfirmationDialog exitConfirmationDialog;
+    ConfirmationDialog exitGameConfirmationDialog;
+    ConfirmationDialog exitToMainMenuConfirmationDialog;
     ConfirmationDialog creditsConfirmationDialog;
     VBoxContainer MainOptionsContainer;
     VBoxContainer LanguageOptionsContainer;
@@ -24,6 +25,7 @@ public partial class MainMenu : Control {
     Button languageButton;
     Button creditsButton;
     Button exitGameButton;
+    Button exitToMainMenuButton;
     Button settingsButton;
     public TextureRect mainMenuBackgroundImage;
     public const bool LOAD_SCREEN = true;
@@ -45,9 +47,12 @@ public partial class MainMenu : Control {
         languageButton = GetNode<Button>("MainOptionsContainer/LanguageButton");
         settingsButton = GetNode<Button>("MainOptionsContainer/SettingsButton"); ;
         creditsButton = GetNode<Button>("MainOptionsContainer/CreditsButton");
-        exitGameButton = GetNode<Button>("MainOptionsContainer/ExitButton");
+        exitGameButton = GetNode<Button>("MainOptionsContainer/ExitGameButton");
+        exitToMainMenuButton = GetNode<Button>("MainOptionsContainer/ExitToMainMenuButton");
 
-        exitConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/ExitButton/ExitConfirmationDialog");
+        exitGameConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/ExitGameButton/ExitGameConfirmationDialog");
+        exitToMainMenuConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/ExitToMainMenuButton/ExitToMainMenuConfirmationDialog");
+
         creditsConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/CreditsButton/CreditsConfirmationDialog");
 
         //trigger events depending on the option clicked
@@ -57,9 +62,14 @@ public partial class MainMenu : Control {
         loadGameButton.Pressed += OnLoadGameButtonPressed;
         languageButton.Pressed += OnLanguageButtonPressed;
         creditsButton.Pressed += OnCreditsButtonPressed;
-        exitGameButton.Pressed += OnExitButtonPressed;
-        exitConfirmationDialog.Canceled += OnExitCancelButtonPressed;
-        exitConfirmationDialog.Confirmed += OnExitConfirmButtonPressed;
+        exitGameButton.Pressed += OnExitGameButtonPressed;
+        exitToMainMenuButton.Pressed += OnExitToMainMenuButtonPressed;
+        exitGameConfirmationDialog.Canceled += OnExitGameCancelButtonPressed;
+        exitGameConfirmationDialog.Confirmed += OnExitGameConfirmButtonPressed;
+        exitToMainMenuConfirmationDialog.Confirmed += OnExitToMainMenuConfirmButtonPressed;
+        exitToMainMenuConfirmationDialog.Canceled += OnExitToMainMenuCancelButtonPressed;
+
+
         creditsConfirmationDialog.Canceled += OnCreditsCancelOrConfirmButtonPressed;
         creditsConfirmationDialog.Confirmed += OnCreditsCancelOrConfirmButtonPressed;
 
@@ -147,20 +157,26 @@ public partial class MainMenu : Control {
 
     public void DisplayMainMenu() {
         startNewGameButton.Show();
+        exitGameButton.Show();
         saveGameButton.Hide();
         continueGameButton.Hide();
+        exitToMainMenuButton.Hide();
         mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/DialogueOrPlayerChoice/cosmos ether.png");
         GameStateManager.Instance.ToggleAutosave(false);
+        UIManager.Instance.inGameMenuButton.Hide();
+        UIManager.Instance.menuOverlay.Visible = false; //a mask to avoid clicking on the dialoguebox when menus are open
+        MainOptionsContainer.Show();
         Show();
     }
 
     public void DisplayInGameMenu() {
         saveGameButton.Show();
         continueGameButton.Show();
+        exitToMainMenuButton.Show();
         startNewGameButton.Hide();
+        exitGameButton.Hide();
         mainMenuBackgroundImage.Texture = null;
-        //put overlay to prevent reading input from other UI elements
-        UIManager.Instance.menuOverlay.Visible = true;
+        UIManager.Instance.menuOverlay.Visible = true; //put overlay to prevent reading input from other UI elements behind this mask
         GameStateManager.Instance.ToggleAutosave(false);
         Show();
     }
@@ -171,19 +187,18 @@ public partial class MainMenu : Control {
         Hide();
     }
 
-    public void CloseMainMenu()
-    {
+    public void CloseMainMenu() {
         Hide();
     }
 
     private void OnSaveGameButtonPressed() {
-       // SaveGameButtonPressed.Invoke();
+        // SaveGameButtonPressed.Invoke();
         UIManager.Instance.saveGameScreen.ShowScreen(SAVE_SCREEN);
-        
+
     }
 
-       private void OnLoadGameButtonPressed() {
-       // LoadGameButtonPressed.Invoke();
+    private void OnLoadGameButtonPressed() {
+        // LoadGameButtonPressed.Invoke();
         UIManager.Instance.saveGameScreen.ShowScreen(LOAD_SCREEN);
         //Hide();
     }
@@ -208,24 +223,42 @@ public partial class MainMenu : Control {
 
     }
 
-    private void OnExitButtonPressed() {
-        ShowConfirmationPopup();
+    private void OnExitGameButtonPressed() {
+        ShowExitGameConfirmationPopup();
 
     }
 
-    public void ShowConfirmationPopup() {
+    public void OnExitToMainMenuButtonPressed() {
+        ShowExitToMainMenuConfirmationPopup();
+    }
+
+    public void ShowExitGameConfirmationPopup() {
         MainOptionsContainer.Hide();
-        exitConfirmationDialog.Show();
+        exitGameConfirmationDialog.Show();
+    }
+
+    public void ShowExitToMainMenuConfirmationPopup() {
+        MainOptionsContainer.Hide();
+        exitToMainMenuConfirmationDialog.Show();
     }
 
     //triggered by confirmationDialog.Confirmed event
-    private void OnExitConfirmButtonPressed() {
+    private void OnExitGameConfirmButtonPressed() {
         GetTree().Quit(); // Exit the game
     }
 
     //triggered by confirmationDialog.Canceled event
-    private void OnExitCancelButtonPressed() {
+    private void OnExitGameCancelButtonPressed() {
         // Close the confirmation popup
+        GetTree().CallGroup("popups", "close_all");
+        MainOptionsContainer.Show();
+    }
+
+    private void OnExitToMainMenuConfirmButtonPressed() {
+        DisplayMainMenu();
+    }
+
+    private void OnExitToMainMenuCancelButtonPressed() {
         GetTree().CallGroup("popups", "close_all");
         MainOptionsContainer.Show();
     }

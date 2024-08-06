@@ -45,7 +45,7 @@ advance_dialogue={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://Translations/MenuUITranslations - Sheet1 (1).ca.translation", "res://Translations/MenuUITranslations - Sheet1 (1).en.translation", "res://Translations/MenuUITranslations - Sheet1 (1).fr.translation")
+locale/translations=PackedStringArray("res://Translations/MenuUITranslations - Sheet1 (1).ca.translation", "res://Translations/MenuUITranslations - Sheet1 (1).csv", "res://Translations/MenuUITranslations - Sheet1 (1).en.translation", "res://Translations/MenuUITranslations - Sheet1 (1).fr.translation")
 locale/include_text_server_data=true
 
 [rendering]

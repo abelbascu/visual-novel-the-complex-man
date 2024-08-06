@@ -119,7 +119,23 @@ public partial class MainMenu : Control {
             GD.Print($"Button name: {button.Name}, Key: {initialText}, Locale: {TranslationServer.GetLocale()}");
         }
 
+
+        ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
+        ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
+
     }
+
+
+    private void ApplyCustomStyleToButtonsInContainer(VBoxContainer container)
+{
+    foreach (var child in container.GetChildren())
+    {
+        if (child is Button button)
+        {
+            UIManager.Instance.ApplyCustomStyleToButton(button);
+        }
+    }
+}
 
 
     //we constantly check if the dev (me!) changes the locale via the export variable 'language' in the editor

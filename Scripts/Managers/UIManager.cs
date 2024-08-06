@@ -145,4 +145,63 @@ public partial class UIManager : Control {
     public PlayerChoicesBoxUI GetPlayerChoicesBoxUI() {
         return playerChoicesBoxUI;
     }
+
+
+    public void ApplyCustomStyleToButton(Button button) {
+     var normalStyle = new StyleBoxFlat {
+            BgColor = Colors.Blue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
+        button.AddThemeStyleboxOverride("normal", normalStyle);
+
+        Color customBlue = new Color(
+            0f / 255f,  // Red component
+            71f / 255f,  // Green component
+            171f / 255f   // Blue component
+        );
+
+        // Hover state
+        var hoverStyle = new StyleBoxFlat {
+            BgColor = customBlue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
+
+        button.AddThemeStyleboxOverride("hover", hoverStyle);
+
+
+        // Pressed state
+        var pressedStyle = new StyleBoxFlat {
+            BgColor = Colors.DarkBlue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
+
+         button.AddThemeStyleboxOverride("pressed", pressedStyle);
+
+        // Set font size
+        button.AddThemeFontSizeOverride("font_size", 40);
+    }
 }

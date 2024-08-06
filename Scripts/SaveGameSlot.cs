@@ -15,8 +15,8 @@ public partial class SaveGameSlot : HBoxContainer {
     private MarginContainer marginContainer;
     private int slotNumber;
     private string saveFilePath;
-
     private bool isMouseOver = false;
+    private const int ACTION_BUTTON_FONT_SIZE = 30;
 
     public override void _Ready() {
 
@@ -31,6 +31,62 @@ public partial class SaveGameSlot : HBoxContainer {
         marginContainer = GetNode<MarginContainer>("MarginContainer");
 
         actionButton.Pressed += OnActionButtonPressed;
+
+        var normalStyle = new StyleBoxFlat {
+            BgColor = Colors.Blue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
+        actionButton.AddThemeStyleboxOverride("normal", normalStyle);
+
+        Color customBlue = new Color(
+            0f / 255f,  // Red component
+            71f / 255f,  // Green component
+            171f / 255f   // Blue component
+        );
+
+        // Hover state
+        var hoverStyle = new StyleBoxFlat {
+            BgColor = customBlue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
+
+        actionButton.AddThemeStyleboxOverride("hover", hoverStyle);
+
+
+        // Pressed state
+        var pressedStyle = new StyleBoxFlat {
+            BgColor = Colors.DarkBlue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
+        actionButton.AddThemeStyleboxOverride("pressed", pressedStyle);
+
+
+        actionButton.AddThemeFontSizeOverride("font_size", ACTION_BUTTON_FONT_SIZE);
+
     }
 
     public void SetLoadSlotData(GameStateManager.GameState gameState, int number, bool isLoadScreen) {

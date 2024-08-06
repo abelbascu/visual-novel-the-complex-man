@@ -21,8 +21,44 @@ public partial class SaveGameScreen : MarginContainer {
         marginContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         marginContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 
-        goBackButton = GetNode<Button>("GoBackButton");
+        goBackButton = GetNode<Button>("MarginContainer2/GoBackButton");
         goBackButton.Pressed += () => OnGoBackButtonPressed();
+
+        goBackButton.AnchorTop = 0;
+        goBackButton.AnchorRight = 1;
+        goBackButton.AnchorBottom = 0;
+        goBackButton.AnchorLeft = 1;
+        goBackButton.SetAnchorsPreset(Control.LayoutPreset.TopRight);
+        //goBackButton.Position = new Vector2(-10, 10);  
+
+         var normalStyle = new StyleBoxFlat {
+            BgColor = Colors.Blue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
+        goBackButton.AddThemeStyleboxOverride("normal", normalStyle);
+
+                var hoverStyle = new StyleBoxFlat {
+            BgColor = Colors.DarkBlue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
+
+        goBackButton.AddThemeStyleboxOverride("hover", hoverStyle);
     }
 
     private void CreateNoSavesLabel() {
@@ -43,7 +79,7 @@ public partial class SaveGameScreen : MarginContainer {
         //noSavesLabel.AnchorRight = 1;
         //noSavesLabel.AnchorBottom = 1;
 
-       // noSavesLabel.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        // noSavesLabel.SetAnchorsPreset(Control.LayoutPreset.FullRect);
 
         noSavesLabel.CustomMinimumSize = new Vector2(400, 500);
 

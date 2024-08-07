@@ -28,7 +28,6 @@ public partial class GameStateManager : Node {
         public DateTime SaveTime { get; set; }
         public TimeSpan TimePlayed { get; set; }
         public float DialoguesVisitedPercentage { get; set; }
-        //public Image Screenshot { get; set; }
         public string VisualPath { get; set; }
         public VisualManager.VisualType VisualType;
         public bool IsAutosave { get; set; }
@@ -124,7 +123,6 @@ public partial class GameStateManager : Node {
             SaveTime = DateTime.Now,
             TimePlayed = GetCurrentPlayTime(),
             DialoguesVisitedPercentage = CalculateDialoguesVisitedPercentage(),
-            //Screenshot = CaptureScreenshot(),
             VisualPath = VisualManager.Instance.VisualPath,
             VisualType = VisualManager.Instance.visualType
         };
@@ -214,9 +212,8 @@ public partial class GameStateManager : Node {
     private void ApplyGameState(GameState gameState) {
         DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject(gameState.CurrentConversationID, gameState.CurrentDialogueObjectID);
         DialogueManager.Instance.currentConversationID = gameState.CurrentConversationID;
-        DialogueManager.languageCode = gameState.LanguageCode;
+        TranslationServer.SetLocale(gameState.LanguageCode);
         DialogueManager.Instance.playerChoicesList = gameState.PlayerChoicesList.Select(id => DialogueManager.Instance.GetDialogueObject(gameState.CurrentConversationID, id)).ToList();
-        //VisualManager.Instance.DisplayImage(DialogueManager.Instance.currentDialogueObject.VisualPath);
         UIManager.Instance.inGameMenuButton.Show();
         VisualManager.Instance.VisualPath = gameState.VisualPath;
         VisualManager.Instance.visualType = gameState.VisualType;

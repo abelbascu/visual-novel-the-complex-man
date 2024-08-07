@@ -9,7 +9,6 @@ using System.Dynamic;
 public partial class DialogueManager : Control {
 
     //-------------------------------------------------------------------config variables---------------------------------------------------------------------------------
-    public static string languageCode = "en";
     [Export] public int currentConversationID = 2; //set here the conversation you want to load. Conversations in Chatmapper are what we could call chapters.
     [Export] public int currentDialogueID = 1; //set here the starting dialogue of the conversation
     //-----------------------------------------------------------------dependency variables------------------------------------------------------------------------------
@@ -121,7 +120,7 @@ public partial class DialogueManager : Control {
         if (playerChoicesBoxUI != null)
             playerChoicesBoxUI.Hide();
 
-        dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, DialogueManager.languageCode);
+        dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, TranslationServer.GetLocale());
     }
 
     public void DisplayPlayerChoices(List<DialogueObject> playerChoices, Action<bool> setIsPlayerChoiceBeingPrinted) {
@@ -137,7 +136,7 @@ public partial class DialogueManager : Control {
                 dialogueBoxUI.Hide();
 
             setIsPlayerChoiceBeingPrinted(true);
-            playerChoicesBoxUI.DisplayPlayerChoices(playerChoices, DialogueManager.languageCode);
+            playerChoicesBoxUI.DisplayPlayerChoices(playerChoices, TranslationServer.GetLocale());
             setIsPlayerChoiceBeingPrinted(false);
         }
     }

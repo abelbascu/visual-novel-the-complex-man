@@ -97,8 +97,8 @@ public partial class MainMenu : Control {
         language = parts[0];
         TranslationServer.SetLocale(language);
         //for testing purposes, will change the language directly here so we do not have to tinker witn Windows locale settings each time
-        string languageCode = "en";
-        TranslationServer.SetLocale(languageCode);
+        //string languageCode = "en";
+        //TranslationServer.SetLocale(languageCode);
 
         //below, we grab the locale keys before they are overwritten by the fallback locale translation,
         //otherwise we wouldn't be able to switch to another locale as the keys would be destroyed.
@@ -126,16 +126,13 @@ public partial class MainMenu : Control {
     }
 
 
-    private void ApplyCustomStyleToButtonsInContainer(VBoxContainer container)
-{
-    foreach (var child in container.GetChildren())
-    {
-        if (child is Button button)
-        {
-            UIManager.Instance.ApplyCustomStyleToButton(button);
+    private void ApplyCustomStyleToButtonsInContainer(VBoxContainer container) {
+        foreach (var child in container.GetChildren()) {
+            if (child is Button button) {
+                UIManager.Instance.ApplyCustomStyleToButton(button);
+            }
         }
     }
-}
 
 
     //we constantly check if the dev (me!) changes the locale via the export variable 'language' in the editor
@@ -145,7 +142,7 @@ public partial class MainMenu : Control {
         if (language != previousLanguage) {
             previousLanguage = language;
             TranslationServer.SetLocale(language);
-            DialogueManager.languageCode = language;
+            GD.Print("new game locale: " + TranslationServer.GetLocale());
             UpdateButtonTexts();
         }
     }

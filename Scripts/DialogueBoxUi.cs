@@ -70,7 +70,7 @@ public partial class DialogueBoxUI : MarginContainer {
     public string GetLocaleDialogue(DialogueObject dialogueObj, string locale) {
 
         string localeCurrentDialogue = locale switch {
-            "f  " => dialogueObj.FrenchText,
+            "fr" => dialogueObj.FrenchText,
             "ca" => dialogueObj.CatalanText,
             // Add more cases as needed for other locales
             _ => dialogueObj.DialogueTextDefault  // Default to the default text field

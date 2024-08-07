@@ -13,7 +13,7 @@ public partial class DialogueManager : Control {
     [Export] public int currentConversationID = 2; //set here the conversation you want to load. Conversations in Chatmapper are what we could call chapters.
     [Export] public int currentDialogueID = 1; //set here the starting dialogue of the conversation
     //-----------------------------------------------------------------dependency variables------------------------------------------------------------------------------
-    public  Dictionary<int, List<DialogueObject>> conversationDialogues; //the int refers to the conversation ID, see 'currentConversationID' above.
+    public Dictionary<int, List<DialogueObject>> conversationDialogues; //the int refers to the conversation ID, see 'currentConversationID' above.
     public DialogueObject currentDialogueObject { get; set; }
     public List<DialogueObject> playerChoicesList;
     //----------------------------------------------------------------------bools----------------------------------------------------------------------------------------
@@ -64,8 +64,8 @@ public partial class DialogueManager : Control {
             CallDeferred(nameof(InitializeUI));
             return;
         }
-            dialogueBoxUI = UIManager.Instance.GetDialogueBoxUI();
-            playerChoicesBoxUI = UIManager.Instance.GetPlayerChoicesBoxUI();       
+        dialogueBoxUI = UIManager.Instance.GetDialogueBoxUI();
+        playerChoicesBoxUI = UIManager.Instance.GetPlayerChoicesBoxUI();
     }
 
     private void LoadDialogueObjects(string filePath) {
@@ -94,9 +94,7 @@ public partial class DialogueManager : Control {
 
         if (!string.IsNullOrEmpty(dialogObj.VisualPath)) {
             VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, (VisualManager.VisualType)dialogObj.VisualType);
-        }
-        else
-        {
+        } else {
             VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath, VisualManager.Instance.visualType);
         }
 
@@ -112,9 +110,9 @@ public partial class DialogueManager : Control {
 
 
     public void DisplayDialogue(DialogueObject currentDialogueObject) {
-        if (DialogueManager.Instance.isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
+        if (isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
             return;
-        DialogueManager.Instance.isDialogueBeingPrinted = true;
+        isDialogueBeingPrinted = true;
         if (dialogueBoxUI == null) {
             DisplayDialogueBoxUI();
         }
@@ -225,13 +223,15 @@ public partial class DialogueManager : Control {
 
             if (linkDict != null) {
                 int destinationDialogID = linkDict["DestinationDialogID"];
-                int destinationConvoID = linkDict["DestinationConvoID"];
-                if (destinationDialogID == 0)
+                int destinationConversationID = linkDict["DestinationConvoID"];
+                if (destinationDialogID == 0) //if we land on a new Conversation, the ID 0 is a header, so let's move to the first dialogue
                     destinationDialogID = 1;
-                nextDialogObject = GetDialogueObject(destinationConvoID, destinationDialogID);
+                nextDialogObject = GetDialogueObject(destinationConversationID, destinationDialogID);
                 //first, if the dialogue that we clicked take us to another new conversation, let's reset the player choices list and buttons on the VBox
-                if (currentConversationID != destinationConvoID) {
-                    currentConversationID = destinationConvoID;
+                if (currentConversationID != destinationConversationID) {
+                    currentConversationID = destinationConversationID;
+                    //if we are landing on a new conversation, it means we reach the end of the previosu conversatrions
+                    //and we can clear the unvisited player choices
                     playerChoicesList.Clear();
                     if (UIManager.Instance.playerChoicesBoxUI != null)
                         UIManager.Instance.playerChoicesBoxUI.RemoveAllPlayerChoiceButtons();

@@ -61,7 +61,7 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.AddThemeStyleboxOverride("hover", hoverStyle);
     }
 
-    private void CreateNoSavesLabel() {
+    private void CreateNoSavesAvailableLabel() {
         noSavesLabel = new RichTextLabel {
             BbcodeEnabled = true,
             Text = "[center]No saved games yet. Please save a game first.[/center]",
@@ -75,15 +75,7 @@ public partial class SaveGameScreen : MarginContainer {
         noSavesLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         noSavesLabel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
         noSavesLabel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.Center);
-
-        //noSavesLabel.AnchorRight = 1;
-        //noSavesLabel.AnchorBottom = 1;
-
-        // noSavesLabel.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-
         noSavesLabel.CustomMinimumSize = new Vector2(400, 500);
-
-
         slotsContainer.AddChild(noSavesLabel);
     }
 
@@ -97,7 +89,7 @@ public partial class SaveGameScreen : MarginContainer {
         foreach (Node child in slotsContainer.GetChildren()) {
             child.QueueFree();
         }
-        CreateNoSavesLabel();
+        CreateNoSavesAvailableLabel();
 
         // Populate with appropriate slots
         PopulateSaveOrLoadSlots(isLoadScreen);
@@ -156,7 +148,6 @@ public partial class SaveGameScreen : MarginContainer {
             UIManager.Instance.mainMenu.CloseMainMenu();
             GameStateManager.Instance.ToggleAutosave(true);
         }
-
         //QueueFree();
         Hide();
     }

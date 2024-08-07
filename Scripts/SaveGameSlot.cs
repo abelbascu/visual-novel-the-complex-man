@@ -3,6 +3,11 @@ using System;
 using System.IO;
 
 public partial class SaveGameSlot : HBoxContainer {
+
+    [Export]
+    private Vector2 ThumbnailSize = new Vector2(120, 67); // 16:9 aspect ratio
+    private TextureRect thumbnailTextureRect;
+
     public Action<int> SaveRequested;
     public Action<string> LoadRequested;
 
@@ -10,7 +15,7 @@ public partial class SaveGameSlot : HBoxContainer {
     private RichTextLabel dateLabel;
     private RichTextLabel timePlayedLabel;
     private RichTextLabel gameCompletedPercentageLabel;
-    private TextureRect screenshotTexture;
+
     private Button actionButton;
     private MarginContainer marginContainer;
     private int slotNumber;
@@ -26,7 +31,7 @@ public partial class SaveGameSlot : HBoxContainer {
         dateLabel = GetNode<RichTextLabel>("MarginContainer/HBoxContainer/VBoxContainer2/MarginContainer/GameSaveDate");
         timePlayedLabel = GetNode<RichTextLabel>("MarginContainer/HBoxContainer/VBoxContainer/MarginContainer2/TimePlayed");
         gameCompletedPercentageLabel = GetNode<RichTextLabel>("MarginContainer/HBoxContainer/VBoxContainer2/MarginContainer2/GameCompletedPercent");
-        screenshotTexture = GetNode<TextureRect>("MarginContainer2/HBoxContainer/TextureRect");
+        thumbnailTextureRect = GetNode<TextureRect>("MarginContainer2/HBoxContainer/TextureRect");
         actionButton = GetNode<Button>("MarginContainer2/HBoxContainer/Button");
         marginContainer = GetNode<MarginContainer>("MarginContainer");
 
@@ -83,8 +88,6 @@ public partial class SaveGameSlot : HBoxContainer {
             BorderWidthRight = 2
         };
         actionButton.AddThemeStyleboxOverride("pressed", pressedStyle);
-
-
         actionButton.AddThemeFontSizeOverride("font_size", ACTION_BUTTON_FONT_SIZE);
 
     }
@@ -103,11 +106,14 @@ public partial class SaveGameSlot : HBoxContainer {
         timePlayedLabel.Text = $"Time Played: {FormatTimeSpan(gameState.TimePlayed)}";
         gameCompletedPercentageLabel.Text = $"Dialogues: {gameState.DialoguesVisitedPercentage:F1}%";
 
-        if (gameState.Screenshot != null) {
-            var imageTexture = ImageTexture.CreateFromImage(gameState.Screenshot);
-            screenshotTexture.Texture = imageTexture;
+        if (gameState.VisualPath != null) {
+            Image image = Image.LoadFromFile(gameState.VisualPath);
+            //without Lanczos interpolation, the thumbnail is very pixelated
+            image.Resize((int)ThumbnailSize.X, (int)ThumbnailSize.Y, Image.Interpolation.Lanczos);
+            ImageTexture texture = ImageTexture.CreateFromImage(image);
+            thumbnailTextureRect.Texture = texture;
         } else {
-            screenshotTexture.Texture = null;
+            thumbnailTextureRect.Texture = null;
         }
 
         actionButton.Text = isLoadScreen ? "Load Game" : "Save Game";
@@ -120,7 +126,7 @@ public partial class SaveGameSlot : HBoxContainer {
         dateLabel.Text = "";
         timePlayedLabel.Text = "";
         gameCompletedPercentageLabel.Text = "";
-        screenshotTexture.Texture = null;
+        thumbnailTextureRect.Texture = null;
         actionButton.Text = "Save Game";
     }
 

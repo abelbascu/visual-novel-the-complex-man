@@ -28,7 +28,7 @@ public partial class GameStateManager : Node {
         public DateTime SaveTime { get; set; }
         public TimeSpan TimePlayed { get; set; }
         public float DialoguesVisitedPercentage { get; set; }
-        public Image Screenshot { get; set; }
+        //public Image Screenshot { get; set; }
         public string VisualPath { get; set; }
         public VisualManager.VisualType VisualType;
         public bool IsAutosave { get; set; }
@@ -98,7 +98,6 @@ public partial class GameStateManager : Node {
         }
     }
 
-
     private int GetNextSaveNumber() {
         string saveDirectoryPath = Path.Combine(OS.GetUserDataDir(), SaveDirectory);
         var allSaves = Directory.GetFiles(saveDirectoryPath, $"*{SaveFileExtension}");
@@ -125,7 +124,7 @@ public partial class GameStateManager : Node {
             SaveTime = DateTime.Now,
             TimePlayed = GetCurrentPlayTime(),
             DialoguesVisitedPercentage = CalculateDialoguesVisitedPercentage(),
-            Screenshot = CaptureScreenshot(),
+            //Screenshot = CaptureScreenshot(),
             VisualPath = VisualManager.Instance.VisualPath,
             VisualType = VisualManager.Instance.visualType
         };
@@ -188,7 +187,6 @@ public partial class GameStateManager : Node {
             }
         }
 
-
         return savedGames.OrderByDescending(g => g.SaveTime).ToList();
     }
 
@@ -222,7 +220,12 @@ public partial class GameStateManager : Node {
         UIManager.Instance.inGameMenuButton.Show();
         VisualManager.Instance.VisualPath = gameState.VisualPath;
         VisualManager.Instance.visualType = gameState.VisualType;
-        DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
+        if (DialogueManager.Instance.playerChoicesList != null && DialogueManager.Instance.currentDialogueObject.Actor == "1") //if the current dialogue object it's a single player choice
+        {
+            DialogueManager.Instance.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, DialogueManager.Instance.SetIsPlayerChoiceBeingPrinted);
+            VisualManager.Instance.DisplayVisual(gameState.VisualPath, gameState.VisualType);
+        } else
+            DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
 
         SetCurrentPlayTime(gameState.TimePlayed);
     }

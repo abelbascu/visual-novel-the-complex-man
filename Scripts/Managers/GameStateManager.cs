@@ -97,12 +97,6 @@ public partial class GameStateManager : Node {
         }
     }
 
-    private int GetNextSaveNumber() {
-        string saveDirectoryPath = Path.Combine(OS.GetUserDataDir(), SaveDirectory);
-        var allSaves = Directory.GetFiles(saveDirectoryPath, $"*{SaveFileExtension}");
-        return allSaves.Length + 1;
-    }
-
     public void SaveGame(bool isAutosave = false) {
         var gameState = CreateGameState();
         gameState.IsAutosave = isAutosave;

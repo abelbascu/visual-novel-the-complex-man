@@ -21,8 +21,8 @@ public partial class DialogueManager : Control {
     //------------------------------------------------------------------event handlers-----------------------------------------------------------------------------------
     //---------------------------------------------------------------------singleton--------------------------------------------------------------------------------------
     public static DialogueManager Instance { get; private set; }
-    DialogueBoxUI dialogueBoxUI;
-    PlayerChoicesBoxUI playerChoicesBoxUI;
+    public DialogueBoxUI dialogueBoxUI;
+    public PlayerChoicesBoxUI playerChoicesBoxUI;
 
 
     public void SetIsPlayerChoiceBeingPrinted(bool isPrinting) {

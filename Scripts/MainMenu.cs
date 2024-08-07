@@ -34,7 +34,6 @@ public partial class MainMenu : Control {
 
     public override void _Ready() {
 
-
         mainMenuBackgroundImage = GetNode<TextureRect>("BackgroundImage");
 
         this.Show();
@@ -69,7 +68,6 @@ public partial class MainMenu : Control {
         exitToMainMenuConfirmationDialog.Confirmed += OnExitToMainMenuConfirmButtonPressed;
         exitToMainMenuConfirmationDialog.Canceled += OnExitToMainMenuCancelButtonPressed;
 
-
         creditsConfirmationDialog.Canceled += OnCreditsCancelOrConfirmButtonPressed;
         creditsConfirmationDialog.Confirmed += OnCreditsCancelOrConfirmButtonPressed;
 
@@ -88,7 +86,6 @@ public partial class MainMenu : Control {
         AnchorBottom = 1;
         OffsetRight = 0;
         OffsetBottom = 0;
-
 
         //***** SET LANGUAGE HERE *****
         //we check what language the user has in his Windows OS
@@ -119,12 +116,9 @@ public partial class MainMenu : Control {
             GD.Print($"Button name: {button.Name}, Key: {initialText}, Locale: {TranslationServer.GetLocale()}");
         }
 
-
         ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
         ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
-
     }
-
 
     private void ApplyCustomStyleToButtonsInContainer(VBoxContainer container) {
         foreach (var child in container.GetChildren()) {
@@ -133,7 +127,6 @@ public partial class MainMenu : Control {
             }
         }
     }
-
 
     //we constantly check if the dev (me!) changes the locale via the export variable 'language' in the editor
     public override void _Process(double delta) {
@@ -144,6 +137,10 @@ public partial class MainMenu : Control {
             TranslationServer.SetLocale(language);
             GD.Print("new game locale: " + TranslationServer.GetLocale());
             UpdateButtonTexts();
+            if(UIManager.Instance.dialogueBoxUI.IsVisibleInTree() == true)
+                DialogueManager.Instance.DisplayDialogue(DialogueManager.Instance.currentDialogueObject);
+            if(UIManager.Instance.playerChoicesBoxUI.IsVisibleInTree() == true)
+                UIManager.Instance.playerChoicesBoxUI.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, TranslationServer.GetLocale());
         }
     }
 
@@ -281,7 +278,6 @@ public partial class MainMenu : Control {
         MainOptionsContainer.Show();
     }
 
-
     private void OnEnglishButtonPressed() {
         language = "en";
     }
@@ -297,11 +293,7 @@ public partial class MainMenu : Control {
     private void OnGoBackButtonPressed() {
         LanguageOptionsContainer.Hide();
         MainOptionsContainer.Show();
-
     }
-
-
-
 }
 
 

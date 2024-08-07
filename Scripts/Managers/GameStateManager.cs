@@ -18,6 +18,8 @@ public partial class GameStateManager : Node {
     private float timeSinceLastAutosave = 0;
     private bool autosaveEnabled = true;
 
+    public int DialoguesVisitedID;
+
     public class GameState {
         public int SlotNumber { get; set; }
         public DialogueObject CurrentDialogueObject { get; set; }
@@ -27,7 +29,7 @@ public partial class GameStateManager : Node {
         public List<int> PlayerChoicesList { get; set; }
         public DateTime SaveTime { get; set; }
         public TimeSpan TimePlayed { get; set; }
-        public float DialoguesVisitedPercentage { get; set; }
+        public float DialoguesVisitedForAllGamesPercentage { get; set; }
         public string VisualPath { get; set; }
         public VisualManager.VisualType VisualType;
         public bool IsAutosave { get; set; }
@@ -36,7 +38,7 @@ public partial class GameStateManager : Node {
     public class PersistentData {
         public int GamesPlayed { get; set; }
         public TimeSpan TotalTimePlayed { get; set; }
-        public HashSet<int> DialoguesVisited { get; set; }
+        public HashSet<int> DialoguesVisitedForAllGames { get; set; }
         public HashSet<int> EndingsSeen { get; set; }
     }
 
@@ -54,6 +56,16 @@ public partial class GameStateManager : Node {
         string saveDirectoryPath = Path.Combine(OS.GetUserDataDir(), SaveDirectory);
         Directory.CreateDirectory(saveDirectoryPath);
         LoadPersistentData();
+        CallDeferred(nameof(SubscribeToEvents));
+    }
+
+    private void SubscribeToEvents() {
+        DialogueManager.Instance.DialogueVisited += OnDialogueVisited;
+    }
+
+    private void OnDialogueVisited(int dialogueObjectID) {
+        persistentData.DialoguesVisitedForAllGames.Add(dialogueObjectID);
+        SavePersistentData();
     }
 
     public override void _Process(double delta) {
@@ -91,7 +103,7 @@ public partial class GameStateManager : Node {
             persistentData = new PersistentData {
                 GamesPlayed = 0,
                 TotalTimePlayed = TimeSpan.Zero,
-                DialoguesVisited = new HashSet<int>(),
+                DialoguesVisitedForAllGames = new HashSet<int>(),
                 EndingsSeen = new HashSet<int>()
             };
         }
@@ -116,7 +128,7 @@ public partial class GameStateManager : Node {
             PlayerChoicesList = DialogueManager.Instance.playerChoicesList.Select(d => d.ID).ToList(),
             SaveTime = DateTime.Now,
             TimePlayed = GetCurrentPlayTime(),
-            DialoguesVisitedPercentage = CalculateDialoguesVisitedPercentage(),
+            DialoguesVisitedForAllGamesPercentage = CalculateDialoguesVisiteForAllGamesdPercentage(),
             VisualPath = VisualManager.Instance.VisualPath,
             VisualType = VisualManager.Instance.visualType
         };
@@ -131,8 +143,6 @@ public partial class GameStateManager : Node {
     private void UpdatePersistentData(GameState gameState) {
         persistentData.GamesPlayed++;
         persistentData.TotalTimePlayed += gameState.TimePlayed;
-        persistentData.DialoguesVisited.Add(gameState.CurrentDialogueObjectID);
-
         SavePersistentData();
     }
 
@@ -241,15 +251,12 @@ public partial class GameStateManager : Node {
         return TimeSpan.Zero;
     }
 
-    private float CalculateDialoguesVisitedPercentage() {
+    private float CalculateDialoguesVisiteForAllGamesdPercentage() {
         int totalDialogues = DialogueManager.Instance.conversationDialogues.Values.Sum(list => list.Count);
-        int visitedDialogues = persistentData.DialoguesVisited.Count;
-        return (float)visitedDialogues / totalDialogues * 100;
+        int visitedDialoguesForAllGames = persistentData.DialoguesVisitedForAllGames.Count;
+        return (float)visitedDialoguesForAllGames / totalDialogues * 100;
     }
 
-    private Image CaptureScreenshot() {
-        return null;
-    }
 }
 
 

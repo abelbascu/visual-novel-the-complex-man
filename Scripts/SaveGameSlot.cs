@@ -104,7 +104,7 @@ public partial class SaveGameSlot : HBoxContainer {
         titleLabel.Text = $"Game Save {slotNumber}{autosaveLabel}";
         dateLabel.Text = gameState.SaveTime.ToString("MMM d, yyyy - h:mm:ss tt");
         timePlayedLabel.Text = $"Time Played: {FormatTimeSpan(gameState.TimePlayed)}";
-        gameCompletedPercentageLabel.Text = $"Dialogues: {gameState.DialoguesVisitedPercentage:F1}%";
+        gameCompletedPercentageLabel.Text = $"Dialogues visited: {gameState.DialoguesVisitedForAllGamesPercentage:F1}%";
 
         if (gameState.VisualPath != null) {
             Image image = Image.LoadFromFile(gameState.VisualPath);

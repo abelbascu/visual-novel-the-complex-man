@@ -153,9 +153,6 @@ public partial class SaveGameScreen : MarginContainer {
     }
 
     private void RefreshSaveSlots() {
-        // foreach (Node child in slotsContainer.GetChildren()) {
-        //     child.QueueFree();
-        // }
         PopulateSaveOrLoadSlots(false);
     }
 

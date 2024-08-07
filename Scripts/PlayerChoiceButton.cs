@@ -137,6 +137,6 @@ public partial class PlayerChoiceButton : MarginContainer {
 
     private void OnButtonPressed() {
         var dialogueManager = DialogueManager.Instance;
-        dialogueManager.OnPlayerButtonUIPressed(dialogueObject);
+        dialogueManager.OnPlayerChoiceButtonUIPressed(dialogueObject);
     }
 }

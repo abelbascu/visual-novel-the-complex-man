@@ -24,6 +24,8 @@ public partial class DialogueManager : Control {
     public DialogueBoxUI dialogueBoxUI;
     public PlayerChoicesBoxUI playerChoicesBoxUI;
 
+    public Action<int> DialogueVisited;
+
 
     public void SetIsPlayerChoiceBeingPrinted(bool isPrinting) {
         IsPlayerChoiceBeingPrinted = isPrinting;
@@ -179,11 +181,11 @@ public partial class DialogueManager : Control {
     }
 
     public void OnTextBoxFinishedDisplayingPlayerChoices() {
-        IsPlayerChoiceBeingPrinted = false;
+        IsPlayerChoiceBeingPrinted = false;  
     }
 
     public void OnTextBoxFinishedDisplayingDialogueLine() {
-        isDialogueBeingPrinted = false;
+        isDialogueBeingPrinted = false;  
     }
 
     public void RemoveFromPlayerChoicesList(DialogueObject dialogObj) {
@@ -191,6 +193,8 @@ public partial class DialogueManager : Control {
     }
 
     public void OnDialogueBoxUIPressed() {
+
+        DialogueVisited.Invoke(currentDialogueObject.ID);
 
         DialogueObject nextDialogObject = new();
         List<int> destinationDialogIDs = new();
@@ -304,7 +308,10 @@ public partial class DialogueManager : Control {
         }
     }
 
-    public void OnPlayerButtonUIPressed(DialogueObject playerChoiceObject) {
+    public void OnPlayerChoiceButtonUIPressed(DialogueObject playerChoiceObject) {
+
+         DialogueVisited.Invoke(playerChoiceObject.ID);
+
         //we need to remove first the dialogObject on playerChoicesList with the same ID as playerChoiceObject.ID
         playerChoicesList.RemoveAll(dialogObj => dialogObj.ID == playerChoiceObject.ID);
         currentDialogueObject = playerChoiceObject;
@@ -364,6 +371,9 @@ public partial class DialogueManager : Control {
             AddNoGroupPlayerChoicesToList(currentDialogueObject);
             DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
         }
+
+        //at the moment we'll count player choices as dialogue objevts to count the Total number of dialogues visited;
+       // DialogueVisited.Invoke(playerChoiceObject.ID);
     }
 
     public void RemoveAllNoGroupChildrenFromSameNoGroupParent(DialogueObject playerChoiceObject) {

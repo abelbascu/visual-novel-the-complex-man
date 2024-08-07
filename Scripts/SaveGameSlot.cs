@@ -33,7 +33,7 @@ public partial class SaveGameSlot : HBoxContainer {
         actionButton.Pressed += OnActionButtonPressed;
 
         var normalStyle = new StyleBoxFlat {
-            BgColor = Colors.Blue,
+            BgColor = Colors.NavyBlue,
             CornerRadiusTopLeft = 10,
             CornerRadiusTopRight = 10,
             CornerRadiusBottomLeft = 10,

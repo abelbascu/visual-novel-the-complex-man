@@ -1,8 +1,8 @@
 [gd_scene load_steps=5 format=3 uid="uid://c77p3prgew061"]
 
 [ext_resource type="Script" path="res://Scripts/InGameMenuButton.cs" id="1_6s4mo"]
-[ext_resource type="Texture2D" uid="uid://b284hkhwxeorc" path="res://Visuals/UI/ingame menu icon.png" id="1_drbph"]
 [ext_resource type="Texture2D" uid="uid://dsdb86xtawq4c" path="res://Visuals/UI/ingame menu icon hover.png" id="2_75nc4"]
+[ext_resource type="Texture2D" uid="uid://mybles4rb74q" path="res://Visuals/UI/ingame menu icon white.png" id="2_vwvvi"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_w2emj"]
 
@@ -23,7 +23,9 @@ material = SubResource("CanvasItemMaterial_w2emj")
 layout_mode = 2
 
 [node name="TextureButton" type="TextureButton" parent="."]
+modulate = Color(0.160784, 0.427451, 1, 0.956863)
+self_modulate = Color(0, 0.392157, 0.917647, 0.909804)
 layout_mode = 2
 size_flags_horizontal = 4
-texture_normal = ExtResource("1_drbph")
+texture_normal = ExtResource("2_vwvvi")
 texture_hover = ExtResource("2_75nc4")

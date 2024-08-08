@@ -30,6 +30,10 @@ public partial class MainMenu : Control {
     public TextureRect mainMenuBackgroundImage;
     public const bool LOAD_SCREEN = true;
     public const bool SAVE_SCREEN = false;
+    public Action MainMenuOpened;
+    public Action InGameMenuOpened;
+    public Action MainMenuClosed;
+    public Action InGameMenuClosed;
 
 
     public override void _Ready() {
@@ -177,6 +181,7 @@ public partial class MainMenu : Control {
         UIManager.Instance.menuOverlay.Visible = false; //a mask to avoid clicking on the dialoguebox when menus are open
         MainOptionsContainer.Show();
         Show();
+        MainMenuOpened?.Invoke();
     }
 
     public void DisplayInGameMenu() {
@@ -189,16 +194,19 @@ public partial class MainMenu : Control {
         UIManager.Instance.menuOverlay.Visible = true; //put overlay to prevent reading input from other UI elements behind this mask
         GameStateManager.Instance.ToggleAutosave(false);
         Show();
+        InGameMenuOpened?.Invoke();
     }
 
     public void CloseInGameMenu() {
         UIManager.Instance.menuOverlay.Visible = false;
         GameStateManager.Instance.ToggleAutosave(true);
         Hide();
+        InGameMenuClosed?.Invoke();
     }
 
     public void CloseMainMenu() {
         Hide();
+        MainMenuClosed?.Invoke();
     }
 
     private void OnSaveGameButtonPressed() {

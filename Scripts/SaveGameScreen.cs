@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public partial class SaveGameScreen : MarginContainer {
     private PackedScene saveGameSlotScene;
     private ScrollContainer scrollContainer;
-    private VBoxContainer slotsContainer;
+    public VBoxContainer slotsContainer;
     private MarginContainer marginContainer;
     private Button goBackButton;
     private RichTextLabel noSavesLabel;

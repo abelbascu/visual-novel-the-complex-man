@@ -14,8 +14,9 @@ public partial class GameStateManager : Node {
     private const string SaveDirectory = "saves";
     private const string PersistentDataFile = "persistent_data.dat";
     private const string AutosavePrefix = "autosave_";
-    private const int AutosaveInterval = 300; // 5 minutes in seconds
+    private const int AutosaveInterval = 60; // 5 minutes in seconds
     private float timeSinceLastAutosave = 0;
+    private float totalTimeElapsedSinceGameStart;
     private bool autosaveEnabled = true;
 
     public int DialoguesVisitedID;
@@ -44,6 +45,12 @@ public partial class GameStateManager : Node {
 
     private PersistentData persistentData;
 
+    private DateTime gameStartTime;
+    private TimeSpan totalPlayTime = TimeSpan.Zero;
+    private bool isGameActive = false;
+
+    public Action GameLoaded;
+
     public override void _EnterTree() {
         if (Instance == null) {
             Instance = this;
@@ -61,6 +68,31 @@ public partial class GameStateManager : Node {
 
     private void SubscribeToEvents() {
         DialogueManager.Instance.DialogueVisited += OnDialogueVisited;
+        UIManager.Instance.mainMenu.StartNewGameButtonPressed += StartGameTimer;
+        GameLoaded += StartGameTimer;
+        UIManager.Instance.mainMenu.MainMenuOpened += PauseGameTimer;
+        UIManager.Instance.mainMenu.InGameMenuOpened += PauseGameTimer;
+        UIManager.Instance.mainMenu.MainMenuClosed += ResumeGameTimer;
+        UIManager.Instance.mainMenu.InGameMenuClosed += ResumeGameTimer;
+    }
+
+    private void StartGameTimer() {
+        gameStartTime = DateTime.Now;
+        isGameActive = true;
+    }
+
+    private void PauseGameTimer() {
+        if (isGameActive) {
+            totalPlayTime += DateTime.Now - gameStartTime;
+            isGameActive = false;
+        }
+    }
+
+    private void ResumeGameTimer() {
+        if (!isGameActive) {
+            gameStartTime = DateTime.Now;
+            isGameActive = true;
+        }
     }
 
     private void OnDialogueVisited(int dialogueObjectID) {
@@ -110,6 +142,7 @@ public partial class GameStateManager : Node {
     }
 
     public void SaveGame(bool isAutosave = false) {
+        PauseGameTimer();
         var gameState = CreateGameState();
         gameState.IsAutosave = isAutosave;
         string prefix = isAutosave ? AutosavePrefix : "save_";
@@ -140,9 +173,15 @@ public partial class GameStateManager : Node {
         File.WriteAllBytes(filePath, encryptedData);
     }
 
+    // private void AllGamesTimePlayed() {
+    //     List<GameStateManager.GameState> saveGames = GetSavedGames();
+    //     for (int i = 0; i < saveGames.Count; i++) {
+    //         persistentData.TotalTimePlayed += saveGames[i].TimePlayed;
+    //     }
+    // }
+
     private void UpdatePersistentData(GameState gameState) {
         persistentData.GamesPlayed++;
-        persistentData.TotalTimePlayed += gameState.TimePlayed;
         SavePersistentData();
     }
 
@@ -197,6 +236,7 @@ public partial class GameStateManager : Node {
         if (gameState != null) {
             ApplyGameState(gameState);
         }
+        GameLoaded.Invoke();
     }
 
     private GameState LoadGameState(string filePath) {
@@ -237,7 +277,8 @@ public partial class GameStateManager : Node {
     }
 
     private void SetCurrentPlayTime(TimeSpan time) {
-
+        totalPlayTime = time;
+        gameStartTime = DateTime.Now;
     }
     private byte[] EncryptData(string data) {
         return Encoding.UTF8.GetBytes(data);
@@ -248,7 +289,7 @@ public partial class GameStateManager : Node {
     }
 
     private TimeSpan GetCurrentPlayTime() {
-        return TimeSpan.Zero;
+        return totalPlayTime;
     }
 
     private float CalculateDialoguesVisiteForAllGamesdPercentage() {
@@ -256,7 +297,6 @@ public partial class GameStateManager : Node {
         int visitedDialoguesForAllGames = persistentData.DialoguesVisitedForAllGames.Count;
         return (float)visitedDialoguesForAllGames / totalDialogues * 100;
     }
-
 }
 
 

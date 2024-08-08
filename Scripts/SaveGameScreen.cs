@@ -136,8 +136,10 @@ public partial class SaveGameScreen : MarginContainer {
         slotInstance.LoadRequested += OnLoadRequested;
     }
 
+    private const bool AUTODSAVE_DISABLED = false;
+
     private void OnSaveRequested(int slotNumber) {
-        GameStateManager.Instance.SaveGame();
+        GameStateManager.Instance.SaveGame(AUTODSAVE_DISABLED);
         RefreshSaveSlots();
     }
 

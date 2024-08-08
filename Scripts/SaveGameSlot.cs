@@ -95,7 +95,7 @@ public partial class SaveGameSlot : HBoxContainer {
     public void SetLoadSlotData(GameStateManager.GameState gameState, int number, bool isLoadScreen) {
         slotNumber = number;
         string prefix = gameState.IsAutosave ? "autosave_" : "save_";
-        saveFilePath = Path.Combine(OS.GetUserDataDir(), "saves", $"save_{slotNumber:D3}.sav");
+        saveFilePath = Path.Combine(OS.GetUserDataDir(), "saves", $"{prefix}{slotNumber:D3}.sav");
 
         // Normalize the path to ensure consistent slash direction
         saveFilePath = Path.GetFullPath(saveFilePath);

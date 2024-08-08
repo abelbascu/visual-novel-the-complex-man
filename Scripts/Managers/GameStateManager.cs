@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Security.Cryptography;
 using System.Text;
+using System.Reflection.Metadata;
 
 public partial class GameStateManager : Node {
 
@@ -14,10 +15,12 @@ public partial class GameStateManager : Node {
     private const string SaveDirectory = "saves";
     private const string PersistentDataFile = "persistent_data.dat";
     private const string AutosavePrefix = "autosave_";
-    private const int AutosaveInterval = 60; // 5 minutes in seconds
+    private const int AutosaveInterval = 15; // 5 minutes in seconds
     private float timeSinceLastAutosave = 0;
     private float totalTimeElapsedSinceGameStart;
-    private bool autosaveEnabled = true;
+    // private const bool AUTOSAVE_ENABLED = true;
+    // private const bool AUTOSAVE_DISABLED = false;
+    private bool isAutoSave = true;
 
     public int DialoguesVisitedID;
 
@@ -101,30 +104,44 @@ public partial class GameStateManager : Node {
     }
 
     public override void _Process(double delta) {
-        if (autosaveEnabled) {
+        if (isAutoSave) {
             timeSinceLastAutosave += (float)delta;
             if (timeSinceLastAutosave >= AutosaveInterval) {
-                Autosave();
+                SaveGame(isAutoSave);
                 timeSinceLastAutosave = 0;
             }
         }
     }
 
-    public void ToggleAutosave(bool enable) {
-        autosaveEnabled = enable;
-        if (enable) {
+    public void ToggleAutosave(bool isAutosave) {
+        isAutoSave = isAutosave;
+        if (isAutoSave) {
             timeSinceLastAutosave = 0; // Reset the timer when enabling
         }
     }
 
-    private void Autosave() {
+    public void SaveGame(bool isAutosave) {
+        if (isAutosave == false)
+            PauseGameTimer();
+
         var gameState = CreateGameState();
-        gameState.IsAutosave = true;
-        string autosavePath = GetNextAutosaveFilePath();
-        SaveGameState(gameState, autosavePath);
-        GD.Print("Autosave completed: " + autosavePath);
+        gameState.IsAutosave = isAutosave;
+        string prefix = isAutosave ? AutosavePrefix : "save_";
+        string saveFilePath = GetNextFilePath(prefix);
+        gameState.SlotNumber = int.Parse(Path.GetFileNameWithoutExtension(saveFilePath).Substring(prefix.Length));
+        SaveGameState(gameState, saveFilePath);
+        UpdatePersistentData(gameState);
+        if (isAutosave) {
+            GD.Print("Autosave completed: " + saveFilePath);
+        } else
+            GD.Print("Manual save completed: " + saveFilePath);
     }
 
+    private void SaveGameState(GameState gameState, string filePath) {
+        var json = JsonSerializer.Serialize(gameState);
+        var encryptedData = EncryptData(json);
+        File.WriteAllBytes(filePath, encryptedData);
+    }
 
     public void LoadPersistentData() {
         string persistentDataPath = Path.Combine(OS.GetUserDataDir(), PersistentDataFile);
@@ -139,17 +156,6 @@ public partial class GameStateManager : Node {
                 EndingsSeen = new HashSet<int>()
             };
         }
-    }
-
-    public void SaveGame(bool isAutosave = false) {
-        PauseGameTimer();
-        var gameState = CreateGameState();
-        gameState.IsAutosave = isAutosave;
-        string prefix = isAutosave ? AutosavePrefix : "save_";
-        string saveFilePath = GetNextFilePath(prefix);
-        gameState.SlotNumber = int.Parse(Path.GetFileNameWithoutExtension(saveFilePath).Substring(prefix.Length));
-        SaveGameState(gameState, saveFilePath);
-        UpdatePersistentData(gameState);
     }
 
     private GameState CreateGameState() {
@@ -167,19 +173,6 @@ public partial class GameStateManager : Node {
         };
     }
 
-    private void SaveGameState(GameState gameState, string filePath) {
-        var json = JsonSerializer.Serialize(gameState);
-        var encryptedData = EncryptData(json);
-        File.WriteAllBytes(filePath, encryptedData);
-    }
-
-    // private void AllGamesTimePlayed() {
-    //     List<GameStateManager.GameState> saveGames = GetSavedGames();
-    //     for (int i = 0; i < saveGames.Count; i++) {
-    //         persistentData.TotalTimePlayed += saveGames[i].TimePlayed;
-    //     }
-    // }
-
     private void UpdatePersistentData(GameState gameState) {
         persistentData.GamesPlayed++;
         SavePersistentData();
@@ -189,14 +182,6 @@ public partial class GameStateManager : Node {
         string persistentDataPath = Path.Combine(OS.GetUserDataDir(), PersistentDataFile);
         string json = JsonSerializer.Serialize(persistentData);
         File.WriteAllText(persistentDataPath, json);
-    }
-
-    private string GetNextSaveFilePath() {
-        return GetNextFilePath("save_");
-    }
-
-    private string GetNextAutosaveFilePath() {
-        return GetNextFilePath(AutosavePrefix);
     }
 
     private string GetNextFilePath(string prefix) {

@@ -24,6 +24,8 @@ public partial class DialogueManager : Control {
     public DialogueBoxUI dialogueBoxUI;
     public PlayerChoicesBoxUI playerChoicesBoxUI;
 
+    //public const string NARRATOR = "3";
+
     public Action<int> DialogueVisited;
 
 

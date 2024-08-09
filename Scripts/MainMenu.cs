@@ -98,8 +98,8 @@ public partial class MainMenu : Control {
         language = parts[0];
         TranslationServer.SetLocale(language);
         //for testing purposes, will change the language directly here so we do not have to tinker witn Windows locale settings each time
-        //string languageCode = "en";
-        //TranslationServer.SetLocale(languageCode);
+        language = "en";
+        TranslationServer.SetLocale(language);
 
         //below, we grab the locale keys before they are overwritten by the fallback locale translation,
         //otherwise we wouldn't be able to switch to another locale as the keys would be destroyed.

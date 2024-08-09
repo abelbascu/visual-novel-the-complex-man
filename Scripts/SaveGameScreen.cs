@@ -9,6 +9,7 @@ public partial class SaveGameScreen : MarginContainer {
     private MarginContainer marginContainer;
     private Button goBackButton;
     private RichTextLabel noSavesLabel;
+    private string noSavesTRANSLATE = "NO_SAVES_AVAILABLE";
 
 
     public override void _Ready() {
@@ -31,7 +32,7 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.SetAnchorsPreset(Control.LayoutPreset.TopRight);
         //goBackButton.Position = new Vector2(-10, 10);  
 
-         var normalStyle = new StyleBoxFlat {
+        var normalStyle = new StyleBoxFlat {
             BgColor = Colors.Blue,
             CornerRadiusTopLeft = 10,
             CornerRadiusTopRight = 10,
@@ -45,7 +46,7 @@ public partial class SaveGameScreen : MarginContainer {
         };
         goBackButton.AddThemeStyleboxOverride("normal", normalStyle);
 
-                var hoverStyle = new StyleBoxFlat {
+        var hoverStyle = new StyleBoxFlat {
             BgColor = Colors.DarkBlue,
             CornerRadiusTopLeft = 10,
             CornerRadiusTopRight = 10,
@@ -62,9 +63,12 @@ public partial class SaveGameScreen : MarginContainer {
     }
 
     private void CreateNoSavesAvailableLabel() {
+
+        string translatedText = $"[center]{TranslationServer.Translate(noSavesTRANSLATE)}[/center]";
+  
         noSavesLabel = new RichTextLabel {
             BbcodeEnabled = true,
-            Text = "[center]No saved games yet. Please save a game first.[/center]",
+            Text = translatedText,
             FitContent = false,
             Name = "NoSavesLabel",
             Visible = false

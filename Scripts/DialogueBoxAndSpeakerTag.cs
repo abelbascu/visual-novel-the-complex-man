@@ -11,6 +11,7 @@ public partial class DialogueBoxAndSpeakerTag : VBoxContainer {
     private float spaceTime = 0.00006f;
     private float punctuationTime = 0.000002f;
     public DialogueLineLabel dialogueLineLabel;
+    public RichTextLabel speakerTag;
     Timer letterDisplayTimer;
     NinePatchRect backgroundRect;
     public MarginContainer innerMarginContainer;
@@ -22,6 +23,9 @@ public partial class DialogueBoxAndSpeakerTag : VBoxContainer {
     public override void _Ready() {
 
         MouseFilter = MouseFilterEnum.Ignore;
+
+        speakerTag = GetNode<RichTextLabel>("SpeakerTagMarginContainer/SpeakerTagRichTextLabel");
+        speakerTag.BbcodeEnabled = true;
 
         backgroundRect = GetNode<NinePatchRect>("DialogueBoxUI/NinePatchRect"); // Adjust the path if needed
         if (backgroundRect != null) {
@@ -65,6 +69,12 @@ public partial class DialogueBoxAndSpeakerTag : VBoxContainer {
         // dialogueLineLabel.Text = "";
         dialogueLineLabel.Clear();
         DisplayLetter();
+    }
+
+    public void DisplaySpeakerName(string actor)
+    {
+        speakerTag.AddThemeFontSizeOverride("normal_font", 50);
+        speakerTag.Text = $"[center][b][color=yellow][font size=30]{actor}[/font][/color][/b][/center]";
     }
 
     public string GetLocaleDialogue(DialogueObject dialogueObj, string locale) {

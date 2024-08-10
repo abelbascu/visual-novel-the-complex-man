@@ -31,6 +31,11 @@ public partial class DialogueManager : Control {
 
     public Action<int> DialogueVisited;
 
+    public enum Actors {
+        Player = 1,
+        Narrator = 3
+    };
+
 
     public void SetIsPlayerChoiceBeingPrinted(bool isPrinting) {
         IsPlayerChoiceBeingPrinted = isPrinting;
@@ -114,7 +119,6 @@ public partial class DialogueManager : Control {
         }
     }
 
-
     public void DisplayDialogue(DialogueObject currentDialogueObject) {
         if (isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
             return;
@@ -128,6 +132,23 @@ public partial class DialogueManager : Control {
             playerChoicesBoxUI.Hide();
 
         dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, TranslationServer.GetLocale());
+        Actors actor;
+        if (Enum.TryParse(currentDialogueObject.Actor, out actor))
+        {
+        string speakerName = GetSpeakerName(actor);
+        dialogueBoxUI.DisplaySpeakerName(speakerName);
+        }
+    }
+
+    
+    public string GetSpeakerName(Actors actor)
+    {
+        return actor switch
+        {
+            Actors.Player => "Player",
+            Actors.Narrator => "Narrator",
+            _ => "Unknown Speaker"
+        };
     }
 
     public void DisplayPlayerChoices(List<DialogueObject> playerChoices, Action<bool> setIsPlayerChoiceBeingPrinted) {

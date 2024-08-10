@@ -1,6 +1,5 @@
-[gd_scene load_steps=5 format=3 uid="uid://8ytymk06gtxw"]
+[gd_scene load_steps=4 format=3 uid="uid://8ytymk06gtxw"]
 
-[ext_resource type="Script" path="res://Scripts/DialogueBoxUI.cs" id="1_i37ha"]
 [ext_resource type="Texture2D" uid="uid://dvmxcg1hidawy" path="res://Visuals/UI/dialogue box UI bckg transparent resized.png" id="2_tw5bf"]
 [ext_resource type="Script" path="res://Scripts/DialogueLineLabel.cs" id="3_gs1qn"]
 
@@ -22,7 +21,6 @@ grow_horizontal = 2
 grow_vertical = 0
 size_flags_horizontal = 8
 size_flags_vertical = 8
-script = ExtResource("1_i37ha")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="."]
 clip_contents = true

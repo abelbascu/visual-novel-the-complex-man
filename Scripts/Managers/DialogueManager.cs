@@ -5,12 +5,15 @@ using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Dynamic;
+using System.Security.Cryptography.X509Certificates;
 
 public partial class DialogueManager : Control {
 
+    public const int STARTING_CONVO_ID = 2;
+    public const int STARTING_DIALOGUE_ID = 1;
     //-------------------------------------------------------------------config variables---------------------------------------------------------------------------------
-    [Export] public int currentConversationID = 2; //set here the conversation you want to load. Conversations in Chatmapper are what we could call chapters.
-    [Export] public int currentDialogueID = 1; //set here the starting dialogue of the conversation
+    [Export] public int currentConversationID = STARTING_CONVO_ID; //set here the conversation you want to load. Conversations in Chatmapper are what we could call chapters.
+    [Export] public int currentDialogueID = STARTING_DIALOGUE_ID; //set here the starting dialogue of the conversation
     //-----------------------------------------------------------------dependency variables------------------------------------------------------------------------------
     public Dictionary<int, List<DialogueObject>> conversationDialogues; //the int refers to the conversation ID, see 'currentConversationID' above.
     public DialogueObject currentDialogueObject { get; set; }
@@ -21,7 +24,7 @@ public partial class DialogueManager : Control {
     //------------------------------------------------------------------event handlers-----------------------------------------------------------------------------------
     //---------------------------------------------------------------------singleton--------------------------------------------------------------------------------------
     public static DialogueManager Instance { get; private set; }
-    public DialogueBoxUI dialogueBoxUI;
+    public DialogueBoxAndSpeakerTag dialogueBoxUI;
     public PlayerChoicesBoxUI playerChoicesBoxUI;
 
     //public const string NARRATOR = "3";

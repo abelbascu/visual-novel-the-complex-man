@@ -10,7 +10,7 @@ public partial class UIManager : Control {
 
     public static UIManager Instance { get; private set; }
     public PackedScene dialogueBoxUIScene;
-    public DialogueBoxUI dialogueBoxUI; //the graphical rectangle container to display the text over
+    public DialogueBoxAndSpeakerTag dialogueBoxUI; //the graphical rectangle container to display the text over
     private VBoxContainer dialogueChoicesMarginContainer;
     private const int UI_BOTTOM_POSITION = 200; //starting at the bottom of the screen, we subtract this value to position the Y screen position of the dilaogue box  
     public PackedScene playerChoicesBoxUIScene;
@@ -59,8 +59,8 @@ public partial class UIManager : Control {
         playerChoicesBoxUI.OffsetBottom = OFFSET_BOTTOM;
 
         //Set up DialogueBoxUI
-        dialogueBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxUI.tscn");
-        dialogueBoxUI = dialogueBoxUIScene.Instantiate<DialogueBoxUI>();
+        dialogueBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxAndSpeakerTag.tscn");
+        dialogueBoxUI = dialogueBoxUIScene.Instantiate<DialogueBoxAndSpeakerTag>();
         AddChild(dialogueBoxUI);
         dialogueBoxUI.Hide();
         // Set anchors to stretch horizontally
@@ -138,7 +138,7 @@ public partial class UIManager : Control {
         }
     }
 
-    public DialogueBoxUI GetDialogueBoxUI() {
+    public DialogueBoxAndSpeakerTag GetDialogueBoxUI() {
         return dialogueBoxUI;
     }
 

@@ -107,11 +107,12 @@ public partial class SaveGameSlot : HBoxContainer {
         gameCompletedPercentageLabel.Text = $"Dialogues visited: {gameState.DialoguesVisitedForAllGamesPercentage:F1}%";
 
         if (gameState.VisualPath != null) {
-            Image image = Image.LoadFromFile(gameState.VisualPath);
+            Texture2D texture = GD.Load<Texture2D>(gameState.VisualPath);
             //without Lanczos interpolation, the thumbnail is very pixelated
+            var image = texture.GetImage();
             image.Resize((int)ThumbnailSize.X, (int)ThumbnailSize.Y, Image.Interpolation.Lanczos);
-            ImageTexture texture = ImageTexture.CreateFromImage(image);
-            thumbnailTextureRect.Texture = texture;
+            ImageTexture resizedTexture = ImageTexture.CreateFromImage(image);
+            thumbnailTextureRect.Texture = resizedTexture;
         } else {
             thumbnailTextureRect.Texture = null;
         }

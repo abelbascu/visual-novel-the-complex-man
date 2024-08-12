@@ -15,7 +15,7 @@ public partial class GameStateManager : Node {
     private const string SaveDirectory = "saves";
     private const string PersistentDataFile = "persistent_data.dat";
     private const string AutosavePrefix = "autosave_";
-    private const int AutosaveInterval = 60; // 5 minutes in seconds
+    private const int AutosaveInterval = 15; // 5 minutes in seconds
     private float timeSinceLastAutosave = 0;
     private float totalTimeElapsedSinceGameStart;
     // private const bool AUTOSAVE_ENABLED = true;
@@ -114,15 +114,22 @@ public partial class GameStateManager : Node {
     }
 
     public void ToggleAutosave(bool isAutosave) {
-        isAutoSave = isAutosave;
+        isAutoSave = isAutosave; // I NEED TO REFACTOR THIS LINE I NEED TO REFACTOR THIS LINE I NEED TO REFACTOR THIS LINE I NEED TO REFACTOR THIS LINE
         if (isAutoSave) {
             timeSinceLastAutosave = 0; // Reset the timer when enabling
         }
     }
 
     public void SaveGame(bool isAutosave) {
-        if (isAutosave == false)
+        //as soon as the ingame menu is open we have already set autosave to false in MainMenu.DisplayInGameMenu()
+        if (isAutosave == false) 
             PauseGameTimer();
+        //if the ingame menu is closed and the game is active, autosave will jump to this line
+        else
+        {
+            totalPlayTime += DateTime.Now - gameStartTime;
+            gameStartTime = DateTime.Now;
+        }
 
         var gameState = CreateGameState();
         gameState.IsAutosave = isAutosave;
@@ -221,7 +228,9 @@ public partial class GameStateManager : Node {
         if (gameState != null) {
             ApplyGameState(gameState);
         }
+        ToggleAutosave(true);
         GameLoaded.Invoke();
+
     }
 
     private GameState LoadGameState(string filePath) {

@@ -10,6 +10,8 @@ public partial class SaveGameScreen : MarginContainer {
     private Button goBackButton;
     private RichTextLabel noSavesLabel;
     private string noSavesTRANSLATE = "NO_SAVES_AVAILABLE";
+    private const bool AUTODSAVE_DISABLED = false;
+    private const bool AUTOSAVE_ENABLED = true;
 
 
     public override void _Ready() {
@@ -140,8 +142,6 @@ public partial class SaveGameScreen : MarginContainer {
         slotInstance.LoadRequested += OnLoadRequested;
     }
 
-    private const bool AUTODSAVE_DISABLED = false;
-
     private void OnSaveRequested(int slotNumber) {
         GameStateManager.Instance.SaveGame(AUTODSAVE_DISABLED);
         RefreshSaveSlots();
@@ -152,7 +152,6 @@ public partial class SaveGameScreen : MarginContainer {
         GameStateManager.Instance.LoadGame(saveFilePath);
         if (UIManager.Instance.mainMenu.IsVisibleInTree()) {
             UIManager.Instance.mainMenu.CloseMainMenu();
-            GameStateManager.Instance.ToggleAutosave(true);
         }
         //QueueFree();
         Hide();

@@ -273,6 +273,10 @@ public partial class MainMenu : Control {
     }
 
     private void OnExitToMainMenuConfirmButtonPressed() {
+        CloseInGameMenu();
+        UIManager.Instance.HideAllUIElements();
+        VisualManager.Instance.RemoveImage();
+        //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN 
         DisplayMainMenu();
     }
 

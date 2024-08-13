@@ -1,0 +1,62 @@
+[gd_scene load_steps=2 format=3 uid="uid://bmtre6kqrxwmu"]
+
+[ext_resource type="Script" path="res://Scripts/InputNameScreen.cs" id="1_qomts"]
+
+[node name="InputNameScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_qomts")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MarginContainer1" type="MarginContainer" parent="MarginContainer"]
+custom_minimum_size = Vector2(1300, 600)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/MarginContainer1"]
+layout_mode = 2
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer/MarginContainer1/VBoxContainer"]
+custom_minimum_size = Vector2(800, 100)
+layout_mode = 2
+theme_override_font_sizes/normal_font_size = 40
+text = "You can't enter the tavern without telling your name, traveller..."
+
+[node name="LineEdit" type="LineEdit" parent="MarginContainer/MarginContainer1/VBoxContainer"]
+custom_minimum_size = Vector2(1200, 100)
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+placeholder_text = "<Type your name here>"
+caret_blink = true
+caret_force_displayed = true
+
+[node name="MarginContainer2" type="MarginContainer" parent="MarginContainer"]
+custom_minimum_size = Vector2(400, 400)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="MarginContainer/MarginContainer2"]
+title = "Confirm your name"
+initial_position = 4
+size = Vector2i(764, 300)
+visible = true
+min_size = Vector2i(200, 300)
+max_size = Vector2i(800, 300)
+ok_button_text = ""
+dialog_close_on_escape = false
+cancel_button_text = ""

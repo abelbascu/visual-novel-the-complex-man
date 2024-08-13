@@ -55,12 +55,18 @@ public partial class GameManager : Control {
 
     public void OnStartButtonPressed() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
-        UIManager.Instance.inGameMenuButton.Show();
-        DialogueManager.Instance.currentDialogueID = DialogueManager.STARTING_DIALOGUE_ID;
-        DialogueManager.Instance.currentConversationID = DialogueManager.STARTING_CONVO_ID;
-        DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject
-            (DialogueManager.Instance.currentConversationID, DialogueManager.Instance.currentDialogueID);
-        DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
-        GameStateManager.Instance.ToggleAutosave(true);
+
+        UIManager.Instance.inputNameScreen.Show();
+        UIManager.Instance.inputNameScreen.FadeIn();
+
+        // UIManager.Instance.inGameMenuButton.Show();
+        // DialogueManager.Instance.currentDialogueID = DialogueManager.STARTING_DIALOGUE_ID;
+        // DialogueManager.Instance.currentConversationID = DialogueManager.STARTING_CONVO_ID;
+        // DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject
+        //     (DialogueManager.Instance.currentConversationID, DialogueManager.Instance.currentDialogueID);
+        // DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
+        // GameStateManager.Instance.ToggleAutosave(true);
     }
+
+
 }

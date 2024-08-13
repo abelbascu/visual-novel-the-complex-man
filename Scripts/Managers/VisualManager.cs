@@ -57,6 +57,13 @@ public partial class VisualManager : Control {
         fullScreenImage.Show();
     }
 
+
+    public void RemoveImage()
+    {
+        fullScreenImage.Texture = null;
+        fullScreenImage.Hide();
+    }
+
     // private void PlayCutscene(string videoPath)
     // {
     //     var video = ResourceLoader.Load<VideoStream>(videoPath);

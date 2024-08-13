@@ -27,7 +27,7 @@ public partial class UIManager : Control {
     public InGameMenuButton inGameMenuButton;
     public Control menuOverlay;
     public SaveGameScreen saveGameScreen;
-
+    public InputNameScreen inputNameScreen;
 
     public override void _Ready() {
 
@@ -41,6 +41,9 @@ public partial class UIManager : Control {
 
         saveGameScreen = GetNode<SaveGameScreen>("SaveGameScreen");
         saveGameScreen.Hide();
+
+        inputNameScreen = GetNode<InputNameScreen>("InputNameScreen");
+        inputNameScreen.Hide();
 
         //Set up PlayerChoicesBoxUI
         playerChoicesBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
@@ -92,6 +95,15 @@ public partial class UIManager : Control {
         menuOverlay.Connect("gui_input", new Callable(this, nameof(OnOverlayGuiInput)));
 
         AddChild(menuOverlay);
+    }
+
+    public void HideAllUIElements() {
+        var uiManager = this;
+        foreach (Control child in uiManager.GetChildren()) {
+            if (child != this && child is Control controlNode) {
+                controlNode.Visible = false;
+            }
+        }
     }
 
     private void SetupNodeOrder() {
@@ -148,7 +160,7 @@ public partial class UIManager : Control {
 
 
     public void ApplyCustomStyleToButton(Button button) {
-     var normalStyle = new StyleBoxFlat {
+        var normalStyle = new StyleBoxFlat {
             BgColor = Colors.NavyBlue,
             CornerRadiusTopLeft = 10,
             CornerRadiusTopRight = 10,
@@ -199,7 +211,7 @@ public partial class UIManager : Control {
             BorderWidthRight = 2
         };
 
-         button.AddThemeStyleboxOverride("pressed", pressedStyle);
+        button.AddThemeStyleboxOverride("pressed", pressedStyle);
 
         // Set font size
         button.AddThemeFontSizeOverride("font_size", 40);

@@ -158,7 +158,7 @@ public partial class InputNameScreen : Control {
         DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject
             (DialogueManager.Instance.currentConversationID, DialogueManager.Instance.currentDialogueID);
         DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
-        GameStateManager.Instance.ToggleAutosave(true);
+        LoadSaveManager.Instance.ToggleAutosave(true);
 
          fadeRect.MouseFilter = MouseFilterEnum.Ignore; //AT THIS POINT WE ALLOW THE USER TO CLICK ON THE DIALOGUE BOX, AS THE FADE IN IS LONGER TO CREATE A BIT OF ZEITGEIST STORYTELLING ANTICIPATION SMOOTHNESS
 

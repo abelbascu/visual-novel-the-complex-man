@@ -104,7 +104,7 @@ public partial class SaveGameScreen : MarginContainer {
     }
 
     private void PopulateSaveOrLoadSlots(bool isLoadScreen) {
-        List<GameStateManager.GameState> saveGames = GameStateManager.Instance.GetSavedGames();
+        List<LoadSaveManager.GameState> saveGames = LoadSaveManager.Instance.GetSavedGames();
 
         foreach (Node child in slotsContainer.GetChildren()) {
             if (child != noSavesLabel) {
@@ -128,7 +128,7 @@ public partial class SaveGameScreen : MarginContainer {
         }
     }
 
-    private void AddSaveOrLoadSlot(GameStateManager.GameState gameState, int slotNumber, bool isLoadScreen) {
+    private void AddSaveOrLoadSlot(LoadSaveManager.GameState gameState, int slotNumber, bool isLoadScreen) {
         var slotInstance = saveGameSlotScene.Instantiate<SaveGameSlot>();
         slotsContainer.AddChild(slotInstance);
 
@@ -143,13 +143,13 @@ public partial class SaveGameScreen : MarginContainer {
     }
 
     private void OnSaveRequested(int slotNumber) {
-        GameStateManager.Instance.SaveGame(AUTODSAVE_DISABLED);
+        LoadSaveManager.Instance.SaveGame(AUTODSAVE_DISABLED);
         RefreshSaveSlots();
     }
 
     private void OnLoadRequested(string saveFilePath) {
         UIManager.Instance.menuOverlay.Visible = false;
-        GameStateManager.Instance.LoadGame(saveFilePath);
+        LoadSaveManager.Instance.LoadGame(saveFilePath);
         if (UIManager.Instance.mainMenu.IsVisibleInTree()) {
             UIManager.Instance.mainMenu.CloseMainMenu();
         }

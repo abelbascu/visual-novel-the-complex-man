@@ -92,7 +92,7 @@ public partial class SaveGameSlot : HBoxContainer {
 
     }
 
-    public void SetLoadSlotData(GameStateManager.GameState gameState, int number, bool isLoadScreen) {
+    public void SetLoadSlotData(LoadSaveManager.GameState gameState, int number, bool isLoadScreen) {
         slotNumber = number;
         string prefix = gameState.IsAutosave ? "autosave_" : "save_";
         saveFilePath = Path.Combine(OS.GetUserDataDir(), "saves", $"{prefix}{slotNumber:D3}.sav");

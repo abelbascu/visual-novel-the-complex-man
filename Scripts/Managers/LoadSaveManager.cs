@@ -8,9 +8,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Reflection.Metadata;
 
-public partial class GameStateManager : Node {
+public partial class LoadSaveManager : Node {
 
-    public static GameStateManager Instance { get; private set; }
+    public static LoadSaveManager Instance { get; private set; }
     private const string SaveFileExtension = ".sav";
     private const string SaveDirectory = "saves";
     private const string PersistentDataFile = "persistent_data.dat";

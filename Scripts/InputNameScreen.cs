@@ -152,26 +152,19 @@ public partial class InputNameScreen : Control {
         }
 
         // Set up game elements (but keep them covered by the fade rect)
-        UIManager.Instance.inGameMenuButton.Show();
-        DialogueManager.Instance.currentDialogueID = DialogueManager.STARTING_DIALOGUE_ID;
-        DialogueManager.Instance.currentConversationID = DialogueManager.STARTING_CONVO_ID;
-        DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject
-            (DialogueManager.Instance.currentConversationID, DialogueManager.Instance.currentDialogueID);
-        DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
-        LoadSaveManager.Instance.ToggleAutosave(true);
+        
 
-         fadeRect.MouseFilter = MouseFilterEnum.Ignore; //AT THIS POINT WE ALLOW THE USER TO CLICK ON THE DIALOGUE BOX, AS THE FADE IN IS LONGER TO CREATE A BIT OF ZEITGEIST STORYTELLING ANTICIPATION SMOOTHNESS
+        fadeRect.MouseFilter = MouseFilterEnum.Ignore; //AT THIS POINT WE ALLOW THE USER TO CLICK ON THE DIALOGUE BOX, AS THE FADE IN IS LONGER TO CREATE A BIT OF ZEITGEIST STORYTELLING ANTICIPATION SMOOTHNESS
 
         // Move the fadeRect to be on top of the new elements
         CallDeferred(nameof(PositionScreenAndStartFadeIn));
+        GameStateManager.Instance.DISPLAY_NEW_GAME_DIALOGUES();
     }
 
-    private void PositionScreenAndStartFadeIn()
-    {
+    private void PositionScreenAndStartFadeIn() {
         // Get the parent (which should be UIManager)
         var uiManager = GetParent();
-        if (uiManager == null)
-        {
+        if (uiManager == null) {
             GD.PrintErr("Failed to find parent UIManager. Check the scene hierarchy.");
             return;
         }
@@ -185,7 +178,7 @@ public partial class InputNameScreen : Control {
 
     private void FadeInGameElements() {
         GD.Print("Starting fade in to reveal game elements");
-       
+
         var tween = CreateTween();
         GD.Print($"staring value of crrent alpha: {fadeRect.Color.A}");
         tween.TweenProperty(fadeRect, "color:a", 0.0, 3.5f);

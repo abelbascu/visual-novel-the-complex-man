@@ -1,10 +1,11 @@
-[gd_scene load_steps=6 format=3 uid="uid://bauqxmelp0rdi"]
+[gd_scene load_steps=7 format=3 uid="uid://bauqxmelp0rdi"]
 
 [ext_resource type="Script" path="res://Scripts/Managers/UIManager.cs" id="1_rn3fk"]
 [ext_resource type="PackedScene" uid="uid://c8t14jwiqekss" path="res://Scenes/MainMenu.tscn" id="2_xic3a"]
 [ext_resource type="PackedScene" uid="uid://c77p3prgew061" path="res://Scenes/InGameMenuButton.tscn" id="3_j7bll"]
 [ext_resource type="PackedScene" uid="uid://df8r024e7wb0b" path="res://Scenes/SaveGameScreen.tscn" id="4_ituhu"]
 [ext_resource type="PackedScene" uid="uid://bmtre6kqrxwmu" path="res://Scenes/InputNameScreen.tscn" id="5_6qnj0"]
+[ext_resource type="PackedScene" uid="uid://11fx20rqcq14" path="res://Scenes/SplashScreen.tscn" id="6_l6sjf"]
 
 [node name="UiManager" type="Control"]
 layout_mode = 3
@@ -15,9 +16,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_rn3fk")
 
-[node name="MainMenu" parent="." instance=ExtResource("2_xic3a")]
-layout_mode = 1
-
 [node name="InGameMenuButton" parent="." instance=ExtResource("3_j7bll")]
 layout_mode = 1
 offset_top = 61.0
@@ -26,6 +24,19 @@ offset_bottom = 600.0
 [node name="SaveGameScreen" parent="." instance=ExtResource("4_ituhu")]
 layout_mode = 1
 
+[node name="SplashScreen" parent="." instance=ExtResource("6_l6sjf")]
+layout_mode = 0
+anchors_preset = 0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_right = 1916.0
+offset_bottom = 1085.0
+grow_horizontal = 1
+grow_vertical = 1
+
 [node name="InputNameScreen" parent="." instance=ExtResource("5_6qnj0")]
 visible = false
+layout_mode = 1
+
+[node name="MainMenu" parent="." instance=ExtResource("2_xic3a")]
 layout_mode = 1

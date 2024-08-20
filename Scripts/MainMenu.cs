@@ -11,8 +11,8 @@ public partial class MainMenu : Control {
     ConfirmationDialog exitGameConfirmationDialog;
     ConfirmationDialog exitToMainMenuConfirmationDialog;
     ConfirmationDialog creditsConfirmationDialog;
-    VBoxContainer MainOptionsContainer;
-    VBoxContainer LanguageOptionsContainer;
+    public VBoxContainer MainOptionsContainer;
+    public VBoxContainer LanguageOptionsContainer;
     private Dictionary<Button, string> buttonLocalizationKeys = new();
     private Dictionary<Button, string> buttonLanguageKeys = new();
     public Action StartNewGameButtonPressed;
@@ -28,8 +28,8 @@ public partial class MainMenu : Control {
     Button exitToMainMenuButton;
     Button settingsButton;
     public TextureRect mainMenuBackgroundImage;
-    public const bool LOAD_SCREEN = true;
-    public const bool SAVE_SCREEN = false;
+    public bool LOAD_SCREEN = true;
+    public bool SAVE_SCREEN = false;
     public Action MainMenuOpened;
     public Action InGameMenuOpened;
     public Action MainMenuClosed;
@@ -141,9 +141,9 @@ public partial class MainMenu : Control {
             TranslationServer.SetLocale(language);
             GD.Print("new game locale: " + TranslationServer.GetLocale());
             UpdateButtonTexts();
-            if(UIManager.Instance.dialogueBoxUI.IsVisibleInTree() == true)
+            if (UIManager.Instance.dialogueBoxUI.IsVisibleInTree() == true)
                 DialogueManager.Instance.DisplayDialogue(DialogueManager.Instance.currentDialogueObject);
-            if(UIManager.Instance.playerChoicesBoxUI.IsVisibleInTree() == true)
+            if (UIManager.Instance.playerChoicesBoxUI.IsVisibleInTree() == true)
                 UIManager.Instance.playerChoicesBoxUI.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, TranslationServer.GetLocale());
         }
     }
@@ -170,12 +170,19 @@ public partial class MainMenu : Control {
     }
 
     public void DisplayMainMenu() {
+        MainOptionsContainer.Show();
         startNewGameButton.Show();
         exitGameButton.Show();
         saveGameButton.Hide();
         continueGameButton.Hide();
         exitToMainMenuButton.Hide();
-        mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/DialogueOrPlayerChoice/cosmos ether.png");
+        //mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/DialogueOrPlayerChoice/cosmos ether.png");
+        mainMenuBackgroundImage.Texture = null;
+        mainMenuBackgroundImage.SetAnchorsPreset(LayoutPreset.FullRect);
+
+
+
+
         LoadSaveManager.Instance.ToggleAutosave(false);
         UIManager.Instance.inGameMenuButton.Hide();
         UIManager.Instance.menuOverlay.Visible = false; //a mask to avoid clicking on the dialoguebox when menus are open
@@ -198,10 +205,12 @@ public partial class MainMenu : Control {
     }
 
     public void CloseInGameMenu() {
-        UIManager.Instance.menuOverlay.Visible = false;
-        LoadSaveManager.Instance.ToggleAutosave(true);
+
+        //InGameMenuClosed?.Invoke();
+        // if (GameStateManager.Instance.CurrentState == InGameMenuOpened) {
+        //     GameStateManager.Instance.ENTER_DIALOGUE_MODE(); //PUTTING THIS IN AN IF CLAUSE IS DANGEROUS!!!
+        // }
         Hide();
-        InGameMenuClosed?.Invoke();
     }
 
     public void CloseMainMenu() {
@@ -209,36 +218,33 @@ public partial class MainMenu : Control {
         MainMenuClosed?.Invoke();
     }
 
+    private void OnStartNewGameButtonPressed() {
+        Hide();
+        GameStateManager.Instance.START_NEW_GAME();
+    }
+
+    private void OnContinueButtonPressed() {
+        GameStateManager.Instance.ENTER_DIALOGUE_MODE();
+    }
+
     private void OnSaveGameButtonPressed() {
         // SaveGameButtonPressed.Invoke();
-        UIManager.Instance.saveGameScreen.ShowScreen(SAVE_SCREEN);
-
+        GameStateManager.Instance.INITIALIZE_SAVE_SCREEN();
     }
 
     private void OnLoadGameButtonPressed() {
         // LoadGameButtonPressed.Invoke();
-        UIManager.Instance.saveGameScreen.ShowScreen(LOAD_SCREEN);
+        GameStateManager.Instance.INITIALIZE_LOAD_SCREEN();
         //Hide();
     }
 
-    private void OnStartNewGameButtonPressed() {
-        StartNewGameButtonPressed?.Invoke();
-        Hide();
-    }
-
-    private void OnContinueButtonPressed() {
-        CloseInGameMenu();
-    }
-
     private void OnLanguageButtonPressed() {
-        MainOptionsContainer.Hide();
-        LanguageOptionsContainer.Show();
+        GameStateManager.Instance.DISPLAY_LANGUAGE_MENU();
     }
 
     private void OnCreditsButtonPressed() {
         creditsConfirmationDialog.Show();
         MainOptionsContainer.Hide();
-
     }
 
     private void OnExitGameButtonPressed() {
@@ -268,26 +274,24 @@ public partial class MainMenu : Control {
     //triggered by confirmationDialog.Canceled event
     private void OnExitGameCancelButtonPressed() {
         // Close the confirmation popup
-        GetTree().CallGroup("popups", "close_all");
-        MainOptionsContainer.Show();
+        GameStateManager.Instance.GO_BACK_TO_MENU();
     }
 
     private void OnExitToMainMenuConfirmButtonPressed() {
-        CloseInGameMenu();
-        UIManager.Instance.HideAllUIElements();
-        VisualManager.Instance.RemoveImage();
+        GameStateManager.Instance.DISPLAY_MAIN_MENU();
+        // CloseInGameMenu();
+        // UIManager.Instance.HideAllUIElements();
+        // VisualManager.Instance.RemoveImage();
         //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN 
-        DisplayMainMenu();
+        //DisplayMainMenu();
     }
 
     private void OnExitToMainMenuCancelButtonPressed() {
-        GetTree().CallGroup("popups", "close_all");
-        MainOptionsContainer.Show();
+        GameStateManager.Instance.GO_BACK_TO_MENU();
     }
 
     private void OnCreditsCancelOrConfirmButtonPressed() {
-        GetTree().CallGroup("popups", "close_all");
-        MainOptionsContainer.Show();
+        GameStateManager.Instance.GO_BACK_TO_MENU();
     }
 
     private void OnEnglishButtonPressed() {
@@ -304,7 +308,7 @@ public partial class MainMenu : Control {
 
     private void OnGoBackButtonPressed() {
         LanguageOptionsContainer.Hide();
-        MainOptionsContainer.Show();
+        GameStateManager.Instance.GO_BACK_TO_MENU();
     }
 }
 

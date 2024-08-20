@@ -133,8 +133,10 @@ public partial class SaveGameSlot : HBoxContainer {
 
     private void OnActionButtonPressed() {
         if (actionButton.Text == "Save Game") {
+            //GameStateManager.Instance.SAVE_GAME();
             SaveRequested.Invoke(slotNumber);
         } else {
+            
             LoadRequested.Invoke(saveFilePath);
             //UIManager.Instance.saveGameScreen.Hide();
             //UIManager.Instance.menuOverlay.Visible = false;

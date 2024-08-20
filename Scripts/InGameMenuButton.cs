@@ -12,7 +12,7 @@ public partial class InGameMenuButton : MarginContainer {
 
     public void OnTextureButtonPressed() {
         if (UIManager.Instance.mainMenu.Visible == false) {
-            UIManager.Instance.mainMenu.DisplayInGameMenu();
+            GameStateManager.Instance.DISPLAY_INGAME_MENU();
         }
 		else
 		{

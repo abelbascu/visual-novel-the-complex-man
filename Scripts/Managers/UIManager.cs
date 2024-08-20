@@ -28,10 +28,13 @@ public partial class UIManager : Control {
     public Control menuOverlay;
     public SaveGameScreen saveGameScreen;
     public InputNameScreen inputNameScreen;
+    public SplashScreen splashScreen;
 
     public override void _Ready() {
 
         MouseFilter = MouseFilterEnum.Ignore;
+
+        splashScreen = GetNode<SplashScreen>("SplashScreen");
 
         mainMenu = GetNode<MainMenu>("MainMenu");
         mainMenu.Hide();
@@ -97,6 +100,14 @@ public partial class UIManager : Control {
         AddChild(menuOverlay);
     }
 
+    public void ShowSplashScreen() {
+        splashScreen.Show();
+    }
+
+    public void HideSplashScreen() {
+        splashScreen.Hide();
+    }
+
     public void HideAllUIElements() {
         var uiManager = this;
         foreach (Control child in uiManager.GetChildren()) {
@@ -129,7 +140,6 @@ public partial class UIManager : Control {
         //if i put it between the menuOverlay and mainMenu lines, it doesn't work.
         MoveChild(inGameMenuButton, GetChildCount() - 1);
         MoveChild(saveGameScreen, GetChildCount() - 1);
-
     }
 
     // Call this method whenever you show or hide UI elements

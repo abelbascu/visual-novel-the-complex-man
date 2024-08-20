@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Reflection.Metadata;
+using System.Threading;
 
 public partial class LoadSaveManager : Node {
 
@@ -107,7 +108,8 @@ public partial class LoadSaveManager : Node {
         if (isAutoSave) {
             timeSinceLastAutosave += (float)delta;
             if (timeSinceLastAutosave >= AutosaveInterval) {
-                SaveGame(isAutoSave);
+                GameStateManager.Instance.START_AUTOSAVE_GAME(); //LET'S SHOW A MESSAGE TO THE USER THAT WE ARE AUTOSAVING
+                //SaveGame(isAutoSave);
                 timeSinceLastAutosave = 0;
             }
         }
@@ -122,11 +124,10 @@ public partial class LoadSaveManager : Node {
 
     public void SaveGame(bool isAutosave) {
         //as soon as the ingame menu is open we have already set autosave to false in MainMenu.DisplayInGameMenu()
-        if (isAutosave == false) 
+        if (isAutosave == false)
             PauseGameTimer();
         //if the ingame menu is closed and the game is active, autosave will jump to this line
-        else
-        {
+        else {
             totalPlayTime += DateTime.Now - gameStartTime;
             gameStartTime = DateTime.Now;
         }
@@ -140,8 +141,14 @@ public partial class LoadSaveManager : Node {
         UpdatePersistentData(gameState);
         if (isAutosave) {
             GD.Print("Autosave completed: " + saveFilePath);
+             //SHOW A MESSAGE TO THE USER THAT THE GAME WAS PROPERLY AUTOSAVED
         } else
-            GD.Print("Manual save completed: " + saveFilePath);
+            GD.Print("Manual save completed: " + saveFilePath); //SHOW A MESSAGE TO THE USER THAT THE GAME WAS PROPERLY AUTOSAVED
+
+        Thread.Sleep(2000); //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT) 
+                            //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)
+                            //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)
+
     }
 
     private void SaveGameState(GameState gameState, string filePath) {
@@ -226,11 +233,14 @@ public partial class LoadSaveManager : Node {
     public void LoadGame(string saveFilePath) {
         var gameState = LoadGameState(saveFilePath);
         if (gameState != null) {
+           // GameStateManager.Instance.ENTER_LOADING_SUBSTATE();
             ApplyGameState(gameState);
+            Thread.Sleep(2000); //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT) 
+            //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)
+            //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)   
         }
         ToggleAutosave(true);
-        GameLoaded.Invoke();
-
+        GameLoaded.Invoke(); //do not remove, we need it to start game timer.
     }
 
     private GameState LoadGameState(string filePath) {

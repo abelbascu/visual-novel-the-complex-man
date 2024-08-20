@@ -54,7 +54,6 @@ size_flags_vertical = 4
 title = "Confirm your name"
 initial_position = 4
 size = Vector2i(764, 300)
-visible = true
 min_size = Vector2i(200, 300)
 max_size = Vector2i(800, 300)
 ok_button_text = ""

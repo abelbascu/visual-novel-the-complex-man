@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using static GameStateMachine;
 
 public partial class SaveGameScreen : MarginContainer {
     private PackedScene saveGameSlotScene;
@@ -87,7 +88,7 @@ public partial class SaveGameScreen : MarginContainer {
 
     private void OnGoBackButtonPressed() {
         Hide();
-        GameStateManager.Instance.GO_BACK_TO_MENU();
+        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
         //UIManager.Instance.
     }
 
@@ -108,9 +109,9 @@ public partial class SaveGameScreen : MarginContainer {
     public void DisplaySaveOrLoadScreen(bool isLoadScreen) {
 
         if(isLoadScreen)
-            GameStateManager.Instance.DISPLAY_LOAD_SCREEN();
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
         else
-            GameStateManager.Instance.DISPLAY_SAVE_SCREEN();
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
         Show();
     }
 
@@ -155,12 +156,12 @@ public partial class SaveGameScreen : MarginContainer {
 
     private void OnSaveRequested(int slotNumber) {
 
-        GameStateManager.Instance.SAVE_GAME(AUTODSAVE_DISABLED);
+        GameStateManager.Instance.Fire(Trigger.SAVE_GAME, AUTODSAVE_DISABLED);
     }
 
     private void OnLoadRequested(string saveFilePath) {
 
-        GameStateManager.Instance.LOAD_GAME(saveFilePath);
+        GameStateManager.Instance.Fire(Trigger.LOAD_GAME, saveFilePath);
         //QueueFree();
         Hide();
     }

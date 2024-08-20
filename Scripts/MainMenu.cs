@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Diagnostics.SymbolStore;
+using static GameStateMachine;
 
 public partial class MainMenu : Control {
 
@@ -220,26 +221,26 @@ public partial class MainMenu : Control {
 
     private void OnStartNewGameButtonPressed() {
         Hide();
-        GameStateManager.Instance.START_NEW_GAME();
+        GameStateManager.Instance.Fire(Trigger.START_NEW_GAME);
     }
 
     private void OnContinueButtonPressed() {
-        GameStateManager.Instance.ENTER_DIALOGUE_MODE();
+        GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
     }
 
     private void OnSaveGameButtonPressed() {
         // SaveGameButtonPressed.Invoke();
-        GameStateManager.Instance.INITIALIZE_SAVE_SCREEN();
+        GameStateManager.Instance.Fire(Trigger.INITIALIZE_SAVE_SCREEN);
     }
 
     private void OnLoadGameButtonPressed() {
         // LoadGameButtonPressed.Invoke();
-        GameStateManager.Instance.INITIALIZE_LOAD_SCREEN();
+        GameStateManager.Instance.Fire(Trigger.INITIALIZE_LOAD_SCREEN);
         //Hide();
     }
 
     private void OnLanguageButtonPressed() {
-        GameStateManager.Instance.DISPLAY_LANGUAGE_MENU();
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_LANGUAGE_MENU);
     }
 
     private void OnCreditsButtonPressed() {
@@ -274,11 +275,11 @@ public partial class MainMenu : Control {
     //triggered by confirmationDialog.Canceled event
     private void OnExitGameCancelButtonPressed() {
         // Close the confirmation popup
-        GameStateManager.Instance.GO_BACK_TO_MENU();
+        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
 
     private void OnExitToMainMenuConfirmButtonPressed() {
-        GameStateManager.Instance.DISPLAY_MAIN_MENU();
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
         // CloseInGameMenu();
         // UIManager.Instance.HideAllUIElements();
         // VisualManager.Instance.RemoveImage();
@@ -287,11 +288,11 @@ public partial class MainMenu : Control {
     }
 
     private void OnExitToMainMenuCancelButtonPressed() {
-        GameStateManager.Instance.GO_BACK_TO_MENU();
+        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
 
     private void OnCreditsCancelOrConfirmButtonPressed() {
-        GameStateManager.Instance.GO_BACK_TO_MENU();
+        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
 
     private void OnEnglishButtonPressed() {
@@ -308,7 +309,7 @@ public partial class MainMenu : Control {
 
     private void OnGoBackButtonPressed() {
         LanguageOptionsContainer.Hide();
-        GameStateManager.Instance.GO_BACK_TO_MENU();
+        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
 }
 

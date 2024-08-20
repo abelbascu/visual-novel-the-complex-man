@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using static GameStateMachine;
 
 public partial class InputNameScreen : Control {
     private RichTextLabel questionLabel;
@@ -158,7 +159,7 @@ public partial class InputNameScreen : Control {
 
         // Move the fadeRect to be on top of the new elements
         CallDeferred(nameof(PositionScreenAndStartFadeIn));
-        GameStateManager.Instance.DISPLAY_NEW_GAME_DIALOGUES();
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_NEW_GAME_DIALOGUES);
     }
 
     private void PositionScreenAndStartFadeIn() {

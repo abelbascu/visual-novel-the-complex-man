@@ -19,7 +19,7 @@ public class GameStateMachine {
     }
 
     public enum SubState {
-        None, 
+        None,
         LoadScreenInitialized,                      // do not delete this! is needed in ConfigureTransition() for states without substate.
         LoadScreenDisplayed,
         Loading,
@@ -67,38 +67,39 @@ public class GameStateMachine {
     private Dictionary<(State, SubState), Dictionary<Trigger, (State, SubState)>> transitions;
     private object[] _transitionArguments;
     public event Action<State, SubState, State, SubState, object[]> StateChanged;
+    public Trigger LastTrigger { get; private set; }
 
     public GameStateMachine() {
         transitions = new Dictionary<(State, SubState), Dictionary<Trigger, (State, SubState)>>();
         currentSubState = SubState.None;
     }
 
-    public void ConfigureTransition(State fromState, Trigger trigger, State toState) {
-        ConfigureTransition(fromState, SubState.None, trigger, toState, SubState.None);
-    }
+    // public void ConfigureTransition(State fromState, Trigger trigger, State toState) {
+    //     ConfigureTransition(fromState, SubState.None, trigger, toState, SubState.None);
+    // }
 
-    // Overload 2: Transitions from a substate back to its parent state
-    public void ConfigureTransition(SubState fromSubState, Trigger trigger, State state) {
-        ConfigureTransition(state, fromSubState, trigger, state, SubState.None);
-    }
+    // // Overload 2: Transitions from a substate back to its parent state
+    // public void ConfigureTransition(SubState fromSubState, Trigger trigger, State state) {
+    //     ConfigureTransition(state, fromSubState, trigger, state, SubState.None);
+    // }
 
-    // Overload 3: Transitions from a state to its substate
-    public void ConfigureTransition(State state, Trigger trigger, SubState toSubState) {
-        ConfigureTransition(state, SubState.None, trigger, state, toSubState);
-    }
+    // // Overload 3: Transitions from a state to its substate
+    // public void ConfigureTransition(State state, Trigger trigger, SubState toSubState) {
+    //     ConfigureTransition(state, SubState.None, trigger, state, toSubState);
+    // }
 
-    // Overload 4: Transitions between substates within the same state
-    public void ConfigureTransition(State state, SubState fromSubState, Trigger trigger, SubState toSubState) {
-        ConfigureTransition(state, fromSubState, trigger, state, toSubState);
-    }
+    // // Overload 4: Transitions between substates within the same state
+    // public void ConfigureTransition(State state, SubState fromSubState, Trigger trigger, SubState toSubState) {
+    //     ConfigureTransition(state, fromSubState, trigger, state, toSubState);
+    // }
 
-    // Overload 5: Transitions from a state-substate to another state without substate
-    public void ConfigureTransition(State fromState, SubState fromSubState, Trigger trigger, State toState) {
-        ConfigureTransition(fromState, fromSubState, trigger, toState, SubState.None);
-    }
+    // // Overload 5: Transitions from a state-substate to another state without substate
+    // public void ConfigureTransition(State fromState, SubState fromSubState, Trigger trigger, State toState) {
+    //     ConfigureTransition(fromState, fromSubState, trigger, toState, SubState.None);
+    // }
 
     // Overload 6: Full control over substates
-    public void ConfigureTransition(State fromState, SubState fromSubState, Trigger trigger, State toState, SubState toSubState) {
+    public void ConfigureTransition(State fromState, SubState fromSubState, State toState, SubState toSubState, Trigger trigger) {
         var fromKey = (fromState, fromSubState);
         if (!transitions.ContainsKey(fromKey)) {
             transitions[fromKey] = new Dictionary<Trigger, (State, SubState)>();
@@ -113,11 +114,12 @@ public class GameStateMachine {
             throw new InvalidOperationException($"No valid transition from {currentState}.{currentSubState} with trigger {trigger}");
         }
 
+        LastTrigger = trigger;
         _transitionArguments = arguments;
         State previousState = currentState;
         SubState previousSubState = currentSubState;
         (currentState, currentSubState) = transitions[currentKey][trigger];
-        GD.Print($"State changed from {previousState} ({previousSubState}) to {currentState} ({currentSubState})");
+        GD.Print($"State changed from {previousState} ({previousSubState}) to {currentState} ({currentSubState}), , Trigger: {trigger}");
         StateChanged?.Invoke(previousState, previousSubState, currentState, currentSubState, arguments);
     }
 

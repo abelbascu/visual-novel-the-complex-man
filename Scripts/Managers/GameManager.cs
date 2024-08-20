@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Security.Cryptography.X509Certificates;
+using static GameStateMachine;
 
 
 public partial class GameManager : Control {
@@ -46,7 +47,7 @@ public partial class GameManager : Control {
         DialogueManager = GetNodeOrNull<DialogueManager>("DialogueManager");
         GameStateManager = GetNodeOrNull<GameStateManager>("GameStateManager");
 
-        GameStateManager.Instance.DISPLAY_SPLASH_SCREEN();
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_SPLASH_SCREEN);
     }
 
     public void Display_Splash_Screen() {
@@ -74,7 +75,7 @@ public partial class GameManager : Control {
 
     public void Starting_New_Game() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
-        GameStateManager.Instance.DISPLAY_ENTER_YOUR_NAME_SCREEN();
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_ENTER_YOUR_NAME_SCREEN);
     }
 
     public void Display_Enter_Your_Name_Screen() {
@@ -92,7 +93,7 @@ public partial class GameManager : Control {
         DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
         LoadSaveManager.Instance.ToggleAutosave(true);
 
-        GameStateManager.Instance.ENTER_DIALOGUE_MODE();
+        GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
     }
 
     public void Resume_Game() {
@@ -110,7 +111,7 @@ public partial class GameManager : Control {
         if (UIManager.Instance.mainMenu.IsVisibleInTree()) {
             UIManager.Instance.mainMenu.CloseMainMenu();
         }
-        GameStateManager.Instance.ENTER_DIALOGUE_MODE();
+        GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
     }
 
     public void Initialize_Save_Screen() {
@@ -129,13 +130,13 @@ public partial class GameManager : Control {
     public void Save_Game(bool isAutosave) {
         LoadSaveManager.Instance.SaveGame(isAutosave);
         UIManager.Instance.saveGameScreen.RefreshSaveSlots();
-        GameStateManager.Instance.SAVING_COMPLETED();
-        GameStateManager.Instance.DISPLAY_SAVE_SCREEN();
+        GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED);
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
 
     public void Autosave_Game(bool isAutoSave) {
         Save_Game(isAutoSave);
-        GameStateManager.Instance.ENTER_DIALOGUE_MODE();
+        GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
     }
 
     public void Initialize_Load_Screen() {

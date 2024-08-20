@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using static GameStateMachine;
 
 public partial class InGameMenuButton : MarginContainer {
 
@@ -12,7 +13,7 @@ public partial class InGameMenuButton : MarginContainer {
 
     public void OnTextureButtonPressed() {
         if (UIManager.Instance.mainMenu.Visible == false) {
-            GameStateManager.Instance.DISPLAY_INGAME_MENU();
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
         }
 		else
 		{

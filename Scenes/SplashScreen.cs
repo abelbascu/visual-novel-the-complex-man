@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using static GameStateMachine;
 
 public partial class SplashScreen : Control
 {
@@ -36,6 +37,6 @@ public partial class SplashScreen : Control
     {
         pressAnyKeyLabel.Hide();
         ProcessMode = ProcessModeEnum.Disabled;
-        GameStateManager.Instance.DISPLAY_MAIN_MENU();
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
     }
 }

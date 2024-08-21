@@ -57,7 +57,7 @@ public partial class MainMenu : Control {
         exitGameConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/ExitGameButton/ExitGameConfirmationDialog");
         exitToMainMenuConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/ExitToMainMenuButton/ExitToMainMenuConfirmationDialog");
 
-        creditsConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/CreditsButton/CreditsConfirmationDialog");
+        creditsConfirmationDialog = GetNode<ConfirmationDialog>("CreditsConfirmationDialog");
 
         //trigger events depending on the option clicked
         startNewGameButton.Pressed += OnStartNewGameButtonPressed;
@@ -123,6 +123,8 @@ public partial class MainMenu : Control {
 
         ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
         ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
+
+        UIManager.Instance.SetupCustomConfirmationDialog(creditsConfirmationDialog);
     }
 
     private void ApplyCustomStyleToButtonsInContainer(VBoxContainer container) {
@@ -171,19 +173,15 @@ public partial class MainMenu : Control {
     }
 
     public void DisplayMainMenu() {
+        UIManager.Instance.HideAllUIElements();
         MainOptionsContainer.Show();
         startNewGameButton.Show();
         exitGameButton.Show();
         saveGameButton.Hide();
         continueGameButton.Hide();
         exitToMainMenuButton.Hide();
-        //mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/DialogueOrPlayerChoice/cosmos ether.png");
-        mainMenuBackgroundImage.Texture = null;
+        mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/splash screen the dragon riddle.png");
         mainMenuBackgroundImage.SetAnchorsPreset(LayoutPreset.FullRect);
-
-
-
-
         LoadSaveManager.Instance.ToggleAutosave(false);
         UIManager.Instance.inGameMenuButton.Hide();
         UIManager.Instance.menuOverlay.Visible = false; //a mask to avoid clicking on the dialoguebox when menus are open
@@ -241,29 +239,40 @@ public partial class MainMenu : Control {
     }
 
     private void OnCreditsButtonPressed() {
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_CREDITS);
         creditsConfirmationDialog.Show();
         MainOptionsContainer.Hide();
     }
 
-    private void OnExitGameButtonPressed() {
-        ShowExitGameConfirmationPopup();
-
+    private void OnCreditsCancelOrConfirmButtonPressed() {
+        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
 
     public void OnExitToMainMenuButtonPressed() {
         ShowExitToMainMenuConfirmationPopup();
     }
 
+    public void ShowExitToMainMenuConfirmationPopup() {
+        MainOptionsContainer.Hide();
+        exitToMainMenuConfirmationDialog.Show();
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_EXIT_TO_MAIN_MENU_CONFIRMATION_POPUP);
+    }
+    private void OnExitToMainMenuConfirmButtonPressed() {
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+    }
+
+    private void OnExitToMainMenuCancelButtonPressed() {
+        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
+    }
+
+    private void OnExitGameButtonPressed() {
+        ShowExitGameConfirmationPopup();
+    }
+
     public void ShowExitGameConfirmationPopup() {
         MainOptionsContainer.Hide();
         exitGameConfirmationDialog.Show();
     }
-
-    public void ShowExitToMainMenuConfirmationPopup() {
-        MainOptionsContainer.Hide();
-        exitToMainMenuConfirmationDialog.Show();
-    }
-
     //triggered by confirmationDialog.Confirmed event
     private void OnExitGameConfirmButtonPressed() {
         GetTree().Quit(); // Exit the game
@@ -275,22 +284,7 @@ public partial class MainMenu : Control {
         GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
 
-    private void OnExitToMainMenuConfirmButtonPressed() {
-        GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
-        // CloseInGameMenu();
-        // UIManager.Instance.HideAllUIElements();
-        // VisualManager.Instance.RemoveImage();
-        //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN 
-        //DisplayMainMenu();
-    }
 
-    private void OnExitToMainMenuCancelButtonPressed() {
-        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
-    }
-
-    private void OnCreditsCancelOrConfirmButtonPressed() {
-        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
-    }
 
     private void OnEnglishButtonPressed() {
         language = "en";

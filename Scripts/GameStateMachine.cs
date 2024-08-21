@@ -10,8 +10,6 @@ public class GameStateMachine {
         MainMenuDisplayed,
         InGameMenuDisplayed,
         StartingNewGame,
-        //LoadingCompelted
-        //SavingCompleted
         SettingUpNewGameDialogues,
         InDialogueMode,
         EnterYourNameScreenDisplayed,
@@ -21,9 +19,10 @@ public class GameStateMachine {
 
     public enum SubState {
         None,
-        LoadScreenInitialized,                      // do not delete this! is needed in ConfigureTransition() for states without substate.
+        LoadScreenInitialized,
         LoadScreenDisplayed,
         Loading,
+        CompleteLoadingBasedOnGameMode,
         LoadingCompleted,
         SaveScreenInitialized,
         SaveScreenDisplayed,
@@ -32,7 +31,7 @@ public class GameStateMachine {
         AutoSaving,
         CreditsDisplayed,
         LanguageMenuDisplayed,
-        ConfirmationDialogDisplayed,
+        ExitToMainMenuConfirmationPopupDisplayed
     }
 
     public enum Trigger {
@@ -46,22 +45,22 @@ public class GameStateMachine {
         INITIALIZE_LOAD_SCREEN,
         DISPLAY_LOAD_SCREEN,
         LOAD_GAME,
-        COMPLETE_GAME_LOADING_BASED_ON_GAME_MODE,
+        COMPLETE_LOADING_BASED_ON_GAME_MODE,
+        LOADING_COMPLETED,
         ENTER_LOADING_SUBSTATE,
         INITIALIZE_SAVE_SCREEN,
         DISPLAY_SAVE_SCREEN,
         SAVE_GAME,
         SAVING_COMPLETED,
-        //BACK_TO_SAVE_SCREEN_FROM_SAVE_COMPLETED,
         START_AUTOSAVE_GAME,
         RESUME_TO_DIALOGUE_MODE,
         RESUME_GAME_FROM_AUTOSAVE,
-        //RESUME_GAME,
         GO_BACK_TO_MENU, //from any submenu inside main OR ingame menu
+        DISPLAY_EXIT_TO_MAIN_MENU_CONFIRMATION_POPUP,
         EXIT_TO_MAIN_MENU, //froM the confirmation popup in INGAME MENU. We must warn user he can lose progress
         DISPLAY_CREDITS,
         HIDE_CREDITS,
-        DISPLAY_LANGUAGE_MENU, //ShowLanguageSelection,
+        DISPLAY_LANGUAGE_MENU, 
         DISPLAY_ENDING_SCREEN, //It can be a lost game, a victory, partial victory, neutral ending, etc.
         EXIT_GAME
     }

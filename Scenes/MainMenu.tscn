@@ -13,6 +13,13 @@ size_flags_horizontal = 4
 size_flags_vertical = 8
 script = ExtResource("1_2ygpx")
 
+[node name="CreditsConfirmationDialog" type="ConfirmationDialog" parent="."]
+title = ""
+initial_position = 2
+size = Vector2i(800, 80)
+dialog_text = "CREDITS_INFO"
+dialog_autowrap = true
+
 [node name="BackgroundImage" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -79,12 +86,6 @@ auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "CREDITS"
-
-[node name="CreditsConfirmationDialog" type="ConfirmationDialog" parent="MainOptionsContainer/CreditsButton"]
-title = ""
-position = Vector2i(740, 500)
-size = Vector2i(500, 100)
-dialog_text = "CREDITS_INFO"
 
 [node name="ExitToMainMenuButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1

@@ -24,7 +24,7 @@ public partial class SplashScreen : Control
         }
     }
 
-    private void OnBackgroundGuiInput(InputEvent @event)
+    public void OnBackgroundGuiInput(InputEvent @event)
     {
         if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
         {
@@ -33,9 +33,9 @@ public partial class SplashScreen : Control
         }
     }
 
-    private void TransitionToMainMenu()
+    public void TransitionToMainMenu()
     {
-        pressAnyKeyLabel.Hide();
+        pressAnyKeyLabel.Visible = false;
         ProcessMode = ProcessModeEnum.Disabled;
         GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
     }

@@ -46,8 +46,8 @@ public partial class GameManager : Control {
         UIManager = GetNodeOrNull<UIManager>("UiManager");
         DialogueManager = GetNodeOrNull<DialogueManager>("DialogueManager");
         GameStateManager = GetNodeOrNull<GameStateManager>("GameStateManager");
-
-        GameStateManager.Instance.Fire(Trigger.DISPLAY_SPLASH_SCREEN);
+        //here we set the first FSM state
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_SPLASH_SCREEN); 
     }
 
     public void Display_Splash_Screen() {
@@ -84,6 +84,7 @@ public partial class GameManager : Control {
 
     public void Starting_New_Game() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
+        UIManager.Instance.mainMenu.CloseMainMenu();
         GameStateManager.Instance.Fire(Trigger.DISPLAY_ENTER_YOUR_NAME_SCREEN);
     }
 
@@ -112,31 +113,29 @@ public partial class GameManager : Control {
     public void Load_Game(string saveFilePath) {
         UIManager.Instance.HideAllUIElements();
         //WE NEED CHANGE TO THE 'LOADING' STATE WHILE DATA IS BEING LOADED. WE NEED TO IMPLEMENT AN ANIMATED LOADING SYMBOL TO WARN THE USER.
-        //WE NEED CHANGE TO THE 'LOADING' STATE WHILE DATA IS BEING LOADED. WE NEED TO IMPLEMENT AN ANIMATED LOADING SYMBOL TO WARN THE USER.
-        //WE NEED CHANGE TO THE 'LOADING' STATE WHILE DATA IS BEING LOADED. WE NEED TO IMPLEMENT AN ANIMATED LOADING SYMBOL TO WARN THE USER.
         UIManager.Instance.menuOverlay.Visible = false;
         LoadSaveManager.Instance.LoadGame(saveFilePath);
         if (UIManager.Instance.mainMenu.IsVisibleInTree()) {
             UIManager.Instance.mainMenu.CloseMainMenu();
         }
 
-        GameStateManager.Instance.Fire(Trigger.COMPLETE_GAME_LOADING_BASED_ON_GAME_MODE, GameStateManager.Instance.GetLastGameMode());
+        GameStateManager.Instance.Fire(Trigger.COMPLETE_LOADING_BASED_ON_GAME_MODE, GameStateManager.Instance.GetLastGameMode());
     }
 
-    public void Complete_Game_Loading_Based_On_Game_Mode(State lastGameMode) {
+    public void Complete_Loading_Based_On_Game_Mode(State lastGameMode) {
         switch (lastGameMode) {
             case State.InDialogueMode:
                 Initialize_Dialogue_Mode_Settings_On_Loaded_Game();
-                GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE); //REFACTOR THIS WE NEED TO TRIGGER A Load_Game_Mode_From_Loaded_Game_State()
+                GameStateManager.Instance.Fire(Trigger.LOADING_COMPLETED); //WE NEED TO ADD THIS ONE ON EVERY NEW CASE!!
+                GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE); 
                 break;
 
             default:
                 lastGameMode = State.None;
                 break;
-
+      
         }
     }
-
     public void Initialize_Dialogue_Mode_Settings_On_Loaded_Game() {
         UIManager.Instance.inGameMenuButton.Show();
         //A BIT HACKY FIX where if the currentDialogObj is a PlayerChoice, and the user clicked on it and then saved the game, and if its DestinationDialogueID are PlayerChoices,
@@ -151,7 +150,6 @@ public partial class GameManager : Control {
         } else
             DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
     }
-
 
     public void Initialize_Save_Screen() {
         UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.mainMenu.SAVE_SCREEN);
@@ -177,10 +175,6 @@ public partial class GameManager : Control {
         UIManager.Instance.mainMenu.LanguageOptionsContainer.Show();
     }
 
-    // public void Display_Save_Screen() {
-    //     UIManager.saveGameScreen.DisplaySaveOrLoadScreen();
-    // }
-
     public void Save_Game(bool isAutosave) {
         LoadSaveManager.Instance.SaveGame(isAutosave);
         UIManager.Instance.saveGameScreen.RefreshSaveSlots();
@@ -188,21 +182,33 @@ public partial class GameManager : Control {
         GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
 
+
+    public void ResumeGame() {
+        UIManager.mainMenu.CloseInGameMenu();
+        LoadSaveManager.Instance.ToggleAutosave(true);
+    }
+
+    public void Exit_To_Main_Menu() {
+           // CloseInGameMenu();
+        UIManager.Instance.HideAllUIElements();
+        VisualManager.Instance.RemoveImage();
+        //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN 
+        UIManager.mainMenu.DisplayMainMenu();
+    }
+
+
+
+
+
     public void Autosave_Game(bool isAutoSave) {
         Save_Game(isAutoSave);
         GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
     }
 
 
-
-
-    // public void Display_Load_Screen() {
-    //     UIManager.saveGameScreen.DisplaySaveOrLoadScreen();
+    // public void Display_Credits()
+    // {
+        
     // }
-
-    public void ResumeGame() {
-        UIManager.mainMenu.CloseInGameMenu();
-        LoadSaveManager.Instance.ToggleAutosave(true);
-    }
 
 }

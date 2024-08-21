@@ -12,7 +12,7 @@ public partial class InputNameScreen : Control {
     private RichTextLabel richTextLabel;
     private MarginContainer marginContainer;
 
-    [Export] public float FadeDuration { get; set; } = 2.0f;
+    [Export] public float FadeDuration { get; set; } = 0.5f;
 
     public override void _Ready() {
         // Get references to existing nodes
@@ -29,13 +29,24 @@ public partial class InputNameScreen : Control {
         SetupConfirmationDialog();
         SetupFadeEffect();
 
-        Hide();
+        this.Visible = false;
     }
 
     public void Show() {
         base.Show();
+        nameInput.Text="";
         CallDeferred(nameof(SetInitialFocus));
+        ShowNodeAndChildren(this);
         FadeIn();
+    }
+
+    public void ShowNodeAndChildren(Node node) {
+        if (node is CanvasItem canvasItem) {
+            canvasItem.Visible = true;
+        }
+        foreach (Node child in node.GetChildren()) {
+            ShowNodeAndChildren(child);
+        }
     }
 
     private void SetInitialFocus() {
@@ -116,6 +127,7 @@ public partial class InputNameScreen : Control {
     private void OnConfirmName() {
         GD.Print($"Name confirmed: {username}");
         FadeOut();
+
     }
 
     private void OnCancelConfirmation() {
@@ -153,7 +165,7 @@ public partial class InputNameScreen : Control {
         }
 
         // Set up game elements (but keep them covered by the fade rect)
-        
+
 
         fadeRect.MouseFilter = MouseFilterEnum.Ignore; //AT THIS POINT WE ALLOW THE USER TO CLICK ON THE DIALOGUE BOX, AS THE FADE IN IS LONGER TO CREATE A BIT OF ZEITGEIST STORYTELLING ANTICIPATION SMOOTHNESS
 
@@ -182,7 +194,7 @@ public partial class InputNameScreen : Control {
 
         var tween = CreateTween();
         GD.Print($"staring value of crrent alpha: {fadeRect.Color.A}");
-        tween.TweenProperty(fadeRect, "color:a", 0.0, 3.5f);
+        tween.TweenProperty(fadeRect, "color:a", 0.0, FadeDuration);
         tween.Finished += OnFadeInGameElementsFinished;
 
         var timer = GetTree().CreateTimer(FadeDuration / 2);

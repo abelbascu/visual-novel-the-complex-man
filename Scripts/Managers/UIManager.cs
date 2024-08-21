@@ -169,6 +169,92 @@ public partial class UIManager : Control {
     }
 
 
+    public void SetupCustomConfirmationDialog(ConfirmationDialog dialog) {
+        // Create a new theme for the entire dialog
+        var customTheme = new Theme();
+        dialog.Theme = customTheme;
+
+        // Style for the main panel (affects the entire dialog including top bar)
+        var panelStyle = new StyleBoxFlat {
+            BgColor = Colors.NavyBlue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
+        customTheme.SetStylebox("panel", "Window", panelStyle);
+
+        // Style for the close button (top-right X)
+        var closeButtonStyle = new StyleBoxFlat {
+            BgColor = Colors.Transparent
+        };
+        customTheme.SetStylebox("close", "Window", closeButtonStyle);
+
+        // Style for the OK button with added padding
+        var buttonStyle = new StyleBoxFlat {
+            BgColor = Colors.DarkSlateBlue,
+            CornerRadiusTopLeft = 5,
+            CornerRadiusTopRight = 5,
+            CornerRadiusBottomLeft = 5,
+            CornerRadiusBottomRight = 5,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 1,
+            BorderWidthTop = 1,
+            BorderWidthLeft = 1,
+            BorderWidthRight = 1,
+            ContentMarginLeft = 20,
+            ContentMarginRight = 20,
+            ContentMarginTop = 10,
+            ContentMarginBottom = 10
+        };
+        customTheme.SetStylebox("normal", "Button", buttonStyle);
+
+        // Set text color for the entire dialog
+        customTheme.SetColor("font_color", "Label", Colors.White);
+        customTheme.SetColor("font_color", "Button", Colors.White);
+
+        // Create and set larger font for dialog text and button
+        customTheme.SetFontSize("font_size", "Label", 35);
+        customTheme.SetFontSize("font_size", "Button", 35);
+
+        // Apply theme to the dialog and its children
+        ApplyThemeRecursively(dialog, customTheme);
+
+        // Center the OK button
+        var buttonContainer = dialog.GetOkButton().GetParent() as BoxContainer;
+        if (buttonContainer != null) {
+            buttonContainer.Alignment = BoxContainer.AlignmentMode.Center;
+
+            // Remove all children except the OK button
+            foreach (var child in buttonContainer.GetChildren()) {
+                if (child != dialog.GetOkButton()) {
+                    buttonContainer.RemoveChild(child);
+                    child.QueueFree();
+                }
+            }
+        }
+
+        // Ensure the OK button is using the correct style
+        dialog.GetOkButton().AddThemeStyleboxOverride("normal", buttonStyle);
+    }
+
+    private void ApplyThemeRecursively(Node node, Theme theme) {
+        if (node is Control control) {
+            control.Theme = theme;
+        }
+
+        foreach (var child in node.GetChildren()) {
+            ApplyThemeRecursively(child, theme);
+        }
+    }
+
+
+
     public void ApplyCustomStyleToButton(Button button) {
         var normalStyle = new StyleBoxFlat {
             BgColor = Colors.NavyBlue,

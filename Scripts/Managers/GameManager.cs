@@ -47,7 +47,7 @@ public partial class GameManager : Control {
         DialogueManager = GetNodeOrNull<DialogueManager>("DialogueManager");
         GameStateManager = GetNodeOrNull<GameStateManager>("GameStateManager");
         //here we set the first FSM state
-        GameStateManager.Instance.Fire(Trigger.DISPLAY_SPLASH_SCREEN); 
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_SPLASH_SCREEN);
     }
 
     public void Display_Splash_Screen() {
@@ -127,13 +127,17 @@ public partial class GameManager : Control {
             case State.InDialogueMode:
                 Initialize_Dialogue_Mode_Settings_On_Loaded_Game();
                 GameStateManager.Instance.Fire(Trigger.LOADING_COMPLETED); //WE NEED TO ADD THIS ONE ON EVERY NEW CASE!!
-                GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE); 
+                GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
                 break;
 
             default:
-                lastGameMode = State.None;
+                //if gamemode was not saved correctly, we try to load the last saved dialogue or player choices 
+                lastGameMode = State.InDialogueMode;
+                Initialize_Dialogue_Mode_Settings_On_Loaded_Game();
+                GameStateManager.Instance.Fire(Trigger.LOADING_COMPLETED); //WE NEED TO ADD THIS ONE ON EVERY NEW CASE!!
+                GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
                 break;
-      
+
         }
     }
     public void Initialize_Dialogue_Mode_Settings_On_Loaded_Game() {
@@ -189,11 +193,15 @@ public partial class GameManager : Control {
     }
 
     public void Exit_To_Main_Menu() {
-           // CloseInGameMenu();
+        // CloseInGameMenu();
         UIManager.Instance.HideAllUIElements();
         VisualManager.Instance.RemoveImage();
         //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN 
         UIManager.mainMenu.DisplayMainMenu();
+    }
+
+    public void Exit_Game() {
+        GetTree().Quit();
     }
 
 
@@ -208,7 +216,7 @@ public partial class GameManager : Control {
 
     // public void Display_Credits()
     // {
-        
+
     // }
 
 }

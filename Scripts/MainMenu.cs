@@ -272,10 +272,11 @@ public partial class MainMenu : Control {
     public void ShowExitGameConfirmationPopup() {
         MainOptionsContainer.Hide();
         exitGameConfirmationDialog.Show();
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_EXIT_GAME_MENU_CONFIRMATION_POPUP);
     }
     //triggered by confirmationDialog.Confirmed event
     private void OnExitGameConfirmButtonPressed() {
-        GetTree().Quit(); // Exit the game
+        GameStateManager.Instance.Fire(Trigger.EXIT_GAME);
     }
 
     //triggered by confirmationDialog.Canceled event

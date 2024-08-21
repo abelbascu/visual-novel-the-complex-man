@@ -31,7 +31,9 @@ public class GameStateMachine {
         AutoSaving,
         CreditsDisplayed,
         LanguageMenuDisplayed,
-        ExitToMainMenuConfirmationPopupDisplayed
+        ExitToMainMenuConfirmationPopupDisplayed,
+        ExitGameConfirmationPopupDisplayed,
+        ExitingGame
     }
 
     public enum Trigger {
@@ -62,6 +64,7 @@ public class GameStateMachine {
         HIDE_CREDITS,
         DISPLAY_LANGUAGE_MENU, 
         DISPLAY_ENDING_SCREEN, //It can be a lost game, a victory, partial victory, neutral ending, etc.
+        DISPLAY_EXIT_GAME_MENU_CONFIRMATION_POPUP,
         EXIT_GAME
     }
 

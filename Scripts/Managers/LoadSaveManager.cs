@@ -39,6 +39,7 @@ public partial class LoadSaveManager : Node {
         public string VisualPath { get; set; }
         public VisualManager.VisualType VisualType;
         public bool IsAutosave { get; set; }
+        public State lastGameMode;
     }
 
     public class PersistentData {
@@ -146,7 +147,7 @@ public partial class LoadSaveManager : Node {
         } else
             GD.Print("Manual save completed: " + saveFilePath); //SHOW A MESSAGE TO THE USER THAT THE GAME WAS PROPERLY AUTOSAVED
 
-        Thread.Sleep(2000); //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT) 
+        Thread.Sleep(1000); //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT) 
                             //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)
                             //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)
 
@@ -236,7 +237,7 @@ public partial class LoadSaveManager : Node {
         if (gameState != null) {
            // GameStateManager.Instance.ENTER_LOADING_SUBSTATE();
             ApplyGameState(gameState);
-            Thread.Sleep(2000); //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT) 
+            Thread.Sleep(1000); //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT) 
             //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)
             //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)   
         }
@@ -263,20 +264,8 @@ public partial class LoadSaveManager : Node {
         DialogueManager.Instance.currentConversationID = gameState.CurrentConversationID;
         TranslationServer.SetLocale(gameState.LanguageCode);
         DialogueManager.Instance.playerChoicesList = gameState.PlayerChoicesList.Select(id => DialogueManager.Instance.GetDialogueObject(gameState.CurrentConversationID, id)).ToList();
-        UIManager.Instance.inGameMenuButton.Show();
         VisualManager.Instance.VisualPath = gameState.VisualPath;
         VisualManager.Instance.visualType = gameState.VisualType;
-        //A BIT HACKY FIX where if the currentDialogObj is a PlayerChoice, and the user clicked on it and then saved the game, and if its DestinationDialogueID are PlayerChoices,
-        //it means that they were all already saved in a List and displayed to the screen, so when loading that saved game it should not display that currentDialogObj, but only its associated playerChoices
-        if (DialogueManager.Instance.playerChoicesList != null && DialogueManager.Instance.currentDialogueObject.Actor == "1") //if the current dialogue object it's a single player choice
-        {
-            //notice that we don't use DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) to avoid displaying the already visited player choice that is still hold in the current dialogue object
-            //until the player selects a new player choice. Notice that most times, after an NPC or actor dialogue, a group of player choices may be displayed, but it may also happen that after a 
-            //player choice is displayed, more new player chocies are displayed. We are solving this rare case here. 
-            DialogueManager.Instance.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, DialogueManager.Instance.SetIsPlayerChoiceBeingPrinted);
-            VisualManager.Instance.DisplayVisual(gameState.VisualPath, gameState.VisualType);
-        } else
-            DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
 
         SetCurrentPlayTime(gameState.TimePlayed);
     }

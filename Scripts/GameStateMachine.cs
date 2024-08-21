@@ -5,6 +5,7 @@ using Godot;
 public class GameStateMachine {
 
     public enum State {
+        None,
         SplashScreenDisplayed,
         MainMenuDisplayed,
         InGameMenuDisplayed,
@@ -23,6 +24,7 @@ public class GameStateMachine {
         LoadScreenInitialized,                      // do not delete this! is needed in ConfigureTransition() for states without substate.
         LoadScreenDisplayed,
         Loading,
+        LoadingCompleted,
         SaveScreenInitialized,
         SaveScreenDisplayed,
         Saving,
@@ -44,6 +46,7 @@ public class GameStateMachine {
         INITIALIZE_LOAD_SCREEN,
         DISPLAY_LOAD_SCREEN,
         LOAD_GAME,
+        COMPLETE_GAME_LOADING_BASED_ON_GAME_MODE,
         ENTER_LOADING_SUBSTATE,
         INITIALIZE_SAVE_SCREEN,
         DISPLAY_SAVE_SCREEN,

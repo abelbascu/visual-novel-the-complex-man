@@ -101,19 +101,19 @@ public partial class SaveGameScreen : MarginContainer {
 
         // Populate with appropriate slots
         PopulateSaveOrLoadSlots(isLoadScreen);
-
-        DisplaySaveOrLoadScreen(isLoadScreen);
         
     }
 
-    public void DisplaySaveOrLoadScreen(bool isLoadScreen) {
+    public void DisplayLoadScreen()
+    {
+       Show();
+    }
 
-        if(isLoadScreen)
-            GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
-        else
-            GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
+    public void DisplaySaveScreen()
+    {
         Show();
     }
+
 
     private void PopulateSaveOrLoadSlots(bool isLoadScreen) {
         List<LoadSaveManager.GameState> saveGames = LoadSaveManager.Instance.GetSavedGames();

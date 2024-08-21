@@ -9,6 +9,14 @@ using System.Linq.Expressions;
 
 public partial class GameStateManager : Node {
 
+
+    // public enum GameMode {
+    //     None,
+    //     Dialogue,
+    //     Minigame,
+    //     Cutscene,
+    // }
+
     public static GameStateManager Instance { get; private set; }
     private GameStateMachine stateMachine;
     //public event Action<State, SubState, State, SubState, object[]> OnStateChanged;
@@ -54,7 +62,7 @@ public partial class GameStateManager : Node {
         stateTransitions = new Dictionary<(State, SubState, State, SubState, Trigger), Delegate>
         {
             //splashscreen > splashscreen
-            {(State.SplashScreenDisplayed, SubState.None, State.SplashScreenDisplayed, SubState.None, Trigger.DISPLAY_SPLASH_SCREEN),
+            {(State.None, SubState.None, State.SplashScreenDisplayed, SubState.None, Trigger.DISPLAY_SPLASH_SCREEN),
                 () => GameManager.Instance.Display_Splash_Screen()},
             // splashscreen > main Menu
             {(State.SplashScreenDisplayed, SubState.None, State.MainMenuDisplayed, SubState.None, Trigger.DISPLAY_MAIN_MENU),
@@ -88,7 +96,7 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Initialize_Save_Screen()},
             //initialize save screen > display save screen
             {(State.InGameMenuDisplayed, SubState.SaveScreenInitialized, State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, Trigger.DISPLAY_SAVE_SCREEN),
-                () => { }},
+                () => GameManager.Instance.Display_Save_Screen()},
             //display save screen > saving 
             {(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, State.InGameMenuDisplayed, SubState.Saving, Trigger.SAVE_GAME),
                 new Action<bool>(isAutosave => GameManager.Instance.Save_Game(isAutosave))},
@@ -103,16 +111,43 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Go_Back_To_Menu()},
             //ingame menu > dialogue mode
             {(State.InGameMenuDisplayed, SubState.None, State.InDialogueMode, SubState.None, Trigger.RESUME_TO_DIALOGUE_MODE),
-                () => GameManager.Instance.Resume_To_Dialogue_Mode()},
-
+                () => GameManager.Instance.Resume_To_Dialogue_Mode()},           
+            //ingame menu > initialize load screen
             {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.LoadScreenInitialized, Trigger.INITIALIZE_LOAD_SCREEN),
                 () => GameManager.Instance.Initialize_Load_Screen()},
+            //initialize load screen > display load screen
+             {(State.InGameMenuDisplayed, SubState.LoadScreenInitialized, State.InGameMenuDisplayed, SubState.LoadScreenDisplayed, Trigger.DISPLAY_LOAD_SCREEN),
+                () => GameManager.Instance.Display_Load_Screen()},
+            //load screen > go bakc to ingame menu    
+             {(State.InGameMenuDisplayed, SubState.LoadScreenDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
+                () => GameManager.Instance.Go_Back_To_Menu()},
+             // Load Game transition
+            {(State.InGameMenuDisplayed, SubState.LoadScreenDisplayed, State.InGameMenuDisplayed, SubState.Loading, Trigger.LOAD_GAME),
+                new Action<string>(filePath => GameManager.Instance.Load_Game(filePath))},
+            //Load Game > Enter Dialogue Mode
+            {(State.InGameMenuDisplayed, SubState.Loading, State.InGameMenuDisplayed, SubState.LoadingCompleted, Trigger.COMPLETE_GAME_LOADING_BASED_ON_GAME_MODE),
+                new Action<State>(lastGameMode => GameManager.Instance.Complete_Game_Loading_Based_On_Game_Mode(lastGameMode))},
+
+            {(State.InGameMenuDisplayed, SubState.LoadingCompleted, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
+                () =>{}},
+
+            {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed, Trigger.DISPLAY_LANGUAGE_MENU),
+                () => GameManager.Instance.Display_Language_Menu()},
+
+            {(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
+                () => GameManager.Instance.Go_Back_To_Menu()},
+                
+
+
+
+
+
+
+
 
             {(State.InGameMenuDisplayed, SubState.None, State.MainMenuDisplayed, SubState.None, Trigger.EXIT_TO_MAIN_MENU),
                 () => GameManager.Instance.Display_Main_Menu()},
 
-            {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed, Trigger.DISPLAY_LANGUAGE_MENU),
-                () => GameManager.Instance.Display_Language_Menu()},
 
 //     stateMachine.ConfigureTransition(SubState.SaveScreenDisplayed, Trigger.GO_BACK_TO_MENU, State.InGameMenuDisplayed);
 

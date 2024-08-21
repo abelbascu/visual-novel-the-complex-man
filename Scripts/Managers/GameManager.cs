@@ -68,12 +68,11 @@ public partial class GameManager : Control {
         LoadSaveManager.Instance.ToggleAutosave(false);
     }
 
-    public void Close_Ingame_Menu()
-    {
+    public void Close_Ingame_Menu() {
         UIManager.Instance.mainMenu.CloseInGameMenu();
     }
 
-    public void Resume_To_Dialogue_Mode(){
+    public void Resume_To_Dialogue_Mode() {
         //at the moment we can only go back to dialogue mode when we close the ingame menu
         Close_Ingame_Menu();
     }
@@ -120,15 +119,61 @@ public partial class GameManager : Control {
         if (UIManager.Instance.mainMenu.IsVisibleInTree()) {
             UIManager.Instance.mainMenu.CloseMainMenu();
         }
-        GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+
+        GameStateManager.Instance.Fire(Trigger.COMPLETE_GAME_LOADING_BASED_ON_GAME_MODE, GameStateManager.Instance.GetLastGameMode());
     }
+
+    public void Complete_Game_Loading_Based_On_Game_Mode(State lastGameMode) {
+        switch (lastGameMode) {
+            case State.InDialogueMode:
+                Initialize_Dialogue_Mode_Settings_On_Loaded_Game();
+                GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE); //REFACTOR THIS WE NEED TO TRIGGER A Load_Game_Mode_From_Loaded_Game_State()
+                break;
+
+            default:
+                lastGameMode = State.None;
+                break;
+
+        }
+    }
+
+    public void Initialize_Dialogue_Mode_Settings_On_Loaded_Game() {
+        UIManager.Instance.inGameMenuButton.Show();
+        //A BIT HACKY FIX where if the currentDialogObj is a PlayerChoice, and the user clicked on it and then saved the game, and if its DestinationDialogueID are PlayerChoices,
+        //it means that they were all already saved in a List and displayed to the screen, so when loading that saved game it should not display that currentDialogObj, but only its associated playerChoices
+        if (DialogueManager.Instance.playerChoicesList != null && DialogueManager.Instance.currentDialogueObject.Actor == "1") //if the current dialogue object it's a single player choice
+        {
+            //notice that we don't use DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) to avoid displaying the already visited player choice that is still hold in the current dialogue object
+            //until the player selects a new player choice. Notice that most times, after an NPC or actor dialogue, a group of player choices may be displayed, but it may also happen that after a 
+            //player choice is displayed, more new player chocies are displayed. We are solving this rare case here. 
+            DialogueManager.Instance.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, DialogueManager.Instance.SetIsPlayerChoiceBeingPrinted);
+            VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath, VisualManager.Instance.visualType);
+        } else
+            DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
+    }
+
 
     public void Initialize_Save_Screen() {
         UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.mainMenu.SAVE_SCREEN);
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
 
+    public void Display_Save_Screen() {
+        UIManager.Instance.saveGameScreen.DisplaySaveScreen();
+    }
+
+    public void Initialize_Load_Screen() {
+        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.mainMenu.LOAD_SCREEN);
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
+    }
+
+    public void Display_Load_Screen() {
+        UIManager.Instance.saveGameScreen.DisplayLoadScreen();
+    }
+
+
     public void Display_Language_Menu() {
-         UIManager.Instance.mainMenu.MainOptionsContainer.Hide();
+        UIManager.Instance.mainMenu.MainOptionsContainer.Hide();
         UIManager.Instance.mainMenu.LanguageOptionsContainer.Show();
     }
 
@@ -148,9 +193,8 @@ public partial class GameManager : Control {
         GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
     }
 
-    public void Initialize_Load_Screen() {
-        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.mainMenu.LOAD_SCREEN);
-    }
+
+
 
     // public void Display_Load_Screen() {
     //     UIManager.saveGameScreen.DisplaySaveOrLoadScreen();

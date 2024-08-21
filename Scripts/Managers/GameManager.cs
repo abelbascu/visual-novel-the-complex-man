@@ -68,6 +68,16 @@ public partial class GameManager : Control {
         LoadSaveManager.Instance.ToggleAutosave(false);
     }
 
+    public void Close_Ingame_Menu()
+    {
+        UIManager.Instance.mainMenu.CloseInGameMenu();
+    }
+
+    public void Resume_To_Dialogue_Mode(){
+        //at the moment we can only go back to dialogue mode when we close the ingame menu
+        Close_Ingame_Menu();
+    }
+
     public void Go_Back_To_Menu() {
         GetTree().CallGroup("popups", "close_all");
         UIManager.mainMenu.MainOptionsContainer.Show();
@@ -96,9 +106,8 @@ public partial class GameManager : Control {
         GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
     }
 
-    public void Resume_Game() {
-        UIManager.Instance.menuOverlay.Visible = false;
-        LoadSaveManager.Instance.ToggleAutosave(true);
+    public void Resume_Game_From_Ingame_Menu_Closed() {
+        UIManager.Instance.mainMenu.CloseInGameMenu();
     }
 
     public void Load_Game(string saveFilePath) {

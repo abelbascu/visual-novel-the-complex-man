@@ -51,6 +51,7 @@ public class GameStateMachine {
         SAVING_COMPLETED,
         //BACK_TO_SAVE_SCREEN_FROM_SAVE_COMPLETED,
         START_AUTOSAVE_GAME,
+        RESUME_TO_DIALOGUE_MODE,
         RESUME_GAME_FROM_AUTOSAVE,
         //RESUME_GAME,
         GO_BACK_TO_MENU, //from any submenu inside main OR ingame menu

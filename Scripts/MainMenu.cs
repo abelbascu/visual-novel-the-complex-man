@@ -206,11 +206,8 @@ public partial class MainMenu : Control {
     }
 
     public void CloseInGameMenu() {
-
-        //InGameMenuClosed?.Invoke();
-        // if (GameStateManager.Instance.CurrentState == InGameMenuOpened) {
-        //     GameStateManager.Instance.ENTER_DIALOGUE_MODE(); //PUTTING THIS IN AN IF CLAUSE IS DANGEROUS!!!
-        // }
+        UIManager.Instance.menuOverlay.Visible = false;
+        LoadSaveManager.Instance.ToggleAutosave(true);
         Hide();
     }
 
@@ -225,7 +222,7 @@ public partial class MainMenu : Control {
     }
 
     private void OnContinueButtonPressed() {
-        GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+        GameStateManager.Instance.ResumeGameMode();
     }
 
     private void OnSaveGameButtonPressed() {

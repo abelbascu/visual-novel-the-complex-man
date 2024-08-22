@@ -110,9 +110,19 @@ public partial class LoadSaveManager : Node {
         if (isAutoSave) {
             timeSinceLastAutosave += (float)delta;
             if (timeSinceLastAutosave >= AutosaveInterval) {
-                GameStateManager.Instance.Fire(Trigger.START_AUTOSAVE_GAME); //LET'S SHOW A MESSAGE TO THE USER THAT WE ARE AUTOSAVING
-                //SaveGame(isAutoSave);
+                //GameStateManager.Instance.Fire(Trigger.START_AUTOSAVE_GAME); //LET'S SHOW A MESSAGE TO THE USER THAT WE ARE AUTOSAVING
+                
+                
+                //SHOULD WE MOVE THE BELOW TO GAMEMAMANGER?
+
+                
+                
+                SaveGame(isAutoSave);
                 timeSinceLastAutosave = 0;
+
+
+
+                //AND AFTER IT FIRE TRIGGER AUTOSAVE_COMPLETED AND THEN ENTER_DIALOGUE_MODE
             }
         }
     }

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using static GameStateMachine;
+using static UIInputHelper;
 
 public partial class InputNameScreen : Control {
     private RichTextLabel questionLabel;
@@ -8,9 +9,9 @@ public partial class InputNameScreen : Control {
     private ConfirmationDialog confirmationDialog;
     private string username;
     private ColorRect fadeRect;
-    //private AnimationPlayer animationPlayer;
     private RichTextLabel richTextLabel;
     private MarginContainer marginContainer;
+    private bool isNameConfirmed = false;
 
     [Export] public float FadeDuration { get; set; } = 0.5f;
 
@@ -25,8 +26,8 @@ public partial class InputNameScreen : Control {
 
         // Set up the nodes
         //SetupQuestionLabel();
-        SetupNameInput();
-        SetupConfirmationDialog();
+        ListenForNameConfirmation();
+        SetupConfirmationDialogTheme();
         SetupFadeEffect();
 
         this.Visible = false;
@@ -34,19 +35,13 @@ public partial class InputNameScreen : Control {
 
     public void Show() {
         base.Show();
-        nameInput.Text="";
+        isNameConfirmed = false;
+        //process again
+        confirmationDialog.ProcessMode = Node.ProcessModeEnum.Inherit;
+        EnableParentChildrenInput(this);
+        nameInput.Text = "";
         CallDeferred(nameof(SetInitialFocus));
-        ShowNodeAndChildren(this);
         FadeIn();
-    }
-
-    public void ShowNodeAndChildren(Node node) {
-        if (node is CanvasItem canvasItem) {
-            canvasItem.Visible = true;
-        }
-        foreach (Node child in node.GetChildren()) {
-            ShowNodeAndChildren(child);
-        }
     }
 
     private void SetInitialFocus() {
@@ -57,16 +52,21 @@ public partial class InputNameScreen : Control {
         // questionLabel.Text = "What's your name, traveller?";
     }
 
-    private void SetupNameInput() {
+    private void ListenForNameConfirmation() {
         // nameInput.PlaceholderText = "Enter your name";
+        //player confirms by hitting the OK button on the LineEdit textobx or hitting the Enter key
         nameInput.TextSubmitted += OnNameSubmitted;
     }
 
-    private void SetupConfirmationDialog() {
+    private void SetupConfirmationDialogTheme() {
         confirmationDialog.Confirmed += OnConfirmName;
         confirmationDialog.Canceled += OnCancelConfirmation;
         confirmationDialog.Visible = false; // Ensure the dialog is initially hidden
                                             // Center the text in the confirmation dialog 
+
+        // Prevent the dialog from closing itself, we'll handle that
+        confirmationDialog.GetOkButton().Pressed += () => confirmationDialog.Visible = false;
+        confirmationDialog.GetCancelButton().Pressed += () => confirmationDialog.Visible = false;
 
         // Create a MarginContainer to hold the RichTextLabel
         var marginContainer = new MarginContainer();
@@ -88,17 +88,10 @@ public partial class InputNameScreen : Control {
         marginContainer.AddChild(richTextLabel);
     }
 
-
-    private void SetupFadeEffect() {
-        fadeRect = new ColorRect();
-        fadeRect.Color = Colors.Black;
-        fadeRect.MouseFilter = Control.MouseFilterEnum.Ignore;
-        //fadeRect.Color = new Color(0, 0, 0, 0); // Start fully transparent
-        fadeRect.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        AddChild(fadeRect);
-    }
-
     public override void _UnhandledKeyInput(InputEvent @event) {
+
+        if (isNameConfirmed) return;
+
         if (@event is InputEventKey eventKey && eventKey.Pressed && eventKey.Keycode == Key.Enter) {
             ShowConfirmationDialog();
             GetViewport().SetInputAsHandled(); //I DON'T KNOW WHY WE NEED THIS
@@ -125,14 +118,32 @@ public partial class InputNameScreen : Control {
     }
 
     private void OnConfirmName() {
-        GD.Print($"Name confirmed: {username}");
-        FadeOut();
 
+        if (isNameConfirmed) return; // Prevent multiple confirmations
+        isNameConfirmed = true;
+
+        GD.Print($"Name confirmed: {username}");
+        confirmationDialog.ProcessMode = Node.ProcessModeEnum.Disabled;
+        nameInput.ProcessMode = confirmationDialog.ProcessMode = Node.ProcessModeEnum.Disabled;
+        DisableParentChildrenInput(this);
+        // Hide the confirmation dialog
+        confirmationDialog.Visible = false;
+        FadeOut();
     }
 
     private void OnCancelConfirmation() {
         confirmationDialog.Visible = false; // Hide the dialog when cancelled
         nameInput.GrabFocus();
+    }
+
+
+    private void SetupFadeEffect() {
+        fadeRect = new ColorRect();
+        fadeRect.Color = Colors.Black;
+        fadeRect.MouseFilter = Control.MouseFilterEnum.Ignore;
+        //fadeRect.Color = new Color(0, 0, 0, 0); // Start fully transparent
+        fadeRect.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        AddChild(fadeRect);
     }
 
     private void FadeOut() {

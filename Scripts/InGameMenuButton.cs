@@ -18,6 +18,7 @@ public partial class InGameMenuButton : MarginContainer {
 		else
 		{
 			UIManager.Instance.mainMenu.CloseInGameMenu();
+            GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
 		}
          UIManager.Instance.UpdateUILayout();
     }

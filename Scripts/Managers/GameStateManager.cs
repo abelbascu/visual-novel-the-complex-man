@@ -61,6 +61,7 @@ public partial class GameStateManager : Node {
     private void ConfigureStateTransitions() {
         stateTransitions = new Dictionary<(State, SubState, State, SubState, Trigger), Delegate>
         {
+          
             //splashscreen > splashscreen
             {(State.None, SubState.None, State.SplashScreenDisplayed, SubState.None, Trigger.DISPLAY_SPLASH_SCREEN),
                 () => GameManager.Instance.Display_Splash_Screen()},
@@ -69,8 +70,6 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Display_Main_Menu()},
             //main Menu > start new game
             {(State.MainMenuDisplayed, SubState.None, State.StartingNewGame, SubState.None, Trigger.START_NEW_GAME),
-
-
                 () => GameManager.Instance.Starting_New_Game()},
             //start New Game > enter your name screen
             {(State.StartingNewGame, SubState.None, State.EnterYourNameScreenDisplayed, SubState.None, Trigger.DISPLAY_ENTER_YOUR_NAME_SCREEN),
@@ -78,7 +77,7 @@ public partial class GameStateManager : Node {
             //enter your name screen > set up new game dialogues 
             {(State.EnterYourNameScreenDisplayed, SubState.None, State.SettingUpNewGameDialogues, SubState.None, Trigger.DISPLAY_NEW_GAME_DIALOGUES),
                 () => GameManager.Instance.Display_New_Game_Dialogues()},
-            //set up new game dialogues > enter Dialogue Mode
+            //set up new game dialogues > enter dialogue node
             {(State.SettingUpNewGameDialogues, SubState.None, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
                 () => { }},
 
@@ -87,6 +86,9 @@ public partial class GameStateManager : Node {
             //in dialogue mode > display ingame menu
             {(State.InDialogueMode, SubState.None, State.InGameMenuDisplayed, SubState.None, Trigger.DISPLAY_INGAME_MENU),
                 () => GameManager.Instance.Display_Ingame_Menu()},
+            //in game menu > enter dialogue node
+            {(State.InGameMenuDisplayed, SubState.None, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
+                () => {}},
             //ingame menu > initialize save screen
             {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.SaveScreenInitialized, Trigger.INITIALIZE_SAVE_SCREEN),
                 () => GameManager.Instance.Initialize_Save_Screen()},
@@ -150,6 +152,18 @@ public partial class GameStateManager : Node {
             //exit to main menu confirmation popup > back to ingame menu
             {(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
                 () => GameManager.Instance.Go_Back_To_Menu()},
+
+
+            {(State.InDialogueMode, SubState.None, State.InDialogueMode, SubState.AutoSaving, Trigger.AUTOSAVE_GAME),
+                () => {}},
+
+            {(State.InDialogueMode, SubState.AutoSaving, State.InDialogueMode, SubState.AutoSavingCompleted, Trigger.AUTOSAVE_COMPLETED),
+                () => {}},
+
+            {(State.InDialogueMode, SubState.AutoSavingCompleted, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
+                () => {}},
+
+            
 
 
             //WE ARE MISSING AUTOSAVE 

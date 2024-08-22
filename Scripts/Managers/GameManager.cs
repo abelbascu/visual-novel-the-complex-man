@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Security.Cryptography.X509Certificates;
 using static GameStateMachine;
+using UIHelpers;
 
 
 public partial class GameManager : Control {
@@ -91,10 +92,14 @@ public partial class GameManager : Control {
     public void Display_Enter_Your_Name_Screen() {
         UIManager.Instance.inputNameScreen.Show();
         UIManager.Instance.splashScreen.Hide();
-        UIManager.Instance.inputNameScreen.FadeIn();
+       // UIManager.Instance.inputNameScreen.Show();
     }
 
     public void Display_New_Game_Dialogues() {
+
+        var fadeIn = new UIFadeIn(this);
+        fadeIn.FadeIn();
+
         UIManager.Instance.inGameMenuButton.Show();
         DialogueManager.Instance.currentDialogueID = DialogueManager.STARTING_DIALOGUE_ID;
         DialogueManager.Instance.currentConversationID = DialogueManager.STARTING_CONVO_ID;

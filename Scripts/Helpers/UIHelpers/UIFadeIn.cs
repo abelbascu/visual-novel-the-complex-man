@@ -8,19 +8,19 @@ namespace UIHelpers
         private ColorRect fadeRect;
         public float FadeDuration { get; set; } = 0.5f;
 
-        public UIFadeIn(Node topLevelContainer)
+        public UIFadeIn(Node parent)
         {
-            SetupFadeEffect(topLevelContainer);
+            SetupFadeEffect(parent);
         }
 
-        private void SetupFadeEffect(Node topoLevelContainer)
+        private void SetupFadeEffect(Node parent)
         {
             fadeRect = new ColorRect();
             fadeRect.Color = Colors.Black;
             fadeRect.MouseFilter = Control.MouseFilterEnum.Ignore;
             fadeRect.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-            topoLevelContainer.AddChild(fadeRect);
-            topoLevelContainer.MoveChild(fadeRect, -1);  //move to top so the effect is seen
+            parent.AddChild(fadeRect);
+            parent.MoveChild(fadeRect, -1);  //move to top so the effect is seen
         }
 
         public void FadeIn(Action onFadeInFinished = null)
@@ -33,14 +33,20 @@ namespace UIHelpers
             tween.Finished += () =>
             {
                 OnFadeInFinished();
-                onFadeInFinished?.Invoke();
+                onFadeInFinished?.Invoke(); //notice this is invoking an external action from the caller script
+                CleanUp();
             };
         }
 
         private void OnFadeInFinished()
         {
             GD.Print("Fade in complete (now transparent)");
-            fadeRect.Visible = false;
+         
+        }
+
+        private void CleanUp() {
+            fadeRect.QueueFree();
+            QueueFree();
         }
     }
 }

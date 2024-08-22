@@ -8,7 +8,6 @@ public partial class InputNameScreen : Control {
     private LineEdit nameInput;
     private ConfirmationDialog confirmationDialog;
     private string username;
-    private ColorRect fadeRect;
     private RichTextLabel richTextLabel;
     private MarginContainer marginContainer;
     private bool isNameConfirmed = false;
@@ -55,33 +54,39 @@ public partial class InputNameScreen : Control {
 
         ListenForNameConfirmation();
         SetupConfirmationDialogTheme();
-        SetupFadeEffects();
 
         this.Visible = false;
-    }
-
-    public void SetupFadeEffects() {
-        fadeIn = new UIFadeIn(this);
-        fadeOut = new UIFadeOut(this);
-        fadeIn.FadeDuration = FadeDuration;
-        fadeOut.FadeDuration = FadeDuration;
     }
 
     public void Show() {
         base.Show();
         ResetNameInputScreen();
         CallDeferred(nameof(SetInitialFocus));
+        FadeIn();
+    }
+
+    private void FadeIn() {
+        fadeIn = new UIFadeIn(this);
+        fadeIn.FadeDuration = FadeDuration;
         fadeIn.FadeIn();
+    }
+
+    private void FadeOut() {
+        fadeOut = new UIFadeOut(this);
+        fadeOut.FadeDuration = FadeDuration;
+        fadeOut.FadeOut(OnFadeOutFinished);
     }
 
     private void ResetNameInputScreen() {
         isNameConfirmed = false;
         //process again
-        confirmationDialog.ProcessMode = Node.ProcessModeEnum.Inherit;
+        //confirmationDialog.ProcessMode = Node.ProcessModeEnum.Inherit;
         UIInputHelper.EnableParentChildrenInput(this);
         nameInput.Text = "";
         nameInput.Editable = true;
         nameInput.FocusMode = Control.FocusModeEnum.All;
+        confirmationDialog.ProcessMode = Node.ProcessModeEnum.Inherit;
+        nameInput.ProcessMode = confirmationDialog.ProcessMode = Node.ProcessModeEnum.Inherit;
     }
 
     private void SetInitialFocus() {
@@ -106,6 +111,7 @@ public partial class InputNameScreen : Control {
             GetViewport().SetInputAsHandled();
         }
     }
+
 
     public override void _UnhandledKeyInput(InputEvent @event) {
         if (isNameConfirmed) return;
@@ -154,8 +160,9 @@ public partial class InputNameScreen : Control {
         UIInputHelper.DisableParentChildrenInput(this);
         // Hide the confirmation dialog
         confirmationDialog.Visible = false;
-        fadeOut.FadeOut(OnFadeOutFinished);
+        FadeOut();
     }
+
 
     private void OnCancelConfirmation() {
         confirmationDialog.Visible = false; // Hide the dialog when cancelled

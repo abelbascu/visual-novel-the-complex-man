@@ -8,19 +8,19 @@ namespace UIHelpers
         private ColorRect fadeRect;
         public float FadeDuration { get; set; } = 0.5f;
 
-        public UIFadeOut(Node topLevelContainer)
+        public UIFadeOut(Node parent)
         {
-            SetupFadeEffect(topLevelContainer);
+            SetupFadeEffect(parent);
         }
 
-        private void SetupFadeEffect(Node topLevelContainer)
+        private void SetupFadeEffect(Node parent)
         {
             fadeRect = new ColorRect();
             fadeRect.Color = new Color(0, 0, 0, 0); // Start fully transparent
             fadeRect.MouseFilter = Control.MouseFilterEnum.Ignore;
             fadeRect.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-            topLevelContainer.AddChild(fadeRect);
-            topLevelContainer.MoveChild(fadeRect, -1); //move to top so the effect is seen
+            parent.AddChild(fadeRect);
+            parent.MoveChild(fadeRect, -1); //move to top so the effect is seen
         }
 
         public void FadeOut(Action onFadeOutFinished = null)
@@ -34,7 +34,13 @@ namespace UIHelpers
             {
                 OnFadeOutFinished();
                 onFadeOutFinished?.Invoke();
+                CleanUp();
             };
+        }
+
+        private void CleanUp() {
+            fadeRect.QueueFree();
+            QueueFree();
         }
 
         private void OnFadeOutFinished()

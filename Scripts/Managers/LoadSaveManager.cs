@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Reflection.Metadata;
 using System.Threading;
+using System.Threading.Tasks;
 using static GameStateMachine;
 
 public partial class LoadSaveManager : Node {
@@ -110,19 +111,9 @@ public partial class LoadSaveManager : Node {
         if (isAutoSave) {
             timeSinceLastAutosave += (float)delta;
             if (timeSinceLastAutosave >= AutosaveInterval) {
-                //GameStateManager.Instance.Fire(Trigger.START_AUTOSAVE_GAME); //LET'S SHOW A MESSAGE TO THE USER THAT WE ARE AUTOSAVING
-                
-                
-                //SHOULD WE MOVE THE BELOW TO GAMEMAMANGER?
-
-                
-                
-                SaveGame(isAutoSave);
+                GameStateManager.Instance.Fire(Trigger.AUTOSAVE_GAME, isAutoSave);
+                //SaveGame(isAutoSave);
                 timeSinceLastAutosave = 0;
-
-
-
-                //AND AFTER IT FIRE TRIGGER AUTOSAVE_COMPLETED AND THEN ENTER_DIALOGUE_MODE
             }
         }
     }
@@ -134,7 +125,7 @@ public partial class LoadSaveManager : Node {
         }
     }
 
-    public void SaveGame(bool isAutosave) {
+    public async Task SaveGame(bool isAutosave) {
         //as soon as the ingame menu is open we have already set autosave to false in MainMenu.DisplayInGameMenu()
         if (isAutosave == false)
             PauseGameTimer();
@@ -144,22 +135,28 @@ public partial class LoadSaveManager : Node {
             gameStartTime = DateTime.Now;
         }
 
+        // Show "Saving" message for manual saves
+        if (!isAutosave) {
+           await UIManager.Instance.saveGameScreen.ShowSaveStatusLabel(true);
+        }
+
         var gameState = CreateGameState();
         gameState.IsAutosave = isAutosave;
         string prefix = isAutosave ? AutosavePrefix : "save_";
         string saveFilePath = GetNextFilePath(prefix);
         gameState.SlotNumber = int.Parse(Path.GetFileNameWithoutExtension(saveFilePath).Substring(prefix.Length));
+
         SaveGameState(gameState, saveFilePath);
         UpdatePersistentData(gameState);
-        if (isAutosave) {
-            GD.Print("Autosave completed: " + saveFilePath);
-             //SHOW A MESSAGE TO THE USER THAT THE GAME WAS PROPERLY AUTOSAVED
-        } else
-            GD.Print("Manual save completed: " + saveFilePath); //SHOW A MESSAGE TO THE USER THAT THE GAME WAS PROPERLY AUTOSAVED
 
-        Thread.Sleep(1000); //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT) 
-                            //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)
-                            //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)
+        // Simulate save delay for autosaves
+        if (isAutosave) {
+            await ToSignal(GetTree().CreateTimer(1.5f), "timeout");
+            GD.Print("Autosave completed: " + saveFilePath);
+        } else
+
+            GD.Print($"{(isAutosave ? "Autosave" : "Manual save")} completed: {saveFilePath}");
+        await UIManager.Instance.saveGameScreen.ShowSaveStatusLabel(false);
 
     }
 
@@ -245,7 +242,7 @@ public partial class LoadSaveManager : Node {
     public void LoadGame(string saveFilePath) {
         var gameState = LoadGameState(saveFilePath);
         if (gameState != null) {
-           // GameStateManager.Instance.ENTER_LOADING_SUBSTATE();
+            // GameStateManager.Instance.ENTER_LOADING_SUBSTATE();
             ApplyGameState(gameState);
             Thread.Sleep(1000); //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT) 
             //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)

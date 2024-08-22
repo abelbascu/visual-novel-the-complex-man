@@ -155,10 +155,10 @@ public partial class GameStateManager : Node {
 
 
             {(State.InDialogueMode, SubState.None, State.InDialogueMode, SubState.AutoSaving, Trigger.AUTOSAVE_GAME),
-                () => {}},
+                new Action<bool>(isAutosave => GameManager.Instance.Autosave_Game(isAutosave))},
 
             {(State.InDialogueMode, SubState.AutoSaving, State.InDialogueMode, SubState.AutoSavingCompleted, Trigger.AUTOSAVE_COMPLETED),
-                () => {}},
+                () => GameManager.Instance.NotifyAutosaveCompleted()},
 
             {(State.InDialogueMode, SubState.AutoSavingCompleted, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
                 () => {}},
@@ -218,15 +218,6 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Go_Back_To_Menu()},
 
 
-
-
-
-
-
-
-
-
-
             // Add more transitions as needed
         };
 
@@ -278,117 +269,8 @@ public partial class GameStateManager : Node {
         }
     }
 
-    private void HandleTransitionArguments(State newState, SubState newSubState, object[] arguments) {
-        if (newState == State.InDialogueMode && newSubState == SubState.Loading && arguments.Length > 0) {
-            if (arguments[0] is string filePath) {
-                GameManager.Instance.Load_Game(filePath);
-            }
-        }
-        // Add more argument handling logic as needed
-    }
-
     public bool IsInState(State state) { return stateMachine.IsInState(state); }
     public State CurrentState => stateMachine.CurrentState;
 }
-
-// private void ConfigureTransitions() {
-//   
-//     // MainMenuDisplayed transitions
-//     stateMachine.ConfigureTransition(State.MainMenuDisplayed, Trigger.ENTER_DIALOGUE_MODE, State.InDialogueMode);
-//     stateMachine.ConfigureTransition(State.MainMenuDisplayed, Trigger.START_NEW_GAME, State.StartingNewGame);
-//     stateMachine.ConfigureTransition(State.MainMenuDisplayed, Trigger.INITIALIZE_LOAD_SCREEN, SubState.LoadScreenInitialized);
-//     stateMachine.ConfigureTransition(State.MainMenuDisplayed, Trigger.DISPLAY_CREDITS, SubState.CreditsDisplayed);
-//     stateMachine.ConfigureTransition(State.MainMenuDisplayed, Trigger.DISPLAY_LANGUAGE_MENU, SubState.LanguageMenuDisplayed);
-//     stateMachine.ConfigureTransition(State.MainMenuDisplayed, Trigger.EXIT_GAME, State.ExitingGame);
-
-//     //WE NEED TO ADD SETTINGS SCREEN
-
-//     //In Dialogue Mode transitions
-//     stateMachine.ConfigureTransition(State.InDialogueMode, Trigger.START_AUTOSAVE_GAME, SubState.AutoSaving);
-//     stateMachine.ConfigureTransition(State.InDialogueMode, Trigger.DISPLAY_ENDING_SCREEN, State.EndingScreenDisplayed);
-
-//     // Autosaving transitions
-//     stateMachine.ConfigureTransition(SubState.AutoSaving, Trigger.RESUME_GAME_FROM_AUTOSAVE, State.InDialogueMode);
-
-//     // InGameMenuDisplayed transitions
-//     //stateMachine.ConfigureTransition(State.InGameMenuDisplayed, Trigger.RESUME_GAME, State.InDialogueMode);
-//     stateMachine.ConfigureTransition(State.InGameMenuDisplayed, Trigger.INITIALIZE_SAVE_SCREEN, SubState.SaveScreenInitialized);
-//     stateMachine.ConfigureTransition(State.InGameMenuDisplayed, Trigger.INITIALIZE_LOAD_SCREEN, SubState.LoadScreenInitialized);
-//     stateMachine.ConfigureTransition(State.InGameMenuDisplayed, Trigger.EXIT_TO_MAIN_MENU, State.MainMenuDisplayed);
-//     stateMachine.ConfigureTransition(State.InGameMenuDisplayed, Trigger.DISPLAY_LANGUAGE_MENU, SubState.LanguageMenuDisplayed);
-//     //WE NEED TO ADD SETTINGS SCREEN
-
-
-//     // SaveScreen transitions
-//     stateMachine.ConfigureTransition(State.InGameMenuDisplayed, SubState.SaveScreenInitialized, Trigger.DISPLAY_SAVE_SCREEN, SubState.SaveScreenDisplayed);
-//     stateMachine.ConfigureTransition(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, Trigger.SAVE_GAME, SubState.Saving);
-//     stateMachine.ConfigureTransition(State.InGameMenuDisplayed, SubState.Saving, Trigger.SAVING_COMPLETED, SubState.SavingCompleted);
-//     stateMachine.ConfigureTransition(State.InGameMenuDisplayed, SubState.SavingCompleted, Trigger.DISPLAY_SAVE_SCREEN, SubState.SaveScreenDisplayed);
-//     stateMachine.ConfigureTransition(SubState.SaveScreenDisplayed, Trigger.GO_BACK_TO_MENU, State.InGameMenuDisplayed);
-
-//     // LoadScreenDisplayed transitions
-//     stateMachine.ConfigureTransition(State.InGameMenuDisplayed, SubState.LoadScreenInitialized, Trigger.DISPLAY_LOAD_SCREEN, SubState.LoadScreenDisplayed);
-//     stateMachine.ConfigureTransition(State.MainMenuDisplayed, SubState.LoadScreenInitialized, Trigger.DISPLAY_LOAD_SCREEN, SubState.LoadScreenDisplayed);
-
-//     stateMachine.ConfigureTransition(State.InGameMenuDisplayed, SubState.LoadScreenDisplayed, Trigger.LOAD_GAME, SubState.Loading);
-//     stateMachine.ConfigureTransition(State.MainMenuDisplayed, SubState.LoadScreenDisplayed, Trigger.LOAD_GAME, SubState.Loading);
-//     //stateMachine.ConfigureTransition(State.MainMenuDisplayed, SubState.LoadScreenDisplayed, Trigger.ENTER_LOADING_SUBSTATE, SubState.Loading);
-//     stateMachine.ConfigureTransition(State.InGameMenuDisplayed, SubState.Loading, Trigger.ENTER_DIALOGUE_MODE, State.InDialogueMode);
-//     stateMachine.ConfigureTransition(State.MainMenuDisplayed, SubState.Loading, Trigger.ENTER_DIALOGUE_MODE, State.InDialogueMode);
-//     // stateMachine.ConfigureTransition(State.MainMenuDisplayed, SubState.Loading, Trigger.START_NEW_GAME, State.StartingNewGame);
-
-//     stateMachine.ConfigureTransition(SubState.LoadScreenDisplayed, Trigger.GO_BACK_TO_MENU, State.MainMenuDisplayed);
-//     stateMachine.ConfigureTransition(SubState.LoadScreenDisplayed, Trigger.GO_BACK_TO_MENU, State.InGameMenuDisplayed);
-
-//     // Loading transitions
-//     //stateMachine.ConfigureTransition(State.MainMenuDisplayed, SubState.Loading, Trigger.START_NEW_GAME, State.SettinUpNewGame);
-
-
-//     // Saving transitions
-//     //stateMachine.ConfigureTransition(State.InGameMenuDisplayed, SubState.Saving, Trigger.BACK_TO_SAVE_SCREEN_FROM_SAVE_COMPLETED, SubState.SaveScreenDisplayed);
-//     // Credits transitions
-//     stateMachine.ConfigureTransition(SubState.CreditsDisplayed, Trigger.HIDE_CREDITS, State.MainMenuDisplayed);
-
-//     // LanguageSelection transitions
-//     //stateMachine.ConfigureTransition(SubState.LanguageSelectionDisplayed, Trigger.ChangeLanguage, State.LanguageChanged); //SHOULD WE HAVE A 'LanguageChanged' state?
-//     stateMachine.ConfigureTransition(SubState.LanguageMenuDisplayed, Trigger.GO_BACK_TO_MENU, State.MainMenuDisplayed);
-//     stateMachine.ConfigureTransition(SubState.LanguageMenuDisplayed, Trigger.GO_BACK_TO_MENU, State.InGameMenuDisplayed);
-// }
-
-//You can add methods for other actions that need multiple arguments 
-//EXAMPLE: public void SOME_OTHER_ACTION(string arg1, int arg2, bool arg3) {stateMachine.Fire(Trigger.SOME_OTHER_TRIGGER, arg1, arg2, arg3);}
-
-//    private void Fire(Trigger trigger, params object[] arguments) {
-//         stateMachine.Fire(trigger, arguments);
-//     }
-
-
-// public enum Trigger {
-//     DISPLAY_SPLASH_SCREEN  - DONE
-//     DISPLAY_MAIN_MENU,     - DONE
-//     DISPLAY_INGAME_MENU,   - DONE
-//     START_NEW_GAME,        - DONE
-//     DISPLAY_ENTER_YOUR_NAME_SCREEN,  -DONE
-//     DISPLAY_NEW_GAME_DIALOGUES       -DONE
-//     ENTER_DIALOGUE_MODE              -DONE
-//     DISPLAY_LOAD_SCREEN,             -DONE
-//     LOAD_GAME,                       -DONE                   
-//     ENTER_LOADING_SUBSTATE,          -DONE
-//     DISPLAY_SAVE_SCREEN,             -DONE            
-//     SAVE_GAME,                       -DONE
-//     BACK_TO_SAVE_SCREEN_FROM_SAVE_COMPLETED, //NOT IMPLEMENTED, WE DON'T NEED IT 
-//     START_AUTOSAVE_GAME,             -DONE
-//     RESUME_GAME_FROM_AUTOSAVE,                                                       //NOT IMPLEMENTED, WE DON'T NEED IT , JUST USING ENTER_DIALOGUE_MODE()
-//     RESUME_GAME,                                                                     //NOT IMPLEMENTED, WE DON'T NEED IT , JUST USING ENTER_DIALOGUE_MODE()
-//     GO_BACK_TO_MENU, //from any submenu inside main OR ingame menu
-//     EXIT_TO_MAIN_MENU, //froM the confirmation popup in INGAME MENU. We must warn user he can lose progress
-//     DISPLAY_CREDITS,
-//     HIDE_CREDITS,
-//     DISPLAY_LANGUAGE_MENU, //ShowLanguageSelection,
-//     DISPLAY_ENDING_SCREEN, //It can be a lost game, a victory, partial victory, neutral ending, etc.
-//     EXIT_GAME
-// }
-
-
 
 

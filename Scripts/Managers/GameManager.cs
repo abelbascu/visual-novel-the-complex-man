@@ -186,8 +186,7 @@ public partial class GameManager : Control {
 
     public void Save_Game(bool isAutosave) {
         LoadSaveManager.Instance.SaveGame(isAutosave);
-        UIManager.Instance.saveGameScreen.RefreshSaveSlots();
-        GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED);
+        GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED); //should i put them in loadsavemanager?
         GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
 
@@ -210,12 +209,15 @@ public partial class GameManager : Control {
     }
 
 
-
-
-
     public void Autosave_Game(bool isAutoSave) {
         Save_Game(isAutoSave);
+        GameStateManager.Instance.Fire(Trigger.AUTOSAVE_COMPLETED);
         GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+    }
+
+    public void NotifyAutosaveCompleted()
+    {
+        //SHOW A MESSAGE AT THE BOTTOM RIGHT THAT THE AUTOSAVE WAS COMPLETED
     }
 
 

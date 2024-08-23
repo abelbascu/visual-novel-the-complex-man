@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 public partial class UITextTweenFadeOut : Node
 {
-    public async Task FadeOut(Control control, float duration = 2.5f)
+    public async Task FadeOut(Control control, float duration = 1.2f)
     {
         var tween = control.CreateTween();
         tween.TweenProperty(control, "modulate:a", 0.0f, duration);

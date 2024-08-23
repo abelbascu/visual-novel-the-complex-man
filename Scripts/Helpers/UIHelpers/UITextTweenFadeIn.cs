@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 public partial class UITextTweenFadeIn : Node
 {
-    public async Task FadeIn(Control control, float duration = 2.5f)
+    public async Task FadeIn(Control control, float duration = 1.8f)
     {
         control.Modulate = new Color(control.Modulate, 0);
         control.Visible = true;

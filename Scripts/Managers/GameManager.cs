@@ -183,9 +183,7 @@ public partial class GameManager : Control {
     }
 
     public void Save_Game(bool isAutosave) {
-        LoadSaveManager.Instance.SaveGame(isAutosave);
-        //should i put them in loadsavemanager?
-        
+        LoadSaveManager.Instance.SaveGame(isAutosave);    
     }
 
 

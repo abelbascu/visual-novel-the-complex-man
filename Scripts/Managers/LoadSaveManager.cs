@@ -18,7 +18,7 @@ public partial class LoadSaveManager : Node {
     private const string SaveDirectory = "saves";
     private const string PersistentDataFile = "persistent_data.dat";
     private const string AutosavePrefix = "autosave_";
-    private const int AutosaveInterval = 300; // 5 minutes in seconds
+    private const int AutosaveInterval = 6; // 5 minutes in seconds
     private float timeSinceLastAutosave = 0;
     private float totalTimeElapsedSinceGameStart;
     // private const bool AUTOSAVE_ENABLED = true;
@@ -176,7 +176,7 @@ public partial class LoadSaveManager : Node {
         await fadeOut.FadeOut(autosaveLabel);
 
         if (!isSaving)
-            await fadeOut.FadeOut(autosaveLabel);
+            await fadeOut.FadeOut(autosaveLabel); /// where is the fade in first for AUTOSAVE COMPLETED TEXT???
     }
 
     private void UpdateAutosaveLabel(string text) {
@@ -186,17 +186,22 @@ public partial class LoadSaveManager : Node {
 
     public async Task SaveGame(bool isAutosave) {
 
+        //-------------BEFORE SAVEING THE GAME, SHOW THE 'SAVING' TEXT TO THE USER----------------------
+        
         // Show "Saving" message for manual saves
         //as soon as the ingame menu is open we have already set autosave to false in MainMenu.DisplayInGameMenu()
         if (isAutosave) {
             totalPlayTime += DateTime.Now - gameStartTime;
             gameStartTime = DateTime.Now;
             await ShowAutosaveStatusLabel(CURRENTLY_AUTOSAVING_CONST);
+        //is is manual save
         } else {
             PauseGameTimer();
             //contrary to autosave, we trigger the manual save Fire.Trigger when save button is pressed, no need to call it here
             await UIManager.Instance.saveGameScreen.ShowSaveStatusLabel(CURRENTLY_SAVING_CONST);
         }
+
+        //--------------------------------DO THE ACTUAL SAVING HERE-------------------------------------
 
         var gameState = CreateGameState();
         gameState.IsAutosave = isAutosave;
@@ -209,11 +214,15 @@ public partial class LoadSaveManager : Node {
 
         GD.Print($"{(isAutosave ? "Autosave" : "Manual save")} completed: {saveFilePath}");
 
+        //-----------TELL THE USER THE SAVE WAS COMPLETE AND TRIGGER GAME STATE CHANGES--------------------------
+
         if (isAutosave) {
             await ShowAutosaveStatusLabel(AUTOSAVING_COMPLETED_CONST);
             //timeSinceLastAutosave = 0;
         } else {
             await UIManager.Instance.saveGameScreen.ShowSaveStatusLabel(SAVING_COMPLETED_CONST);
+            GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED);
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
         }
     }
 

@@ -16,76 +16,17 @@ public partial class SaveGameScreen : MarginContainer {
     private string noSavesTRANSLATE = "NO_SAVES_AVAILABLE";
     private const bool AUTODSAVE_DISABLED_CONST = false;
     private const bool AUTOSAVE_ENABLED_CONST = true;
-    private SaveGameSlot saveGameButton; //this is added at compile time, we get it in AddSaveOrLoadSlot method
+    private SaveGameSlot saveGameSlot; //this is added at compile time, we get it in AddSaveOrLoadSlot method
     private const int NOTIFY_SAVE_STATUS_LABEL_FONT_SIZE = 40;
-
-
-    public async Task ShowSaveStatusLabel(bool isBeingSaved = false) {
-        DisableUserInput();
-
-        SaveStatusLabel.Visible = true;
-        
-        // Use CallDeferred to ensure the label is updated in the next frame
-        CallDeferred(nameof(UpdateSaveStatusLabel), isBeingSaved ? "SAVING THE GAME, PLEASE WAIT..." : "GAME WAS SAVED SUCCESSFULLY");
-
-        // Wait for the next frame to ensure the label has been updated
-        await ToSignal(GetTree(), "process_frame");
-
-
-        // await fadeIn.FadeIn(autosaveLabelContainer);
-
-        var displayTimer = GetTree().CreateTimer(1.5f);
-
-        if (isBeingSaved) {
-            await ToSignal(displayTimer, "timeout");
-        } else {
-            await ToSignal(displayTimer, "timeout"); 
-            RefreshSaveSlots();
-            HideSaveStatusLabel(); //let's block user input until saving is complete   
-        }
-        
-    }
-
-    private void UpdateSaveStatusLabel(string text) {
-        SaveStatusLabel.Text = text;
-    }
-
-    public void HideSaveStatusLabel() {
-        EnableUserInput();
-        SaveStatusLabel.Visible = false;
-    }
-
-    private void DisableUserInput() {
-        goBackButton.ProcessMode = Node.ProcessModeEnum.Disabled;
-        saveGameButton.ProcessMode = Node.ProcessModeEnum.Disabled;
-    }
-
-    private void EnableUserInput() {
-        goBackButton.ProcessMode = Node.ProcessModeEnum.Inherit;
-        saveGameButton.ProcessMode = Node.ProcessModeEnum.Inherit;
-    }
-
-    private void SaveStatusLabelTheme() {
-        var normalStyle = new StyleBoxFlat {
-            BgColor = Colors.NavyBlue,
-            CornerRadiusTopLeft = 10,
-            CornerRadiusTopRight = 10,
-            CornerRadiusBottomLeft = 10,
-            CornerRadiusBottomRight = 10,
-            BorderColor = Colors.White,
-            BorderWidthBottom = 2,
-            BorderWidthTop = 2,
-            BorderWidthLeft = 2,
-            BorderWidthRight = 2
-        };
-        //SaveStatusLabel.AddThemeStyleboxOverride("normal", normalStyle);
-        // SaveStatusLabel.AddThemeFontSizeOverride("font_size", NOTIFY_SAVE_STATUS_LABEL_FONT_SIZE);
-    }
-
-
+    private UITextTweenFadeIn fadeIn;
+    private UITextTweenFadeOut fadeOut;
 
 
     public override void _Ready() {
+
+        fadeIn = new UITextTweenFadeIn();
+        fadeOut = new UITextTweenFadeOut();
+
         saveGameSlotScene = GD.Load<PackedScene>("res://Scenes/SaveGameSlot.tscn");
         scrollContainer = GetNode<ScrollContainer>("MarginContainer/ScrollContainer");
         slotsContainer = GetNode<VBoxContainer>("MarginContainer/ScrollContainer/VBoxContainer");
@@ -138,6 +79,73 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.AddThemeStyleboxOverride("hover", hoverStyle);
     }
 
+
+    public async Task ShowSaveStatusLabel(bool isBeingSaved = false) {
+
+        DisableUserInput();
+
+        SaveStatusLabel.Visible = true;
+
+        // Use CallDeferred to ensure the label is updated in the next frame
+        CallDeferred(nameof(UpdateSaveStatusLabel), isBeingSaved ? "SAVING THE GAME, PLEASE WAIT..." : "GAME WAS SAVED SUCCESSFULLY");
+
+        await fadeIn.FadeIn(SaveStatusLabel);
+        await fadeOut.FadeOut(SaveStatusLabel);
+
+        if (!isBeingSaved) {
+            EnableUserInput();  //enable user input until saving is complete 
+            RefreshSaveSlots();
+            HideSaveStatusLabel();
+        }
+    }
+
+    private void UpdateSaveStatusLabel(string text) {
+        SaveStatusLabel.Text = text;
+    }
+
+    public void HideSaveStatusLabel() {
+
+        SaveStatusLabel.Visible = false;
+    }
+
+    private void DisableUserInput() {
+
+        goBackButton.Disabled = true;
+        goBackButton.FocusMode = Control.FocusModeEnum.None;
+        goBackButton.MouseFilter = Control.MouseFilterEnum.Ignore;
+
+        if (saveGameSlot != null) {
+            saveGameSlot.DisableButton();
+        }
+    }
+
+    private void EnableUserInput() {
+
+        goBackButton.Disabled = false;
+        goBackButton.FocusMode = Control.FocusModeEnum.All;
+        goBackButton.MouseFilter = Control.MouseFilterEnum.Stop;
+        goBackButton.ProcessMode = Node.ProcessModeEnum.Inherit;
+
+        if (saveGameSlot != null) {
+            saveGameSlot.EnableButton();
+        }
+    }
+
+    private void SaveStatusLabelTheme() {
+        var normalStyle = new StyleBoxFlat {
+            BgColor = Colors.NavyBlue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
+    }
+
     private void CreateNoSavesAvailableLabel() {
 
         string translatedText = $"[center]{TranslationServer.Translate(noSavesTRANSLATE)}[/center]";
@@ -185,7 +193,6 @@ public partial class SaveGameScreen : MarginContainer {
         Show();
     }
 
-
     private void PopulateSaveOrLoadSlots(bool isLoadScreen) {
         List<LoadSaveManager.GameState> saveGames = LoadSaveManager.Instance.GetSavedGames();
 
@@ -225,18 +232,22 @@ public partial class SaveGameScreen : MarginContainer {
         slotInstance.SaveRequested += OnSaveRequested;
         slotInstance.LoadRequested += OnLoadRequested;
 
-        saveGameButton = slotInstance;
+        saveGameSlot = slotInstance;
     }
 
     private void OnSaveRequested(int slotNumber) {
-
-        GameStateManager.Instance.Fire(Trigger.SAVE_GAME, AUTODSAVE_DISABLED_CONST);
+        //-------------------TRIGGER GAME STATE CHANGE -----------------------------
+        //--------------------------------------------------------------------------
+       
+        if(GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed)) {
+             //DisableUserInput();
+             GameStateManager.Instance.Fire(Trigger.SAVE_GAME, AUTODSAVE_DISABLED_CONST);
+        }
     }
 
     private void OnLoadRequested(string saveFilePath) {
 
         GameStateManager.Instance.Fire(Trigger.LOAD_GAME, saveFilePath);
-        //QueueFree();
         Hide();
     }
 

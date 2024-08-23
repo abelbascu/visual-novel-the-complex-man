@@ -61,6 +61,11 @@ public partial class GameStateManager : Node {
     private void ConfigureStateTransitions() {
         stateTransitions = new Dictionary<(State, SubState, State, SubState, Trigger), Delegate>
         {
+            //--------------------------------------------------------------------------------------------------------------------------------------//  
+            //------------------------------------------------------GLOBAL GAME STATE CHART---------------------------------------------------------// 
+            //--------------------------------------------------------------------------------------------------------------------------------------//   
+
+            //-----FROM GAME INTRO TO DIALOGUE MODE-----//  
           
             //splashscreen > splashscreen
             {(State.None, SubState.None, State.SplashScreenDisplayed, SubState.None, Trigger.DISPLAY_SPLASH_SCREEN),
@@ -153,26 +158,19 @@ public partial class GameStateManager : Node {
             {(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
                 () => GameManager.Instance.Go_Back_To_Menu()},
 
+            //-----AUTOSAVE-----//  
 
+            // dialogue mode => autosaving
             {(State.InDialogueMode, SubState.None, State.InDialogueMode, SubState.AutoSaving, Trigger.AUTOSAVE_GAME),
-                new Action<bool>(isAutosave => GameManager.Instance.Autosave_Game(isAutosave))},
-
+                () =>{}},
+            //autoaaving > autosave complete
             {(State.InDialogueMode, SubState.AutoSaving, State.InDialogueMode, SubState.AutoSavingCompleted, Trigger.AUTOSAVE_COMPLETED),
-                () => GameManager.Instance.NotifyAutosaveCompleted()},
-
+                () => {}},
+            //autosave complete > dialogue mode
             {(State.InDialogueMode, SubState.AutoSavingCompleted, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
                 () => {}},
 
-            
-
-
-            //WE ARE MISSING AUTOSAVE 
-            //WE ARE MISSING AUTOSAVE
-            //WE ARE MISSING AUTOSAVE
-
-             //-----MAIN MENU-----//  
-
-    
+            //-----MAIN MENU-----//  
              
             //main menu > initialize load screen
             {(State.MainMenuDisplayed, SubState.None, State.MainMenuDisplayed, SubState.LoadScreenInitialized, Trigger.INITIALIZE_LOAD_SCREEN),
@@ -215,10 +213,8 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Exit_Game()},
             //exit game confirmation popup > back to ingame menu
             {(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => GameManager.Instance.Go_Back_To_Menu()},
-
-
-            // Add more transitions as needed
+                () => GameManager.Instance.Go_Back_To_Menu()}
+        
         };
 
         // Configure transitions in the state machine

@@ -14,8 +14,8 @@ public partial class SaveGameScreen : MarginContainer {
     private RichTextLabel noSavesLabel;
     private RichTextLabel SaveStatusLabel;
     private string noSavesTRANSLATE = "NO_SAVES_AVAILABLE";
-    private const bool AUTODSAVE_DISABLED = false;
-    private const bool AUTOSAVE_ENABLED = true;
+    private const bool AUTODSAVE_DISABLED_CONST = false;
+    private const bool AUTOSAVE_ENABLED_CONST = true;
     private SaveGameSlot saveGameButton; //this is added at compile time, we get it in AddSaveOrLoadSlot method
     private const int NOTIFY_SAVE_STATUS_LABEL_FONT_SIZE = 40;
 
@@ -227,7 +227,7 @@ public partial class SaveGameScreen : MarginContainer {
 
     private void OnSaveRequested(int slotNumber) {
 
-        GameStateManager.Instance.Fire(Trigger.SAVE_GAME, AUTODSAVE_DISABLED);
+        GameStateManager.Instance.Fire(Trigger.SAVE_GAME, AUTODSAVE_DISABLED_CONST);
     }
 
     private void OnLoadRequested(string saveFilePath) {

@@ -186,8 +186,8 @@ public partial class GameManager : Control {
 
     public void Save_Game(bool isAutosave) {
         LoadSaveManager.Instance.SaveGame(isAutosave);
-        GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED); //should i put them in loadsavemanager?
-        GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
+        //should i put them in loadsavemanager?
+        
     }
 
 

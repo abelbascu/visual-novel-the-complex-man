@@ -182,7 +182,6 @@ public partial class MainMenu : Control {
         exitToMainMenuButton.Hide();
         mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/splash screen the dragon riddle.png");
         mainMenuBackgroundImage.SetAnchorsPreset(LayoutPreset.FullRect);
-        LoadSaveManager.Instance.ToggleAutosave(false);
         UIManager.Instance.inGameMenuButton.Hide();
         UIManager.Instance.menuOverlay.Visible = false; //a mask to avoid clicking on the dialoguebox when menus are open
         MainOptionsContainer.Show();
@@ -198,14 +197,12 @@ public partial class MainMenu : Control {
         exitGameButton.Hide();
         mainMenuBackgroundImage.Texture = null;
         UIManager.Instance.menuOverlay.Visible = true; //put overlay to prevent reading input from other UI elements behind this mask
-        LoadSaveManager.Instance.ToggleAutosave(false);
         Show();
         InGameMenuOpened?.Invoke();
     }
 
     public void CloseInGameMenu() {
         UIManager.Instance.menuOverlay.Visible = false;
-        LoadSaveManager.Instance.ToggleAutosave(true);
         Hide();
     }
 

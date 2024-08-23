@@ -216,7 +216,7 @@ public partial class GameStateManager : Node {
             //exit game confirmation popup > back to ingame menu
             {(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
                 () => GameManager.Instance.Go_Back_To_Menu()}
-        
+
         };
 
         // Configure transitions in the state machine
@@ -267,7 +267,9 @@ public partial class GameStateManager : Node {
         }
     }
 
-    public bool IsInState(State state) { return stateMachine.IsInState(state); }
+    public bool IsInState(State state, SubState substate) {
+        return stateMachine.IsInState(state, substate);
+    }
     public State CurrentState => stateMachine.CurrentState;
 }
 

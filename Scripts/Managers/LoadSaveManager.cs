@@ -18,12 +18,11 @@ public partial class LoadSaveManager : Node {
     private const string SaveDirectory = "saves";
     private const string PersistentDataFile = "persistent_data.dat";
     private const string AutosavePrefix = "autosave_";
-    private const int AutosaveInterval = 8; // 5 minutes in seconds
+    private const int AutosaveInterval = 300; // 5 minutes in seconds
     private float timeSinceLastAutosave = 0;
     private float totalTimeElapsedSinceGameStart;
     // private const bool AUTOSAVE_ENABLED = true;
     // private const bool AUTOSAVE_DISABLED = false;
-    private bool isAutoSave = false;
     private RichTextLabel autosaveLabel;
     public MarginContainer autosaveLabelContainer;
     public const bool AUTOSAVING_COMPLETED_CONST = false;
@@ -32,6 +31,7 @@ public partial class LoadSaveManager : Node {
     public const bool CURRENTLY_SAVING_CONST = true;
     private UITextTweenFadeIn fadeIn;
     private UITextTweenFadeOut fadeOut;
+    private readonly Color paleYellow = new Color(1, 1, 0.8f, 1);
 
     public int DialoguesVisitedID;
 
@@ -98,6 +98,7 @@ public partial class LoadSaveManager : Node {
         autosaveLabelContainer.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft, Control.LayoutPresetMode.KeepSize);
         MoveChild(autosaveLabelContainer, -1);  // Move to top of the hierarchy
 
+        
         // Create and set up the autosave label
         autosaveLabel = new RichTextLabel {
             //CustomMinimumSize = new Vector2(300, 75),
@@ -105,6 +106,7 @@ public partial class LoadSaveManager : Node {
             Visible = true, //we set it to true so fade in/out can operate on the text.
         };
         autosaveLabel.AddThemeFontSizeOverride("normal_font_size", 28);
+         autosaveLabel.AddThemeColorOverride("default_color", paleYellow);
         autosaveLabel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.CenterLeft, Control.LayoutPresetMode.KeepSize);
         autosaveLabelContainer.AddChild(autosaveLabel);
     }
@@ -144,20 +146,26 @@ public partial class LoadSaveManager : Node {
     }
 
     public override async void _Process(double delta) {
-        if (isAutoSave) {
+
+        if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
             timeSinceLastAutosave += (float)delta;
             if (timeSinceLastAutosave >= AutosaveInterval) {
-                SaveGame(isAutoSave);
-                timeSinceLastAutosave = 0;
+                _ = PerformAutosave();
             }
         }
     }
 
-    public void ToggleAutosave(bool isAutosave) {
-        isAutoSave = isAutosave; // I NEED TO REFACTOR THIS LINE I NEED TO REFACTOR THIS LINE I NEED TO REFACTOR THIS LINE I NEED TO REFACTOR THIS LINE
-        if (isAutoSave) {
-            timeSinceLastAutosave = 0; // Reset the timer when enabling
+    private async Task PerformAutosave() {
+
+        if (!GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
+            return; // Don't start autosave if we're not in the correct state
         }
+
+        GameStateManager.Instance.Fire(Trigger.AUTOSAVE_GAME);
+        await SaveGame(true);
+        GameStateManager.Instance.Fire(Trigger.AUTOSAVE_COMPLETED);
+        GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+        timeSinceLastAutosave = 0;
     }
 
     public async Task ShowAutosaveStatusLabel(bool isSaving) {
@@ -183,7 +191,6 @@ public partial class LoadSaveManager : Node {
         if (isAutosave) {
             totalPlayTime += DateTime.Now - gameStartTime;
             gameStartTime = DateTime.Now;
-            GameStateManager.Instance.Fire(Trigger.AUTOSAVE_GAME);
             await ShowAutosaveStatusLabel(CURRENTLY_AUTOSAVING_CONST);
         } else {
             PauseGameTimer();
@@ -204,13 +211,9 @@ public partial class LoadSaveManager : Node {
 
         if (isAutosave) {
             await ShowAutosaveStatusLabel(AUTOSAVING_COMPLETED_CONST);
-            GameStateManager.Instance.Fire(Trigger.AUTOSAVE_COMPLETED);
-            GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
             //timeSinceLastAutosave = 0;
         } else {
             await UIManager.Instance.saveGameScreen.ShowSaveStatusLabel(SAVING_COMPLETED_CONST);
-            GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED);
-            GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
         }
     }
 
@@ -302,7 +305,6 @@ public partial class LoadSaveManager : Node {
                                 //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)
                                 //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)   
         }
-        ToggleAutosave(true);
         GameLoaded.Invoke(); //do not remove, we need it to start game timer.
     }
 

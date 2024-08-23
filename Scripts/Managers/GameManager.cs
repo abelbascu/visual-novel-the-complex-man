@@ -66,7 +66,6 @@ public partial class GameManager : Control {
 
     public void Display_Ingame_Menu() {
         UIManager.mainMenu.DisplayInGameMenu();
-        LoadSaveManager.Instance.ToggleAutosave(false);
     }
 
     public void Close_Ingame_Menu() {
@@ -106,7 +105,6 @@ public partial class GameManager : Control {
         DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject
             (DialogueManager.Instance.currentConversationID, DialogueManager.Instance.currentDialogueID);
         DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
-        LoadSaveManager.Instance.ToggleAutosave(true);
 
         GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
     }
@@ -193,7 +191,6 @@ public partial class GameManager : Control {
 
     public void ResumeGame() {
         UIManager.mainMenu.CloseInGameMenu();
-        LoadSaveManager.Instance.ToggleAutosave(true);
     }
 
     public void Exit_To_Main_Menu() {

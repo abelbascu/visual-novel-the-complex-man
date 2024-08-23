@@ -211,8 +211,8 @@ public partial class GameManager : Control {
 
     public void Autosave_Game(bool isAutoSave) {
         Save_Game(isAutoSave);
-        GameStateManager.Instance.Fire(Trigger.AUTOSAVE_COMPLETED);
-        GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+        //GameStateManager.Instance.Fire(Trigger.AUTOSAVE_COMPLETED);
+       // GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
     }
 
     public void NotifyAutosaveCompleted()

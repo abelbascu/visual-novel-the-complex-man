@@ -23,13 +23,16 @@ public partial class SaveGameScreen : MarginContainer {
     public async Task ShowSaveStatusLabel(bool isBeingSaved = false) {
         DisableUserInput();
 
+        SaveStatusLabel.Visible = true;
+        
         // Use CallDeferred to ensure the label is updated in the next frame
         CallDeferred(nameof(UpdateSaveStatusLabel), isBeingSaved ? "SAVING THE GAME, PLEASE WAIT..." : "GAME WAS SAVED SUCCESSFULLY");
 
         // Wait for the next frame to ensure the label has been updated
         await ToSignal(GetTree(), "process_frame");
 
-        SaveStatusLabel.Visible = true;
+
+        // await fadeIn.FadeIn(autosaveLabelContainer);
 
         var displayTimer = GetTree().CreateTimer(1.5f);
 

@@ -18,18 +18,20 @@ public partial class LoadSaveManager : Node {
     private const string SaveDirectory = "saves";
     private const string PersistentDataFile = "persistent_data.dat";
     private const string AutosavePrefix = "autosave_";
-    private const int AutosaveInterval = 15; // 5 minutes in seconds
+    private const int AutosaveInterval = 8; // 5 minutes in seconds
     private float timeSinceLastAutosave = 0;
     private float totalTimeElapsedSinceGameStart;
     // private const bool AUTOSAVE_ENABLED = true;
     // private const bool AUTOSAVE_DISABLED = false;
-    private bool isAutoSave = true;
+    private bool isAutoSave = false;
     private RichTextLabel autosaveLabel;
     public MarginContainer autosaveLabelContainer;
     public const bool AUTOSAVING_COMPLETED_CONST = false;
     public const bool SAVING_COMPLETED_CONST = false;
     public const bool CURRENTLY_AUTOSAVING_CONST = true;
     public const bool CURRENTLY_SAVING_CONST = true;
+    private UITextTweenFadeIn fadeIn;
+    private UITextTweenFadeOut fadeOut;
 
     public int DialoguesVisitedID;
 
@@ -79,6 +81,11 @@ public partial class LoadSaveManager : Node {
         LoadPersistentData();
         CallDeferred(nameof(SubscribeToEvents));
         CreateAutoSaveStatusLabel();
+
+        fadeIn = new UITextTweenFadeIn();
+        fadeOut = new UITextTweenFadeOut();
+        AddChild(fadeIn);
+        AddChild(fadeOut);
     }
 
     private void CreateAutoSaveStatusLabel() {
@@ -95,7 +102,7 @@ public partial class LoadSaveManager : Node {
         autosaveLabel = new RichTextLabel {
             //CustomMinimumSize = new Vector2(300, 75),
             BbcodeEnabled = true,
-            Visible = false,
+            Visible = true, //we set it to true so fade in/out can operate on the text.
         };
         autosaveLabel.AddThemeFontSizeOverride("normal_font_size", 28);
         autosaveLabel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.CenterLeft, Control.LayoutPresetMode.KeepSize);
@@ -136,7 +143,7 @@ public partial class LoadSaveManager : Node {
         SavePersistentData();
     }
 
-    public override void _Process(double delta) {
+    public override async void _Process(double delta) {
         if (isAutoSave) {
             timeSinceLastAutosave += (float)delta;
             if (timeSinceLastAutosave >= AutosaveInterval) {
@@ -155,17 +162,17 @@ public partial class LoadSaveManager : Node {
 
     public async Task ShowAutosaveStatusLabel(bool isSaving) {
         string message = isSaving ? "AUTOSAVING..." : "AUTOSAVE COMPLETED";
+
         CallDeferred(nameof(UpdateAutosaveLabel), message);
-
-        autosaveLabel.Visible = true;
-
-        await ToSignal(GetTree().CreateTimer(1.5f), "timeout");
+        await fadeIn.FadeIn(autosaveLabel);
+        await fadeOut.FadeOut(autosaveLabel);
 
         if (!isSaving)
-            autosaveLabel.Visible = false;
+            await fadeOut.FadeOut(autosaveLabel);
     }
 
     private void UpdateAutosaveLabel(string text) {
+
         autosaveLabel.Text = $"[center]{text}[/center]";
     }
 
@@ -180,7 +187,7 @@ public partial class LoadSaveManager : Node {
             await ShowAutosaveStatusLabel(CURRENTLY_AUTOSAVING_CONST);
         } else {
             PauseGameTimer();
-            GameStateManager.Instance.Fire(Trigger.SAVE_GAME);
+            //contrary to autosave, we trigger the manual save Fire.Trigger when save button is pressed, no need to call it here
             await UIManager.Instance.saveGameScreen.ShowSaveStatusLabel(CURRENTLY_SAVING_CONST);
         }
 
@@ -199,6 +206,7 @@ public partial class LoadSaveManager : Node {
             await ShowAutosaveStatusLabel(AUTOSAVING_COMPLETED_CONST);
             GameStateManager.Instance.Fire(Trigger.AUTOSAVE_COMPLETED);
             GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+            //timeSinceLastAutosave = 0;
         } else {
             await UIManager.Instance.saveGameScreen.ShowSaveStatusLabel(SAVING_COMPLETED_CONST);
             GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED);

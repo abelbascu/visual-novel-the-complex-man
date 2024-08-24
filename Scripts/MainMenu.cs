@@ -225,6 +225,16 @@ public partial class MainMenu : Control {
         MainMenuClosed?.Invoke();
     }
 
+    public void HideIngameMenuIcon()
+    {
+        UIManager.Instance.inGameMenuButton.Visible = false;
+    }
+
+    public void ShowIngameMenuIcon()
+    {
+         UIManager.Instance.inGameMenuButton.Visible = true;
+    }
+
     private void OnStartNewGameButtonPressed() {
         _ = OnStartNewGameButtonPressedAsync();
     }

@@ -204,10 +204,16 @@ public partial class GameManager : Control {
     }
 
 
-    public void Autosave_Game(bool isAutoSave) {
-        Save_Game(isAutoSave);
+    public void Autosave_Game() {
+        //Save_Game(isAutoSave); This is not needed, as the game executes the autosave automatically every x time.
+        UIManager.Instance.mainMenu.HideIngameMenuIcon();
         //GameStateManager.Instance.Fire(Trigger.AUTOSAVE_COMPLETED);
        // GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+    }
+
+    public void Autosave_Completed()
+    {
+        UIManager.Instance.mainMenu.ShowIngameMenuIcon();
     }
 
     public void NotifyAutosaveCompleted()

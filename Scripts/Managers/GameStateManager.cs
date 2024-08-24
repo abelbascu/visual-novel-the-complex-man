@@ -162,10 +162,10 @@ public partial class GameStateManager : Node {
 
             // dialogue mode => autosaving
             {(State.InDialogueMode, SubState.None, State.InDialogueMode, SubState.AutoSaving, Trigger.AUTOSAVE_GAME),
-                () =>{}},
+                () => GameManager.Instance.Autosave_Game()},
             //autoaaving > autosave complete
             {(State.InDialogueMode, SubState.AutoSaving, State.InDialogueMode, SubState.AutoSavingCompleted, Trigger.AUTOSAVE_COMPLETED),
-                () => {}},
+                () => GameManager.Instance.Autosave_Completed()},
             //autosave complete > dialogue mode
             {(State.InDialogueMode, SubState.AutoSavingCompleted, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
                 () => {}},
@@ -222,7 +222,6 @@ public partial class GameStateManager : Node {
             stateMachine.ConfigureTransition(transition.Item1, transition.Item2, transition.Item3, transition.Item4, transition.Item5);
         }
     }
-
 
     private void OnStateChanged(State previousState, SubState previousSubstate, State newState, SubState newSubState, object[] arguments) {
         var transitionKey = (previousState, previousSubstate, newState, newSubState, stateMachine.LastTrigger);

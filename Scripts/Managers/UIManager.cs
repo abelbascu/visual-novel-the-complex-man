@@ -131,8 +131,8 @@ public partial class UIManager : Control {
         // Ensure the ingame menu and the ingame menu icon are on top of the overlay
         MoveChild(mainMenu, GetChildCount() - 1);
         //for whatever reason i need to put this line last for the ingame menu button to work
-        //if i put it between the menuOverlay and mainMenu lines, it doesn't work.
         MoveChild(inGameMenuButton, GetChildCount() - 1);
+        //if i put it between the menuOverlay and mainMenu lines, it doesn't work.
         MoveChild(saveGameScreen, GetChildCount() - 1);
     }
 

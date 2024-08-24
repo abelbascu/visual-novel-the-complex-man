@@ -201,6 +201,8 @@ public partial class MainMenu : Control {
     }
 
     public void DisplayInGameMenu() {
+        Show();
+        
         saveGameButton.Show();
         continueGameButton.Show();
         exitToMainMenuButton.Show();
@@ -209,9 +211,10 @@ public partial class MainMenu : Control {
         mainMenuBackgroundImage.Texture = null;
         UIManager.Instance.menuOverlay.Visible = true; //put overlay to prevent reading input from other UI elements behind this mask
                                                        // Reset the opacity of the shared content (optionsMenuContainer)
-        MainOptionsContainer.Modulate = new Color(1, 1, 1, 1);  // Full opacity
         MainOptionsContainer.Show();
-        Show();
+        MainOptionsContainer.Modulate = new Color(1, 1, 1, 1);  // Full opacity
+        MainOptionsContainer.TopLevel = true;
+        
         InGameMenuOpened?.Invoke();
     }
 

@@ -47,36 +47,9 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.AnchorBottom = 0;
         goBackButton.AnchorLeft = 1;
         goBackButton.SetAnchorsPreset(Control.LayoutPreset.TopRight);
-        //goBackButton.Position = new Vector2(-10, 10);  
+        //goBackButton.Position = new Vector2(-10, 10); 
 
-        var normalStyle = new StyleBoxFlat {
-            BgColor = Colors.Blue,
-            CornerRadiusTopLeft = 10,
-            CornerRadiusTopRight = 10,
-            CornerRadiusBottomLeft = 10,
-            CornerRadiusBottomRight = 10,
-            BorderColor = Colors.White,
-            BorderWidthBottom = 2,
-            BorderWidthTop = 2,
-            BorderWidthLeft = 2,
-            BorderWidthRight = 2
-        };
-        goBackButton.AddThemeStyleboxOverride("normal", normalStyle);
-
-        var hoverStyle = new StyleBoxFlat {
-            BgColor = Colors.DarkBlue,
-            CornerRadiusTopLeft = 10,
-            CornerRadiusTopRight = 10,
-            CornerRadiusBottomLeft = 10,
-            CornerRadiusBottomRight = 10,
-            BorderColor = Colors.White,
-            BorderWidthBottom = 2,
-            BorderWidthTop = 2,
-            BorderWidthLeft = 2,
-            BorderWidthRight = 2
-        };
-
-        goBackButton.AddThemeStyleboxOverride("hover", hoverStyle);
+        UIThemeHelper.ApplyCustomStyleToButton(goBackButton);
     }
 
 
@@ -240,7 +213,6 @@ public partial class SaveGameScreen : MarginContainer {
         //--------------------------------------------------------------------------
        
         if(GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed)) {
-             //DisableUserInput();
              GameStateManager.Instance.Fire(Trigger.SAVE_GAME, AUTODSAVE_DISABLED_CONST);
         }
     }
@@ -254,7 +226,4 @@ public partial class SaveGameScreen : MarginContainer {
     public void RefreshSaveSlots() {
         PopulateSaveOrLoadSlots(false);
     }
-
-
-
 }

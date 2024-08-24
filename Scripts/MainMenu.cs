@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Diagnostics.SymbolStore;
 using static GameStateMachine;
+using System.Threading.Tasks;
 
 public partial class MainMenu : Control {
 
@@ -35,9 +36,14 @@ public partial class MainMenu : Control {
     public Action InGameMenuOpened;
     public Action MainMenuClosed;
     public Action InGameMenuClosed;
+    private UITextTweenFadeIn fadeIn;
+    private UITextTweenFadeOut fadeOut;
 
 
     public override void _Ready() {
+
+        fadeIn = new UITextTweenFadeIn();
+        fadeOut = new UITextTweenFadeOut();
 
         mainMenuBackgroundImage = GetNode<TextureRect>("BackgroundImage");
 
@@ -123,14 +129,13 @@ public partial class MainMenu : Control {
 
         ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
         ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
-
-        UIManager.Instance.SetupCustomConfirmationDialog(creditsConfirmationDialog);
+        UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
     }
 
     private void ApplyCustomStyleToButtonsInContainer(VBoxContainer container) {
         foreach (var child in container.GetChildren()) {
             if (child is Button button) {
-                UIManager.Instance.ApplyCustomStyleToButton(button);
+                UIThemeHelper.ApplyCustomStyleToButton(button);
             }
         }
     }
@@ -172,9 +177,10 @@ public partial class MainMenu : Control {
         }
     }
 
-    public void DisplayMainMenu() {
+    public async Task DisplayMainMenu() {
+
         UIManager.Instance.HideAllUIElements();
-        MainOptionsContainer.Show();
+        MainOptionsContainer.Hide();
         startNewGameButton.Show();
         exitGameButton.Show();
         saveGameButton.Hide();
@@ -184,9 +190,12 @@ public partial class MainMenu : Control {
         mainMenuBackgroundImage.SetAnchorsPreset(LayoutPreset.FullRect);
         UIManager.Instance.inGameMenuButton.Hide();
         UIManager.Instance.menuOverlay.Visible = false; //a mask to avoid clicking on the dialoguebox when menus are open
-        MainOptionsContainer.Show();
         Show();
+
         MainMenuOpened?.Invoke();
+
+        MainOptionsContainer.Show();
+        await fadeIn.FadeIn(MainOptionsContainer);
     }
 
     public void DisplayInGameMenu() {

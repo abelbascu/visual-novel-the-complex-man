@@ -32,15 +32,15 @@ expand_mode = 1
 [node name="MainOptionsContainer" type="VBoxContainer" parent="."]
 layout_direction = 2
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -224.0
-offset_top = -284.0
-offset_right = 180.0
-offset_bottom = 53.0
+offset_left = -212.0
+offset_top = -162.0
+offset_right = 211.0
+offset_bottom = 437.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -95,11 +95,12 @@ text = "EXIT_TO_MAIN_MENU"
 
 [node name="ExitToMainMenuConfirmationDialog" type="ConfirmationDialog" parent="MainOptionsContainer/ExitToMainMenuButton"]
 title = ""
-position = Vector2i(760, 540)
-size = Vector2i(400, 100)
+position = Vector2i(620, 450)
+size = Vector2i(700, 300)
 always_on_top = true
 ok_button_text = "YES"
 dialog_text = "WANT_QUIT_TO_MAIN_MENU?"
+dialog_autowrap = true
 cancel_button_text = "NO"
 
 [node name="ExitGameButton" type="Button" parent="MainOptionsContainer"]
@@ -134,6 +135,12 @@ offset_bottom = 168.5
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="GoBackButton" type="Button" parent="LanguageOptionsContainer"]
+layout_mode = 2
+theme_override_colors/icon_normal_color = Color(0, 0.854902, 0, 1)
+theme_override_font_sizes/font_size = 40
+text = "GO_BACK"
+
 [node name="EnglishButton" type="Button" parent="LanguageOptionsContainer"]
 layout_mode = 2
 theme_override_colors/icon_normal_color = Color(0, 0.854902, 0, 1)
@@ -157,9 +164,3 @@ auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "UNDEFINED_LANGUAGE1"
-
-[node name="GoBackButton" type="Button" parent="LanguageOptionsContainer"]
-layout_mode = 2
-theme_override_colors/icon_normal_color = Color(0, 0.854902, 0, 1)
-theme_override_font_sizes/font_size = 40
-text = "GO_BACK"

@@ -229,8 +229,11 @@ public static class UIThemeHelper {
         // Ensure the OK button is using the correct style
         confirmationDialog.GetOkButton().AddThemeStyleboxOverride("normal", buttonStyle);
 
-        LeaveOnlyOKButtonInWindow(confirmationDialog);
-
+        if (confirmationDialog.Name == "ExitGameConfirmationDialog" || confirmationDialog.Name == "ExitToMainMenuConfirmationDialog") {
+            //do nothing
+        } else {
+            LeaveOnlyOKButtonInWindow(confirmationDialog);
+        }
     }
 
     private static void LeaveOnlyOKButtonInWindow(Window window) {

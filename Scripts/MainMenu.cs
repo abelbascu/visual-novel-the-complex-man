@@ -130,6 +130,8 @@ public partial class MainMenu : Control {
         ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
         ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
         UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
+        UIThemeHelper.ApplyCustomStyleToWindowDialog(exitGameConfirmationDialog);
+         UIThemeHelper.ApplyCustomStyleToWindowDialog(exitToMainMenuConfirmationDialog);
     }
 
     private void ApplyCustomStyleToButtonsInContainer(VBoxContainer container) {
@@ -206,6 +208,9 @@ public partial class MainMenu : Control {
         exitGameButton.Hide();
         mainMenuBackgroundImage.Texture = null;
         UIManager.Instance.menuOverlay.Visible = true; //put overlay to prevent reading input from other UI elements behind this mask
+                                                       // Reset the opacity of the shared content (optionsMenuContainer)
+        MainOptionsContainer.Modulate = new Color(1, 1, 1, 1);  // Full opacity
+        MainOptionsContainer.Show();
         Show();
         InGameMenuOpened?.Invoke();
     }
@@ -221,7 +226,13 @@ public partial class MainMenu : Control {
     }
 
     private void OnStartNewGameButtonPressed() {
+        _ = OnStartNewGameButtonPressedAsync();
+    }
+
+    private async Task OnStartNewGameButtonPressedAsync() {
+        await fadeOut.FadeOut(this);
         Hide();
+
         GameStateManager.Instance.Fire(Trigger.START_NEW_GAME);
     }
 

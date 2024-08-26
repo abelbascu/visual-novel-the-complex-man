@@ -45,6 +45,10 @@ public partial class MainMenu : Control {
         fadeIn = new UITextTweenFadeIn();
         fadeOut = new UITextTweenFadeOut();
 
+        CallDeferred("DisableInput");
+        CallDeferred("SetInputHandled");
+
+
         mainMenuBackgroundImage = GetNode<TextureRect>("BackgroundImage");
 
         this.Show();
@@ -131,7 +135,7 @@ public partial class MainMenu : Control {
         ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
         UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
         UIThemeHelper.ApplyCustomStyleToWindowDialog(exitGameConfirmationDialog);
-         UIThemeHelper.ApplyCustomStyleToWindowDialog(exitToMainMenuConfirmationDialog);
+        UIThemeHelper.ApplyCustomStyleToWindowDialog(exitToMainMenuConfirmationDialog);
     }
 
     private void ApplyCustomStyleToButtonsInContainer(VBoxContainer container) {
@@ -179,30 +183,62 @@ public partial class MainMenu : Control {
         }
     }
 
+
+    private const float InputDelay = 1.0f; // Adjust this value as needed
+
     public async Task DisplayMainMenu() {
 
+        SetProcessInput(false);
+
+        // Clear any pending input events
+        GetViewport().SetInputAsHandled();
+
         UIManager.Instance.HideAllUIElements();
-        MainOptionsContainer.Hide();
+        //MainOptionsContainer.Hide();
+
+        VisualManager.Instance.RemoveImage();
+        mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/splash screen the dragon riddle.png");
+        mainMenuBackgroundImage.TopLevel = true;
+        mainMenuBackgroundImage.SetAnchorsPreset(LayoutPreset.FullRect);
+
         startNewGameButton.Show();
         exitGameButton.Show();
         saveGameButton.Hide();
         continueGameButton.Hide();
         exitToMainMenuButton.Hide();
-        mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/splash screen the dragon riddle.png");
-        mainMenuBackgroundImage.SetAnchorsPreset(LayoutPreset.FullRect);
         UIManager.Instance.inGameMenuButton.Hide();
         UIManager.Instance.menuOverlay.Visible = false; //a mask to avoid clicking on the dialoguebox when menus are open
+
+        MainOptionsContainer.TopLevel = true;
+        MainOptionsContainer.Show();
         Show();
 
         MainMenuOpened?.Invoke();
 
-        MainOptionsContainer.Show();
-        await fadeIn.FadeIn(MainOptionsContainer);
+        await fadeIn.FadeIn(MainOptionsContainer, 0.6f);
+
+        // Re-enable input processing after a short delay
+        await ToSignal(GetTree().CreateTimer(0.1), "timeout");
+
+        CallDeferred("EnableInput");
     }
 
-    public void DisplayInGameMenu() {
+    private void EnableInput() {
+        SetProcessInput(true);
+    }
+
+    public void DisableInput() {
+        SetProcessInput(false);
+    }
+
+    private void SetInputHandled() {
+        GetViewport().SetInputAsHandled();
+    }
+
+
+    public async Task DisplayInGameMenu() {
+
         Show();
-        
         saveGameButton.Show();
         continueGameButton.Show();
         exitToMainMenuButton.Show();
@@ -213,39 +249,40 @@ public partial class MainMenu : Control {
                                                        // Reset the opacity of the shared content (optionsMenuContainer)
         MainOptionsContainer.Show();
         MainOptionsContainer.Modulate = new Color(1, 1, 1, 1);  // Full opacity
-        MainOptionsContainer.TopLevel = true;
-        
         InGameMenuOpened?.Invoke();
+        MainOptionsContainer.TopLevel = true;
+        await fadeIn.FadeIn(MainOptionsContainer, 0.6f);
+
     }
 
-    public void CloseInGameMenu() {
+    public async Task CloseInGameMenu() {
         UIManager.Instance.menuOverlay.Visible = false;
         Hide();
     }
 
-    public void CloseMainMenu() {
+    public async Task CloseMainMenu() {
+        MainOptionsContainer.TopLevel = false;
+        //mainMenuBackgroundImage.TopLevel = false;
+        await fadeOut.FadeOut(MainOptionsContainer, 1.5f);
         Hide();
         MainMenuClosed?.Invoke();
     }
 
-    public void HideIngameMenuIcon()
-    {
+    public void HideIngameMenuIcon() {
         UIManager.Instance.inGameMenuButton.Visible = false;
     }
 
-    public void ShowIngameMenuIcon()
-    {
-         UIManager.Instance.inGameMenuButton.Visible = true;
+    public void ShowIngameMenuIcon() {
+        UIManager.Instance.inGameMenuButton.Visible = true;
     }
 
     private void OnStartNewGameButtonPressed() {
-        _ = OnStartNewGameButtonPressedAsync();
+        OnStartNewGameButtonPressedAsync();
     }
 
-    private async Task OnStartNewGameButtonPressedAsync() {
-        await fadeOut.FadeOut(this);
-        Hide();
+    private void OnStartNewGameButtonPressedAsync() {
 
+        // Hide();
         GameStateManager.Instance.Fire(Trigger.START_NEW_GAME);
     }
 

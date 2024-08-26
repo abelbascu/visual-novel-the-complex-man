@@ -141,10 +141,6 @@ public partial class UIManager : Control {
         EnsureOverlayOnTop();
     }
 
-    public void DisplayMainMenu() {
-        mainMenu.Show();
-    }
-
     public override void _EnterTree() {
         base._EnterTree();
         if (Instance == null) {

@@ -159,10 +159,18 @@ public partial class SaveGameScreen : MarginContainer {
     }
 
     public void DisplayLoadScreen() {
+        if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+            UIManager.Instance.mainMenu.CloseMainMenu();
+        else
+            UIManager.Instance.mainMenu.CloseInGameMenu();
         Show();
     }
 
     public void DisplaySaveScreen() {
+        if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+            UIManager.Instance.mainMenu.CloseMainMenu();
+        else
+            UIManager.Instance.mainMenu.CloseInGameMenu();
         Show();
     }
 
@@ -211,9 +219,9 @@ public partial class SaveGameScreen : MarginContainer {
     private void OnSaveRequested(int slotNumber) {
         //-------------------TRIGGER GAME STATE CHANGE -----------------------------
         //--------------------------------------------------------------------------
-       
-        if(GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed)) {
-             GameStateManager.Instance.Fire(Trigger.SAVE_GAME, AUTODSAVE_DISABLED_CONST);
+
+        if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed)) {
+            GameStateManager.Instance.Fire(Trigger.SAVE_GAME, AUTODSAVE_DISABLED_CONST);
         }
     }
 

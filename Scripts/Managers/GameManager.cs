@@ -3,6 +3,7 @@ using System;
 using System.Security.Cryptography.X509Certificates;
 using static GameStateMachine;
 using UIHelpers;
+using System.Threading.Tasks;
 
 
 public partial class GameManager : Control {
@@ -53,15 +54,15 @@ public partial class GameManager : Control {
 
     public void Display_Splash_Screen() {
         UIManager.ShowSplashScreen();
-        UIManager.mainMenu.CloseMainMenu();
+       // UIManager.mainMenu.CloseMainMenu();
     }
 
     public void Display_Main_Menu() {
-        //UIManager.HideSplashScreen();
-        UIManager.mainMenu.CloseInGameMenu();
-        //UIManager.Instance.HideAllUIElements();
-        VisualManager.Instance.RemoveImage();
-        UIManager.mainMenu.DisplayMainMenu();
+       UIManager.HideSplashScreen();
+       UIManager.mainMenu.CloseInGameMenu();
+      UIManager.Instance.HideAllUIElements();
+        
+      UIManager.Instance.mainMenu.DisplayMainMenu();
     }
 
     public void Display_Ingame_Menu() {
@@ -77,14 +78,22 @@ public partial class GameManager : Control {
         Close_Ingame_Menu();
     }
 
-    public void Go_Back_To_Menu() {
+    public async Task Go_Back_To_Menu() {
         GetTree().CallGroup("popups", "close_all");
-        UIManager.mainMenu.MainOptionsContainer.Show();
+        if(GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+        {
+            Display_Main_Menu();
+        }
+        else {
+             await UIManager.Instance.mainMenu.DisplayInGameMenu();
+        }
+        // UIManager.Instance.mainMenu.MainOptionsContainer.TopLevel = true;
+        // UIManager.Instance.mainMenu.MainOptionsContainer.Show();
     }
 
-    public void Starting_New_Game() {
+    public async Task Starting_New_Game() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
-        UIManager.Instance.mainMenu.CloseMainMenu();
+        await UIManager.Instance.mainMenu.CloseMainMenu();
         GameStateManager.Instance.Fire(Trigger.DISPLAY_ENTER_YOUR_NAME_SCREEN);
     }
 
@@ -179,6 +188,7 @@ public partial class GameManager : Control {
 
     public void Display_Language_Menu() {
         UIManager.Instance.mainMenu.MainOptionsContainer.Hide();
+        UIManager.Instance.mainMenu.LanguageOptionsContainer.TopLevel = true;
         UIManager.Instance.mainMenu.LanguageOptionsContainer.Show();
     }
 

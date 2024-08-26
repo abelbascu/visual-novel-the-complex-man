@@ -64,7 +64,7 @@ public class GameStateMachine {
         EXIT_TO_MAIN_MENU, //froM the confirmation popup in INGAME MENU. We must warn user he can lose progress
         DISPLAY_CREDITS,
         HIDE_CREDITS,
-        DISPLAY_LANGUAGE_MENU, 
+        DISPLAY_LANGUAGE_MENU,
         DISPLAY_ENDING_SCREEN, //It can be a lost game, a victory, partial victory, neutral ending, etc.
         DISPLAY_EXIT_GAME_MENU_CONFIRMATION_POPUP,
         EXIT_GAME
@@ -139,8 +139,9 @@ public class GameStateMachine {
     }
 
     public bool IsInState(State state, SubState subState = SubState.None) {
-        return currentState == state && currentSubState == subState; ;
+        return currentState == state && currentSubState == subState;
     }
+
 
     public State CurrentState => currentState;
     public SubState CurrentSubState => currentSubState;

@@ -23,6 +23,10 @@ public static class UIInputHelper
         {
             SetWindowInputState(window, isEnableInput);
         }
+        // else  if (parent is Node2D node)
+        // {
+        //     SetNodeInputState(node, isEnableInput);
+        // }
 
         foreach (var child in parent.GetChildren())
         {
@@ -41,4 +45,10 @@ public static class UIInputHelper
         window.GuiDisableInput = !isEnableInput;
         window.Exclusive = !isEnableInput;
     }
+
+    //  private static void SetNodeInputState(Node2D node, bool isEnableInput)
+    // {
+    //     node.MouseFilter = isEnableInput ? node.MouseFilterEnum.Stop : node.MouseFilterEnum.Ignore;
+    //     node.FocusMode = isEnableInput ? node.FocusModeEnum.All : node.FocusModeEnum.None;
+    // }
 }

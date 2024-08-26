@@ -5,6 +5,7 @@ using System.Diagnostics.Metrics;
 using System.Diagnostics.SymbolStore;
 using static GameStateMachine;
 using System.Threading.Tasks;
+using UIHelpers;
 
 public partial class MainMenu : Control {
 
@@ -42,12 +43,10 @@ public partial class MainMenu : Control {
 
     public override void _Ready() {
 
+        DisableInput();
+
         fadeIn = new UITextTweenFadeIn();
         fadeOut = new UITextTweenFadeOut();
-
-        CallDeferred("DisableInput");
-        CallDeferred("SetInputHandled");
-
 
         mainMenuBackgroundImage = GetNode<TextureRect>("BackgroundImage");
 
@@ -188,7 +187,10 @@ public partial class MainMenu : Control {
 
     public async Task DisplayMainMenu() {
 
-        SetProcessInput(false);
+        //we have disabled input with SetProcessInput(false)at  Ready(), doing it here has no effect
+
+        //this works well though, but disables input in all nodes, not the parent one only.
+        //UIInputHelper.DisableParentChildrenInput(this);
 
         // Clear any pending input events
         GetViewport().SetInputAsHandled();
@@ -216,11 +218,10 @@ public partial class MainMenu : Control {
         MainMenuOpened?.Invoke();
 
         await fadeIn.FadeIn(MainOptionsContainer, 0.6f);
+        SetProcessInput(true);
 
-        // Re-enable input processing after a short delay
-        await ToSignal(GetTree().CreateTimer(0.1), "timeout");
-
-        CallDeferred("EnableInput");
+       // UIInputHelper.EnableParentChildrenInput(this);
+        
     }
 
     private void EnableInput() {

@@ -58,7 +58,7 @@ public partial class GameManager : Control {
     }
 
     public void Display_Main_Menu() {
-       UIManager.HideSplashScreen();
+       //UIManager.HideSplashScreen();
        UIManager.mainMenu.CloseInGameMenu();
       UIManager.Instance.HideAllUIElements();
         

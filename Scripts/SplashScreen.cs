@@ -21,21 +21,31 @@ public partial class SplashScreen : Control {
         GetViewport().SetInputAsHandled();
     }
 
+
     public override void _Ready() {
-       // CallDeferred("DisableInput");
+        CallDeferred("DisableInput");
         CallDeferred("SetInputHandled");
         backgroundTexture = GetNode<TextureRect>("TextureRect");
+        backgroundTexture.Modulate = new Color(1, 1, 1, 0); // Start fully transparent
         pressAnyKeyLabel = GetNode<RichTextLabel>("MarginContainer/RichTextLabel");
 
         backgroundTexture.GuiInput += OnBackgroundGuiInput;
         fadeIn = new UITextTweenFadeIn();
         fadeOut = new UITextTweenFadeOut();
+
+        // Use CallDeferred with a lambda to call the async method
+        FadeInScreen();
     }
 
+    public async Task FadeInScreen() {
+        backgroundTexture.Show();
+        await fadeIn.FadeIn(backgroundTexture, 1.5f);
+        SetProcessInput(true);
+    }
 
     public override void _Process(double delta) {
         base._Process(delta);
-        while (!isExecuting) {
+        if (!isExecuting) {
             _ = TaskContinousFadeInout();
         }
     }
@@ -52,7 +62,8 @@ public partial class SplashScreen : Control {
         if (@event.IsActionPressed("action_key")) {
             // Consume the event
             GetViewport().SetInputAsHandled();
-            CallDeferred("TransitionToMainMenu");
+            // CallDeferred("TransitionToMainMenu");
+            TransitionToMainMenu();
         }
     }
 
@@ -64,22 +75,17 @@ public partial class SplashScreen : Control {
         }
     }
 
-    public async void TransitionToMainMenu() {
-        // Disable input processing immediately
+    public void TransitionToMainMenu() {
+
+        // becasue even if we hide the scen it still processes input behind.
         SetProcessInput(false);
 
         pressAnyKeyLabel.Visible = false;
-        ProcessMode = ProcessModeEnum.Disabled;
 
-        //UIManager.Instance.mainMenu.ProcessMode = ProcessModeEnum.Disabled;
-        // Add a small delay to ensure any pending input events are processed
-        //await ToSignal(GetTree().CreateTimer(0.1), "timeout");
         //await fadeOut.FadeOut(backgroundTexture, 1.5f);
-
         GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
 
-        await ToSignal(GetTree().CreateTimer(0.1), "timeout");
-        //UIManager.Instance.mainMenu.ProcessMode = ProcessModeEnum.Inherit;
+        Visible = false;
     }
 
 }

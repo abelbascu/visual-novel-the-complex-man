@@ -34,7 +34,7 @@ public partial class SplashScreen : Control {
         fadeOut = new UITextTweenFadeOut();
 
         // Use CallDeferred with a lambda to call the async method
-        FadeInScreen();
+        _ =FadeInScreen();
     }
 
     public async Task FadeInScreen() {
@@ -42,6 +42,14 @@ public partial class SplashScreen : Control {
         await fadeIn.FadeIn(backgroundTexture, 1.5f);
         SetProcessInput(true);
     }
+
+    public async Task FadeOutScreen()
+{
+    SetProcessInput(false);
+    pressAnyKeyLabel.Visible = false;
+    await fadeOut.FadeOut(backgroundTexture, 0.5f);
+    Visible = false;
+}
 
     public override void _Process(double delta) {
         base._Process(delta);
@@ -81,6 +89,8 @@ public partial class SplashScreen : Control {
         SetProcessInput(false);
 
         pressAnyKeyLabel.Visible = false;
+
+        //await FadeOutScreen();
 
         //await fadeOut.FadeOut(backgroundTexture, 1.5f);
         GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);

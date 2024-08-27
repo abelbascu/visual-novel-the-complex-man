@@ -43,7 +43,7 @@ public partial class MainMenu : Control {
 
     public override void _Ready() {
 
-        DisableInput();
+        CallDeferred("DisableInput");
 
         fadeIn = new UITextTweenFadeIn();
         fadeOut = new UITextTweenFadeOut();
@@ -53,6 +53,10 @@ public partial class MainMenu : Control {
         this.Show();
         //displaying the UI boxes with the options
         MainOptionsContainer = GetNode<VBoxContainer>("MainOptionsContainer");
+
+        MainOptionsContainer.Visible = false;
+
+
         startNewGameButton = GetNode<Button>("MainOptionsContainer/StartNewGameButton");
         saveGameButton = GetNode<Button>("MainOptionsContainer/SaveGameButton"); ;
         continueGameButton = GetNode<Button>("MainOptionsContainer/ContinueButton"); ;
@@ -187,8 +191,7 @@ public partial class MainMenu : Control {
 
     public async Task DisplayMainMenu() {
 
-        //we have disabled input with SetProcessInput(false)at  Ready(), doing it here has no effect
-
+        //we have disabled input with SetProcessInput(false) at Ready(), doing it here has no effect
         //this works well though, but disables input in all nodes, not the parent one only.
         //UIInputHelper.DisableParentChildrenInput(this);
 
@@ -199,7 +202,11 @@ public partial class MainMenu : Control {
         //MainOptionsContainer.Hide();
 
         VisualManager.Instance.RemoveImage();
+        mainMenuBackgroundImage.Show();
+        mainMenuBackgroundImage.Visible = true;
         mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/splash screen the dragon riddle.png");
+        mainMenuBackgroundImage.Modulate = new Color(1, 1, 1, 1);  // This sets it to ffffff (fully opaque)
+
         mainMenuBackgroundImage.TopLevel = true;
         mainMenuBackgroundImage.SetAnchorsPreset(LayoutPreset.FullRect);
 
@@ -217,11 +224,11 @@ public partial class MainMenu : Control {
 
         MainMenuOpened?.Invoke();
 
-        await fadeIn.FadeIn(MainOptionsContainer, 0.6f);
+        await FadeInMainMenu();
+        //ADD FADE OUT FOR THE BACKGROUND IMAGE.
         SetProcessInput(true);
 
-       // UIInputHelper.EnableParentChildrenInput(this);
-        
+        // UIInputHelper.EnableParentChildrenInput(this);
     }
 
     private void EnableInput() {
@@ -256,17 +263,51 @@ public partial class MainMenu : Control {
 
     }
 
+    public async Task FadeInMainMenu() {
+     var fadeIn = new UITextTweenFadeIn();
+    var tasks = new List<Task>();
+
+    // Ensure everything is visible but transparent before starting the fade
+    MainOptionsContainer.Modulate = new Color(1, 1, 1, 0);
+    mainMenuBackgroundImage.Modulate = new Color(1, 1, 1, 0);
+    MainOptionsContainer.Show();
+    mainMenuBackgroundImage.Show();
+
+    tasks.Add(fadeIn.FadeIn(MainOptionsContainer, 0.6f));
+    tasks.Add(fadeIn.FadeIn(mainMenuBackgroundImage, 0.6f));
+
+    await Task.WhenAll(tasks);
+    }
+
+
+    public async Task FadeOutMainMenu() {
+        var fadeOut = new UITextTweenFadeOut();
+        var backgroundFadeOut = new UITextTweenFadeOut();
+
+        Task mainMenuFade = fadeOut.FadeOut(MainOptionsContainer, 1.0f);
+        Task backgroundFade = backgroundFadeOut.FadeOut(mainMenuBackgroundImage, 1.0f);
+
+        await Task.WhenAll(mainMenuFade, backgroundFade);
+        Hide();
+        mainMenuBackgroundImage.Hide();
+    }
+
     public async Task CloseInGameMenu() {
         UIManager.Instance.menuOverlay.Visible = false;
-        Hide();
+        await FadeOutMainMenu();
+        InGameMenuClosed?.Invoke();
     }
 
     public async Task CloseMainMenu() {
         MainOptionsContainer.TopLevel = false;
-        //mainMenuBackgroundImage.TopLevel = false;
-        await fadeOut.FadeOut(MainOptionsContainer, 1.5f);
-        Hide();
+        mainMenuBackgroundImage.TopLevel = false;
+
+        await FadeOutMainMenu();
         MainMenuClosed?.Invoke();
+
+        MainOptionsContainer.TopLevel = false;
+        mainMenuBackgroundImage.TopLevel = true;
+
     }
 
     public void HideIngameMenuIcon() {
@@ -281,9 +322,10 @@ public partial class MainMenu : Control {
         OnStartNewGameButtonPressedAsync();
     }
 
-    private void OnStartNewGameButtonPressedAsync() {
+    private async void OnStartNewGameButtonPressedAsync() {
 
         // Hide();
+        await FadeOutMainMenu();
         GameStateManager.Instance.Fire(Trigger.START_NEW_GAME);
     }
 
@@ -297,9 +339,12 @@ public partial class MainMenu : Control {
     }
 
     private void OnLoadGameButtonPressed() {
-        // LoadGameButtonPressed.Invoke();
+        _ = OnLoadGameButtonPressedAsync();
+    }
+
+    private async Task OnLoadGameButtonPressedAsync() {
+        await FadeOutMainMenu();
         GameStateManager.Instance.Fire(Trigger.INITIALIZE_LOAD_SCREEN);
-        //Hide();
     }
 
     private void OnLanguageButtonPressed() {

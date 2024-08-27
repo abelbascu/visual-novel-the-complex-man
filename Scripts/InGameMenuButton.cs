@@ -5,7 +5,7 @@ using static GameStateMachine;
 public partial class InGameMenuButton : MarginContainer {
 
     TextureButton textureButton;
-    // Called when the node enters the scene tree for the first time.
+    
     public override void _Ready() {
         textureButton = GetNode<TextureButton>("TextureButton");
         textureButton.Pressed += OnTextureButtonPressed;

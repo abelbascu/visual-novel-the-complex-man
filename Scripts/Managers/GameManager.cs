@@ -53,39 +53,38 @@ public partial class GameManager : Control {
     }
 
     public void Display_Splash_Screen() {
-        UIManager.ShowSplashScreen();
-       // UIManager.mainMenu.CloseMainMenu();
+        UIManager.Instance.ShowSplashScreen();
+        // UIManager.mainMenu.CloseMainMenu();
     }
 
-    public void Display_Main_Menu() {
-       //UIManager.HideSplashScreen();
-       UIManager.mainMenu.CloseInGameMenu();
-      UIManager.Instance.HideAllUIElements();
+    public async Task Display_Main_Menu() {
+        //UIManager.HideSplashScreen();
+        if (UIManager.Instance.mainMenu.MainOptionsContainer.Visible == true)
+            await UIManager.Instance.mainMenu.CloseInGameMenu();
         
-      UIManager.Instance.mainMenu.DisplayMainMenu();
+        await UIManager.Instance.mainMenu.DisplayMainMenu();
     }
 
-    public void Display_Ingame_Menu() {
-        UIManager.mainMenu.DisplayInGameMenu();
+    public async Task Display_Ingame_Menu() {
+        await UIManager.Instance.mainMenu.DisplayInGameMenu();
     }
 
-    public void Close_Ingame_Menu() {
-        UIManager.Instance.mainMenu.CloseInGameMenu();
+    public async Task Close_Ingame_Menu() {
+        await UIManager.Instance.mainMenu.CloseInGameMenu();
     }
 
-    public void Resume_To_Dialogue_Mode() {
+    public async Task Resume_To_Dialogue_Mode() {
         //at the moment we can only go back to dialogue mode when we close the ingame menu
-        Close_Ingame_Menu();
+        await Close_Ingame_Menu();
     }
 
     public async Task Go_Back_To_Menu() {
         GetTree().CallGroup("popups", "close_all");
-        if(GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
-        {
-            Display_Main_Menu();
-        }
-        else {
-             await UIManager.Instance.mainMenu.DisplayInGameMenu();
+
+        if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed) {
+             await UIManager.Instance.mainMenu.DisplayMainMenu();
+        } else {
+            await UIManager.Instance.mainMenu.DisplayInGameMenu();
         }
         // UIManager.Instance.mainMenu.MainOptionsContainer.TopLevel = true;
         // UIManager.Instance.mainMenu.MainOptionsContainer.Show();
@@ -100,7 +99,7 @@ public partial class GameManager : Control {
     public void Display_Enter_Your_Name_Screen() {
         UIManager.Instance.inputNameScreen.Show();
         UIManager.Instance.splashScreen.Hide();
-       // UIManager.Instance.inputNameScreen.Show();
+        // UIManager.Instance.inputNameScreen.Show();
     }
 
     public void Display_New_Game_Dialogues() {
@@ -118,17 +117,17 @@ public partial class GameManager : Control {
         GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
     }
 
-    public void Resume_Game_From_Ingame_Menu_Closed() {
-        UIManager.Instance.mainMenu.CloseInGameMenu();
+    public async Task Resume_Game_From_Ingame_Menu_Closed() {
+        await UIManager.Instance.mainMenu.CloseInGameMenu();
     }
 
-    public void Load_Game(string saveFilePath) {
+    public async Task Load_Game(string saveFilePath) {
         UIManager.Instance.HideAllUIElements();
         //WE NEED CHANGE TO THE 'LOADING' STATE WHILE DATA IS BEING LOADED. WE NEED TO IMPLEMENT AN ANIMATED LOADING SYMBOL TO WARN THE USER.
         UIManager.Instance.menuOverlay.Visible = false;
         LoadSaveManager.Instance.LoadGame(saveFilePath);
         if (UIManager.Instance.mainMenu.IsVisibleInTree()) {
-            UIManager.Instance.mainMenu.CloseMainMenu();
+            await UIManager.Instance.mainMenu.CloseMainMenu();
         }
 
         GameStateManager.Instance.Fire(Trigger.COMPLETE_LOADING_BASED_ON_GAME_MODE, GameStateManager.Instance.GetLastGameMode());
@@ -168,21 +167,26 @@ public partial class GameManager : Control {
     }
 
     public void Initialize_Save_Screen() {
-        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.mainMenu.SAVE_SCREEN);
+        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.SAVE_SCREEN);
         GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
 
-    public void Display_Save_Screen() {
-        UIManager.Instance.saveGameScreen.DisplaySaveScreen();
+    public async Task Display_Save_Screen() {
+        await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
     }
 
     public void Initialize_Load_Screen() {
-        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.mainMenu.LOAD_SCREEN);
+        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.LOAD_SCREEN);
         GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
     }
 
-    public void Display_Load_Screen() {
-        UIManager.Instance.saveGameScreen.DisplayLoadScreen();
+    public async Task Display_Load_Screen() {
+        if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+            await UIManager.Instance.mainMenu.CloseMainMenu();
+        else
+            await UIManager.Instance.mainMenu.CloseInGameMenu();
+
+            await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
     }
 
 
@@ -192,21 +196,21 @@ public partial class GameManager : Control {
         UIManager.Instance.mainMenu.LanguageOptionsContainer.Show();
     }
 
-    public void Save_Game(bool isAutosave) {
-        LoadSaveManager.Instance.SaveGame(isAutosave);    
+    public async Task Save_Game(bool isAutosave) {
+        await LoadSaveManager.Instance.SaveGame(isAutosave);
     }
 
 
-    public void ResumeGame() {
-        UIManager.mainMenu.CloseInGameMenu();
+    public async Task ResumeGame() {
+        await UIManager.Instance.mainMenu.CloseInGameMenu();
     }
 
-    public void Exit_To_Main_Menu() {
+    public async Task Exit_To_Main_Menu() {
         // CloseInGameMenu();
         UIManager.Instance.HideAllUIElements();
         VisualManager.Instance.RemoveImage();
         //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN 
-        UIManager.mainMenu.DisplayMainMenu();
+        await UIManager.Instance.mainMenu.DisplayMainMenu();
     }
 
     public void Exit_Game() {
@@ -218,16 +222,14 @@ public partial class GameManager : Control {
         //Save_Game(isAutoSave); This is not needed, as the game executes the autosave automatically every x time.
         UIManager.Instance.mainMenu.HideIngameMenuIcon();
         //GameStateManager.Instance.Fire(Trigger.AUTOSAVE_COMPLETED);
-       // GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+        // GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
     }
 
-    public void Autosave_Completed()
-    {
+    public void Autosave_Completed() {
         UIManager.Instance.mainMenu.ShowIngameMenuIcon();
     }
 
-    public void NotifyAutosaveCompleted()
-    {
+    public void NotifyAutosaveCompleted() {
         //SHOW A MESSAGE AT THE BOTTOM RIGHT THAT THE AUTOSAVE WAS COMPLETED
     }
 

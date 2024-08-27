@@ -155,24 +155,18 @@ public partial class SaveGameScreen : MarginContainer {
 
         // Populate with appropriate slots
         PopulateSaveOrLoadSlots(isLoadScreen);
-
     }
 
-    public void DisplayLoadScreen() {
-        if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
-            UIManager.Instance.mainMenu.CloseMainMenu();
-        else
-            UIManager.Instance.mainMenu.CloseInGameMenu();
+
+    public async Task DisplaySaveScreen() {
+
+        // Ensure the save game screen is fully transparent before showing
+        Modulate = new Color(1, 1, 1, 0);
         Show();
+        var fadeIn = new UITextTweenFadeIn();
+        await fadeIn.FadeIn(this, 1.0f);
     }
 
-    public void DisplaySaveScreen() {
-        if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
-            UIManager.Instance.mainMenu.CloseMainMenu();
-        else
-            UIManager.Instance.mainMenu.CloseInGameMenu();
-        Show();
-    }
 
     private void PopulateSaveOrLoadSlots(bool isLoadScreen) {
         List<LoadSaveManager.GameState> saveGames = LoadSaveManager.Instance.GetSavedGames();

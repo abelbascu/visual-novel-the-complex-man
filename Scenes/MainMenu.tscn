@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://c8t14jwiqekss"]
+[gd_scene load_steps=2 format=3 uid="uid://d38a20qw7dyh0"]
 
 [ext_resource type="Script" path="res://Scripts/MainMenu.cs" id="1_2ygpx"]
 
@@ -9,11 +9,10 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 4
-size_flags_vertical = 8
 script = ExtResource("1_2ygpx")
 
 [node name="CreditsConfirmationDialog" type="ConfirmationDialog" parent="."]
+auto_translate_mode = 1
 title = ""
 initial_position = 2
 size = Vector2i(800, 80)
@@ -94,6 +93,7 @@ theme_override_font_sizes/font_size = 40
 text = "EXIT_TO_MAIN_MENU"
 
 [node name="ExitToMainMenuConfirmationDialog" type="ConfirmationDialog" parent="MainOptionsContainer/ExitToMainMenuButton"]
+auto_translate_mode = 1
 title = ""
 position = Vector2i(620, 450)
 size = Vector2i(700, 300)

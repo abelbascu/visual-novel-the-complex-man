@@ -108,13 +108,7 @@ public partial class SaveGameSlot : HBoxContainer {
     }
 
     public void DisableButton() {
-        //NOT WORKING AT THE MOMENT, SEEMS A GODOT BUG, DO NOT DELETE
-        // actionButton.AddThemeStyleboxOverride("normal", disabledStyle);
-        // actionButton.AddThemeStyleboxOverride("hover", disabledStyle);
-        // actionButton.AddThemeStyleboxOverride("pressed", disabledStyle);
-        // actionButton.AddThemeStyleboxOverride("disabled", disabledStyle);
-        // actionButton.AddThemeStyleboxOverride("disabled_pressed", disabledStyle);
-        // actionButton.AddThemeStyleboxOverride("disabled_hover", disabledStyle);
+        actionButton.MouseFilter = MouseFilterEnum.Stop;
         actionButton.SetProcessMode(Node.ProcessModeEnum.Disabled);
         buttonContainer.SetProcessMode(Node.ProcessModeEnum.Disabled);
         actionButton.FocusMode = Control.FocusModeEnum.None;
@@ -124,6 +118,7 @@ public partial class SaveGameSlot : HBoxContainer {
     }
 
     public void EnableButton() {
+        actionButton.MouseFilter = MouseFilterEnum.Stop;
         actionButton.SetProcessMode(Node.ProcessModeEnum.Inherit);
         actionButton.Disabled = false;
         actionButton.FocusMode = Control.FocusModeEnum.All;

@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using static GameStateMachine;
-using UIHelpers;
+using System.Threading.Tasks;
 
 public partial class InputNameScreen : Control {
     private RichTextLabel questionLabel;
@@ -12,13 +12,10 @@ public partial class InputNameScreen : Control {
     private MarginContainer marginContainer;
     private bool isNameConfirmed = false;
 
-    private UIFadeIn fadeIn;
-    private UIFadeOut fadeOut;
-
     [Export] public float FadeDuration { get; set; } = 0.5f;
 
     private void SetupConfirmationDialogTheme() {
-        confirmationDialog.Confirmed += OnConfirmName;
+        confirmationDialog.Confirmed += () => _ = OnConfirmName();
         confirmationDialog.Canceled += OnCancelConfirmation;
         confirmationDialog.Visible = false; // Ensure the dialog is initially hidden
         // Prevent the dialog from closing itself, we'll handle that
@@ -58,23 +55,15 @@ public partial class InputNameScreen : Control {
         this.Visible = false;
     }
 
-    public void Show() {
+    public async Task Show() {
         base.Show();
         ResetNameInputScreen();
         CallDeferred(nameof(SetInitialFocus));
-        FadeIn();
+        await FadeIn();
     }
 
-    private void FadeIn() {
-        fadeIn = new UIFadeIn(this);
-        fadeIn.FadeDuration = FadeDuration;
-        fadeIn.FadeIn();
-    }
-
-    private void FadeOut() {
-        fadeOut = new UIFadeOut(this);
-        fadeOut.FadeDuration = FadeDuration;
-        fadeOut.FadeOut(OnFadeOutFinished);
+    private async Task FadeIn() {
+        await UIFadeHelper.FadeInControl(this, 1.3f);
     }
 
     private void ResetNameInputScreen() {
@@ -112,7 +101,6 @@ public partial class InputNameScreen : Control {
         }
     }
 
-
     public override void _UnhandledKeyInput(InputEvent @event) {
         if (isNameConfirmed) return;
         if (@event is InputEventKey eventKey && eventKey.Pressed && eventKey.Keycode == Key.Enter) {
@@ -129,7 +117,6 @@ public partial class InputNameScreen : Control {
             }
         }
     }
-
 
     private void OnNameSubmitted(string newText) {
         ShowConfirmationDialog();
@@ -150,8 +137,12 @@ public partial class InputNameScreen : Control {
         }
     }
 
+    private async Task OnConfirmName() {
+        nameInput.Editable = false;
+        nameInput.FocusMode = Control.FocusModeEnum.None;
+        nameInput.ProcessMode = Node.ProcessModeEnum.Disabled;
+        confirmationDialog.ProcessMode = Node.ProcessModeEnum.Disabled;
 
-    private void OnConfirmName() {
         if (isNameConfirmed) return; // Prevent multiple confirmations
         isNameConfirmed = true;
         GD.Print($"Name confirmed: {username}");
@@ -160,18 +151,13 @@ public partial class InputNameScreen : Control {
         UIInputHelper.DisableParentChildrenInput(this);
         // Hide the confirmation dialog
         confirmationDialog.Visible = false;
-        FadeOut();
+        await UIFadeHelper.FadeOutControl(this, 1.3f);
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_NEW_GAME_DIALOGUES);
+        Visible = false;
     }
-
 
     private void OnCancelConfirmation() {
         confirmationDialog.Visible = false; // Hide the dialog when cancelled
         nameInput.GrabFocus();
-    }
-
-    private void OnFadeOutFinished() {
-        GD.Print("Fade out complete (now black)");
-        GameStateManager.Instance.Fire(Trigger.DISPLAY_NEW_GAME_DIALOGUES);
-        Hide();
     }
 }

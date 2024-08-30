@@ -1,7 +1,6 @@
 using Godot;
 using System;
 using static GameStateMachine;
-using UIHelpers;
 using System.Threading.Tasks;
 
 public partial class SplashScreen : Control {
@@ -83,14 +82,14 @@ public partial class SplashScreen : Control {
         }
     }
 
-    public void TransitionToMainMenu() {
+    public async Task TransitionToMainMenu() {
 
         // becasue even if we hide the scen it still processes input behind.
         SetProcessInput(false);
 
         pressAnyKeyLabel.Visible = false;
 
-        //await FadeOutScreen();
+        await UIFadeHelper.FadeOutControl(this, 1.0f);
 
         //await fadeOut.FadeOut(backgroundTexture, 1.5f);
         GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);

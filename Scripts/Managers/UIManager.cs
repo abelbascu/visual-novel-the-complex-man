@@ -1,4 +1,5 @@
 using Godot;
+using System.Threading.Tasks;
 
 public partial class UIManager : Control {
 
@@ -23,8 +24,67 @@ public partial class UIManager : Control {
     public SaveGameScreen saveGameScreen;
     public InputNameScreen inputNameScreen;
     public SplashScreen splashScreen;
+     private Control fadeOverlay;
+
+
+    private void ConnectAllControlsGuiInput(Control parent)
+    {
+        foreach (var node in parent.GetChildren())
+        {
+            if (node is Control control)
+            {
+                control.GuiInput += (InputEvent @event) => OnControlGuiInput(@event, control);
+                ConnectAllControlsGuiInput(control);
+            }
+        }
+    }
+
+    private void OnControlGuiInput(InputEvent @event, Control clickedControl)
+    {
+        if (@event is InputEventMouseButton mouseEvent &&
+            mouseEvent.Pressed &&
+            mouseEvent.ButtonIndex == MouseButton.Left)
+        {
+            HandleClick(clickedControl);
+        }
+    }
+
+    private void HandleClick(Control clickedControl)
+    {
+        GD.Print($"Clicked on: {clickedControl.Name} (Type: {clickedControl.GetType().Name})");
+        // Add your custom click handling logic here
+    }
 
     public override void _Ready() {
+
+          // Connect to the GUI input event of all child controls
+        ConnectAllControlsGuiInput(this);
+
+         fadeOverlay = new Control
+        {
+            Name = "FadeOverlay",
+            MouseFilter = MouseFilterEnum.Ignore,
+            AnchorRight = 1,
+            AnchorBottom = 1
+        };
+        
+        // Add a ColorRect as a child of the fadeOverlay
+        var colorRect = new ColorRect
+        {
+            Color = Colors.Black,
+            MouseFilter = MouseFilterEnum.Ignore,
+            AnchorRight = 1,
+            AnchorBottom = 1
+        };
+        fadeOverlay.AddChild(colorRect);
+         // becasue even if we hide the scen it still processes input behind.
+        
+        
+        AddChild(fadeOverlay);
+        MoveChild(fadeOverlay, -1);  // Move to top (last child)
+        
+        // Initially set the overlay to be transparent
+        fadeOverlay.Modulate = new Color(1, 1, 1, 0);
 
         MouseFilter = MouseFilterEnum.Ignore;
 
@@ -92,6 +152,29 @@ public partial class UIManager : Control {
         menuOverlay.Connect("gui_input", new Callable(this, nameof(OnOverlayGuiInput)));
 
         AddChild(menuOverlay);
+    }
+
+
+    public async Task FadeInScreenOverlay(float duration = 1.2f)
+    {
+        fadeOverlay.Visible = true;
+         fadeOverlay.Modulate = new Color(1, 1, 1, 0);  // Start fully opaque
+        await UIFadeHelper.FadeInControl(fadeOverlay, duration);
+        fadeOverlay.Visible = false;
+    }
+
+    public async Task FadeOutScreenOverlay(float duration = 2.2f)
+    {
+        fadeOverlay.Visible = true;
+         fadeOverlay.Modulate = new Color(1, 1, 1, 1);  // Start fully transparent
+        await UIFadeHelper.FadeOutControl(fadeOverlay, duration);
+        fadeOverlay.Visible = false;
+         // becasue even if we hide the scen it still processes input behind.
+        fadeOverlay.SetProcessInput(false);
+        //colorRect.SetProcessInput(false);
+
+        fadeOverlay.Free();
+
     }
 
     public void ShowSplashScreen() {

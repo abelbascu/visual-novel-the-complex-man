@@ -141,13 +141,13 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Display_Language_Menu()},
             //language menu > go back to ingame menu
             {(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => GameManager.Instance.Go_Back_To_Menu()},
+                () => {}},
             //ingame menu > game credits
              {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.CreditsDisplayed, Trigger.DISPLAY_CREDITS),
                 () => {}},
             //game credits > go back to ingame menu    
              {(State.InGameMenuDisplayed, SubState.CreditsDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => GameManager.Instance.Go_Back_To_Menu()},
+                () => {}},
             //ingame menu > exit to main menu confirmation popup
             {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, Trigger.DISPLAY_EXIT_TO_MAIN_MENU_CONFIRMATION_POPUP),
                 () => {}},
@@ -156,7 +156,7 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Display_Main_Menu()},
             //exit to main menu confirmation popup > back to ingame menu
             {(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => GameManager.Instance.Go_Back_To_Menu()},
+                () => {}},
 
             //-----AUTOSAVE-----//  
 
@@ -198,13 +198,13 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Display_Language_Menu()},
             //language menu > go back to main menu
             {(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed, State.MainMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => GameManager.Instance.Go_Back_To_Menu()},
+                () => {}},
             //main menu > game credits
              {(State.MainMenuDisplayed, SubState.None, State.MainMenuDisplayed, SubState.CreditsDisplayed, Trigger.DISPLAY_CREDITS),
                 () => {}},
             //game credits > go back to main menu    
              {(State.MainMenuDisplayed, SubState.CreditsDisplayed, State.MainMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => GameManager.Instance.Go_Back_To_Menu()},
+                () => {}},
             //main menu > exit game confirmation popup
             {(State.MainMenuDisplayed, SubState.None, State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed, Trigger.DISPLAY_EXIT_GAME_MENU_CONFIRMATION_POPUP),
                 () => {}},
@@ -213,7 +213,7 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Exit_Game()},
             //exit game confirmation popup > back to ingame menu
             {(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => GameManager.Instance.Go_Back_To_Menu()}
+                () => {}}
 
         };
 
@@ -268,6 +268,7 @@ public partial class GameStateManager : Node {
         return stateMachine.IsInState(state, substate);
     }
     public State CurrentState => stateMachine.CurrentState;
+    public SubState CurrentSubstate => stateMachine.CurrentSubState;
 }
 
 

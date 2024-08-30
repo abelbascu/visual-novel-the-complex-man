@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://bauqxmelp0rdi"]
 
 [ext_resource type="Script" path="res://Scripts/Managers/UIManager.cs" id="1_rn3fk"]
-[ext_resource type="PackedScene" uid="uid://c8t14jwiqekss" path="res://Scenes/MainMenu.tscn" id="2_xic3a"]
+[ext_resource type="PackedScene" uid="uid://d38a20qw7dyh0" path="res://Scenes/MainMenu.tscn" id="2_xic3a"]
 [ext_resource type="PackedScene" uid="uid://c77p3prgew061" path="res://Scenes/InGameMenuButton.tscn" id="3_j7bll"]
 [ext_resource type="PackedScene" uid="uid://df8r024e7wb0b" path="res://Scenes/SaveGameScreen.tscn" id="4_ituhu"]
 [ext_resource type="PackedScene" uid="uid://bmtre6kqrxwmu" path="res://Scenes/InputNameScreen.tscn" id="5_6qnj0"]

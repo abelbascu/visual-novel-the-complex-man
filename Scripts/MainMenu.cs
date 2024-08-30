@@ -5,7 +5,6 @@ using System.Diagnostics.Metrics;
 using System.Diagnostics.SymbolStore;
 using static GameStateMachine;
 using System.Threading.Tasks;
-using UIHelpers;
 
 public partial class MainMenu : Control {
 
@@ -30,6 +29,7 @@ public partial class MainMenu : Control {
     Button exitGameButton;
     Button exitToMainMenuButton;
     Button settingsButton;
+    Button languagesGoBackButton;
     public TextureRect mainMenuBackgroundImage;
     public bool LOAD_SCREEN = true;
     public bool SAVE_SCREEN = false;
@@ -73,32 +73,32 @@ public partial class MainMenu : Control {
         creditsConfirmationDialog = GetNode<ConfirmationDialog>("CreditsConfirmationDialog");
 
         //trigger events depending on the option clicked
-        startNewGameButton.Pressed += OnStartNewGameButtonPressed;
-        continueGameButton.Pressed += OnContinueButtonPressed;
-        saveGameButton.Pressed += OnSaveGameButtonPressed;
-        loadGameButton.Pressed += OnLoadGameButtonPressed;
-        languageButton.Pressed += OnLanguageButtonPressed;
-        creditsButton.Pressed += OnCreditsButtonPressed;
-        exitGameButton.Pressed += OnExitGameButtonPressed;
+        startNewGameButton.Pressed += () => _ = OnStartNewGameButtonPressed();
+        continueGameButton.Pressed += () => _ = OnContinueButtonPressed();
+        saveGameButton.Pressed += () => _ = OnSaveGameButtonPressed();
+        loadGameButton.Pressed += () => _ = OnLoadGameButtonPressed();
+        languageButton.Pressed += () => _ = OnLanguageButtonPressed();
+        creditsButton.Pressed += () => _ = OnCreditsButtonPressed();
+        exitGameButton.Pressed += () => _ = OnExitGameButtonPressed();
         exitToMainMenuButton.Pressed += OnExitToMainMenuButtonPressed;
-        exitGameConfirmationDialog.Canceled += OnExitGameCancelButtonPressed;
-        exitGameConfirmationDialog.Confirmed += OnExitGameConfirmButtonPressed;
+        exitGameConfirmationDialog.Canceled += () => _ = OnExitGameCancelButtonPressed();
+        exitGameConfirmationDialog.Confirmed += () => _ = OnExitGameConfirmButtonPressed();
         exitToMainMenuConfirmationDialog.Confirmed += OnExitToMainMenuConfirmButtonPressed;
         exitToMainMenuConfirmationDialog.Canceled += OnExitToMainMenuCancelButtonPressed;
 
-        creditsConfirmationDialog.Canceled += OnCreditsCancelOrConfirmButtonPressed;
-        creditsConfirmationDialog.Confirmed += OnCreditsCancelOrConfirmButtonPressed;
+        creditsConfirmationDialog.Canceled += () => _ = OnCreditsCancelOrConfirmButtonPressed();
+        creditsConfirmationDialog.Confirmed += () => _ = OnCreditsCancelOrConfirmButtonPressed();
 
         LanguageOptionsContainer = GetNode<VBoxContainer>("LanguageOptionsContainer");
         Button englishButton = GetNode<Button>("LanguageOptionsContainer/EnglishButton");
         Button frenchButton = GetNode<Button>("LanguageOptionsContainer/FrenchButton");
         Button catalanButton = GetNode<Button>("LanguageOptionsContainer/CatalanButton");
-        Button goBackButton = GetNode<Button>("LanguageOptionsContainer/GoBackButton");
+        languagesGoBackButton = GetNode<Button>("LanguageOptionsContainer/GoBackButton");
 
         englishButton.Pressed += OnEnglishButtonPressed;
         frenchButton.Pressed += OnFrenchButtonPressed;
         catalanButton.Pressed += OnCatalanButtonPressed;
-        goBackButton.Pressed += OnGoBackButtonPressed;
+        languagesGoBackButton.Pressed += () => _ = OnLanguagesGoBackButtonPressed();
 
         AnchorRight = 1;
         AnchorBottom = 1;
@@ -190,7 +190,7 @@ public partial class MainMenu : Control {
     private const float InputDelay = 1.0f; // Adjust this value as needed
 
     public async Task DisplayMainMenu() {
-
+        DisableButtonsInput();
         //we have disabled input with SetProcessInput(false) at Ready(), doing it here has no effect
         //this works well though, but disables input in all nodes, not the parent one only.
         //UIInputHelper.DisableParentChildrenInput(this);
@@ -202,8 +202,6 @@ public partial class MainMenu : Control {
         //MainOptionsContainer.Hide();
 
         VisualManager.Instance.RemoveImage();
-        mainMenuBackgroundImage.Show();
-        mainMenuBackgroundImage.Visible = true;
         mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/splash screen the dragon riddle.png");
         mainMenuBackgroundImage.Modulate = new Color(1, 1, 1, 1);  // This sets it to ffffff (fully opaque)
 
@@ -221,15 +219,43 @@ public partial class MainMenu : Control {
         MainOptionsContainer.TopLevel = true;
         MainOptionsContainer.Show();
         Show();
+        mainMenuBackgroundImage.Show();
+        mainMenuBackgroundImage.Visible = true;
 
         MainMenuOpened?.Invoke();
 
         await FadeInMainMenu();
-        //ADD FADE OUT FOR THE BACKGROUND IMAGE.
-        SetProcessInput(true);
 
-        // UIInputHelper.EnableParentChildrenInput(this);
+        EnableButtonsInput();
+
+        SetProcessInput(true);
+        UIInputHelper.EnableParentChildrenInput(MainOptionsContainer);
     }
+
+    public async Task FadeInMainMenu() {
+        await Task.WhenAll(
+            UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f),
+            UIFadeHelper.FadeInControl(mainMenuBackgroundImage, 1.0f));
+    }
+
+    private async Task FadeOutMainMenu() {
+        await Task.WhenAll(
+            UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f),
+            UIFadeHelper.FadeOutControl(mainMenuBackgroundImage, 1.0f));
+        this.Visible = false;
+    }
+
+    private async Task FadeInInGamenMenu() {
+
+        await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);
+    }
+
+    private async Task FadeOutInGameMenu() {
+
+        await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
+    }
+
+
 
     private void EnableInput() {
         SetProcessInput(true);
@@ -244,8 +270,34 @@ public partial class MainMenu : Control {
     }
 
 
-    public async Task DisplayInGameMenu() {
+        private void DisableButtonsInput() {
 
+        DisableButtonInput(loadGameButton); //THIS HERE IS VERY HACKY, OR MAYBE WE NEED TO PUT ALL THE ENABLE BUTTON METHODS HERE
+        DisableButtonInput(saveGameButton);
+        DisableButtonInput(startNewGameButton);
+        DisableButtonInput(startNewGameButton);
+    }
+
+    private void EnableButtonsInput() {
+
+        EnableButtonInput(loadGameButton); //THIS HERE IS VERY HACKY, OR MAYBE WE NEED TO PUT ALL THE ENABLE BUTTON METHODS HERE
+        EnableButtonInput(saveGameButton);
+        EnableButtonInput(startNewGameButton);
+    }
+
+    private void DisableButtonInput(Button button) {
+        button.SetProcessInput(false);
+        button.MouseFilter = MouseFilterEnum.Ignore;
+    }
+
+    private void EnableButtonInput(Button button) {
+        button.SetProcessInput(true);
+        button.MouseFilter = MouseFilterEnum.Stop;
+    }
+
+    public async Task DisplayInGameMenu() {
+        DisableButtonsInput();
+        MainOptionsContainer.SetProcessInput(false);
         Show();
         saveGameButton.Show();
         continueGameButton.Show();
@@ -260,53 +312,38 @@ public partial class MainMenu : Control {
         InGameMenuOpened?.Invoke();
         MainOptionsContainer.TopLevel = true;
         await fadeIn.FadeIn(MainOptionsContainer, 0.6f);
+        MainOptionsContainer.SetProcessInput(true);
 
-    }
+        EnableButtonsInput();
 
-    public async Task FadeInMainMenu() {
-     var fadeIn = new UITextTweenFadeIn();
-    var tasks = new List<Task>();
-
-    // Ensure everything is visible but transparent before starting the fade
-    MainOptionsContainer.Modulate = new Color(1, 1, 1, 0);
-    mainMenuBackgroundImage.Modulate = new Color(1, 1, 1, 0);
-    MainOptionsContainer.Show();
-    mainMenuBackgroundImage.Show();
-
-    tasks.Add(fadeIn.FadeIn(MainOptionsContainer, 0.6f));
-    tasks.Add(fadeIn.FadeIn(mainMenuBackgroundImage, 0.6f));
-
-    await Task.WhenAll(tasks);
-    }
-
-
-    public async Task FadeOutMainMenu() {
-        var fadeOut = new UITextTweenFadeOut();
-        var backgroundFadeOut = new UITextTweenFadeOut();
-
-        Task mainMenuFade = fadeOut.FadeOut(MainOptionsContainer, 1.0f);
-        Task backgroundFade = backgroundFadeOut.FadeOut(mainMenuBackgroundImage, 1.0f);
-
-        await Task.WhenAll(mainMenuFade, backgroundFade);
-        Hide();
-        mainMenuBackgroundImage.Hide();
+        UIInputHelper.EnableParentChildrenInput(MainOptionsContainer);
     }
 
     public async Task CloseInGameMenu() {
+        UIInputHelper.DisableParentChildrenInput(MainOptionsContainer);
+
+        MainOptionsContainer.SetProcessInput(false);
         UIManager.Instance.menuOverlay.Visible = false;
-        await FadeOutMainMenu();
+        MainOptionsContainer.SetProcessInput(false);
+        await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
         InGameMenuClosed?.Invoke();
+        MainOptionsContainer.Visible = false;
     }
 
     public async Task CloseMainMenu() {
-        MainOptionsContainer.TopLevel = false;
-        mainMenuBackgroundImage.TopLevel = false;
 
+        UIInputHelper.DisableParentChildrenInput(MainOptionsContainer);
+
+        // MainOptionsContainer.TopLevel = false;
+        // mainMenuBackgroundImage.TopLevel = false;
+        MainOptionsContainer.SetProcessInput(false);
         await FadeOutMainMenu();
         MainMenuClosed?.Invoke();
+        MainOptionsContainer.Visible = false;
+        mainMenuBackgroundImage.Visible = false;
 
-        MainOptionsContainer.TopLevel = false;
-        mainMenuBackgroundImage.TopLevel = true;
+        // MainOptionsContainer.TopLevel = false;
+        // mainMenuBackgroundImage.TopLevel = true;
 
     }
 
@@ -318,59 +355,82 @@ public partial class MainMenu : Control {
         UIManager.Instance.inGameMenuButton.Visible = true;
     }
 
-    private void OnStartNewGameButtonPressed() {
-        OnStartNewGameButtonPressedAsync();
-    }
 
-    private async void OnStartNewGameButtonPressedAsync() {
-
-        // Hide();
+    private async Task OnStartNewGameButtonPressed() {
+        DisableButtonInput(startNewGameButton);
         await FadeOutMainMenu();
         GameStateManager.Instance.Fire(Trigger.START_NEW_GAME);
     }
 
-    private void OnContinueButtonPressed() {
-        GameStateManager.Instance.ResumeGameMode();
+    private async Task OnContinueButtonPressed() {
+        DisableButtonInput(continueGameButton);
+        await FadeOutInGameMenu();
+        GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+        EnableButtonInput(continueGameButton);
     }
 
-    private void OnSaveGameButtonPressed() {
-        // SaveGameButtonPressed.Invoke();
+    private async Task OnSaveGameButtonPressed() {
+        DisableButtonInput(saveGameButton);
+        await FadeOutInGameMenu();
         GameStateManager.Instance.Fire(Trigger.INITIALIZE_SAVE_SCREEN);
     }
 
-    private void OnLoadGameButtonPressed() {
-        _ = OnLoadGameButtonPressedAsync();
-    }
-
-    private async Task OnLoadGameButtonPressedAsync() {
-        await FadeOutMainMenu();
+    private async Task OnLoadGameButtonPressed() {
+        DisableButtonInput(loadGameButton);
+        // await FadeOutInGameMenu();
         GameStateManager.Instance.Fire(Trigger.INITIALIZE_LOAD_SCREEN);
+
     }
 
-    private void OnLanguageButtonPressed() {
+    private async Task OnLanguageButtonPressed() {
+        DisableButtonInput(languageButton);
+        await FadeOutInGameMenu();
         GameStateManager.Instance.Fire(Trigger.DISPLAY_LANGUAGE_MENU);
+        EnableButtonInput(languageButton);
     }
 
-    private void OnCreditsButtonPressed() {
+    public async Task DisplayLanguageMenu() {
+        LanguageOptionsContainer.Visible = true;
+        LanguageOptionsContainer.TopLevel = true;
+        await UIFadeHelper.FadeInControl(LanguageOptionsContainer);
+    }
+
+    private async Task OnCreditsButtonPressed() {
+        DisableButtonInput(creditsButton);
+        await FadeOutInGameMenu();
         GameStateManager.Instance.Fire(Trigger.DISPLAY_CREDITS);
         creditsConfirmationDialog.Show();
-        MainOptionsContainer.Hide();
+        // MainOptionsContainer.Hide();
+        await UIFadeHelper.FadeInWindow(creditsConfirmationDialog, 0.2f);
+        EnableButtonInput(creditsButton);
     }
 
-    private void OnCreditsCancelOrConfirmButtonPressed() {
+    private async Task OnCreditsCancelOrConfirmButtonPressed() {
+        await UIFadeHelper.FadeOutWindow(creditsConfirmationDialog, 0.2f);
+        await FadeInInGamenMenu();
         GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
 
-    public void OnExitToMainMenuButtonPressed() {
-        ShowExitToMainMenuConfirmationPopup();
+    public async void OnExitToMainMenuButtonPressed() {
+        DisableButtonInput(exitToMainMenuButton);
+        //await FadeOutInGameMenu();
+        await ShowExitToMainMenuConfirmationPopup();
+        EnableButtonInput(exitToMainMenuButton);
     }
 
-    public void ShowExitToMainMenuConfirmationPopup() {
-        MainOptionsContainer.Hide();
-        exitToMainMenuConfirmationDialog.Show();
+    public async Task ShowExitToMainMenuConfirmationPopup() {
+        await FadeOutInGameMenu();
+        //MainOptionsContainer.Hide();
+        await UIFadeHelper.FadeInWindow(exitToMainMenuConfirmationDialog, 0.5f);
+        // exitToMainMenuConfirmationDialog.Show();
         GameStateManager.Instance.Fire(Trigger.DISPLAY_EXIT_TO_MAIN_MENU_CONFIRMATION_POPUP);
     }
-    private void OnExitToMainMenuConfirmButtonPressed() {
+    private async void OnExitToMainMenuConfirmButtonPressed() {
+        await UIFadeHelper.FadeOutWindow(exitToMainMenuConfirmationDialog, 0.5f);
+        //await FadeOutInGameMenu();
+        if (GameStateManager.Instance.CurrentState == State.InDialogueMode)
+            VisualManager.Instance.RemoveImage();
+
         GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
     }
 
@@ -378,22 +438,26 @@ public partial class MainMenu : Control {
         GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
 
-    private void OnExitGameButtonPressed() {
-        ShowExitGameConfirmationPopup();
+    private async Task OnExitGameButtonPressed() {
+        DisableButtonInput(exitGameButton);
+        await ShowExitGameConfirmationPopup();
+        EnableButtonInput(exitGameButton);
     }
 
-    public void ShowExitGameConfirmationPopup() {
-        MainOptionsContainer.Hide();
-        exitGameConfirmationDialog.Show();
+    public async Task ShowExitGameConfirmationPopup() {
+        await FadeOutInGameMenu();
+        await UIFadeHelper.FadeInWindow(exitGameConfirmationDialog, 0.6f);
         GameStateManager.Instance.Fire(Trigger.DISPLAY_EXIT_GAME_MENU_CONFIRMATION_POPUP);
     }
     //triggered by confirmationDialog.Confirmed event
-    private void OnExitGameConfirmButtonPressed() {
+    private async Task OnExitGameConfirmButtonPressed() {
+        await FadeOutMainMenu();
         GameStateManager.Instance.Fire(Trigger.EXIT_GAME);
     }
 
     //triggered by confirmationDialog.Canceled event
-    private void OnExitGameCancelButtonPressed() {
+    private async Task OnExitGameCancelButtonPressed() {
+        await FadeInInGamenMenu();
         // Close the confirmation popup
         GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
@@ -412,8 +476,15 @@ public partial class MainMenu : Control {
         language = "ca";
     }
 
-    private void OnGoBackButtonPressed() {
-        LanguageOptionsContainer.Hide();
+    private async Task OnLanguagesGoBackButtonPressed() {
+        DisableButtonInput(languagesGoBackButton);
+        GetTree().CallGroup("popups", "close_all");
+        if (GameStateManager.Instance.CurrentSubstate == SubState.LanguageMenuDisplayed) {
+            await UIFadeHelper.FadeOutControl(LanguageOptionsContainer, 0.6f);
+            LanguageOptionsContainer.Visible = false;
+        }
+        await FadeInInGamenMenu();
+        EnableButtonInput(languagesGoBackButton);
         GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
 }

@@ -2,7 +2,6 @@ using Godot;
 using System;
 using System.Security.Cryptography.X509Certificates;
 using static GameStateMachine;
-using UIHelpers;
 using System.Threading.Tasks;
 
 
@@ -61,7 +60,7 @@ public partial class GameManager : Control {
         //UIManager.HideSplashScreen();
         if (UIManager.Instance.mainMenu.MainOptionsContainer.Visible == true)
             await UIManager.Instance.mainMenu.CloseInGameMenu();
-        
+
         await UIManager.Instance.mainMenu.DisplayMainMenu();
     }
 
@@ -82,39 +81,41 @@ public partial class GameManager : Control {
         GetTree().CallGroup("popups", "close_all");
 
         if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed) {
-             await UIManager.Instance.mainMenu.DisplayMainMenu();
+            await UIManager.Instance.mainMenu.DisplayMainMenu();
         } else {
             await UIManager.Instance.mainMenu.DisplayInGameMenu();
         }
-        // UIManager.Instance.mainMenu.MainOptionsContainer.TopLevel = true;
-        // UIManager.Instance.mainMenu.MainOptionsContainer.Show();
+        //     UIManager.Instance.mainMenu.MainOptionsContainer.TopLevel = true;
+        //     UIManager.Instance.mainMenu.MainOptionsContainer.Show();
     }
 
     public async Task Starting_New_Game() {
         //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
-        await UIManager.Instance.mainMenu.CloseMainMenu();
         GameStateManager.Instance.Fire(Trigger.DISPLAY_ENTER_YOUR_NAME_SCREEN);
     }
 
-    public void Display_Enter_Your_Name_Screen() {
-        UIManager.Instance.inputNameScreen.Show();
+    public async Task Display_Enter_Your_Name_Screen() {
+        await UIManager.Instance.inputNameScreen.Show();
         UIManager.Instance.splashScreen.Hide();
         // UIManager.Instance.inputNameScreen.Show();
     }
 
-    public void Display_New_Game_Dialogues() {
+    public async Task Display_New_Game_Dialogues() {
 
-        var fadeIn = new UIFadeIn(this);
-        fadeIn.FadeIn();
+        //WE NEED A FADE IN HERE
+        //WE NEED A FADE IN HERE
 
-        UIManager.Instance.inGameMenuButton.Show();
         DialogueManager.Instance.currentDialogueID = DialogueManager.STARTING_DIALOGUE_ID;
         DialogueManager.Instance.currentConversationID = DialogueManager.STARTING_CONVO_ID;
         DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject
             (DialogueManager.Instance.currentConversationID, DialogueManager.Instance.currentDialogueID);
         DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
 
+        await UIManager.Instance.FadeOutScreenOverlay(2.0f);
+
+        //await UIManager.Instance.FadeOut();
         GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+        UIManager.Instance.inGameMenuButton.Show();
     }
 
     public async Task Resume_Game_From_Ingame_Menu_Closed() {
@@ -168,32 +169,28 @@ public partial class GameManager : Control {
 
     public void Initialize_Save_Screen() {
         UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.SAVE_SCREEN);
-        GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
 
     public async Task Display_Save_Screen() {
         await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
     }
 
-    public void Initialize_Load_Screen() {
-        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.LOAD_SCREEN);
-        GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
-    }
-
-    public async Task Display_Load_Screen() {
+    public async Task Initialize_Load_Screen() {
         if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
             await UIManager.Instance.mainMenu.CloseMainMenu();
         else
             await UIManager.Instance.mainMenu.CloseInGameMenu();
+  
+        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.LOAD_SCREEN);    
+    }
 
-            await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
+    public async Task Display_Load_Screen() {
+        await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
     }
 
 
-    public void Display_Language_Menu() {
-        UIManager.Instance.mainMenu.MainOptionsContainer.Hide();
-        UIManager.Instance.mainMenu.LanguageOptionsContainer.TopLevel = true;
-        UIManager.Instance.mainMenu.LanguageOptionsContainer.Show();
+    public async Task Display_Language_Menu() {
+       await UIManager.Instance.mainMenu.DisplayLanguageMenu();
     }
 
     public async Task Save_Game(bool isAutosave) {

@@ -24,6 +24,7 @@ public partial class SaveGameScreen : MarginContainer {
 
     public override void _Ready() {
 
+
         fadeIn = new UITextTweenFadeIn();
         fadeOut = new UITextTweenFadeOut();
 
@@ -40,7 +41,8 @@ public partial class SaveGameScreen : MarginContainer {
         marginContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 
         goBackButton = GetNode<Button>("MarginContainer2/GoBackButton");
-        goBackButton.Pressed += () => OnGoBackButtonPressed();
+        goBackButton.Pressed += () => _ = OnGoBackButtonPressed();
+        goBackButton.SetProcessInput(false);
 
         goBackButton.AnchorTop = 0;
         goBackButton.AnchorRight = 1;
@@ -140,8 +142,14 @@ public partial class SaveGameScreen : MarginContainer {
         slotsContainer.AddChild(noSavesLabel);
     }
 
-    private void OnGoBackButtonPressed() {
+    private async Task OnGoBackButtonPressed() {
+        goBackButton.SetProcessInput(false);
+        goBackButton.MouseFilter = MouseFilterEnum.Ignore;
+        await UIFadeHelper.FadeOutControl(this, 0.6f);
+        goBackButton.SetProcessInput(true);
+        goBackButton.MouseFilter = MouseFilterEnum.Stop;
         Hide();
+
         GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
         //UIManager.Instance.
     }
@@ -155,16 +163,23 @@ public partial class SaveGameScreen : MarginContainer {
 
         // Populate with appropriate slots
         PopulateSaveOrLoadSlots(isLoadScreen);
+
+        if (isLoadScreen)
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
+        else
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
 
 
     public async Task DisplaySaveScreen() {
-
+        goBackButton.SetProcessInput(false); //avoid hitting the ga back button repeatedly
+        goBackButton.MouseFilter = MouseFilterEnum.Ignore;
         // Ensure the save game screen is fully transparent before showing
         Modulate = new Color(1, 1, 1, 0);
         Show();
-        var fadeIn = new UITextTweenFadeIn();
-        await fadeIn.FadeIn(this, 1.0f);
+        await UIFadeHelper.FadeInControl(this, 1.0f);
+        goBackButton.SetProcessInput(true);
+        goBackButton.MouseFilter = MouseFilterEnum.Stop;
     }
 
 

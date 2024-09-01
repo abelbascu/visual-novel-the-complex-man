@@ -158,14 +158,17 @@ public partial class UIManager : Control {
     public async Task FadeInScreenOverlay(float duration = 1.2f)
     {
         fadeOverlay.Visible = true;
+        fadeOverlay.TopLevel = true;
          fadeOverlay.Modulate = new Color(1, 1, 1, 0);  // Start fully opaque
         await UIFadeHelper.FadeInControl(fadeOverlay, duration);
         fadeOverlay.Visible = false;
+        fadeOverlay.TopLevel = false;
     }
 
     public async Task FadeOutScreenOverlay(float duration = 2.2f)
     {
         fadeOverlay.Visible = true;
+        fadeOverlay.TopLevel = true;
          fadeOverlay.Modulate = new Color(1, 1, 1, 1);  // Start fully transparent
         await UIFadeHelper.FadeOutControl(fadeOverlay, duration);
         fadeOverlay.Visible = false;
@@ -173,7 +176,8 @@ public partial class UIManager : Control {
         fadeOverlay.SetProcessInput(false);
         //colorRect.SetProcessInput(false);
 
-        fadeOverlay.Free();
+        fadeOverlay.TopLevel = false;
+        //fadeOverlay.Free();
 
     }
 

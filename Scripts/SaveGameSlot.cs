@@ -23,6 +23,9 @@ public partial class SaveGameSlot : HBoxContainer {
     private string saveFilePath;
     private bool isMouseOver = false;
     private const int ACTION_BUTTON_FONT_SIZE = 30;
+    private string autosavedPrefixLabelTRANSLATE = "AUTOSAVE_PREFIX_TITLE"; // (Autosaved)
+    private string timePlayedLabelTRANSLATE = "TIME_PLAYED"; //Time Played
+    private string dialoguesVisitedLabelTRANSLATE = "DIALOGUES_VISITED"; //Dialogues visited
 
     private StyleBoxFlat disabledStyle = new StyleBoxFlat {
         BgColor = Colors.DarkRed,
@@ -134,11 +137,11 @@ public partial class SaveGameSlot : HBoxContainer {
         // Normalize the path to ensure consistent slash direction
         saveFilePath = Path.GetFullPath(saveFilePath);
 
-        string autosaveLabel = gameState.IsAutosave ? " (Autosaved)" : "";
+        string autosaveLabel = gameState.IsAutosave ? $"{Tr(autosavedPrefixLabelTRANSLATE)}" : "";
         titleLabel.Text = $"Game Save {slotNumber}{autosaveLabel}";
         dateLabel.Text = gameState.SaveTime.ToString("MMM d, yyyy - h:mm:ss tt");
-        timePlayedLabel.Text = $"Time Played: {FormatTimeSpan(gameState.TimePlayed)}";
-        gameCompletedPercentageLabel.Text = $"Dialogues visited: {gameState.DialoguesVisitedForAllGamesPercentage:F1}%";
+        timePlayedLabel.Text = $"{Tr(timePlayedLabelTRANSLATE)}: {FormatTimeSpan(gameState.TimePlayed)}";
+        gameCompletedPercentageLabel.Text = $"{Tr(dialoguesVisitedLabelTRANSLATE)}: {gameState.DialoguesVisitedForAllGamesPercentage:F1}%";
 
         if (gameState.VisualPath != null) {
             Texture2D texture = GD.Load<Texture2D>(gameState.VisualPath);

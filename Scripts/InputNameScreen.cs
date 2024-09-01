@@ -11,6 +11,11 @@ public partial class InputNameScreen : Control {
     private RichTextLabel richTextLabel;
     private MarginContainer marginContainer;
     private bool isNameConfirmed = false;
+    private string inputYourNameTitleTRANSLATE = "INPUT_YOUR_NAME_TITLE"; //You can't enter the tavern without telling your name, traveller...
+    private string inputYourNameCancelButtonText_TRANSLATE = "INPUT_YOUR_NAME_CANCEL_BUTTON_TEXT"; //"No, {0} is not my name!\nLet me change it!"
+    private string inputYourNameOKButtonText_TRANSLATE = "INPUT_YOUR_NAME_OK_BUTTON_TEXT"; //Yes, {0} is my name!.\nLet me enter the tavern!"
+    private string inputYourNameConfirmNameText_TRANSLATE = "INPUT_YOUR_NAME_CONFIRM_NAME"; //[center]Are you sure that {username} is your final name?[/center]\n[center]You won't be able to change it during this current play![/center]"
+
 
     [Export] public float FadeDuration { get; set; } = 0.5f;
 
@@ -39,13 +44,15 @@ public partial class InputNameScreen : Control {
         richTextLabel.AddThemeConstantOverride("margin_bottom", 150);
 
         marginContainer.AddChild(richTextLabel);
+  
     }
+
 
     public override void _Ready() {
 
         marginContainer = GetNode<MarginContainer>("MarginContainer");
         var vBoxContainer = marginContainer.GetNode<VBoxContainer>("MarginContainer1/VBoxContainer");
-        questionLabel = vBoxContainer.GetNode<RichTextLabel>("RichTextLabel");
+        questionLabel = vBoxContainer.GetNode<RichTextLabel>("InputYourNameTitle");
         nameInput = vBoxContainer.GetNode<LineEdit>("LineEdit");
         confirmationDialog = marginContainer.GetNode<ConfirmationDialog>("MarginContainer2/ConfirmationDialog");
 
@@ -53,6 +60,8 @@ public partial class InputNameScreen : Control {
         SetupConfirmationDialogTheme();
 
         this.Visible = false;
+
+        questionLabel.Text  = $"{inputYourNameTitleTRANSLATE}";
     }
 
     public async Task Show() {
@@ -122,13 +131,16 @@ public partial class InputNameScreen : Control {
         ShowConfirmationDialog();
     }
 
+
+
     private void ShowConfirmationDialog() {
         username = nameInput.Text;
         if (!string.IsNullOrWhiteSpace(username)) {
             //confirmationDialog.DialogText = $"Are you sure that '{username}' is your name? It can be a curse or a blessing...";
-            confirmationDialog.CancelButtonText = $"No, {username} is not my name!.\nLet me change it!";
-            confirmationDialog.OkButtonText = $"Yes, {username} is my name!.\nLet me enter the tavern!";
-            richTextLabel.Text = $"[center]Are you sure that {username} is your final name?[/center]\n[center]You won't be able to change it during this current play![/center]";
+            //confirmationDialog.CancelButtonText = $"No, {username} is not my name!.\nLet me change it!";
+            confirmationDialog.CancelButtonText = string.Format(Tr(inputYourNameCancelButtonText_TRANSLATE), username);
+            confirmationDialog.OkButtonText = string.Format(Tr(inputYourNameOKButtonText_TRANSLATE), username);
+            richTextLabel.Text = string.Format(Tr(inputYourNameConfirmNameText_TRANSLATE), username);
             confirmationDialog.Visible = true; // Make sure the dialog is visible
             //confirmationDialog.PopupCentered();
         } else {

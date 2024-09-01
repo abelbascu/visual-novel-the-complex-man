@@ -32,6 +32,8 @@ public partial class LoadSaveManager : Node {
     private UITextTweenFadeIn fadeIn;
     private UITextTweenFadeOut fadeOut;
     private readonly Color paleYellow = new Color(1, 1, 0.8f, 1);
+    private string autosaving_TRANSLATE = "AUTOSAVING";
+    private string autosaveCompletedSuccess_TRANSLATE = "AUTOSAVE_COMPLETED_SUCCESS";
 
     public int DialoguesVisitedID;
 
@@ -91,22 +93,30 @@ public partial class LoadSaveManager : Node {
 
         autosaveLabelContainer = new MarginContainer {
             CustomMinimumSize = new Vector2(400, 75),
-            Visible = true
+            Visible = true,
+            AnchorsPreset = (int)Control.LayoutPreset.TopWide
         };
         AddChild(autosaveLabelContainer);
-        autosaveLabelContainer.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft, Control.LayoutPresetMode.KeepSize);
+        // autosaveLabelContainer.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft, Control.LayoutPresetMode.KeepSize);
         MoveChild(autosaveLabelContainer, -1);  // Move to top of the hierarchy
 
 
         // Create and set up the autosave label
         autosaveLabel = new RichTextLabel {
-            //CustomMinimumSize = new Vector2(300, 75),
+            CustomMinimumSize = new Vector2(400, 75),
             BbcodeEnabled = true,
+            FitContent = true,
+            AutowrapMode = TextServer.AutowrapMode.Off,
             Visible = true, //we set it to true so fade in/out can operate on the text.
         };
+        autosaveLabel.CustomMinimumSize = new Vector2(0, 75);
         autosaveLabel.AddThemeFontSizeOverride("normal_font_size", 28);
         autosaveLabel.AddThemeColorOverride("default_color", paleYellow);
-        autosaveLabel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.CenterLeft, Control.LayoutPresetMode.KeepSize);
+        autosaveLabel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
+        autosaveLabelContainer.AddThemeConstantOverride("margin_left", 10);
+         autosaveLabelContainer.AddThemeConstantOverride("margin_right", 10);
+        autosaveLabel.SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
+        autosaveLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         autosaveLabelContainer.AddChild(autosaveLabel);
     }
 
@@ -165,8 +175,9 @@ public partial class LoadSaveManager : Node {
         timeSinceLastAutosave = 0;
     }
 
+
     public async Task ShowAutosaveStatusLabel(bool isSaving) {
-        string message = isSaving ? "AUTOSAVING..." : "AUTOSAVE COMPLETED";
+        string message = isSaving ? $"{autosaving_TRANSLATE}" : $"{autosaveCompletedSuccess_TRANSLATE}";
 
         CallDeferred(nameof(UpdateAutosaveLabel), message);
         await fadeIn.FadeIn(autosaveLabel);
@@ -177,8 +188,7 @@ public partial class LoadSaveManager : Node {
     }
 
     private void UpdateAutosaveLabel(string text) {
-
-        autosaveLabel.Text = $"[center]{text}[/center]";
+        autosaveLabel.Text = $"[center]{TranslationServer.Translate(text)}[/center]";   
     }
 
     public async Task SaveGame(bool isAutosave) {

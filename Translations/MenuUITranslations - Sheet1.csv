@@ -20,3 +20,7 @@ CREDITS_INFO,"Code, Story, Music by Abel Bascunana Pons. Graphics made by AI bec
 OK,Ok,D'accord,Acceptar
 Cancel,Cancel,Annuler,Cancel.lar
 NO_SAVES_AVAILABLE,No saved games yet. Please save a game first.,Aucune partie n'a encore été sauvegardée. Veuillez d'abord sauvegarder une partie.,No hi ha partides guardades. Guarda una partida primer.
+SAVING_GAME,"SAVING THE GAME, PLEASE WAIT...","SAUVEGARDE DU JEU, VEUILLEZ PATIENTER...","GUARDANT JOC, SI US PLAU ESPERA..."
+GAME_SAVED_SUCCESS,GAME WAS SAVED SUCCESSFULLY,LE JEU A ÉTÉ SAUVEGARDÉ AVEC SUCCÈS,JOC GUARDAT AMB ÉXIT
+AUTOSAVING,AUTOSAVING,SAUVEGARDE AUTOMATIQUE,AUTOGUARDANT JOC
+AUTOSAVE_COMPLETED_SUCCESS,GAME WAS AUTOSAVED SUCCESSFULLY,LE JEU A ÉTÉ AUTO SAUVEGARDÉ AVEC SUCCÈS,EL JOC HA ESTAT AUTOGUARDAT AMB ÉXIT

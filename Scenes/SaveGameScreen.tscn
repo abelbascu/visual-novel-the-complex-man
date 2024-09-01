@@ -17,7 +17,7 @@ layout_mode = 2
 color = Color(0.128923, 0.202889, 0.23781, 0.854902)
 
 [node name="MarginContainer3" type="MarginContainer" parent="."]
-custom_minimum_size = Vector2(700, 150)
+custom_minimum_size = Vector2(1000, 175)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
@@ -32,9 +32,9 @@ bbcode_enabled = true
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 140
-theme_override_constants/margin_right = 30
+theme_override_constants/margin_left = 150
+theme_override_constants/margin_top = 160
+theme_override_constants/margin_right = 150
 theme_override_constants/margin_bottom = 25
 
 [node name="ScrollContainer" type="ScrollContainer" parent="MarginContainer"]
@@ -52,7 +52,7 @@ size_flags_horizontal = 8
 size_flags_vertical = 0
 theme_override_constants/margin_left = 75
 theme_override_constants/margin_top = 50
-theme_override_constants/margin_right = 75
+theme_override_constants/margin_right = 150
 theme_override_constants/margin_bottom = 75
 
 [node name="GoBackButton" type="Button" parent="MarginContainer2"]

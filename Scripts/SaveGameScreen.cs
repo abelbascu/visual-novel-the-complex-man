@@ -14,6 +14,8 @@ public partial class SaveGameScreen : MarginContainer {
     private RichTextLabel noSavesLabel;
     private RichTextLabel SaveStatusLabel;
     private string noSavesTRANSLATE = "NO_SAVES_AVAILABLE";
+    private string savingGameTRANSLATE = "SAVING_GAME";
+    private string gamesavedSuccessTRANSLATE = "GAME_SAVED_SUCCESS";
     private const bool AUTODSAVE_DISABLED_CONST = false;
     private const bool AUTOSAVE_ENABLED_CONST = true;
     private SaveGameSlot saveGameSlot; //this is added at compile time, we get it in AddSaveOrLoadSlot method
@@ -62,7 +64,7 @@ public partial class SaveGameScreen : MarginContainer {
         SaveStatusLabel.Visible = true;
 
         // Use CallDeferred to ensure the label is updated in the next frame
-        CallDeferred(nameof(UpdateSaveStatusLabel), isBeingSaved ? "SAVING THE GAME, PLEASE WAIT..." : "GAME WAS SAVED SUCCESSFULLY");
+        CallDeferred(nameof(UpdateSaveStatusLabel), isBeingSaved ? $"{savingGameTRANSLATE}" : $"{gamesavedSuccessTRANSLATE}");
 
         await fadeIn.FadeIn(SaveStatusLabel);
         await fadeOut.FadeOut(SaveStatusLabel);
@@ -75,7 +77,7 @@ public partial class SaveGameScreen : MarginContainer {
     }
 
     private void UpdateSaveStatusLabel(string text) {
-        SaveStatusLabel.Text = text;
+        SaveStatusLabel.Text = $"[center]{TranslationServer.Translate(text)}[/center]";
     }
 
     public void HideSaveStatusLabel() {

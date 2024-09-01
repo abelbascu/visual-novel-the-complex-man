@@ -18,7 +18,7 @@ public partial class LoadSaveManager : Node {
     private const string SaveDirectory = "saves";
     private const string PersistentDataFile = "persistent_data.dat";
     private const string AutosavePrefix = "autosave_";
-    private const int AutosaveInterval = 20; // 5 minutes in seconds
+    private const int AutosaveInterval = 120; // 5 minutes in seconds
     private float timeSinceLastAutosave = 0;
     private float totalTimeElapsedSinceGameStart;
     // private const bool AUTOSAVE_ENABLED = true;
@@ -252,7 +252,7 @@ public partial class LoadSaveManager : Node {
             CurrentDialogueObject = DialogueManager.Instance.currentDialogueObject,
             CurrentDialogueObjectID = DialogueManager.Instance.currentDialogueObject.ID,
             CurrentConversationID = DialogueManager.Instance.currentConversationID,
-            LanguageCode = TranslationServer.GetLocale(),
+            //LanguageCode = TranslationServer.GetLocale(),
             PlayerChoicesList = DialogueManager.Instance.playerChoicesList.Select(d => d.ID).ToList(),
             SaveTime = DateTime.Now,
             TimePlayed = GetCurrentPlayTime(),
@@ -334,7 +334,7 @@ public partial class LoadSaveManager : Node {
     private void ApplyGameState(GameState gameState) {
         DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject(gameState.CurrentConversationID, gameState.CurrentDialogueObjectID);
         DialogueManager.Instance.currentConversationID = gameState.CurrentConversationID;
-        TranslationServer.SetLocale(gameState.LanguageCode);
+        //TranslationServer.SetLocale(gameState.LanguageCode);
         DialogueManager.Instance.playerChoicesList = gameState.PlayerChoicesList.Select(id => DialogueManager.Instance.GetDialogueObject(gameState.CurrentConversationID, id)).ToList();
         VisualManager.Instance.VisualPath = gameState.VisualPath;
         VisualManager.Instance.visualType = gameState.VisualType;

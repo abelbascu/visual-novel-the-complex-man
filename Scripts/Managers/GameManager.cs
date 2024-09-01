@@ -134,6 +134,13 @@ public partial class GameManager : Control {
         GameStateManager.Instance.Fire(Trigger.COMPLETE_LOADING_BASED_ON_GAME_MODE, GameStateManager.Instance.GetLastGameMode());
     }
 
+    public void Enter_Dialogue_Mode() {
+        if (GameStateManager.Instance.CurrentState == State.InDialogueMode) {
+            UIManager.Instance.dialogueBoxUI.TopLevel = true;
+            UIManager.Instance.playerChoicesBoxUI.TopLevel = true;
+        }
+    }
+
     public void Complete_Loading_Based_On_Game_Mode(State lastGameMode) {
         switch (lastGameMode) {
             case State.InDialogueMode:
@@ -180,8 +187,8 @@ public partial class GameManager : Control {
             await UIManager.Instance.mainMenu.CloseMainMenu();
         else
             await UIManager.Instance.mainMenu.CloseInGameMenu();
-  
-        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.LOAD_SCREEN);    
+
+        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.LOAD_SCREEN);
     }
 
     public async Task Display_Load_Screen() {
@@ -190,7 +197,7 @@ public partial class GameManager : Control {
 
 
     public async Task Display_Language_Menu() {
-       await UIManager.Instance.mainMenu.DisplayLanguageMenu();
+        await UIManager.Instance.mainMenu.DisplayLanguageMenu();
     }
 
     public async Task Save_Game(bool isAutosave) {

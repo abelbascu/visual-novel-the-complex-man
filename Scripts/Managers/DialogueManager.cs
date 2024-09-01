@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Dynamic;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 public partial class DialogueManager : Control {
 
@@ -123,7 +124,7 @@ public partial class DialogueManager : Control {
 
     public void DisplayDialogue(DialogueObject currentDialogueObject) {
         if (isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
-            return;
+           return;
         isDialogueBeingPrinted = true;
         if (dialogueBoxUI == null) {
             DisplayDialogueBoxUI();
@@ -171,6 +172,7 @@ public partial class DialogueManager : Control {
     public void DisplayDialogueBoxUI() {
         // Ensure the dialogue box is visible
         dialogueBoxUI.Visible = true;
+        dialogueBoxUI.TopLevel = true;
         //once all chars of the dialogue text are displayed in the container, we can show the next dialogue.
         dialogueBoxUI.FinishedDisplayingDialogueLine += DialogueManager.Instance.OnTextBoxFinishedDisplayingDialogueLine;
     }
@@ -182,6 +184,7 @@ public partial class DialogueManager : Control {
         //VBoxContainer playerChoìces = instance as VBoxContainer;
         playerChoicesBoxUI = instance as PlayerChoicesBoxUI;
         playerChoicesBoxUI.Show();
+        playerChoicesBoxUI.TopLevel = true;
         //once all chars of the dialogue text are displayed in the container, we can show the next line.
         playerChoicesBoxUI.FinishedDisplayingPlayerChoice += DialogueManager.Instance.OnTextBoxFinishedDisplayingPlayerChoices;
     }

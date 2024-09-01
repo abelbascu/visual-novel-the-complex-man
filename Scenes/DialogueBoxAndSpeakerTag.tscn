@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://dvmxcg1hidawy" path="res://Visuals/UI/dialogue box UI bckg transparent resized.png" id="2_u2hgi"]
 [ext_resource type="PackedScene" uid="uid://8ytymk06gtxw" path="res://Scenes/DialogueBoxUI.tscn" id="3_fvo0e"]
 
-[node name="VBoxContainer" type="VBoxContainer"]
+[node name="DialogueBoxAndSpeakerTag" type="VBoxContainer"]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0

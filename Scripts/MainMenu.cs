@@ -149,21 +149,90 @@ public partial class MainMenu : Control {
         }
     }
 
-    //we constantly check if the dev (me!) changes the locale via the export variable 'language' in the editor
-    public override void _Process(double delta) {
-        base._Process(delta);
+    //we constantly check if the dev (me!) changes the locale via the export variable 'language' in the editor or by pressing the language buttons
+    // public override void _Process(double delta) {
+    //     base._Process(delta);
 
-        if (language != previousLanguage) {
-            previousLanguage = language;
-            TranslationServer.SetLocale(language);
-            GD.Print("new game locale: " + TranslationServer.GetLocale());
-            UpdateButtonTexts();
-            if (UIManager.Instance.dialogueBoxUI.IsVisibleInTree() == true)
-                DialogueManager.Instance.DisplayDialogue(DialogueManager.Instance.currentDialogueObject);
-            if (UIManager.Instance.playerChoicesBoxUI.IsVisibleInTree() == true)
-                UIManager.Instance.playerChoicesBoxUI.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, TranslationServer.GetLocale());
+    //     if (language != previousLanguage) {
+    //         previousLanguage = language;
+    //         TranslationServer.SetLocale(language);
+    //         GD.Print("new game locale: " + TranslationServer.GetLocale());
+    //         UpdateButtonTexts();
+    //         if (UIManager.Instance.dialogueBoxUI.IsVisibleInTree() == true)
+    //             DialogueManager.Instance.DisplayDialogue(DialogueManager.Instance.currentDialogueObject);
+    //         if (UIManager.Instance.playerChoicesBoxUI.IsVisibleInTree() == true)
+    //             UIManager.Instance.playerChoicesBoxUI.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, TranslationServer.GetLocale());
+    //     }
+    // }
+
+
+
+    private bool isUpdatingLanguage = false;
+
+    public async Task UpdateTextsBasedOnLocale(string language) {
+        if (isUpdatingLanguage) {
+            GD.Print("Language update already in progress. Ignoring request.");
+            return;
+        }
+
+        isUpdatingLanguage = true;
+        SetButtonsVisualState(false);
+
+        foreach (KeyValuePair<Button, string> pair in buttonLanguageKeys)
+            DisableButtonInput(pair.Key);
+
+        try {
+            if (!DialogueManager.Instance.isDialogueBeingPrinted && !DialogueManager.Instance.IsPlayerChoiceBeingPrinted) {
+                if (language != previousLanguage) {
+                    previousLanguage = language;
+                    TranslationServer.SetLocale(language);
+                    GD.Print("new game locale: " + TranslationServer.GetLocale());
+                    UpdateButtonTexts();
+
+                    if (UIManager.Instance.dialogueBoxUI.IsVisibleInTree()) {
+                        DialogueManager.Instance.DisplayDialogue(DialogueManager.Instance.currentDialogueObject);
+                        await WaitForDialogueCompletion();
+                    }
+
+                    if (UIManager.Instance.playerChoicesBoxUI.IsVisibleInTree()) {
+                        UIManager.Instance.playerChoicesBoxUI.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, TranslationServer.GetLocale());
+                        await WaitForPlayerChoiceCompletion();
+                    }
+                }
+            }
+        } finally {
+            isUpdatingLanguage = false;
+            SetButtonsVisualState(true);
+            foreach (KeyValuePair<Button, string> pair in buttonLanguageKeys)
+                EnableButtonInput(pair.Key);
         }
     }
+
+    private async Task WaitForDialogueCompletion() {
+        while (DialogueManager.Instance.isDialogueBeingPrinted) {
+            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        }
+    }
+
+    private async Task WaitForPlayerChoiceCompletion() {
+        while (DialogueManager.Instance.IsPlayerChoiceBeingPrinted) {
+            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+        }
+    }
+
+    private void SetButtonsVisualState(bool enabled) {
+        foreach (KeyValuePair<Button, string> pair in buttonLanguageKeys) {
+            pair.Key.Modulate = enabled ? Colors.White : Colors.Gray;
+        }
+    }
+
+    private async Task SetButtonsVisualStateAsync(bool enabled) {
+        SetButtonsVisualState(enabled);
+        await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+    }
+
+
+
 
     private void UpdateButtonTexts() {
         foreach (Button button in buttonLocalizationKeys.Keys) {
@@ -191,6 +260,8 @@ public partial class MainMenu : Control {
 
     public async Task DisplayMainMenu() {
         DisableButtonsInput();
+        UIManager.Instance.dialogueBoxUI.TopLevel = false;
+        UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
         //we have disabled input with SetProcessInput(false) at Ready(), doing it here has no effect
         //this works well though, but disables input in all nodes, not the parent one only.
         //UIInputHelper.DisableParentChildrenInput(this);
@@ -270,7 +341,7 @@ public partial class MainMenu : Control {
     }
 
 
-        private void DisableButtonsInput() {
+    private void DisableButtonsInput() {
 
         DisableButtonInput(loadGameButton); //THIS HERE IS VERY HACKY, OR MAYBE WE NEED TO PUT ALL THE ENABLE BUTTON METHODS HERE
         DisableButtonInput(saveGameButton);
@@ -297,6 +368,8 @@ public partial class MainMenu : Control {
 
     public async Task DisplayInGameMenu() {
         DisableButtonsInput();
+        UIManager.Instance.dialogueBoxUI.TopLevel = false;
+        UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
         MainOptionsContainer.SetProcessInput(false);
         Show();
         saveGameButton.Show();
@@ -464,16 +537,19 @@ public partial class MainMenu : Control {
 
 
 
-    private void OnEnglishButtonPressed() {
-        language = "en";
+    private async void OnEnglishButtonPressed() {
+        //language = "en";
+        await UpdateTextsBasedOnLocale("en");
     }
 
-    private void OnFrenchButtonPressed() {
-        language = "fr";
+    private async void OnFrenchButtonPressed() {
+        //language = "fr";
+        await UpdateTextsBasedOnLocale("fr");
     }
 
-    private void OnCatalanButtonPressed() {
-        language = "ca";
+    private async void OnCatalanButtonPressed() {
+        //language = "ca";
+        await UpdateTextsBasedOnLocale("ca");
     }
 
     private async Task OnLanguagesGoBackButtonPressed() {

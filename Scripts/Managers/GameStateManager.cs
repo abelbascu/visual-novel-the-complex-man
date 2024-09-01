@@ -84,7 +84,7 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Display_New_Game_Dialogues()},
             //set up new game dialogues > enter dialogue node
             {(State.SettingUpNewGameDialogues, SubState.None, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
-                () => { }},
+                () => GameManager.Instance.Enter_Dialogue_Mode()},
 
             //-----INGAME MENU-----//  
 
@@ -93,7 +93,7 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Display_Ingame_Menu()},
             //in game menu > enter dialogue node
             {(State.InGameMenuDisplayed, SubState.None, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
-                () => {}},
+                () => GameManager.Instance.Enter_Dialogue_Mode()},
             //ingame menu > initialize save screen
             {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.SaveScreenInitialized, Trigger.INITIALIZE_SAVE_SCREEN),
                 () => GameManager.Instance.Initialize_Save_Screen()},
@@ -135,7 +135,7 @@ public partial class GameStateManager : Node {
                 () => {}},
             //loading completed > enter dialogue mode
             {(State.InGameMenuDisplayed, SubState.LoadingCompleted, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
-                () =>{}},
+                () =>GameManager.Instance.Enter_Dialogue_Mode()},
             //in game menu > language menu
             {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed, Trigger.DISPLAY_LANGUAGE_MENU),
                 () => GameManager.Instance.Display_Language_Menu()},
@@ -168,7 +168,7 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Autosave_Completed()},
             //autosave complete > dialogue mode
             {(State.InDialogueMode, SubState.AutoSavingCompleted, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
-                () => {}},
+                () => GameManager.Instance.Enter_Dialogue_Mode()},
 
             //-----MAIN MENU-----//  
              
@@ -192,7 +192,7 @@ public partial class GameStateManager : Node {
                 () => {}},
             //loading completed > enter dialogue mode
             {(State.MainMenuDisplayed, SubState.LoadingCompleted, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
-                () =>{}},
+                () =>GameManager.Instance.Enter_Dialogue_Mode()},
             //main menu > language menu
             {(State.MainMenuDisplayed, SubState.None, State.MainMenuDisplayed, SubState.LanguageMenuDisplayed, Trigger.DISPLAY_LANGUAGE_MENU),
                 () => GameManager.Instance.Display_Language_Menu()},

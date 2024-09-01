@@ -18,7 +18,7 @@ public partial class LoadSaveManager : Node {
     private const string SaveDirectory = "saves";
     private const string PersistentDataFile = "persistent_data.dat";
     private const string AutosavePrefix = "autosave_";
-    private const int AutosaveInterval = 120; // 5 minutes in seconds
+    private const int AutosaveInterval = 15; // 5 minutes in seconds
     private float timeSinceLastAutosave = 0;
     private float totalTimeElapsedSinceGameStart;
     // private const bool AUTOSAVE_ENABLED = true;
@@ -61,9 +61,8 @@ public partial class LoadSaveManager : Node {
 
     private PersistentData persistentData;
 
-    private DateTime gameStartTime;
+    private DateTime gameStartTime = DateTime.Now;
     private TimeSpan totalPlayTime = TimeSpan.Zero;
-    private bool isGameActive = false;
 
     public Action GameLoaded;
 
@@ -98,7 +97,7 @@ public partial class LoadSaveManager : Node {
         autosaveLabelContainer.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft, Control.LayoutPresetMode.KeepSize);
         MoveChild(autosaveLabelContainer, -1);  // Move to top of the hierarchy
 
-        
+
         // Create and set up the autosave label
         autosaveLabel = new RichTextLabel {
             //CustomMinimumSize = new Vector2(300, 75),
@@ -106,7 +105,7 @@ public partial class LoadSaveManager : Node {
             Visible = true, //we set it to true so fade in/out can operate on the text.
         };
         autosaveLabel.AddThemeFontSizeOverride("normal_font_size", 28);
-         autosaveLabel.AddThemeColorOverride("default_color", paleYellow);
+        autosaveLabel.AddThemeColorOverride("default_color", paleYellow);
         autosaveLabel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.CenterLeft, Control.LayoutPresetMode.KeepSize);
         autosaveLabelContainer.AddChild(autosaveLabel);
     }
@@ -123,22 +122,20 @@ public partial class LoadSaveManager : Node {
 
     private void StartGameTimer() {
         gameStartTime = DateTime.Now;
-        isGameActive = true;
     }
 
     private void PauseGameTimer() {
-        if (isGameActive) {
+        if (GameStateManager.Instance.PreviousState != State.InDialogueMode) { return; }
+        else {
             totalPlayTime += DateTime.Now - gameStartTime;
-            isGameActive = false;
+            gameStartTime = DateTime.Now;
         }
     }
 
     private void ResumeGameTimer() {
-        if (!isGameActive) {
-            gameStartTime = DateTime.Now;
-            isGameActive = true;
-        }
+        gameStartTime = DateTime.Now;
     }
+
 
     private void OnDialogueVisited(int dialogueObjectID) {
         persistentData.DialoguesVisitedForAllGames.Add(dialogueObjectID);
@@ -186,17 +183,15 @@ public partial class LoadSaveManager : Node {
 
     public async Task SaveGame(bool isAutosave) {
 
-        //-------------BEFORE SAVEING THE GAME, SHOW THE 'SAVING' TEXT TO THE USER----------------------
-        
+        //-------------BEFORE SAVING THE GAME, SHOW THE 'SAVING' TEXT TO THE USER----------------------
+
         // Show "Saving" message for manual saves
         //as soon as the ingame menu is open we have already set autosave to false in MainMenu.DisplayInGameMenu()
         if (isAutosave) {
             totalPlayTime += DateTime.Now - gameStartTime;
-            gameStartTime = DateTime.Now;
             await ShowAutosaveStatusLabel(CURRENTLY_AUTOSAVING_CONST);
-        //is is manual save
+            //is is manual save
         } else {
-            PauseGameTimer();
             //contrary to autosave, we trigger the manual save Fire.Trigger when save button is pressed, no need to call it here
             await UIManager.Instance.saveGameScreen.ShowSaveStatusLabel(CURRENTLY_SAVING_CONST);
         }
@@ -218,6 +213,7 @@ public partial class LoadSaveManager : Node {
 
         if (isAutosave) {
             await ShowAutosaveStatusLabel(AUTOSAVING_COMPLETED_CONST);
+            gameStartTime = DateTime.Now;
             //timeSinceLastAutosave = 0;
         } else {
             await UIManager.Instance.saveGameScreen.ShowSaveStatusLabel(SAVING_COMPLETED_CONST);
@@ -230,21 +226,6 @@ public partial class LoadSaveManager : Node {
         var json = JsonSerializer.Serialize(gameState);
         var encryptedData = EncryptData(json);
         File.WriteAllBytes(filePath, encryptedData);
-    }
-
-    public void LoadPersistentData() {
-        string persistentDataPath = Path.Combine(OS.GetUserDataDir(), PersistentDataFile);
-        if (File.Exists(persistentDataPath)) {
-            string json = File.ReadAllText(persistentDataPath);
-            persistentData = JsonSerializer.Deserialize<PersistentData>(json);
-        } else {
-            persistentData = new PersistentData {
-                GamesPlayed = 0,
-                TotalTimePlayed = TimeSpan.Zero,
-                DialoguesVisitedForAllGames = new HashSet<int>(),
-                EndingsSeen = new HashSet<int>()
-            };
-        }
     }
 
     private GameState CreateGameState() {
@@ -261,6 +242,23 @@ public partial class LoadSaveManager : Node {
             VisualType = VisualManager.Instance.visualType
         };
     }
+
+
+    public void LoadPersistentData() {
+        string persistentDataPath = Path.Combine(OS.GetUserDataDir(), PersistentDataFile);
+        if (File.Exists(persistentDataPath)) {
+            string json = File.ReadAllText(persistentDataPath);
+            persistentData = JsonSerializer.Deserialize<PersistentData>(json);
+        } else {
+            persistentData = new PersistentData {
+                GamesPlayed = 0,
+                TotalTimePlayed = TimeSpan.Zero,
+                DialoguesVisitedForAllGames = new HashSet<int>(),
+                EndingsSeen = new HashSet<int>()
+            };
+        }
+    }
+
 
     private void UpdatePersistentData(GameState gameState) {
         persistentData.GamesPlayed++;
@@ -310,9 +308,6 @@ public partial class LoadSaveManager : Node {
         if (gameState != null) {
             // GameStateManager.Instance.ENTER_LOADING_SUBSTATE();
             ApplyGameState(gameState);
-            Thread.Sleep(1000); //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT) 
-                                //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)
-                                //WE ADD A DELAY ON PURPOSE TO INDICATE VISUALLY THE USER THAT WE ARE SAVING THE GAME (TO IMPLEMENT)   
         }
         GameLoaded.Invoke(); //do not remove, we need it to start game timer.
     }

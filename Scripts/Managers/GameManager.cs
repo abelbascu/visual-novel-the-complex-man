@@ -58,6 +58,8 @@ public partial class GameManager : Control {
 
     public async Task Display_Main_Menu() {
         //UIManager.HideSplashScreen();
+
+
         if (UIManager.Instance.mainMenu.MainOptionsContainer.Visible == true)
             await UIManager.Instance.mainMenu.CloseInGameMenu();
 
@@ -65,6 +67,7 @@ public partial class GameManager : Control {
     }
 
     public async Task Display_Ingame_Menu() {
+
         await UIManager.Instance.mainMenu.DisplayInGameMenu();
     }
 
@@ -139,6 +142,7 @@ public partial class GameManager : Control {
             UIManager.Instance.dialogueBoxUI.TopLevel = true;
             UIManager.Instance.playerChoicesBoxUI.TopLevel = true;
         }
+        
     }
 
     public void Complete_Loading_Based_On_Game_Mode(State lastGameMode) {

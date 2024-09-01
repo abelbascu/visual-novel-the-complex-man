@@ -123,14 +123,6 @@ public partial class SaveGameSlot : HBoxContainer {
         actionButton.Disabled = false;
         actionButton.FocusMode = Control.FocusModeEnum.All;
         buttonContainer.SetProcessMode(Node.ProcessModeEnum.Inherit);
-        //NOT WORKING AT THE MOMENT, SEEMS A GODOT BUG, DO NOT DELETE
-        // actionButton.AddThemeStyleboxOverride("normal", normalStyle);
-        // actionButton.AddThemeStyleboxOverride("pressed", pressedStyle);
-        // actionButton.AddThemeStyleboxOverride("hover", hoverStyle);
-        // Remove the disabled overrides
-        // actionButton.RemoveThemeStyleboxOverride("disabled");
-        // actionButton.RemoveThemeStyleboxOverride("disabled_pressed");
-        // actionButton.RemoveThemeStyleboxOverride("disabled_hover");
         Show();
     }
 

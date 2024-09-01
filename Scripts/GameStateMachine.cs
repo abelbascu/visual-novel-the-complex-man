@@ -76,6 +76,8 @@ public class GameStateMachine {
     private object[] _transitionArguments;
     public event Action<State, SubState, State, SubState, object[]> StateChanged;
     public Trigger LastTrigger { get; private set; }
+    public State previousState;
+    public SubState previousSubState;
 
     public GameStateMachine() {
         transitions = new Dictionary<(State, SubState), Dictionary<Trigger, (State, SubState)>>();
@@ -124,8 +126,8 @@ public class GameStateMachine {
 
         LastTrigger = trigger;
         _transitionArguments = arguments;
-        State previousState = currentState;
-        SubState previousSubState = currentSubState;
+        previousState = currentState;
+        previousSubState = currentSubState;
         (currentState, currentSubState) = transitions[currentKey][trigger];
         GD.Print($"State changed from {previousState} ({previousSubState}) to {currentState} ({currentSubState}), , Trigger: {trigger}");
         StateChanged?.Invoke(previousState, previousSubState, currentState, currentSubState, arguments);
@@ -145,4 +147,5 @@ public class GameStateMachine {
 
     public State CurrentState => currentState;
     public SubState CurrentSubState => currentSubState;
+    public State PreviousState => previousState;
 }

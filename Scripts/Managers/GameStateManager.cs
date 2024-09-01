@@ -269,6 +269,8 @@ public partial class GameStateManager : Node {
     }
     public State CurrentState => stateMachine.CurrentState;
     public SubState CurrentSubstate => stateMachine.CurrentSubState;
+    public State PreviousState => stateMachine.previousState;
+    public SubState PreviousSubstate => stateMachine.previousSubState;
 }
 
 

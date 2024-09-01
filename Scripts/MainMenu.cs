@@ -17,9 +17,6 @@ public partial class MainMenu : Control {
     public VBoxContainer LanguageOptionsContainer;
     private Dictionary<Button, string> buttonLocalizationKeys = new();
     private Dictionary<Button, string> buttonLanguageKeys = new();
-    public Action StartNewGameButtonPressed;
-    public Action SaveGameButtonPressed;
-    public Action LoadGameButtonPressed;
     Button startNewGameButton;
     Button saveGameButton;
     Button continueGameButton;
@@ -40,6 +37,9 @@ public partial class MainMenu : Control {
     private UITextTweenFadeIn fadeIn;
     private UITextTweenFadeOut fadeOut;
 
+    public Action StartNewGameButtonPressed;
+    public Action SaveGameButtonPressed;
+    public Action LoadGameButtonPressed;
 
     public override void _Ready() {
 
@@ -262,10 +262,7 @@ public partial class MainMenu : Control {
         DisableButtonsInput();
         UIManager.Instance.dialogueBoxUI.TopLevel = false;
         UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
-        //we have disabled input with SetProcessInput(false) at Ready(), doing it here has no effect
-        //this works well though, but disables input in all nodes, not the parent one only.
-        //UIInputHelper.DisableParentChildrenInput(this);
-
+   
         // Clear any pending input events
         GetViewport().SetInputAsHandled();
 
@@ -292,15 +289,12 @@ public partial class MainMenu : Control {
         Show();
         mainMenuBackgroundImage.Show();
         mainMenuBackgroundImage.Visible = true;
-
-        MainMenuOpened?.Invoke();
-
         await FadeInMainMenu();
-
         EnableButtonsInput();
-
         SetProcessInput(true);
         UIInputHelper.EnableParentChildrenInput(MainOptionsContainer);
+
+        MainMenuOpened?.Invoke();
     }
 
     public async Task FadeInMainMenu() {
@@ -382,14 +376,12 @@ public partial class MainMenu : Control {
                                                        // Reset the opacity of the shared content (optionsMenuContainer)
         MainOptionsContainer.Show();
         MainOptionsContainer.Modulate = new Color(1, 1, 1, 1);  // Full opacity
-        InGameMenuOpened?.Invoke();
         MainOptionsContainer.TopLevel = true;
         await fadeIn.FadeIn(MainOptionsContainer, 0.6f);
         MainOptionsContainer.SetProcessInput(true);
-
         EnableButtonsInput();
-
         UIInputHelper.EnableParentChildrenInput(MainOptionsContainer);
+        InGameMenuOpened?.Invoke();
     }
 
     public async Task CloseInGameMenu() {
@@ -399,8 +391,8 @@ public partial class MainMenu : Control {
         UIManager.Instance.menuOverlay.Visible = false;
         MainOptionsContainer.SetProcessInput(false);
         await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
-        InGameMenuClosed?.Invoke();
         MainOptionsContainer.Visible = false;
+        InGameMenuClosed?.Invoke();
     }
 
     public async Task CloseMainMenu() {
@@ -411,10 +403,10 @@ public partial class MainMenu : Control {
         // mainMenuBackgroundImage.TopLevel = false;
         MainOptionsContainer.SetProcessInput(false);
         await FadeOutMainMenu();
-        MainMenuClosed?.Invoke();
         MainOptionsContainer.Visible = false;
         mainMenuBackgroundImage.Visible = false;
 
+        MainMenuClosed?.Invoke();
         // MainOptionsContainer.TopLevel = false;
         // mainMenuBackgroundImage.TopLevel = true;
 
@@ -432,19 +424,21 @@ public partial class MainMenu : Control {
     private async Task OnStartNewGameButtonPressed() {
         DisableButtonInput(startNewGameButton);
         await FadeOutMainMenu();
+        StartNewGameButtonPressed.Invoke();
         GameStateManager.Instance.Fire(Trigger.START_NEW_GAME);
     }
 
     private async Task OnContinueButtonPressed() {
         DisableButtonInput(continueGameButton);
-        await FadeOutInGameMenu();
+        await CloseInGameMenu();
+
         GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
         EnableButtonInput(continueGameButton);
     }
 
     private async Task OnSaveGameButtonPressed() {
         DisableButtonInput(saveGameButton);
-        await FadeOutInGameMenu();
+        await CloseInGameMenu();
         GameStateManager.Instance.Fire(Trigger.INITIALIZE_SAVE_SCREEN);
     }
 

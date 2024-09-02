@@ -106,8 +106,8 @@ public partial class MainMenu : Control {
         WantToQuitToMainMenuLabel.BbcodeEnabled = true;
 
         WantToQuitToMainMenuLabel.Text = wantToQuitToMainMenuTRANSLATE;
-
         //WantToQuitToMainMenuLabel.Text = $"[center]{TranslationServer.Translate(wantToQuitToMainMenuTRANSLATE)}[/center]";
+
         YesNoExitToMenuButtonsHBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
         // Add margins
         YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_left", 20);
@@ -382,6 +382,7 @@ public partial class MainMenu : Control {
         DisableButtonInput(startNewGameButton);
         DisableButtonInput(languageButton);
         DisableButtonInput(exitGameButton);
+        DisableButtonInput(creditsButton);
     }
 
     private void EnableButtonsInput() {
@@ -391,6 +392,7 @@ public partial class MainMenu : Control {
         EnableButtonInput(startNewGameButton);
         EnableButtonInput(languageButton);
         EnableButtonInput(exitGameButton);
+        EnableButtonInput(creditsButton);
     }
 
     private void DisableButtonInput(Button button) {
@@ -608,6 +610,7 @@ public partial class MainMenu : Control {
     private async Task OnExitGameCancelButtonPressed() {
         DisableButtonInput(NoExitGameButton);
         DisableButtonInput(YesExitGameButton);
+        DisableButtonsInput();
         await UIFadeHelper.FadeOutControl(ExitGameConfirmationPanel, 0.6f);
         ExitGameConfirmationPanel.Visible = false;
         ShowIngameMenuIcon();

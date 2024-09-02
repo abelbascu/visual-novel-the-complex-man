@@ -109,16 +109,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "EXIT_TO_DESKTOP"
 
-[node name="ExitGameConfirmationDialog" type="ConfirmationDialog" parent="MainOptionsContainer/ExitGameButton"]
-auto_translate_mode = 1
-title = ""
-position = Vector2i(760, 540)
-size = Vector2i(400, 100)
-always_on_top = true
-ok_button_text = "YES"
-dialog_text = "WANT_QUIT_GAME?"
-cancel_button_text = "NO"
-
 [node name="LanguageOptionsContainer" type="VBoxContainer" parent="."]
 visible = false
 layout_direction = 2
@@ -128,9 +118,9 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -202.0
+offset_left = -246.5
 offset_top = -168.5
-offset_right = 202.0
+offset_right = 246.5
 offset_bottom = 168.5
 grow_horizontal = 2
 grow_vertical = 2
@@ -164,3 +154,58 @@ auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "UNDEFINED_LANGUAGE1"
+
+[node name="ExitGameConfirmationMarginContainer" type="Panel" parent="."]
+unique_name_in_owner = true
+auto_translate_mode = 1
+layout_mode = 2
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -291.0
+offset_top = -91.0
+offset_right = 209.0
+offset_bottom = 263.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ExitGameConfirmationMarginContainer"]
+layout_mode = 1
+offset_right = 504.0
+offset_bottom = 354.0
+
+[node name="MarginContainer" type="MarginContainer" parent="ExitGameConfirmationMarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(500, 200)
+layout_mode = 2
+
+[node name="WantToQuitGameLabel" type="RichTextLabel" parent="ExitGameConfirmationMarginContainer/VBoxContainer/MarginContainer"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/normal_font_size = 38
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="YesNoButtonsHBoxContainer" type="HBoxContainer" parent="ExitGameConfirmationMarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="YesExitGameButton" type="Button" parent="ExitGameConfirmationMarginContainer/VBoxContainer/YesNoButtonsHBoxContainer"]
+custom_minimum_size = Vector2(200, 75)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 38
+text = "YES"
+
+[node name="NoExitGameButton" type="Button" parent="ExitGameConfirmationMarginContainer/VBoxContainer/YesNoButtonsHBoxContainer"]
+custom_minimum_size = Vector2(200, 75)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 38
+text = "NO"

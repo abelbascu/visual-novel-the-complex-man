@@ -12,6 +12,23 @@ public static class UIThemeHelper {
         button.AddThemeStyleboxOverride(state, style);
     }
 
+
+    public static void ApplyCustomStyleToPanel(Panel panel) {
+        var normalStyle = new StyleBoxFlat {
+            BgColor = Colors.NavyBlue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
+        panel.AddThemeStyleboxOverride("panel", normalStyle);
+    }
+
     public static void ApplyCustomStyleToButton(Button button) {
         var normalStyle = new StyleBoxFlat {
             BgColor = Colors.NavyBlue,

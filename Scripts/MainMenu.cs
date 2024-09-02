@@ -10,7 +10,7 @@ public partial class MainMenu : Control {
 
     [Export] public string language { get; set; } = "";
     private string previousLanguage = "";
-    ConfirmationDialog exitGameConfirmationDialog;
+    Panel ExitGameConfirmationMarginContainer;
     ConfirmationDialog exitToMainMenuConfirmationDialog;
     ConfirmationDialog creditsConfirmationDialog;
     public VBoxContainer MainOptionsContainer;
@@ -27,6 +27,8 @@ public partial class MainMenu : Control {
     Button exitToMainMenuButton;
     Button settingsButton;
     Button languagesGoBackButton;
+    Button YesExitGameButton;
+    Button NoExitGameButton;
     public TextureRect mainMenuBackgroundImage;
     public bool LOAD_SCREEN = true;
     public bool SAVE_SCREEN = false;
@@ -36,6 +38,10 @@ public partial class MainMenu : Control {
     public Action InGameMenuClosed;
     private UITextTweenFadeIn fadeIn;
     private UITextTweenFadeOut fadeOut;
+    private string wantToQuitGameTRANSLATE = "WANT_QUIT_GAME?";
+
+    private RichTextLabel WantToQuitGameLabel;
+    private HBoxContainer YesNoButtonsHBoxContainer;
 
     public Action StartNewGameButtonPressed;
     public Action SaveGameButtonPressed;
@@ -64,11 +70,26 @@ public partial class MainMenu : Control {
         languageButton = GetNode<Button>("MainOptionsContainer/LanguageButton");
         settingsButton = GetNode<Button>("MainOptionsContainer/SettingsButton"); ;
         creditsButton = GetNode<Button>("MainOptionsContainer/CreditsButton");
-        exitGameButton = GetNode<Button>("MainOptionsContainer/ExitGameButton");
         exitToMainMenuButton = GetNode<Button>("MainOptionsContainer/ExitToMainMenuButton");
-
-        exitGameConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/ExitGameButton/ExitGameConfirmationDialog");
         exitToMainMenuConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/ExitToMainMenuButton/ExitToMainMenuConfirmationDialog");
+
+        exitGameButton = GetNode<Button>("MainOptionsContainer/ExitGameButton");
+        ExitGameConfirmationMarginContainer = GetNode<Panel>("%ExitGameConfirmationMarginContainer");
+        YesExitGameButton = GetNode<Button>("ExitGameConfirmationMarginContainer/VBoxContainer/YesNoButtonsHBoxContainer/YesExitGameButton");
+        NoExitGameButton = GetNode<Button>("ExitGameConfirmationMarginContainer/VBoxContainer/YesNoButtonsHBoxContainer/NoExitGameButton");
+        WantToQuitGameLabel = GetNode<RichTextLabel>("ExitGameConfirmationMarginContainer/VBoxContainer/MarginContainer/WantToQuitGameLabel");
+        YesNoButtonsHBoxContainer = GetNode<HBoxContainer>("ExitGameConfirmationMarginContainer/VBoxContainer/YesNoButtonsHBoxContainer");
+
+        WantToQuitGameLabel.BbcodeEnabled = true;
+        
+        WantToQuitGameLabel.Text = $"[center]{TranslationServer.Translate(wantToQuitGameTRANSLATE)}[/center]";
+        YesNoButtonsHBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
+        // Add margins
+        YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_left", 20);
+        YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_right", 20);
+        YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_bottom", 50);
+        // Add space between buttons
+        YesNoButtonsHBoxContainer.AddThemeConstantOverride("separation", 20);
 
         creditsConfirmationDialog = GetNode<ConfirmationDialog>("CreditsConfirmationDialog");
 
@@ -79,12 +100,14 @@ public partial class MainMenu : Control {
         loadGameButton.Pressed += () => _ = OnLoadGameButtonPressed();
         languageButton.Pressed += () => _ = OnLanguageButtonPressed();
         creditsButton.Pressed += () => _ = OnCreditsButtonPressed();
-        exitGameButton.Pressed += () => _ = OnExitGameButtonPressed();
         exitToMainMenuButton.Pressed += OnExitToMainMenuButtonPressed;
-        exitGameConfirmationDialog.Canceled += () => _ = OnExitGameCancelButtonPressed();
-        exitGameConfirmationDialog.Confirmed += () => _ = OnExitGameConfirmButtonPressed();
         exitToMainMenuConfirmationDialog.Confirmed += () => _ = OnExitToMainMenuConfirmButtonPressed();
         exitToMainMenuConfirmationDialog.Canceled += OnExitToMainMenuCancelButtonPressed;
+
+
+        exitGameButton.Pressed += () => _ = OnExitGameButtonPressed();
+        NoExitGameButton.Pressed += () => _ = OnExitGameCancelButtonPressed();
+        YesExitGameButton.Pressed += () => _ = OnExitGameConfirmButtonPressed();
 
         creditsConfirmationDialog.Canceled += () => _ = OnCreditsCancelOrConfirmButtonPressed();
         creditsConfirmationDialog.Confirmed += () => _ = OnCreditsCancelOrConfirmButtonPressed();
@@ -137,14 +160,18 @@ public partial class MainMenu : Control {
         ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
         ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
         UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
-        UIThemeHelper.ApplyCustomStyleToWindowDialog(exitGameConfirmationDialog);
         UIThemeHelper.ApplyCustomStyleToWindowDialog(exitToMainMenuConfirmationDialog);
+        UIThemeHelper.ApplyCustomStyleToPanel(ExitGameConfirmationMarginContainer);
+        ApplyCustomStyleToButtonsInContainer(ExitGameConfirmationMarginContainer);
     }
 
-    private void ApplyCustomStyleToButtonsInContainer(VBoxContainer container) {
+    private void ApplyCustomStyleToButtonsInContainer(Control container) {
         foreach (var child in container.GetChildren()) {
             if (child is Button button) {
                 UIThemeHelper.ApplyCustomStyleToButton(button);
+            } else if (child is Control) {
+                // Recursively apply style to children of this control
+                ApplyCustomStyleToButtonsInContainer(child as Control);
             }
         }
     }
@@ -524,26 +551,28 @@ public partial class MainMenu : Control {
 
     public async Task ShowExitGameConfirmationPopup() {
         await FadeOutInGameMenu();
-        exitGameConfirmationDialog.Visible = true;
-        await UIFadeHelper.FadeInWindow(exitGameConfirmationDialog, 0.6f);
+        ExitGameConfirmationMarginContainer.Visible = true;
+        ExitGameConfirmationMarginContainer.TopLevel = true;
+        await UIFadeHelper.FadeInControl(ExitGameConfirmationMarginContainer, 0.6f);
         GameStateManager.Instance.Fire(Trigger.DISPLAY_EXIT_GAME_MENU_CONFIRMATION_POPUP);
     }
     //triggered by confirmationDialog.Confirmed event
     private async Task OnExitGameConfirmButtonPressed() {
-        await UIFadeHelper.FadeOutWindow(exitGameConfirmationDialog, 0.6f);
-        exitGameConfirmationDialog.Visible = false;
-        await FadeOutMainMenu();
+        HideIngameMenuIcon();
+        await UIFadeHelper.FadeOutControl(ExitGameConfirmationMarginContainer, 1.2f);
+        ExitGameConfirmationMarginContainer.Visible = false;
         GameStateManager.Instance.Fire(Trigger.EXIT_GAME);
     }
 
     //triggered by confirmationDialog.Canceled event
     private async Task OnExitGameCancelButtonPressed() {
+        await UIFadeHelper.FadeOutControl(ExitGameConfirmationMarginContainer, 0.6f);
+        ExitGameConfirmationMarginContainer.Visible = false;
         ShowIngameMenuIcon();
         await FadeInInGamenMenu();
         // Close the confirmation popup
         GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
-
 
 
     private async void OnEnglishButtonPressed() {

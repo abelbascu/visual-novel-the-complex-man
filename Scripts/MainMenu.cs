@@ -68,7 +68,6 @@ public partial class MainMenu : Control {
 
         MainOptionsContainer.Visible = false;
 
-
         startNewGameButton = GetNode<Button>("MainOptionsContainer/StartNewGameButton");
         saveGameButton = GetNode<Button>("MainOptionsContainer/SaveGameButton"); ;
         continueGameButton = GetNode<Button>("MainOptionsContainer/ContinueButton"); ;
@@ -96,7 +95,6 @@ public partial class MainMenu : Control {
         // Add space between buttons
         YesNoButtonsHBoxContainer.AddThemeConstantOverride("separation", 20);
 
-
         ExitToMainMenuPanel = GetNode<Panel>("ExitToMainMenuPanel");
         YesExitToMainMenuButton = GetNode<Button>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/YesExitToMainMenuButton");
         NoExitToMainMenuButton = GetNode<Button>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/NoExitToMainMenuButton");
@@ -115,9 +113,6 @@ public partial class MainMenu : Control {
         YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_bottom", 50);
         // Add space between buttons
         YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("separation", 20);
-
-
-
 
         creditsConfirmationDialog = GetNode<ConfirmationDialog>("CreditsConfirmationDialog");
 
@@ -205,8 +200,6 @@ public partial class MainMenu : Control {
         }
     }
 
-
-
     private bool isUpdatingLanguage = false;
 
     public async Task UpdateTextsBasedOnLocale(string language) {
@@ -270,8 +263,6 @@ public partial class MainMenu : Control {
         SetButtonsVisualState(enabled);
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
     }
-
-
 
 
     private void UpdateButtonTexts() {
@@ -360,8 +351,6 @@ public partial class MainMenu : Control {
         await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
     }
 
-
-
     private void EnableInput() {
         SetProcessInput(true);
     }
@@ -374,10 +363,9 @@ public partial class MainMenu : Control {
         GetViewport().SetInputAsHandled();
     }
 
-
     private void DisableButtonsInput() {
 
-        DisableButtonInput(loadGameButton); //THIS HERE IS VERY HACKY, OR MAYBE WE NEED TO PUT ALL THE ENABLE BUTTON METHODS HERE
+        DisableButtonInput(loadGameButton); 
         DisableButtonInput(saveGameButton);
         DisableButtonInput(startNewGameButton);
         DisableButtonInput(languageButton);
@@ -387,7 +375,7 @@ public partial class MainMenu : Control {
 
     private void EnableButtonsInput() {
 
-        EnableButtonInput(loadGameButton); //THIS HERE IS VERY HACKY, OR MAYBE WE NEED TO PUT ALL THE ENABLE BUTTON METHODS HERE
+        EnableButtonInput(loadGameButton); 
         EnableButtonInput(saveGameButton);
         EnableButtonInput(startNewGameButton);
         EnableButtonInput(languageButton);
@@ -621,7 +609,6 @@ public partial class MainMenu : Control {
         GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
         EnableButtonsInput();
     }
-
 
     private async void OnEnglishButtonPressed() {
         //language = "en";

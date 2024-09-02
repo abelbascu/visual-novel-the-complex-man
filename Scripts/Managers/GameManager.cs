@@ -39,6 +39,41 @@ public partial class GameManager : Control {
         } else {
             QueueFree();
         }
+
+        LoadTranslations();
+    }
+
+    private void LoadTranslations() {
+        // Get the directory path
+        string translationsDir = "res://Translations/";
+
+        // Use DirAccess to iterate through files
+        using var dir = DirAccess.Open(translationsDir);
+        if (dir != null) {
+            dir.ListDirBegin();
+            string fileName = dir.GetNext();
+            while (fileName != "") {
+                if (!dir.CurrentIsDir() && fileName.EndsWith(".translation")) {
+                    string fullPath = translationsDir + fileName;
+                    var translation = GD.Load<Translation>(fullPath);
+                    if (translation != null) {
+                        TranslationServer.AddTranslation(translation);
+                        GD.Print($"Loaded translation: {fullPath}");
+                    } else {
+                        GD.PrintErr($"Failed to load translation: {fullPath}");
+                    }
+                }
+                fileName = dir.GetNext();
+            }
+        } else {
+            GD.PrintErr("An error occurred when trying to access the translations directory.");
+        }
+
+        // Print loaded translations for debugging
+        var loadedLocales = TranslationServer.GetLoadedLocales();
+        foreach (string locale in loadedLocales) {
+            GD.Print($"Loaded translation locale: {locale}");
+        }
     }
 
     private void GameInit() {
@@ -142,7 +177,7 @@ public partial class GameManager : Control {
             UIManager.Instance.dialogueBoxUI.TopLevel = true;
             UIManager.Instance.playerChoicesBoxUI.TopLevel = true;
         }
-        
+
     }
 
     public void Complete_Loading_Based_On_Game_Mode(State lastGameMode) {

@@ -27,7 +27,8 @@ AUTOSAVE_COMPLETED_SUCCESS,GAME WAS AUTOSAVED SUCCESSFULLY,LE JEU A ÉTÉ AUTO S
 AUTOSAVE_PREFIX_TITLE,(Autosaved),(Savegardé),(Autoguardat)
 TIME_PLAYED,Time Played,Temps joué,Temps jugat
 DIALOGUES_VISITED,Dialogues Visited,Dialogues visités,Diàlegs vistos
-INPUT_YOUR_NAME_TITLE,"You can't enter the tavern without telling your name, traveller...","Vous ne pouvez pas entrer dans la taverne sans dire votre nom, voyageur...","No podeu entrar a la taverna sense dir-me el vostre nom, foraster..."
-INPUT_YOUR_NAME_CANCEL_BUTTON_TEXT,"No, {0} is not my name!\nLet me change it!","Non, {0} n'est pas mon nom ! Laissez-moi le changer !","No, {0} no es pas el meu nom! Deixa'm canviar-lo!"
-INPUT_YOUR_NAME_OK_BUTTON_TEXT,"Yes, {0} is my name!.\nLet me enter the tavern!","Oui, je m'appelle {0} ! Laissez-moi entrer dans la taverne !","Sí, em dic {0}! Deixa'm entrar a la taverna!"
-INPUT_YOUR_NAME_CONFIRM_NAME,[center]Are you sure that {0} is your final name?[/center]\n[center]You won't be able to change it during this current play![/center],[center]Êtes-vous sûr que {0} est votre nom définitif ?[/center]\N-[center]Vous ne pourrez pas le changer pendant cette partie ![/center],[center]Segur que {0} es el teu nom?[/center]\n[center]No podràs canviar-lo durant aquesta partida![/center]
+INPUT_YOUR_NAME_TOP_TITLE,"You can't enter the tavern without telling your name, traveller...","Vous ne pouvez pas entrer dans la taverne sans dire votre nom, voyageur...","No podeu entrar a la taverna sense dir-me el vostre nom, foraster..."
+INPUT_YOUR_NAME_CANCEL_BUTTON_TEXT,"No, {0} is not my name!\nLet me change it!","Non, {0} n'est pas mon nom !\n Laissez-moi le changer !","No, {0} no es pas el meu nom!\nDeixa'm canviar-lo!"
+INPUT_YOUR_NAME_OK_BUTTON_TEXT,"Yes, {0} is my name!.\nLet me enter the tavern!","Oui, je m'appelle {0} !\n Laissez-moi entrer dans la taverne !","Sí, em dic {0}!\nDeixa'm entrar a la taverna!"
+INPUT_YOUR_NAME_CONFIRM_NAME,[center]Are you sure that {0} is your final name?[/center]\n[center]You won't be able to change it during this current play![/center],[center]Etes-vous sur que {0} est votre nom definitif ?[/center]\n[center]Vous ne pourrez pas le changer pendant cette partie ![/center],[center]Segur que {0} es el teu nom?[/center]\n[center]No podràs canviar-lo durant aquesta partida![/center]
+TYPE_YOUR_NAME_HERE,<Type your name here>,<Tapez votre nom ici>,<Escriu el teu nom aquí>

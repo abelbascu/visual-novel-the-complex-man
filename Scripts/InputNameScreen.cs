@@ -11,11 +11,11 @@ public partial class InputNameScreen : Control {
     private RichTextLabel richTextLabel;
     private MarginContainer marginContainer;
     private bool isNameConfirmed = false;
-    private string inputYourNameTitleTRANSLATE = "INPUT_YOUR_NAME_TITLE"; //You can't enter the tavern without telling your name, traveller...
+    private string inputYourNameTitleTRANSLATE = "INPUT_YOUR_NAME_TOP_TITLE"; //You can't enter the tavern without telling your name, traveller...
     private string inputYourNameCancelButtonText_TRANSLATE = "INPUT_YOUR_NAME_CANCEL_BUTTON_TEXT"; //"No, {0} is not my name!\nLet me change it!"
     private string inputYourNameOKButtonText_TRANSLATE = "INPUT_YOUR_NAME_OK_BUTTON_TEXT"; //Yes, {0} is my name!.\nLet me enter the tavern!"
     private string inputYourNameConfirmNameText_TRANSLATE = "INPUT_YOUR_NAME_CONFIRM_NAME"; //[center]Are you sure that {username} is your final name?[/center]\n[center]You won't be able to change it during this current play![/center]"
-
+    private RichTextLabel richText;
 
     [Export] public float FadeDuration { get; set; } = 0.5f;
 
@@ -44,7 +44,7 @@ public partial class InputNameScreen : Control {
         richTextLabel.AddThemeConstantOverride("margin_bottom", 150);
 
         marginContainer.AddChild(richTextLabel);
-  
+
     }
 
 
@@ -52,16 +52,18 @@ public partial class InputNameScreen : Control {
 
         marginContainer = GetNode<MarginContainer>("MarginContainer");
         var vBoxContainer = marginContainer.GetNode<VBoxContainer>("MarginContainer1/VBoxContainer");
-        questionLabel = vBoxContainer.GetNode<RichTextLabel>("InputYourNameTitle");
         nameInput = vBoxContainer.GetNode<LineEdit>("LineEdit");
         confirmationDialog = marginContainer.GetNode<ConfirmationDialog>("MarginContainer2/ConfirmationDialog");
+        richText = vBoxContainer.GetNode<RichTextLabel>("RichTextLabel");
 
         ListenForNameConfirmation();
         SetupConfirmationDialogTheme();
 
         this.Visible = false;
 
-        questionLabel.Text  = $"{inputYourNameTitleTRANSLATE}";
+        //seems a godot bug, i needed to put the key in the Godot Editor
+        // string titleText =  TranslationServer.Translate(inputYourNameTitleTRANSLATE);
+        // richText.Text = titleText; 
     }
 
     public async Task Show() {

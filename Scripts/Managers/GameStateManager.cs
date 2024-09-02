@@ -156,7 +156,7 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Display_Main_Menu()},
             //exit to main menu confirmation popup > back to ingame menu
             {(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => {}},
+                () => GameManager.Instance.Go_Back_To_Menu()},
 
             //-----AUTOSAVE-----//  
 

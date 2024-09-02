@@ -54,7 +54,7 @@ action_key={
 
 [internationalization]
 
-locale/translations=PackedStringArray("res://Translations/MenuUITranslations - Sheet1 (4).ca.translation", "res://Translations/MenuUITranslations - Sheet1 (4).csv", "res://Translations/MenuUITranslations - Sheet1 (4).en.translation", "res://Translations/MenuUITranslations - Sheet1 (4).fr.translation")
+locale/translations=PackedStringArray("res://Translations/translations.ca.translation", "res://Translations/translations.csv", "res://Translations/translations.en.translation", "res://Translations/translations.fr.translation")
 locale/include_text_server_data=true
 
 [rendering]

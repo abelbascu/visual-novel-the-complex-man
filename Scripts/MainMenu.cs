@@ -87,7 +87,7 @@ public partial class MainMenu : Control {
 
         WantToQuitGameLabel.BbcodeEnabled = true;
 
-        WantToQuitGameLabel.Text = $"[center]{TranslationServer.Translate(wantToQuitGameTRANSLATE)}[/center]";
+        WantToQuitGameLabel.Text = wantToQuitGameTRANSLATE;
         YesNoButtonsHBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
         // Add margins
         YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_left", 20);
@@ -103,9 +103,11 @@ public partial class MainMenu : Control {
         WantToQuitToMainMenuLabel = GetNode<RichTextLabel>("ExitToMainMenuPanel/VBoxContainer/MarginContainer/WantToExitToMainMenuLabel");
         YesNoExitToMenuButtonsHBoxContainer = GetNode<HBoxContainer>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer");
 
-        WantToQuitGameLabel.BbcodeEnabled = true;
+        WantToQuitToMainMenuLabel.BbcodeEnabled = true;
 
-        WantToQuitToMainMenuLabel.Text = $"[center]{TranslationServer.Translate(wantToQuitToMainMenuTRANSLATE)}[/center]";
+        WantToQuitToMainMenuLabel.Text = wantToQuitToMainMenuTRANSLATE;
+
+        //WantToQuitToMainMenuLabel.Text = $"[center]{TranslationServer.Translate(wantToQuitToMainMenuTRANSLATE)}[/center]";
         YesNoExitToMenuButtonsHBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
         // Add margins
         YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_left", 20);
@@ -388,6 +390,7 @@ public partial class MainMenu : Control {
         EnableButtonInput(saveGameButton);
         EnableButtonInput(startNewGameButton);
         EnableButtonInput(languageButton);
+        EnableButtonInput(exitGameButton);
     }
 
     private void DisableButtonInput(Button button) {

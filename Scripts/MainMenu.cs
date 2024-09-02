@@ -11,7 +11,7 @@ public partial class MainMenu : Control {
     [Export] public string language { get; set; } = "";
     private string previousLanguage = "";
     Panel ExitGameConfirmationPanel;
-    ConfirmationDialog exitToMainMenuConfirmationDialog;
+    Panel ExitToMainMenuPanel;
     ConfirmationDialog creditsConfirmationDialog;
     public VBoxContainer MainOptionsContainer;
     public VBoxContainer LanguageOptionsContainer;
@@ -39,9 +39,15 @@ public partial class MainMenu : Control {
     private UITextTweenFadeIn fadeIn;
     private UITextTweenFadeOut fadeOut;
     private string wantToQuitGameTRANSLATE = "WANT_QUIT_GAME?";
+    private string wantToQuitToMainMenuTRANSLATE = "WANT_QUIT_TO_MAIN_MENU?";
 
     private RichTextLabel WantToQuitGameLabel;
     private HBoxContainer YesNoButtonsHBoxContainer;
+
+    Button YesExitToMainMenuButton;
+    Button NoExitToMainMenuButton;
+    RichTextLabel WantToQuitToMainMenuLabel;
+    HBoxContainer YesNoExitToMenuButtonsHBoxContainer;
 
     public Action StartNewGameButtonPressed;
     public Action SaveGameButtonPressed;
@@ -71,9 +77,8 @@ public partial class MainMenu : Control {
         settingsButton = GetNode<Button>("MainOptionsContainer/SettingsButton"); ;
         creditsButton = GetNode<Button>("MainOptionsContainer/CreditsButton");
         exitToMainMenuButton = GetNode<Button>("MainOptionsContainer/ExitToMainMenuButton");
-        exitToMainMenuConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/ExitToMainMenuButton/ExitToMainMenuConfirmationDialog");
-
         exitGameButton = GetNode<Button>("MainOptionsContainer/ExitGameButton");
+
         ExitGameConfirmationPanel = GetNode<Panel>("%ExitGameConfirmationPanel");
         YesExitGameButton = GetNode<Button>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer/YesExitGameButton");
         NoExitGameButton = GetNode<Button>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer/NoExitGameButton");
@@ -91,6 +96,27 @@ public partial class MainMenu : Control {
         // Add space between buttons
         YesNoButtonsHBoxContainer.AddThemeConstantOverride("separation", 20);
 
+
+        ExitToMainMenuPanel = GetNode<Panel>("ExitToMainMenuPanel");
+        YesExitToMainMenuButton = GetNode<Button>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/YesExitToMainMenuButton");
+        NoExitToMainMenuButton = GetNode<Button>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/NoExitToMainMenuButton");
+        WantToQuitToMainMenuLabel = GetNode<RichTextLabel>("ExitToMainMenuPanel/VBoxContainer/MarginContainer/WantToExitToMainMenuLabel");
+        YesNoExitToMenuButtonsHBoxContainer = GetNode<HBoxContainer>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer");
+
+        WantToQuitGameLabel.BbcodeEnabled = true;
+
+        WantToQuitToMainMenuLabel.Text = $"[center]{TranslationServer.Translate(wantToQuitToMainMenuTRANSLATE)}[/center]";
+        YesNoExitToMenuButtonsHBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
+        // Add margins
+        YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_left", 20);
+        YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_right", 20);
+        YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_bottom", 50);
+        // Add space between buttons
+        YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("separation", 20);
+
+
+
+
         creditsConfirmationDialog = GetNode<ConfirmationDialog>("CreditsConfirmationDialog");
 
         //trigger events depending on the option clicked
@@ -101,9 +127,8 @@ public partial class MainMenu : Control {
         languageButton.Pressed += () => _ = OnLanguageButtonPressed();
         creditsButton.Pressed += () => _ = OnCreditsButtonPressed();
         exitToMainMenuButton.Pressed += OnExitToMainMenuButtonPressed;
-        exitToMainMenuConfirmationDialog.Confirmed += () => _ = OnExitToMainMenuConfirmButtonPressed();
-        exitToMainMenuConfirmationDialog.Canceled += OnExitToMainMenuCancelButtonPressed;
-
+        YesExitToMainMenuButton.Pressed += () => _ = OnExitToMainMenuConfirmButtonPressed();
+        NoExitToMainMenuButton.Pressed  += () => _ = OnExitToMainMenuCancelButtonPressed();
 
         exitGameButton.Pressed += () => _ = OnExitGameButtonPressed();
         NoExitGameButton.Pressed += () => _ = OnExitGameCancelButtonPressed();
@@ -159,10 +184,12 @@ public partial class MainMenu : Control {
 
         ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
         ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
-        UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
-        UIThemeHelper.ApplyCustomStyleToWindowDialog(exitToMainMenuConfirmationDialog);
+        UIThemeHelper.ApplyCustomStyleToPanel(ExitToMainMenuPanel);
+        ApplyCustomStyleToButtonsInContainer(ExitToMainMenuPanel);
         UIThemeHelper.ApplyCustomStyleToPanel(ExitGameConfirmationPanel);
         ApplyCustomStyleToButtonsInContainer(ExitGameConfirmationPanel);
+
+        UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
     }
 
     private void ApplyCustomStyleToButtonsInContainer(Control container) {
@@ -175,22 +202,6 @@ public partial class MainMenu : Control {
             }
         }
     }
-
-    //we constantly check if the dev (me!) changes the locale via the export variable 'language' in the editor or by pressing the language buttons
-    // public override void _Process(double delta) {
-    //     base._Process(delta);
-
-    //     if (language != previousLanguage) {
-    //         previousLanguage = language;
-    //         TranslationServer.SetLocale(language);
-    //         GD.Print("new game locale: " + TranslationServer.GetLocale());
-    //         UpdateButtonTexts();
-    //         if (UIManager.Instance.dialogueBoxUI.IsVisibleInTree() == true)
-    //             DialogueManager.Instance.DisplayDialogue(DialogueManager.Instance.currentDialogueObject);
-    //         if (UIManager.Instance.playerChoicesBoxUI.IsVisibleInTree() == true)
-    //             UIManager.Instance.playerChoicesBoxUI.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, TranslationServer.GetLocale());
-    //     }
-    // }
 
 
 
@@ -513,34 +524,50 @@ public partial class MainMenu : Control {
     }
 
     public async void OnExitToMainMenuButtonPressed() {
-        HideIngameMenuIcon();
+        DisableButtonInput(exitToMainMenuButton);
         DisableButtonsInput();
+        HideIngameMenuIcon();
         //await FadeOutInGameMenu();
         await ShowExitToMainMenuConfirmationPopup();
+        // EnableButtonsInput();
+        // EnableButtonInput(exitToMainMenuButton);
     }
 
     public async Task ShowExitToMainMenuConfirmationPopup() {
-        //MainOptionsContainer.Hide();
+        DisableButtonsInput();
+        DisableButtonInput(NoExitToMainMenuButton);
+        DisableButtonInput(YesExitToMainMenuButton);
         await FadeOutInGameMenu();
-        await UIFadeHelper.FadeInWindow(exitToMainMenuConfirmationDialog, 0.5f);
-        // exitToMainMenuConfirmationDialog.Show();
+        ExitToMainMenuPanel.Visible = true;
+        ExitToMainMenuPanel.TopLevel = true;
+        await UIFadeHelper.FadeInControl(ExitToMainMenuPanel, 0.5f);
+        EnableButtonInput(NoExitToMainMenuButton);
+        EnableButtonInput(YesExitToMainMenuButton);
         GameStateManager.Instance.Fire(Trigger.DISPLAY_EXIT_TO_MAIN_MENU_CONFIRMATION_POPUP);
     }
     private async Task OnExitToMainMenuConfirmButtonPressed() {
-        await UIFadeHelper.FadeOutWindow(exitToMainMenuConfirmationDialog, 0.5f);
-        //await FadeOutInGameMenu();
-        // if (GameStateManager.Instance.CurrentState == State.InDialogueMode) {
+        DisableButtonInput(NoExitToMainMenuButton);
+        DisableButtonInput(YesExitToMainMenuButton);
+        HideIngameMenuIcon();
+        await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.5f);
         await UIManager.Instance.FadeInScreenOverlay(1.5f);
         VisualManager.Instance.RemoveImage();
-        //}
-
+        ExitToMainMenuPanel.Visible = false;
         GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
     }
 
-    private void OnExitToMainMenuCancelButtonPressed() {
+    private async Task OnExitToMainMenuCancelButtonPressed() {
+        DisableButtonInput(NoExitToMainMenuButton);
+        DisableButtonInput(YesExitToMainMenuButton);
+        await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.6f);
+        ExitToMainMenuPanel.Visible = false;
         ShowIngameMenuIcon();
-        EnableButtonInput(exitToMainMenuButton);
+        //await FadeInInGamenMenu();
+        EnableButtonInput(NoExitToMainMenuButton);
+        EnableButtonInput(YesExitToMainMenuButton);
+        //EnableButtonInput(exitToMainMenuButton);
         GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
+        EnableButtonsInput();
     }
 
     private async Task OnExitGameButtonPressed() {

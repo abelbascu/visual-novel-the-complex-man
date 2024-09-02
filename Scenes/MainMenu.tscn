@@ -92,17 +92,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "EXIT_TO_MAIN_MENU"
 
-[node name="ExitToMainMenuConfirmationDialog" type="ConfirmationDialog" parent="MainOptionsContainer/ExitToMainMenuButton"]
-auto_translate_mode = 1
-title = ""
-position = Vector2i(620, 450)
-size = Vector2i(700, 300)
-always_on_top = true
-ok_button_text = "YES"
-dialog_text = "WANT_QUIT_TO_MAIN_MENU?"
-dialog_autowrap = true
-cancel_button_text = "NO"
-
 [node name="ExitGameButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
@@ -204,6 +193,62 @@ theme_override_font_sizes/font_size = 38
 text = "YES"
 
 [node name="NoExitGameButton" type="Button" parent="ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer"]
+custom_minimum_size = Vector2(200, 75)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 38
+text = "NO"
+
+[node name="ExitToMainMenuPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+auto_translate_mode = 1
+visible = false
+layout_mode = 2
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -260.0
+offset_top = -108.0
+offset_right = 240.0
+offset_bottom = 246.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ExitToMainMenuPanel"]
+layout_mode = 1
+offset_right = 504.0
+offset_bottom = 354.0
+
+[node name="MarginContainer" type="MarginContainer" parent="ExitToMainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(500, 200)
+layout_mode = 2
+
+[node name="WantToExitToMainMenuLabel" type="RichTextLabel" parent="ExitToMainMenuPanel/VBoxContainer/MarginContainer"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/normal_font_size = 38
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="YesNoExitToMenuButtonsHBoxContainer" type="HBoxContainer" parent="ExitToMainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="YesExitToMainMenuButton" type="Button" parent="ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer"]
+custom_minimum_size = Vector2(200, 75)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 38
+text = "YES"
+
+[node name="NoExitToMainMenuButton" type="Button" parent="ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer"]
 custom_minimum_size = Vector2(200, 75)
 layout_mode = 2
 size_flags_horizontal = 8

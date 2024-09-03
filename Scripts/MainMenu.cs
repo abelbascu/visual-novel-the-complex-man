@@ -196,9 +196,8 @@ public partial class MainMenu : Control {
 
         TranslationServer.SetLocale(language);
         await SetButtonsVisualStateAsync(false);
-        
-        foreach(Button button in LanguageOptionsContainer.GetChildren())
-        {
+
+        foreach (Button button in LanguageOptionsContainer.GetChildren()) {
             DisableButtonInput(button);
         }
 
@@ -212,13 +211,10 @@ public partial class MainMenu : Control {
             await WaitForPlayerChoiceCompletion();
         }
 
-         foreach(Button button in LanguageOptionsContainer.GetChildren())
-        {
+        foreach (Button button in LanguageOptionsContainer.GetChildren()) {
             EnableButtonInput(button);
             await SetButtonsVisualStateAsync(true);
         }
-
-
     }
 
     private async Task WaitForDialogueCompletion() {
@@ -243,66 +239,6 @@ public partial class MainMenu : Control {
         SetButtonsVisualState(enabled);
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
     }
-
-    public async Task DisplayMainMenu() {
-
-        DisableButtonsInput();
-        //put interfering UI elements behind
-        UIManager.Instance.dialogueBoxUI.TopLevel = false;
-        UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
-
-        // Clear any pending input events
-        GetViewport().SetInputAsHandled();
-
-        UIManager.Instance.HideAllUIElements();
-
-        VisualManager.Instance.RemoveImage();
-        mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/splash screen the dragon riddle.png");
-        mainMenuBackgroundImage.Modulate = new Color(1, 1, 1, 1);  // This sets it to ffffff (fully opaque)
-
-        mainMenuBackgroundImage.TopLevel = true;
-        mainMenuBackgroundImage.SetAnchorsPreset(LayoutPreset.FullRect);
-
-        startNewGameButton.Show();
-        exitGameButton.Show();
-        saveGameButton.Hide();
-        continueGameButton.Hide();
-        exitToMainMenuButton.Hide();
-        UIManager.Instance.inGameMenuButton.Hide();
-        UIManager.Instance.menuOverlay.Visible = false; //a mask to avoid clicking on the dialoguebox when menus are open
-
-        MainOptionsContainer.TopLevel = true;
-        MainOptionsContainer.Show();
-        Show();
-        mainMenuBackgroundImage.Show();
-        mainMenuBackgroundImage.Visible = true;
-        await FadeInMainMenu();
-        CallDeferred(nameof(EnableButtonsInput));
-        SetProcessInput(true);
-
-        MainMenuOpened?.Invoke();
-    }
-
-    public async Task FadeInMainMenu() {
-        await Task.WhenAll(
-            UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f),
-            UIFadeHelper.FadeInControl(mainMenuBackgroundImage, 1.0f));
-    }
-
-    private async Task FadeOutMainMenu() {
-        await Task.WhenAll(
-            UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f),
-            UIFadeHelper.FadeOutControl(mainMenuBackgroundImage, 1.0f));
-        this.Visible = false;
-    }
-
-    private async Task FadeInInGamenMenu() => await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);
-    private async Task FadeOutInGameMenu() => await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
-    private void EnableInput() => SetProcessInput(true);
-    public void DisableInput() => SetProcessInput(false);
-    private void SetInputHandled() => GetViewport().SetInputAsHandled();
-    public void HideIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = false;
-    public void ShowIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = true;
 
     private void DisableButtonsInput() {
         DisableButtonInput(continueGameButton);
@@ -337,6 +273,71 @@ public partial class MainMenu : Control {
         button.MouseFilter = MouseFilterEnum.Stop;
         button.FocusMode = FocusModeEnum.All;
     }
+    
+    public async Task DisplayMainMenu() {
+
+        DisableButtonsInput();
+        //put interfering UI elements behind
+        UIManager.Instance.dialogueBoxUI.TopLevel = false;
+        UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
+
+        // Clear any pending input events
+        GetViewport().SetInputAsHandled();
+
+        UIManager.Instance.HideAllUIElements();
+
+        VisualManager.Instance.RemoveImage();
+        mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/splash screen the dragon riddle.png");
+        mainMenuBackgroundImage.Modulate = new Color(1, 1, 1, 1);  // This sets it to ffffff (fully opaque)
+
+        mainMenuBackgroundImage.TopLevel = true;
+        mainMenuBackgroundImage.SetAnchorsPreset(LayoutPreset.FullRect);
+
+        startNewGameButton.Show();
+        exitGameButton.Show();
+        saveGameButton.Hide();
+        continueGameButton.Hide();
+        exitToMainMenuButton.Hide();
+
+        UIManager.Instance.inGameMenuButton.Hide();
+        
+        //a mask to avoid clicking on the dialoguebox when menus are open
+        UIManager.Instance.menuOverlay.Visible = false;
+
+        MainOptionsContainer.TopLevel = true;
+        MainOptionsContainer.Show();
+        mainMenuBackgroundImage.Show();
+        mainMenuBackgroundImage.Visible = true;
+        Show();
+
+        await FadeInMainMenu();
+
+        EnableButtonsInput();
+
+        MainMenuOpened?.Invoke();
+    }
+
+    public async Task FadeInMainMenu() {
+        await Task.WhenAll(
+            UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f),
+            UIFadeHelper.FadeInControl(mainMenuBackgroundImage, 1.0f));
+    }
+
+    private async Task FadeOutMainMenu() {
+        await Task.WhenAll(
+            UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f),
+            UIFadeHelper.FadeOutControl(mainMenuBackgroundImage, 1.0f));
+        this.Visible = false;
+    }
+
+    private async Task FadeInInGamenMenu() => await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);
+    private async Task FadeOutInGameMenu() => await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
+    private void EnableInput() => SetProcessInput(true);
+    public void DisableInput() => SetProcessInput(false);
+    private void SetInputHandled() => GetViewport().SetInputAsHandled();
+    public void HideIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = false;
+    public void ShowIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = true;
+
 
     public async Task DisplayInGameMenu() {
         DisableButtonsInput();
@@ -351,7 +352,6 @@ public partial class MainMenu : Control {
         exitGameButton.Hide();
         mainMenuBackgroundImage.Texture = null;
         UIManager.Instance.menuOverlay.Visible = true; //put overlay to prevent reading input from other UI elements behind this mask
-                                                       // Reset the opacity of the shared content (optionsMenuContainer)
         MainOptionsContainer.Show();
         MainOptionsContainer.Modulate = new Color(1, 1, 1, 1);  // Full opacity
         MainOptionsContainer.TopLevel = true;

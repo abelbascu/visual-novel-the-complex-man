@@ -26,6 +26,8 @@ public partial class SaveGameSlot : HBoxContainer {
     private string autosavedPrefixLabelTRANSLATE = "AUTOSAVE_PREFIX_TITLE"; // (Autosaved)
     private string timePlayedLabelTRANSLATE = "TIME_PLAYED"; //Time Played
     private string dialoguesVisitedLabelTRANSLATE = "DIALOGUES_VISITED"; //Dialogues visited
+    private string loadGameTRANSLATE = "LOAD_GAME";
+    private string saveGameTRANSLATE = "SAVE_GAME";
 
     private StyleBoxFlat disabledStyle = new StyleBoxFlat {
         BgColor = Colors.DarkRed,
@@ -154,7 +156,7 @@ public partial class SaveGameSlot : HBoxContainer {
             thumbnailTextureRect.Texture = null;
         }
 
-        actionButton.Text = isLoadScreen ? "Load Game" : "Save Game";
+        actionButton.Text = isLoadScreen ? $"{loadGameTRANSLATE}" : $"{saveGameTRANSLATE}";
         actionButton.Visible = isLoadScreen || gameState == null;
     }
 
@@ -165,11 +167,11 @@ public partial class SaveGameSlot : HBoxContainer {
         timePlayedLabel.Text = "";
         gameCompletedPercentageLabel.Text = "";
         thumbnailTextureRect.Texture = null;
-        actionButton.Text = "Save Game";
+        actionButton.Text = saveGameTRANSLATE;
     }
 
     private void OnActionButtonPressed() {
-        if (actionButton.Text == "Save Game") {
+        if (actionButton.Text == saveGameTRANSLATE) {
             SaveRequested.Invoke(slotNumber);
         } else {
 

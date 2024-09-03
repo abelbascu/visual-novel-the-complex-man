@@ -58,8 +58,7 @@ text = "CONTINUE
 [node name="SaveGameButton" type="Button" parent="MainOptionsContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
-text = "SAVE_GAME
-"
+text = "SAVE_GAME"
 
 [node name="LoadGameButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1

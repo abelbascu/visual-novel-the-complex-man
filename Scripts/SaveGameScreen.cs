@@ -11,7 +11,7 @@ public partial class SaveGameScreen : MarginContainer {
     public VBoxContainer slotsContainer;
     private MarginContainer marginContainer;
     private Button goBackButton;
-    private RichTextLabel noSavesLabel;
+    private RichTextLabel noSavesAvailableLabel;
     private RichTextLabel SaveStatusLabel;
     private string noSavesTRANSLATE = "NO_SAVES_AVAILABLE";
     private string savingGameTRANSLATE = "SAVING_GAME";
@@ -25,7 +25,6 @@ public partial class SaveGameScreen : MarginContainer {
 
 
     public override void _Ready() {
-
 
         fadeIn = new UITextTweenFadeIn();
         fadeOut = new UITextTweenFadeOut();
@@ -127,7 +126,7 @@ public partial class SaveGameScreen : MarginContainer {
 
         string translatedText = $"[center]{TranslationServer.Translate(noSavesTRANSLATE)}[/center]";
 
-        noSavesLabel = new RichTextLabel {
+        noSavesAvailableLabel = new RichTextLabel {
             BbcodeEnabled = true,
             Text = translatedText,
             FitContent = false,
@@ -135,13 +134,13 @@ public partial class SaveGameScreen : MarginContainer {
             Visible = false
         };
 
-        noSavesLabel.AddThemeFontSizeOverride("normal_font_size", 40);
-        noSavesLabel.AddThemeColorOverride("default_color", Colors.White);
-        noSavesLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        noSavesLabel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-        noSavesLabel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.Center);
-        noSavesLabel.CustomMinimumSize = new Vector2(400, 500);
-        slotsContainer.AddChild(noSavesLabel);
+        noSavesAvailableLabel.AddThemeFontSizeOverride("normal_font_size", 40);
+        noSavesAvailableLabel.AddThemeColorOverride("default_color", Colors.White);
+        noSavesAvailableLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        noSavesAvailableLabel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+        noSavesAvailableLabel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.Center);
+        noSavesAvailableLabel.CustomMinimumSize = new Vector2(400, 500);
+        slotsContainer.AddChild(noSavesAvailableLabel);
     }
 
     private async Task OnGoBackButtonPressed() {
@@ -172,35 +171,57 @@ public partial class SaveGameScreen : MarginContainer {
             GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
 
+    ColorRect saveGameScreenOverlay = new ColorRect();
+
 
     public async Task DisplaySaveScreen() {
+
+        SetSlotButtonsState(false);
         goBackButton.SetProcessInput(false); //avoid hitting the ga back button repeatedly
         goBackButton.MouseFilter = MouseFilterEnum.Ignore;
+
         // Ensure the save game screen is fully transparent before showing
         Modulate = new Color(1, 1, 1, 0);
+        
         Show();
         await UIFadeHelper.FadeInControl(this, 1.0f);
+
+        SetSlotButtonsState(true);
         goBackButton.SetProcessInput(true);
         goBackButton.MouseFilter = MouseFilterEnum.Stop;
+    }
+
+    private void SetSlotButtonsState(bool enabled) {
+        foreach (var child in slotsContainer.GetChildren()) {
+            if (child is SaveGameSlot slot) {
+                var button = slot.GetNode<Button>("MarginContainer2/HBoxContainer/Button");
+                if (button != null) {
+                    button.SetProcessInput(enabled);
+                    button.MouseFilter = enabled ? MouseFilterEnum.Stop : MouseFilterEnum.Ignore;
+                }
+            }
+        }
     }
 
 
     private void PopulateSaveOrLoadSlots(bool isLoadScreen) {
         List<LoadSaveManager.GameState> saveGames = LoadSaveManager.Instance.GetSavedGames();
 
+        //we first clean the screen of any remaining save or load button.
         foreach (Node child in slotsContainer.GetChildren()) {
-            if (child != noSavesLabel) {
+            if (child != noSavesAvailableLabel) {
                 child.QueueFree();
             }
         }
 
+        //show no saves available text
         if (saveGames.Count == 0 && isLoadScreen) {
-            noSavesLabel.Visible = true;
+            noSavesAvailableLabel.Visible = true;
 
         } else {
 
-            noSavesLabel.Visible = false;
-            //it's the Save screen, not the Load screen
+            noSavesAvailableLabel.Visible = false;
+            //if it's the Save screen, add a Save button on first row
             if (!isLoadScreen)
                 AddSaveOrLoadSlot(null, saveGames.Count + 1, isLoadScreen);
 
@@ -213,6 +234,7 @@ public partial class SaveGameScreen : MarginContainer {
 
     private void AddSaveOrLoadSlot(LoadSaveManager.GameState gameState, int slotNumber, bool isLoadScreen) {
         var slotInstance = saveGameSlotScene.Instantiate<SaveGameSlot>();
+
         slotsContainer.AddChild(slotInstance);
 
         if (gameState != null) {

@@ -6,8 +6,6 @@ using static GameStateMachine;
 
 public partial class MainMenu : Control {
 
-    private string previousLanguage = "";
-
     //UIElements
     Panel ExitGameConfirmationPanel;
     Panel ExitToMainMenuPanel;
@@ -63,6 +61,19 @@ public partial class MainMenu : Control {
     private RichTextLabel WantToQuitGameLabel;
     private RichTextLabel WantToQuitToMainMenuLabel;
 
+
+    public override void _Ready() {
+
+        CallDeferred("DisableInput");
+        GetUINodes();
+        SetupButtonEvents();
+        ApplyCustomStyles();
+        // GetButtonLocalizationKeys();
+
+        //assign the loc keys so each time the language changes the text property is updated
+        WantToQuitGameLabel.Text = wantToQuitGameTRANSLATE;
+        WantToQuitToMainMenuLabel.Text = wantToQuitToMainMenuTRANSLATE;
+    }
 
     private void GetUINodes() {
 
@@ -156,45 +167,6 @@ public partial class MainMenu : Control {
         UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
     }
 
-    private void GetButtonLocalizationKeys() {
-
-        //below, we grab the locale keys before they are overwritten by the fallback locale translation,
-        //otherwise we wouldn't be able to switch to another locale as the keys would be destroyed.
-        //remember the original keys and translations for menu buttons are in a google sheet at https://docs.google.com/spreadsheets/d/1HsAar1VdxVkJbuKUa3ElxSN0yZES2YfNUrk2yA7EeMM/edit?gid=0#gid=0
-        //an example START_NEW_GAME, WANT_QUIT_GAME? are keys that have its corresponding translation columns in the google sheet. 
-        //This google sheet is exported as csv files and added to Godot's filesystem, then again added to the Localizatoin tab in project settings
-        foreach (Button button in MainOptionsContainer.GetChildren()) {
-            string initialText = button.Text;
-            //[button] is the button name in Godot's editor, the .Text is a key manually added that should have a match with a key in the translations file in the filesystem
-            buttonLocalizationKeys[button] = initialText;
-            GD.Print($"Button name: {button.Name}, Key: {initialText}, Locale: {TranslationServer.GetLocale()}");
-        }
-
-        foreach (Button button in LanguageOptionsContainer.GetChildren()) {
-            string initialText = button.Text;
-            //[button] is the button name in Godot's editor, the .Text is a key manually added that should have a match with a key in the translations file in the filesystem
-            buttonLanguageKeys[button] = initialText;
-            GD.Print($"Button name: {button.Name}, Key: {initialText}, Locale: {TranslationServer.GetLocale()}");
-        }
-    }
-
-    public override void _Ready() {
-
-        //this.Show();
-        CallDeferred("DisableInput");
-        GetUINodes();
-        SetupButtonEvents();
-        ApplyCustomStyles();
-        GetButtonLocalizationKeys();
-        //displaying the UI boxes with the options
-        MainOptionsContainer.Visible = false;
-
-        WantToQuitGameLabel.Text = wantToQuitGameTRANSLATE;
-        WantToQuitToMainMenuLabel.Text = wantToQuitToMainMenuTRANSLATE;
-        //WantToQuitToMainMenuLabel.Text = $"[center]{TranslationServer.Translate(wantToQuitToMainMenuTRANSLATE)}[/center]";
-    }
-
-
 
     private void ApplyCustomStyleToButtonsInContainer(Control container) {
         foreach (var child in container.GetChildren()) {
@@ -207,44 +179,19 @@ public partial class MainMenu : Control {
         }
     }
 
-    private bool isUpdatingLanguage = false;
 
     public async Task UpdateTextsBasedOnLocale(string language) {
-        if (isUpdatingLanguage) {
-            GD.Print("Language update already in progress. Ignoring request.");
-            return;
+
+        TranslationServer.SetLocale(language);
+
+        if (UIManager.Instance.dialogueBoxUI.IsVisibleInTree()) {
+            DialogueManager.Instance.DisplayDialogue(DialogueManager.Instance.currentDialogueObject);
+            await WaitForDialogueCompletion();
         }
 
-        isUpdatingLanguage = true;
-        SetButtonsVisualState(false);
-
-        foreach (KeyValuePair<Button, string> pair in buttonLanguageKeys)
-            DisableButtonInput(pair.Key);
-
-        try {
-            if (!DialogueManager.Instance.isDialogueBeingPrinted && !DialogueManager.Instance.IsPlayerChoiceBeingPrinted) {
-                if (language != previousLanguage) {
-                    previousLanguage = language;
-                    TranslationServer.SetLocale(language);
-                    GD.Print("new game locale: " + TranslationServer.GetLocale());
-                    UpdateButtonTexts();
-
-                    if (UIManager.Instance.dialogueBoxUI.IsVisibleInTree()) {
-                        DialogueManager.Instance.DisplayDialogue(DialogueManager.Instance.currentDialogueObject);
-                        await WaitForDialogueCompletion();
-                    }
-
-                    if (UIManager.Instance.playerChoicesBoxUI.IsVisibleInTree()) {
-                        UIManager.Instance.playerChoicesBoxUI.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, TranslationServer.GetLocale());
-                        await WaitForPlayerChoiceCompletion();
-                    }
-                }
-            }
-        } finally {
-            isUpdatingLanguage = false;
-            SetButtonsVisualState(true);
-            foreach (KeyValuePair<Button, string> pair in buttonLanguageKeys)
-                EnableButtonInput(pair.Key);
+        if (UIManager.Instance.playerChoicesBoxUI.IsVisibleInTree()) {
+            UIManager.Instance.playerChoicesBoxUI.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, TranslationServer.GetLocale());
+            await WaitForPlayerChoiceCompletion();
         }
     }
 
@@ -270,7 +217,6 @@ public partial class MainMenu : Control {
         SetButtonsVisualState(enabled);
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
     }
-
 
     private void UpdateButtonTexts() {
         foreach (Button button in buttonLocalizationKeys.Keys) {

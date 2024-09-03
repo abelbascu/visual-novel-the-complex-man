@@ -21,7 +21,7 @@ public partial class GameStateManager : Node {
     private GameStateMachine stateMachine;
     //public event Action<State, SubState, State, SubState, object[]> OnStateChanged;
     private Dictionary<(State, SubState, State, SubState, Trigger), Delegate> stateTransitions;
-    private State lastGameMode;
+    public State LastGameMode {get; private set;}
 
     public override void _EnterTree() {
         if (Instance == null) {
@@ -43,17 +43,17 @@ public partial class GameStateManager : Node {
     }
 
     public State GetLastGameMode() {
-        return lastGameMode;
+        return LastGameMode;
     }
 
     public void ResumeGameMode() {
-        switch (lastGameMode) {
+        switch (LastGameMode) {
             case State.InDialogueMode:
                 Fire(Trigger.RESUME_TO_DIALOGUE_MODE);
                 break;
             // Add cases for other game modes as needed
             default:
-                GD.Print($"Unknown game mode: {lastGameMode}");
+                GD.Print($"Unknown game mode: {LastGameMode}");
                 break;
         }
     }
@@ -129,7 +129,7 @@ public partial class GameStateManager : Node {
                 new Action<string>(filePath => GameManager.Instance.Load_Game(filePath))},
             //loading > complete loading base on game mode 
             {(State.InGameMenuDisplayed, SubState.Loading, State.InGameMenuDisplayed, SubState.CompleteLoadingBasedOnGameMode, Trigger.COMPLETE_LOADING_BASED_ON_GAME_MODE),
-                new Action<State>(lastGameMode => GameManager.Instance.Complete_Loading_Based_On_Game_Mode(lastGameMode))},
+                new Action<State>(LastGameMode => GameManager.Instance.Complete_Loading_Based_On_Game_Mode(LastGameMode))},
             //complete loading based on game mode > loading completed
             {(State.InGameMenuDisplayed, SubState.CompleteLoadingBasedOnGameMode, State.InGameMenuDisplayed, SubState.LoadingCompleted, Trigger.LOADING_COMPLETED),
                 () => {}},
@@ -186,7 +186,7 @@ public partial class GameStateManager : Node {
                 new Action<string>(filePath => GameManager.Instance.Load_Game(filePath))},
             //loading > complete loading base on game mode 
             {(State.MainMenuDisplayed, SubState.Loading, State.MainMenuDisplayed, SubState.CompleteLoadingBasedOnGameMode, Trigger.COMPLETE_LOADING_BASED_ON_GAME_MODE),
-                new Action<State>(lastGameMode => GameManager.Instance.Complete_Loading_Based_On_Game_Mode(lastGameMode))},
+                new Action<State>(LastGameMode => GameManager.Instance.Complete_Loading_Based_On_Game_Mode(LastGameMode))},
             //complete loading based on game mode > loading completed
             {(State.MainMenuDisplayed, SubState.CompleteLoadingBasedOnGameMode, State.MainMenuDisplayed, SubState.LoadingCompleted, Trigger.LOADING_COMPLETED),
                 () => {}},
@@ -227,7 +227,7 @@ public partial class GameStateManager : Node {
         var transitionKey = (previousState, previousSubstate, newState, newSubState, stateMachine.LastTrigger);
 
         if (newState.ToString().Contains("Mode")) {
-            lastGameMode = newState;
+            LastGameMode = newState;
         }
 
         if (stateTransitions.TryGetValue(transitionKey, out var actions)) {

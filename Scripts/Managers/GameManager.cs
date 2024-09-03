@@ -196,8 +196,8 @@ public partial class GameManager : Control {
 
     }
 
-    public void Complete_Loading_Based_On_Game_Mode(State lastGameMode) {
-        switch (lastGameMode) {
+    public void Complete_Loading_Based_On_Game_Mode(State LastGameMode) {
+        switch (LastGameMode) {
             case State.InDialogueMode:
                 Initialize_Dialogue_Mode_Settings_On_Loaded_Game();
                 GameStateManager.Instance.Fire(Trigger.LOADING_COMPLETED); //WE NEED TO ADD THIS ONE ON EVERY NEW CASE!!
@@ -206,7 +206,7 @@ public partial class GameManager : Control {
 
             default:
                 //if gamemode was not saved correctly, we try to load the last saved dialogue or player choices 
-                lastGameMode = State.InDialogueMode;
+                LastGameMode = State.InDialogueMode;
                 Initialize_Dialogue_Mode_Settings_On_Loaded_Game();
                 GameStateManager.Instance.Fire(Trigger.LOADING_COMPLETED); //WE NEED TO ADD THIS ONE ON EVERY NEW CASE!!
                 GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);

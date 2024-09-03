@@ -21,8 +21,6 @@ public partial class LoadSaveManager : Node {
     private const int AutosaveInterval = 15; // 5 minutes in seconds
     private float timeSinceLastAutosave = 0;
     private float totalTimeElapsedSinceGameStart;
-    // private const bool AUTOSAVE_ENABLED = true;
-    // private const bool AUTOSAVE_DISABLED = false;
     private RichTextLabel autosaveLabel;
     public MarginContainer autosaveLabelContainer;
     public const bool AUTOSAVING_COMPLETED_CONST = false;
@@ -51,7 +49,6 @@ public partial class LoadSaveManager : Node {
         public string VisualPath { get; set; }
         public VisualManager.VisualType VisualType;
         public bool IsAutosave { get; set; }
-        public State lastGameMode;
     }
 
     public class PersistentData {
@@ -243,7 +240,6 @@ public partial class LoadSaveManager : Node {
             CurrentDialogueObject = DialogueManager.Instance.currentDialogueObject,
             CurrentDialogueObjectID = DialogueManager.Instance.currentDialogueObject.ID,
             CurrentConversationID = DialogueManager.Instance.currentConversationID,
-            //LanguageCode = TranslationServer.GetLocale(),
             PlayerChoicesList = DialogueManager.Instance.playerChoicesList.Select(d => d.ID).ToList(),
             SaveTime = DateTime.Now,
             TimePlayed = GetCurrentPlayTime(),

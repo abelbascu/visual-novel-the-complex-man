@@ -219,6 +219,7 @@ public partial class MainMenu : Control {
     public async Task DisplayMainMenu() {
 
         DisableButtonsInput();
+        //put interfering UI elements behind
         UIManager.Instance.dialogueBoxUI.TopLevel = false;
         UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
 
@@ -267,14 +268,14 @@ public partial class MainMenu : Control {
         this.Visible = false;
     }
 
-    private async Task FadeInInGamenMenu() => await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);   
-    private async Task FadeOutInGameMenu() => await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);  
+    private async Task FadeInInGamenMenu() => await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);
+    private async Task FadeOutInGameMenu() => await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
     private void EnableInput() => SetProcessInput(true);
     public void DisableInput() => SetProcessInput(false);
     private void SetInputHandled() => GetViewport().SetInputAsHandled();
     public void HideIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = false;
     public void ShowIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = true;
-    
+
     private void DisableButtonsInput() {
         DisableButtonInput(continueGameButton);
         DisableButtonInput(loadGameButton);
@@ -283,6 +284,7 @@ public partial class MainMenu : Control {
         DisableButtonInput(languageButton);
         DisableButtonInput(exitGameButton);
         DisableButtonInput(creditsButton);
+        DisableButtonInput(exitToMainMenuButton);
     }
 
     private void EnableButtonsInput() {
@@ -293,6 +295,7 @@ public partial class MainMenu : Control {
         EnableButtonInput(languageButton);
         EnableButtonInput(exitGameButton);
         EnableButtonInput(creditsButton);
+        EnableButtonInput(exitToMainMenuButton);
     }
 
     private void DisableButtonInput(Button button) {
@@ -309,8 +312,6 @@ public partial class MainMenu : Control {
 
     public async Task DisplayInGameMenu() {
         DisableButtonsInput();
-        UIManager.Instance.dialogueBoxUI.TopLevel = false;
-        UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
         MainOptionsContainer.SetProcessInput(false);
         Show();
         saveGameButton.Show();
@@ -395,9 +396,9 @@ public partial class MainMenu : Control {
     }
 
     private async void OnEnglishButtonPressed() => await UpdateTextsBasedOnLocale("en");
-    private async void OnFrenchButtonPressed() =>  await UpdateTextsBasedOnLocale("fr");
+    private async void OnFrenchButtonPressed() => await UpdateTextsBasedOnLocale("fr");
     private async void OnCatalanButtonPressed() => await UpdateTextsBasedOnLocale("ca");
-    
+
     private async Task OnCreditsButtonPressed() {
         HideIngameMenuIcon();
         DisableButtonsInput();
@@ -421,8 +422,6 @@ public partial class MainMenu : Control {
         HideIngameMenuIcon();
         //await FadeOutInGameMenu();
         await ShowExitToMainMenuConfirmationPopup();
-        // EnableButtonsInput();
-        // EnableButtonInput(exitToMainMenuButton);
     }
 
     public async Task ShowExitToMainMenuConfirmationPopup() {
@@ -442,9 +441,19 @@ public partial class MainMenu : Control {
         DisableButtonInput(YesExitToMainMenuButton);
         HideIngameMenuIcon();
         await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.5f);
-        await UIManager.Instance.FadeInScreenOverlay(1.5f);
-        VisualManager.Instance.RemoveImage();
         ExitToMainMenuPanel.Visible = false;
+
+        GD.Print($"Last Game mode before exit to Main Menu: {GameStateManager.Instance.LastGameMode}");
+
+        if (GameStateManager.Instance.LastGameMode == State.InDialogueMode) {
+            UIManager.Instance.dialogueBoxUI.TopLevel = false;
+            UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
+            UIManager.Instance.fadeOverlay.TopLevel = true;
+            await UIManager.Instance.FadeInScreenOverlay(1.5f);
+            VisualManager.Instance.RemoveImage();
+        }
+
+        EnableButtonsInput();
         GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
     }
 
@@ -509,7 +518,6 @@ public partial class MainMenu : Control {
         EnableButtonsInput();
     }
 
-
     private async Task OnLanguagesGoBackButtonPressed() {
         ShowIngameMenuIcon();
         DisableButtonInput(languagesGoBackButton);
@@ -520,7 +528,6 @@ public partial class MainMenu : Control {
         DisableButtonsInput();
         await UIFadeHelper.FadeInControl(MainOptionsContainer, 0.6f);
         EnableButtonsInput();
-
         GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
 }

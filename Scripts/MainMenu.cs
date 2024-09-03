@@ -167,7 +167,6 @@ public partial class MainMenu : Control {
         UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
     }
 
-
     private void ApplyCustomStyleToButtonsInContainer(Control container) {
         foreach (var child in container.GetChildren()) {
             if (child is Button button) {
@@ -178,7 +177,6 @@ public partial class MainMenu : Control {
             }
         }
     }
-
 
     public async Task UpdateTextsBasedOnLocale(string language) {
 
@@ -218,31 +216,8 @@ public partial class MainMenu : Control {
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
     }
 
-    private void UpdateButtonTexts() {
-        foreach (Button button in buttonLocalizationKeys.Keys) {
-            string localizationKey = buttonLocalizationKeys[button];
-            //as we changed the locale in the editor and it was detected in _Process(), now we are telling Godot to get the proper translation based on the new locale
-            string translatedText = TranslationServer.Translate(localizationKey);
-            //and we add the proper translation to the current button that we previously saved in a dictionary in _Ready()
-            button.Text = translatedText;
-            //GD.Print($"Button Text: {translatedText}, Key: {localizationKey}, Locale: {TranslationServer.GetLocale()}");
-        }
-
-        //for when the language options are displayed, if the user changes language, change the language locale of the buttons too
-        foreach (Button button in buttonLanguageKeys.Keys) {
-            string localizationKey = buttonLanguageKeys[button];
-            //as we changed the locale in the editor and it was detected in _Process(), now we are telling Godot to get the proper translation based on the new locale
-            string translatedText = TranslationServer.Translate(localizationKey);
-            //and we add the proper translation to the current button that we previously saved in a dictionary in _Ready()
-            button.Text = translatedText;
-            //GD.Print($"Button Text: {translatedText}, Key: {localizationKey}, Locale: {TranslationServer.GetLocale()}");
-        }
-    }
-
-
-    private const float InputDelay = 1.0f; // Adjust this value as needed
-
     public async Task DisplayMainMenu() {
+
         DisableButtonsInput();
         UIManager.Instance.dialogueBoxUI.TopLevel = false;
         UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
@@ -251,7 +226,6 @@ public partial class MainMenu : Control {
         GetViewport().SetInputAsHandled();
 
         UIManager.Instance.HideAllUIElements();
-        //MainOptionsContainer.Hide();
 
         VisualManager.Instance.RemoveImage();
         mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/splash screen the dragon riddle.png");
@@ -294,30 +268,15 @@ public partial class MainMenu : Control {
         this.Visible = false;
     }
 
-    private async Task FadeInInGamenMenu() {
-
-        await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);
-    }
-
-    private async Task FadeOutInGameMenu() {
-
-        await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
-    }
-
-    private void EnableInput() {
-        SetProcessInput(true);
-    }
-
-    public void DisableInput() {
-        SetProcessInput(false);
-    }
-
-    private void SetInputHandled() {
-        GetViewport().SetInputAsHandled();
-    }
-
+    private async Task FadeInInGamenMenu() => await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);   
+    private async Task FadeOutInGameMenu() => await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);  
+    private void EnableInput() => SetProcessInput(true);
+    public void DisableInput() => SetProcessInput(false);
+    private void SetInputHandled() => GetViewport().SetInputAsHandled();
+    public void HideIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = false;
+    public void ShowIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = true;
+    
     private void DisableButtonsInput() {
-
         DisableButtonInput(loadGameButton);
         DisableButtonInput(saveGameButton);
         DisableButtonInput(startNewGameButton);
@@ -327,7 +286,6 @@ public partial class MainMenu : Control {
     }
 
     private void EnableButtonsInput() {
-
         EnableButtonInput(loadGameButton);
         EnableButtonInput(saveGameButton);
         EnableButtonInput(startNewGameButton);
@@ -396,17 +354,7 @@ public partial class MainMenu : Control {
         MainMenuClosed?.Invoke();
         // MainOptionsContainer.TopLevel = false;
         // mainMenuBackgroundImage.TopLevel = true;
-
     }
-
-    public void HideIngameMenuIcon() {
-        UIManager.Instance.inGameMenuButton.Visible = false;
-    }
-
-    public void ShowIngameMenuIcon() {
-        UIManager.Instance.inGameMenuButton.Visible = true;
-    }
-
 
     private async Task OnStartNewGameButtonPressed() {
         DisableButtonInput(startNewGameButton);
@@ -451,7 +399,11 @@ public partial class MainMenu : Control {
         LanguageOptionsContainer.TopLevel = true;
         await UIFadeHelper.FadeInControl(LanguageOptionsContainer);
     }
-
+    
+    private async void OnEnglishButtonPressed() => await UpdateTextsBasedOnLocale("en");
+    private async void OnFrenchButtonPressed() =>  await UpdateTextsBasedOnLocale("fr");
+    private async void OnCatalanButtonPressed() => await UpdateTextsBasedOnLocale("ca");
+    
     private async Task OnCreditsButtonPressed() {
         HideIngameMenuIcon();
         DisableButtonsInput();
@@ -563,20 +515,6 @@ public partial class MainMenu : Control {
         EnableButtonsInput();
     }
 
-    private async void OnEnglishButtonPressed() {
-        //language = "en";
-        await UpdateTextsBasedOnLocale("en");
-    }
-
-    private async void OnFrenchButtonPressed() {
-        //language = "fr";
-        await UpdateTextsBasedOnLocale("fr");
-    }
-
-    private async void OnCatalanButtonPressed() {
-        //language = "ca";
-        await UpdateTextsBasedOnLocale("ca");
-    }
 
     private async Task OnLanguagesGoBackButtonPressed() {
         ShowIngameMenuIcon();

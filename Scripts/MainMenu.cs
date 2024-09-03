@@ -1,22 +1,25 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Diagnostics.SymbolStore;
-using static GameStateMachine;
 using System.Threading.Tasks;
+using static GameStateMachine;
 
 public partial class MainMenu : Control {
 
-    [Export] public string language { get; set; } = "";
     private string previousLanguage = "";
+
+    //UIElements
     Panel ExitGameConfirmationPanel;
     Panel ExitToMainMenuPanel;
     ConfirmationDialog creditsConfirmationDialog;
     public VBoxContainer MainOptionsContainer;
     public VBoxContainer LanguageOptionsContainer;
+    public TextureRect mainMenuBackgroundImage;
+
+    //Buttons
     private Dictionary<Button, string> buttonLocalizationKeys = new();
     private Dictionary<Button, string> buttonLanguageKeys = new();
+
     Button startNewGameButton;
     Button saveGameButton;
     Button continueGameButton;
@@ -29,45 +32,41 @@ public partial class MainMenu : Control {
     Button languagesGoBackButton;
     Button YesExitGameButton;
     Button NoExitGameButton;
-    public TextureRect mainMenuBackgroundImage;
+    Button YesExitToMainMenuButton;
+    Button NoExitToMainMenuButton;
+    Button englishButton;
+    Button frenchButton;
+    Button catalanButton;
+
+    //Button containers
+    private HBoxContainer YesNoButtonsHBoxContainer;
+    private HBoxContainer YesNoExitToMenuButtonsHBoxContainer;
+
+    //Constants
     public bool LOAD_SCREEN = true;
     public bool SAVE_SCREEN = false;
+
+    //Events
     public Action MainMenuOpened;
     public Action InGameMenuOpened;
     public Action MainMenuClosed;
     public Action InGameMenuClosed;
-    private UITextTweenFadeIn fadeIn;
-    private UITextTweenFadeOut fadeOut;
-    private string wantToQuitGameTRANSLATE = "WANT_QUIT_GAME?";
-    private string wantToQuitToMainMenuTRANSLATE = "WANT_QUIT_TO_MAIN_MENU?";
-
-    private RichTextLabel WantToQuitGameLabel;
-    private HBoxContainer YesNoButtonsHBoxContainer;
-
-    Button YesExitToMainMenuButton;
-    Button NoExitToMainMenuButton;
-    RichTextLabel WantToQuitToMainMenuLabel;
-    HBoxContainer YesNoExitToMenuButtonsHBoxContainer;
-
     public Action StartNewGameButtonPressed;
     public Action SaveGameButtonPressed;
     public Action LoadGameButtonPressed;
 
-    public override void _Ready() {
+    //Translations
+    private string wantToQuitGameTRANSLATE = "WANT_QUIT_GAME?";
+    private string wantToQuitToMainMenuTRANSLATE = "WANT_QUIT_TO_MAIN_MENU?";
 
-        CallDeferred("DisableInput");
+    //Text labels
+    private RichTextLabel WantToQuitGameLabel;
+    private RichTextLabel WantToQuitToMainMenuLabel;
 
-        fadeIn = new UITextTweenFadeIn();
-        fadeOut = new UITextTweenFadeOut();
 
-        mainMenuBackgroundImage = GetNode<TextureRect>("BackgroundImage");
+    private void GetUINodes() {
 
-        this.Show();
-        //displaying the UI boxes with the options
         MainOptionsContainer = GetNode<VBoxContainer>("MainOptionsContainer");
-
-        MainOptionsContainer.Visible = false;
-
         startNewGameButton = GetNode<Button>("MainOptionsContainer/StartNewGameButton");
         saveGameButton = GetNode<Button>("MainOptionsContainer/SaveGameButton"); ;
         continueGameButton = GetNode<Button>("MainOptionsContainer/ContinueButton"); ;
@@ -77,23 +76,11 @@ public partial class MainMenu : Control {
         creditsButton = GetNode<Button>("MainOptionsContainer/CreditsButton");
         exitToMainMenuButton = GetNode<Button>("MainOptionsContainer/ExitToMainMenuButton");
         exitGameButton = GetNode<Button>("MainOptionsContainer/ExitGameButton");
-
         ExitGameConfirmationPanel = GetNode<Panel>("%ExitGameConfirmationPanel");
         YesExitGameButton = GetNode<Button>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer/YesExitGameButton");
         NoExitGameButton = GetNode<Button>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer/NoExitGameButton");
         WantToQuitGameLabel = GetNode<RichTextLabel>("ExitGameConfirmationPanel/VBoxContainer/MarginContainer/WantToQuitGameLabel");
         YesNoButtonsHBoxContainer = GetNode<HBoxContainer>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer");
-
-        WantToQuitGameLabel.BbcodeEnabled = true;
-
-        WantToQuitGameLabel.Text = wantToQuitGameTRANSLATE;
-        YesNoButtonsHBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
-        // Add margins
-        YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_left", 20);
-        YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_right", 20);
-        YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_bottom", 50);
-        // Add space between buttons
-        YesNoButtonsHBoxContainer.AddThemeConstantOverride("separation", 20);
 
         ExitToMainMenuPanel = GetNode<Panel>("ExitToMainMenuPanel");
         YesExitToMainMenuButton = GetNode<Button>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/YesExitToMainMenuButton");
@@ -101,20 +88,17 @@ public partial class MainMenu : Control {
         WantToQuitToMainMenuLabel = GetNode<RichTextLabel>("ExitToMainMenuPanel/VBoxContainer/MarginContainer/WantToExitToMainMenuLabel");
         YesNoExitToMenuButtonsHBoxContainer = GetNode<HBoxContainer>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer");
 
-        WantToQuitToMainMenuLabel.BbcodeEnabled = true;
-
-        WantToQuitToMainMenuLabel.Text = wantToQuitToMainMenuTRANSLATE;
-        //WantToQuitToMainMenuLabel.Text = $"[center]{TranslationServer.Translate(wantToQuitToMainMenuTRANSLATE)}[/center]";
-
-        YesNoExitToMenuButtonsHBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
-        // Add margins
-        YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_left", 20);
-        YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_right", 20);
-        YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_bottom", 50);
-        // Add space between buttons
-        YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("separation", 20);
-
+        LanguageOptionsContainer = GetNode<VBoxContainer>("LanguageOptionsContainer");
+        englishButton = GetNode<Button>("LanguageOptionsContainer/EnglishButton");
+        frenchButton = GetNode<Button>("LanguageOptionsContainer/FrenchButton");
+        catalanButton = GetNode<Button>("LanguageOptionsContainer/CatalanButton");
+        languagesGoBackButton = GetNode<Button>("LanguageOptionsContainer/GoBackButton");
         creditsConfirmationDialog = GetNode<ConfirmationDialog>("CreditsConfirmationDialog");
+
+        mainMenuBackgroundImage = GetNode<TextureRect>("BackgroundImage");
+    }
+
+    private void SetupButtonEvents() {
 
         //trigger events depending on the option clicked
         startNewGameButton.Pressed += () => _ = OnStartNewGameButtonPressed();
@@ -125,40 +109,54 @@ public partial class MainMenu : Control {
         creditsButton.Pressed += () => _ = OnCreditsButtonPressed();
         exitToMainMenuButton.Pressed += OnExitToMainMenuButtonPressed;
         YesExitToMainMenuButton.Pressed += () => _ = OnExitToMainMenuConfirmButtonPressed();
-        NoExitToMainMenuButton.Pressed  += () => _ = OnExitToMainMenuCancelButtonPressed();
-
+        NoExitToMainMenuButton.Pressed += () => _ = OnExitToMainMenuCancelButtonPressed();
         exitGameButton.Pressed += () => _ = OnExitGameButtonPressed();
         NoExitGameButton.Pressed += () => _ = OnExitGameCancelButtonPressed();
         YesExitGameButton.Pressed += () => _ = OnExitGameConfirmButtonPressed();
-
         creditsConfirmationDialog.Canceled += () => _ = OnCreditsCancelOrConfirmButtonPressed();
         creditsConfirmationDialog.Confirmed += () => _ = OnCreditsCancelOrConfirmButtonPressed();
-
-        LanguageOptionsContainer = GetNode<VBoxContainer>("LanguageOptionsContainer");
-        Button englishButton = GetNode<Button>("LanguageOptionsContainer/EnglishButton");
-        Button frenchButton = GetNode<Button>("LanguageOptionsContainer/FrenchButton");
-        Button catalanButton = GetNode<Button>("LanguageOptionsContainer/CatalanButton");
-        languagesGoBackButton = GetNode<Button>("LanguageOptionsContainer/GoBackButton");
-
         englishButton.Pressed += OnEnglishButtonPressed;
         frenchButton.Pressed += OnFrenchButtonPressed;
         catalanButton.Pressed += OnCatalanButtonPressed;
         languagesGoBackButton.Pressed += () => _ = OnLanguagesGoBackButtonPressed();
+    }
+
+    private void ApplyCustomStyles() {
 
         AnchorRight = 1;
         AnchorBottom = 1;
         OffsetRight = 0;
         OffsetBottom = 0;
 
-        //***** SET LANGUAGE HERE *****
-        //we check what language the user has in his Windows OS
-        string currentCultureName = System.Globalization.CultureInfo.CurrentCulture.Name;
-        string[] parts = currentCultureName.Split('-');
-        language = parts[0];
-        TranslationServer.SetLocale(language);
-        //for testing purposes, will change the language directly here so we do not have to tinker witn Windows locale settings each time
-        language = "en";
-        TranslationServer.SetLocale(language);
+        WantToQuitGameLabel.BbcodeEnabled = true;
+        WantToQuitToMainMenuLabel.BbcodeEnabled = true;
+
+        YesNoButtonsHBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
+        // Add margins
+        YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_left", 20);
+        YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_right", 20);
+        YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_bottom", 50);
+        // Add space between buttons
+        YesNoButtonsHBoxContainer.AddThemeConstantOverride("separation", 20);
+
+        YesNoExitToMenuButtonsHBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
+        // Add margins
+        YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_left", 20);
+        YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_right", 20);
+        YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_bottom", 50);
+        // Add space between buttons
+        YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("separation", 20);
+
+        ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
+        ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
+        UIThemeHelper.ApplyCustomStyleToPanel(ExitToMainMenuPanel);
+        ApplyCustomStyleToButtonsInContainer(ExitToMainMenuPanel);
+        UIThemeHelper.ApplyCustomStyleToPanel(ExitGameConfirmationPanel);
+        ApplyCustomStyleToButtonsInContainer(ExitGameConfirmationPanel);
+        UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
+    }
+
+    private void GetButtonLocalizationKeys() {
 
         //below, we grab the locale keys before they are overwritten by the fallback locale translation,
         //otherwise we wouldn't be able to switch to another locale as the keys would be destroyed.
@@ -178,16 +176,25 @@ public partial class MainMenu : Control {
             buttonLanguageKeys[button] = initialText;
             GD.Print($"Button name: {button.Name}, Key: {initialText}, Locale: {TranslationServer.GetLocale()}");
         }
-
-        ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
-        ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
-        UIThemeHelper.ApplyCustomStyleToPanel(ExitToMainMenuPanel);
-        ApplyCustomStyleToButtonsInContainer(ExitToMainMenuPanel);
-        UIThemeHelper.ApplyCustomStyleToPanel(ExitGameConfirmationPanel);
-        ApplyCustomStyleToButtonsInContainer(ExitGameConfirmationPanel);
-
-        UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
     }
+
+    public override void _Ready() {
+
+        //this.Show();
+        CallDeferred("DisableInput");
+        GetUINodes();
+        SetupButtonEvents();
+        ApplyCustomStyles();
+        GetButtonLocalizationKeys();
+        //displaying the UI boxes with the options
+        MainOptionsContainer.Visible = false;
+
+        WantToQuitGameLabel.Text = wantToQuitGameTRANSLATE;
+        WantToQuitToMainMenuLabel.Text = wantToQuitToMainMenuTRANSLATE;
+        //WantToQuitToMainMenuLabel.Text = $"[center]{TranslationServer.Translate(wantToQuitToMainMenuTRANSLATE)}[/center]";
+    }
+
+
 
     private void ApplyCustomStyleToButtonsInContainer(Control container) {
         foreach (var child in container.GetChildren()) {
@@ -365,7 +372,7 @@ public partial class MainMenu : Control {
 
     private void DisableButtonsInput() {
 
-        DisableButtonInput(loadGameButton); 
+        DisableButtonInput(loadGameButton);
         DisableButtonInput(saveGameButton);
         DisableButtonInput(startNewGameButton);
         DisableButtonInput(languageButton);
@@ -375,7 +382,7 @@ public partial class MainMenu : Control {
 
     private void EnableButtonsInput() {
 
-        EnableButtonInput(loadGameButton); 
+        EnableButtonInput(loadGameButton);
         EnableButtonInput(saveGameButton);
         EnableButtonInput(startNewGameButton);
         EnableButtonInput(languageButton);
@@ -410,7 +417,7 @@ public partial class MainMenu : Control {
         MainOptionsContainer.Show();
         MainOptionsContainer.Modulate = new Color(1, 1, 1, 1);  // Full opacity
         MainOptionsContainer.TopLevel = true;
-        await fadeIn.FadeIn(MainOptionsContainer, 0.6f);
+        await UIFadeHelper.FadeInControl(MainOptionsContainer, 0.6f);
         MainOptionsContainer.SetProcessInput(true);
         EnableButtonsInput();
         UIInputHelper.EnableParentChildrenInput(MainOptionsContainer);

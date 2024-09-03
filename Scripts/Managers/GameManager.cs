@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 
 public partial class GameManager : Control {
+
+    [Export] public string language { get; set; } = "";
     public static GameManager Instance { get; private set; }
     public DialogueManager DialogueManager { get; private set; }
     public UIManager UIManager { get; private set; }
@@ -40,7 +42,21 @@ public partial class GameManager : Control {
             QueueFree();
         }
 
+        SetupInitialLanguage();
         LoadTranslations();
+    }
+
+
+    private void SetupInitialLanguage() {
+        //***** SET LANGUAGE HERE *****
+        //we check what language the user has in his Windows OS
+        string currentCultureName = System.Globalization.CultureInfo.CurrentCulture.Name;
+        string[] parts = currentCultureName.Split('-');
+        language = parts[0];
+        TranslationServer.SetLocale(language);
+        //for testing purposes, will change the language directly here so we do not have to tinker witn Windows locale settings each time
+        language = "en";
+        TranslationServer.SetLocale(language);
     }
 
     private void LoadTranslations() {

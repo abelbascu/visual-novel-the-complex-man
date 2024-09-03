@@ -250,7 +250,6 @@ public partial class MainMenu : Control {
         await FadeInMainMenu();
         CallDeferred(nameof(EnableButtonsInput));
         SetProcessInput(true);
-        UIInputHelper.EnableParentChildrenInput(MainOptionsContainer);
 
         MainMenuOpened?.Invoke();
     }
@@ -277,6 +276,7 @@ public partial class MainMenu : Control {
     public void ShowIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = true;
     
     private void DisableButtonsInput() {
+        DisableButtonInput(continueGameButton);
         DisableButtonInput(loadGameButton);
         DisableButtonInput(saveGameButton);
         DisableButtonInput(startNewGameButton);
@@ -286,6 +286,7 @@ public partial class MainMenu : Control {
     }
 
     private void EnableButtonsInput() {
+        EnableButtonInput(continueGameButton);
         EnableButtonInput(loadGameButton);
         EnableButtonInput(saveGameButton);
         EnableButtonInput(startNewGameButton);
@@ -297,11 +298,13 @@ public partial class MainMenu : Control {
     private void DisableButtonInput(Button button) {
         button.SetProcessInput(false);
         button.MouseFilter = MouseFilterEnum.Ignore;
+        button.FocusMode = FocusModeEnum.None;
     }
 
     private void EnableButtonInput(Button button) {
         button.SetProcessInput(true);
         button.MouseFilter = MouseFilterEnum.Stop;
+        button.FocusMode = FocusModeEnum.All;
     }
 
     public async Task DisplayInGameMenu() {
@@ -324,14 +327,12 @@ public partial class MainMenu : Control {
         await UIFadeHelper.FadeInControl(MainOptionsContainer, 0.6f);
         MainOptionsContainer.SetProcessInput(true);
         EnableButtonsInput();
-        UIInputHelper.EnableParentChildrenInput(MainOptionsContainer);
         ShowIngameMenuIcon();
         InGameMenuOpened?.Invoke();
     }
 
     public async Task CloseInGameMenu() {
-        UIInputHelper.DisableParentChildrenInput(MainOptionsContainer);
-
+        DisableButtonsInput();
         MainOptionsContainer.SetProcessInput(false);
         UIManager.Instance.menuOverlay.Visible = false;
         MainOptionsContainer.SetProcessInput(false);
@@ -341,23 +342,16 @@ public partial class MainMenu : Control {
     }
 
     public async Task CloseMainMenu() {
-
-        UIInputHelper.DisableParentChildrenInput(MainOptionsContainer);
-
-        // MainOptionsContainer.TopLevel = false;
-        // mainMenuBackgroundImage.TopLevel = false;
+        DisableButtonsInput();
         MainOptionsContainer.SetProcessInput(false);
         await FadeOutMainMenu();
         MainOptionsContainer.Visible = false;
         mainMenuBackgroundImage.Visible = false;
-
         MainMenuClosed?.Invoke();
-        // MainOptionsContainer.TopLevel = false;
-        // mainMenuBackgroundImage.TopLevel = true;
     }
 
     private async Task OnStartNewGameButtonPressed() {
-        DisableButtonInput(startNewGameButton);
+        DisableButtonsInput();
         HideIngameMenuIcon();
         await FadeOutMainMenu();
         StartNewGameButtonPressed.Invoke();
@@ -365,8 +359,8 @@ public partial class MainMenu : Control {
     }
 
     private async Task OnContinueButtonPressed() {
-        ShowIngameMenuIcon();
         DisableButtonsInput();
+        ShowIngameMenuIcon();
         await CloseInGameMenu();
 
         GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
@@ -399,7 +393,7 @@ public partial class MainMenu : Control {
         LanguageOptionsContainer.TopLevel = true;
         await UIFadeHelper.FadeInControl(LanguageOptionsContainer);
     }
-    
+
     private async void OnEnglishButtonPressed() => await UpdateTextsBasedOnLocale("en");
     private async void OnFrenchButtonPressed() =>  await UpdateTextsBasedOnLocale("fr");
     private async void OnCatalanButtonPressed() => await UpdateTextsBasedOnLocale("ca");

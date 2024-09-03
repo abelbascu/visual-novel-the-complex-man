@@ -15,9 +15,6 @@ public partial class MainMenu : Control {
     public TextureRect mainMenuBackgroundImage;
 
     //Buttons
-    private Dictionary<Button, string> buttonLocalizationKeys = new();
-    private Dictionary<Button, string> buttonLanguageKeys = new();
-
     Button startNewGameButton;
     Button saveGameButton;
     Button continueGameButton;
@@ -68,7 +65,6 @@ public partial class MainMenu : Control {
         GetUINodes();
         SetupButtonEvents();
         ApplyCustomStyles();
-        // GetButtonLocalizationKeys();
 
         //assign the loc keys so each time the language changes the text property is updated
         WantToQuitGameLabel.Text = wantToQuitGameTRANSLATE;
@@ -77,7 +73,10 @@ public partial class MainMenu : Control {
 
     private void GetUINodes() {
 
+        //main buttons container
         MainOptionsContainer = GetNode<VBoxContainer>("MainOptionsContainer");
+
+        //main buttons
         startNewGameButton = GetNode<Button>("MainOptionsContainer/StartNewGameButton");
         saveGameButton = GetNode<Button>("MainOptionsContainer/SaveGameButton"); ;
         continueGameButton = GetNode<Button>("MainOptionsContainer/ContinueButton"); ;
@@ -87,31 +86,38 @@ public partial class MainMenu : Control {
         creditsButton = GetNode<Button>("MainOptionsContainer/CreditsButton");
         exitToMainMenuButton = GetNode<Button>("MainOptionsContainer/ExitToMainMenuButton");
         exitGameButton = GetNode<Button>("MainOptionsContainer/ExitGameButton");
+
+        //exit game panel
         ExitGameConfirmationPanel = GetNode<Panel>("%ExitGameConfirmationPanel");
         YesExitGameButton = GetNode<Button>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer/YesExitGameButton");
         NoExitGameButton = GetNode<Button>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer/NoExitGameButton");
         WantToQuitGameLabel = GetNode<RichTextLabel>("ExitGameConfirmationPanel/VBoxContainer/MarginContainer/WantToQuitGameLabel");
         YesNoButtonsHBoxContainer = GetNode<HBoxContainer>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer");
 
+        //exit to main menu panel
         ExitToMainMenuPanel = GetNode<Panel>("ExitToMainMenuPanel");
         YesExitToMainMenuButton = GetNode<Button>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/YesExitToMainMenuButton");
         NoExitToMainMenuButton = GetNode<Button>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/NoExitToMainMenuButton");
         WantToQuitToMainMenuLabel = GetNode<RichTextLabel>("ExitToMainMenuPanel/VBoxContainer/MarginContainer/WantToExitToMainMenuLabel");
         YesNoExitToMenuButtonsHBoxContainer = GetNode<HBoxContainer>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer");
 
+        //languages panel
         LanguageOptionsContainer = GetNode<VBoxContainer>("LanguageOptionsContainer");
         englishButton = GetNode<Button>("LanguageOptionsContainer/EnglishButton");
         frenchButton = GetNode<Button>("LanguageOptionsContainer/FrenchButton");
         catalanButton = GetNode<Button>("LanguageOptionsContainer/CatalanButton");
         languagesGoBackButton = GetNode<Button>("LanguageOptionsContainer/GoBackButton");
+
+        //credits
         creditsConfirmationDialog = GetNode<ConfirmationDialog>("CreditsConfirmationDialog");
 
+        //main menu background image
         mainMenuBackgroundImage = GetNode<TextureRect>("BackgroundImage");
     }
 
     private void SetupButtonEvents() {
 
-        //trigger events depending on the option clicked
+        //main buttons events
         startNewGameButton.Pressed += () => _ = OnStartNewGameButtonPressed();
         continueGameButton.Pressed += () => _ = OnContinueButtonPressed();
         saveGameButton.Pressed += () => _ = OnSaveGameButtonPressed();
@@ -119,13 +125,21 @@ public partial class MainMenu : Control {
         languageButton.Pressed += () => _ = OnLanguageButtonPressed();
         creditsButton.Pressed += () => _ = OnCreditsButtonPressed();
         exitToMainMenuButton.Pressed += OnExitToMainMenuButtonPressed;
+        exitGameButton.Pressed += () => _ = OnExitGameButtonPressed();
+
+        //exit to main menu events
         YesExitToMainMenuButton.Pressed += () => _ = OnExitToMainMenuConfirmButtonPressed();
         NoExitToMainMenuButton.Pressed += () => _ = OnExitToMainMenuCancelButtonPressed();
-        exitGameButton.Pressed += () => _ = OnExitGameButtonPressed();
+
+        //exit game events
         NoExitGameButton.Pressed += () => _ = OnExitGameCancelButtonPressed();
         YesExitGameButton.Pressed += () => _ = OnExitGameConfirmButtonPressed();
+
+        //credits events
         creditsConfirmationDialog.Canceled += () => _ = OnCreditsCancelOrConfirmButtonPressed();
         creditsConfirmationDialog.Confirmed += () => _ = OnCreditsCancelOrConfirmButtonPressed();
+
+        //languages events
         englishButton.Pressed += OnEnglishButtonPressed;
         frenchButton.Pressed += OnFrenchButtonPressed;
         catalanButton.Pressed += OnCatalanButtonPressed;
@@ -181,6 +195,12 @@ public partial class MainMenu : Control {
     public async Task UpdateTextsBasedOnLocale(string language) {
 
         TranslationServer.SetLocale(language);
+        await SetButtonsVisualStateAsync(false);
+        
+        foreach(Button button in LanguageOptionsContainer.GetChildren())
+        {
+            DisableButtonInput(button);
+        }
 
         if (UIManager.Instance.dialogueBoxUI.IsVisibleInTree()) {
             DialogueManager.Instance.DisplayDialogue(DialogueManager.Instance.currentDialogueObject);
@@ -191,6 +211,14 @@ public partial class MainMenu : Control {
             UIManager.Instance.playerChoicesBoxUI.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, TranslationServer.GetLocale());
             await WaitForPlayerChoiceCompletion();
         }
+
+         foreach(Button button in LanguageOptionsContainer.GetChildren())
+        {
+            EnableButtonInput(button);
+            await SetButtonsVisualStateAsync(true);
+        }
+
+
     }
 
     private async Task WaitForDialogueCompletion() {
@@ -206,8 +234,8 @@ public partial class MainMenu : Control {
     }
 
     private void SetButtonsVisualState(bool enabled) {
-        foreach (KeyValuePair<Button, string> pair in buttonLanguageKeys) {
-            pair.Key.Modulate = enabled ? Colors.White : Colors.Gray;
+        foreach (Button button in LanguageOptionsContainer.GetChildren()) {
+            button.Modulate = enabled ? Colors.White : Colors.Gray;
         }
     }
 
@@ -312,6 +340,8 @@ public partial class MainMenu : Control {
 
     public async Task DisplayInGameMenu() {
         DisableButtonsInput();
+        UIManager.Instance.dialogueBoxUI.TopLevel = false;
+        UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
         MainOptionsContainer.SetProcessInput(false);
         Show();
         saveGameButton.Show();

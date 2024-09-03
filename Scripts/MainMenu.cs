@@ -148,6 +148,7 @@ public partial class MainMenu : Control {
 
     private void ApplyCustomStyles() {
 
+        //put main menu to full rect
         AnchorRight = 1;
         AnchorBottom = 1;
         OffsetRight = 0;
@@ -157,7 +158,7 @@ public partial class MainMenu : Control {
         WantToQuitToMainMenuLabel.BbcodeEnabled = true;
 
         YesNoButtonsHBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
-        // Add margins
+        // Add margins to prevent buttons touching the edges of panel
         YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_left", 20);
         YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_right", 20);
         YesNoButtonsHBoxContainer.AddThemeConstantOverride("margin_bottom", 50);
@@ -165,13 +166,12 @@ public partial class MainMenu : Control {
         YesNoButtonsHBoxContainer.AddThemeConstantOverride("separation", 20);
 
         YesNoExitToMenuButtonsHBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
-        // Add margins
         YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_left", 20);
         YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_right", 20);
         YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("margin_bottom", 50);
-        // Add space between buttons
         YesNoExitToMenuButtonsHBoxContainer.AddThemeConstantOverride("separation", 20);
 
+        //apply a default blue style with white rounded edges for panels and buttons
         ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
         ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
         UIThemeHelper.ApplyCustomStyleToPanel(ExitToMainMenuPanel);
@@ -192,51 +192,61 @@ public partial class MainMenu : Control {
         }
     }
 
+    //when user selects language on main menu, this is called
     public async Task UpdateTextsBasedOnLocale(string language) {
 
         TranslationServer.SetLocale(language);
-        await SetButtonsVisualStateAsync(false);
+        //put language buttons in grey
+        await SetLanguageButtonsVisualStateAsync(false);
 
+        //then disable them
         foreach (Button button in LanguageOptionsContainer.GetChildren()) {
             DisableButtonInput(button);
         }
 
+        //if there is a dialogue on screen, translate it as soon as language is changed
         if (UIManager.Instance.dialogueBoxUI.IsVisibleInTree()) {
             DialogueManager.Instance.DisplayDialogue(DialogueManager.Instance.currentDialogueObject);
             await WaitForDialogueCompletion();
         }
 
+        //if there are player choices on screen, translate them as soon as language is changed
         if (UIManager.Instance.playerChoicesBoxUI.IsVisibleInTree()) {
             UIManager.Instance.playerChoicesBoxUI.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, TranslationServer.GetLocale());
             await WaitForPlayerChoiceCompletion();
         }
 
+        //enable language buttons again
         foreach (Button button in LanguageOptionsContainer.GetChildren()) {
             EnableButtonInput(button);
-            await SetButtonsVisualStateAsync(true);
         }
+
+        //language buttons to to default color
+        await SetLanguageButtonsVisualStateAsync(true);
     }
 
+    //while dialogue is still being displayed to the new language, wait
     private async Task WaitForDialogueCompletion() {
         while (DialogueManager.Instance.isDialogueBeingPrinted) {
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         }
     }
 
+    //while player choices is still being displayed to the new language, wait
     private async Task WaitForPlayerChoiceCompletion() {
         while (DialogueManager.Instance.IsPlayerChoiceBeingPrinted) {
             await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         }
     }
 
-    private void SetButtonsVisualState(bool enabled) {
+    private void SetLanguageButtonsVisualState(bool enabled) {
         foreach (Button button in LanguageOptionsContainer.GetChildren()) {
             button.Modulate = enabled ? Colors.White : Colors.Gray;
         }
     }
 
-    private async Task SetButtonsVisualStateAsync(bool enabled) {
-        SetButtonsVisualState(enabled);
+    private async Task SetLanguageButtonsVisualStateAsync(bool enabled) {
+        SetLanguageButtonsVisualState(enabled);
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
     }
 
@@ -273,7 +283,7 @@ public partial class MainMenu : Control {
         button.MouseFilter = MouseFilterEnum.Stop;
         button.FocusMode = FocusModeEnum.All;
     }
-    
+
     public async Task DisplayMainMenu() {
 
         DisableButtonsInput();
@@ -300,7 +310,7 @@ public partial class MainMenu : Control {
         exitToMainMenuButton.Hide();
 
         UIManager.Instance.inGameMenuButton.Hide();
-        
+
         //a mask to avoid clicking on the dialoguebox when menus are open
         UIManager.Instance.menuOverlay.Visible = false;
 

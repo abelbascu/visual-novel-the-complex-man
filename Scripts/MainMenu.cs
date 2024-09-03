@@ -250,6 +250,8 @@ public partial class MainMenu : Control {
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
     }
 
+    //when the user clicks on any menu button, let's disable all buttons
+    //to prevent race conditions and breaking the state machine.
     private void DisableButtonsInput() {
         DisableButtonInput(continueGameButton);
         DisableButtonInput(loadGameButton);
@@ -287,45 +289,50 @@ public partial class MainMenu : Control {
     public async Task DisplayMainMenu() {
 
         DisableButtonsInput();
+
         //put interfering UI elements behind
+        //Dialogue Mode UI elements
         UIManager.Instance.dialogueBoxUI.TopLevel = false;
         UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
 
         // Clear any pending input events
         GetViewport().SetInputAsHandled();
 
-        UIManager.Instance.HideAllUIElements();
-
+        //if we come back from a current play, remove the dialogue mode image
         VisualManager.Instance.RemoveImage();
+        //then load the main menu own image
         mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/splash screen the dragon riddle.png");
         mainMenuBackgroundImage.Modulate = new Color(1, 1, 1, 1);  // This sets it to ffffff (fully opaque)
-
-        mainMenuBackgroundImage.TopLevel = true;
         mainMenuBackgroundImage.SetAnchorsPreset(LayoutPreset.FullRect);
+        mainMenuBackgroundImage.Visible = true;
 
+        //specific main menu buttons, not ingame menu
         startNewGameButton.Show();
         exitGameButton.Show();
         saveGameButton.Hide();
         continueGameButton.Hide();
         exitToMainMenuButton.Hide();
 
+        //only displayed in dialogue mode, or future game modes
         UIManager.Instance.inGameMenuButton.Hide();
 
-        //a mask to avoid clicking on the dialoguebox when menus are open
+        //a mask to avoid clicking on the dialoguebox/player choices
+        //when ingame menu is open. If in main menu, disable it.
         UIManager.Instance.menuOverlay.Visible = false;
 
         MainOptionsContainer.TopLevel = true;
         MainOptionsContainer.Show();
         mainMenuBackgroundImage.Show();
-        mainMenuBackgroundImage.Visible = true;
         Show();
 
         await FadeInMainMenu();
-
         EnableButtonsInput();
 
+        //this calls to pause the game timer, more sense on ingame menu
+        //but can be used to autosave game while user exits current game
         MainMenuOpened?.Invoke();
     }
+
 
     public async Task FadeInMainMenu() {
         await Task.WhenAll(
@@ -486,10 +493,10 @@ public partial class MainMenu : Control {
         GD.Print($"Last Game mode before exit to Main Menu: {GameStateManager.Instance.LastGameMode}");
 
         if (GameStateManager.Instance.LastGameMode == State.InDialogueMode) {
-            UIManager.Instance.dialogueBoxUI.TopLevel = false;
-            UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
             UIManager.Instance.fadeOverlay.TopLevel = true;
             await UIManager.Instance.FadeInScreenOverlay(1.5f);
+            UIManager.Instance.dialogueBoxUI.Hide();
+            UIManager.Instance.playerChoicesBoxUI.Hide();
             VisualManager.Instance.RemoveImage();
         }
 
@@ -503,10 +510,8 @@ public partial class MainMenu : Control {
         await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.6f);
         ExitToMainMenuPanel.Visible = false;
         ShowIngameMenuIcon();
-        //await FadeInInGamenMenu();
         EnableButtonInput(NoExitToMainMenuButton);
         EnableButtonInput(YesExitToMainMenuButton);
-        //EnableButtonInput(exitToMainMenuButton);
         GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
         EnableButtonsInput();
     }
@@ -549,7 +554,6 @@ public partial class MainMenu : Control {
         DisableButtonsInput();
         await UIFadeHelper.FadeOutControl(ExitGameConfirmationPanel, 0.6f);
         ExitGameConfirmationPanel.Visible = false;
-        ShowIngameMenuIcon();
         await FadeInInGamenMenu();
         EnableButtonInput(NoExitGameButton);
         EnableButtonInput(YesExitGameButton);
@@ -559,7 +563,9 @@ public partial class MainMenu : Control {
     }
 
     private async Task OnLanguagesGoBackButtonPressed() {
-        ShowIngameMenuIcon();
+        if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
+            ShowIngameMenuIcon();
+
         DisableButtonInput(languagesGoBackButton);
         GetTree().CallGroup("popups", "close_all");
         await UIFadeHelper.FadeOutControl(LanguageOptionsContainer, 0.6f);

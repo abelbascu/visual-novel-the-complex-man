@@ -177,7 +177,7 @@ public partial class GameManager : Control {
     }
 
     public async Task Load_Game(string saveFilePath) {
-        UIManager.Instance.HideAllUIElements();
+        // UIManager.Instance.HideAllUIElements();
         //WE NEED CHANGE TO THE 'LOADING' STATE WHILE DATA IS BEING LOADED. WE NEED TO IMPLEMENT AN ANIMATED LOADING SYMBOL TO WARN THE USER.
         UIManager.Instance.menuOverlay.Visible = false;
         LoadSaveManager.Instance.LoadGame(saveFilePath);
@@ -266,7 +266,7 @@ public partial class GameManager : Control {
 
     public async Task Exit_To_Main_Menu() {
         // CloseInGameMenu();
-        UIManager.Instance.HideAllUIElements();
+        // UIManager.Instance.HideAllUIElements();
         VisualManager.Instance.RemoveImage();
         //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN 
         await UIManager.Instance.mainMenu.DisplayMainMenu();

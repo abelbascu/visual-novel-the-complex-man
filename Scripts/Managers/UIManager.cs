@@ -179,14 +179,14 @@ public partial class UIManager : Control {
         splashScreen.Hide();
     }
 
-    public void HideAllUIElements() {
-        var uiManager = this;
-        foreach (Control child in uiManager.GetChildren()) {
-            if (child != this && child is Control controlNode) {
-                controlNode.Visible = false;
-            }
-        }
-    }
+    // public void HideAllUIElements() {
+    //     var uiManager = this;
+    //     foreach (Control child in uiManager.GetChildren()) {
+    //         if (child != this && child is Control controlNode) {
+    //             controlNode.Visible = false;
+    //         }
+    //     }
+    // }
 
     private void SetupNodeOrder() {
         // Ensure VisualsManager is below UI elements in the scene tree

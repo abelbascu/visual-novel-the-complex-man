@@ -61,7 +61,7 @@ public partial class MainMenu : Control {
 
     public override void _Ready() {
 
-        CallDeferred("DisableInput");
+        //CallDeferred("DisableInput");
         GetUINodes();
         SetupButtonEvents();
         ApplyCustomStyles();
@@ -333,7 +333,6 @@ public partial class MainMenu : Control {
         MainMenuOpened?.Invoke();
     }
 
-
     public async Task FadeInMainMenu() {
         await Task.WhenAll(
             UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f),
@@ -344,13 +343,14 @@ public partial class MainMenu : Control {
         await Task.WhenAll(
             UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f),
             UIFadeHelper.FadeOutControl(mainMenuBackgroundImage, 1.0f));
-        this.Visible = false;
     }
 
     private async Task FadeInInGamenMenu() => await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);
     private async Task FadeOutInGameMenu() => await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
+
     private void EnableInput() => SetProcessInput(true);
-    public void DisableInput() => SetProcessInput(false);
+    //public void DisableInput() => SetProcessInput(false);
+
     private void SetInputHandled() => GetViewport().SetInputAsHandled();
     public void HideIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = false;
     public void ShowIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = true;
@@ -385,7 +385,6 @@ public partial class MainMenu : Control {
         UIManager.Instance.menuOverlay.Visible = false;
         MainOptionsContainer.SetProcessInput(false);
         await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
-        MainOptionsContainer.Visible = false;
         InGameMenuClosed?.Invoke();
     }
 
@@ -393,8 +392,6 @@ public partial class MainMenu : Control {
         DisableButtonsInput();
         MainOptionsContainer.SetProcessInput(false);
         await FadeOutMainMenu();
-        MainOptionsContainer.Visible = false;
-        mainMenuBackgroundImage.Visible = false;
         MainMenuClosed?.Invoke();
     }
 
@@ -488,7 +485,6 @@ public partial class MainMenu : Control {
         DisableButtonInput(YesExitToMainMenuButton);
         HideIngameMenuIcon();
         await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.5f);
-        ExitToMainMenuPanel.Visible = false;
 
         GD.Print($"Last Game mode before exit to Main Menu: {GameStateManager.Instance.LastGameMode}");
 
@@ -508,7 +504,6 @@ public partial class MainMenu : Control {
         DisableButtonInput(NoExitToMainMenuButton);
         DisableButtonInput(YesExitToMainMenuButton);
         await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.6f);
-        ExitToMainMenuPanel.Visible = false;
         ShowIngameMenuIcon();
         EnableButtonInput(NoExitToMainMenuButton);
         EnableButtonInput(YesExitToMainMenuButton);
@@ -543,7 +538,6 @@ public partial class MainMenu : Control {
         DisableButtonInput(YesExitGameButton);
         HideIngameMenuIcon();
         await UIFadeHelper.FadeOutControl(ExitGameConfirmationPanel, 1.2f);
-        ExitGameConfirmationPanel.Visible = false;
         GameStateManager.Instance.Fire(Trigger.EXIT_GAME);
     }
 
@@ -553,7 +547,6 @@ public partial class MainMenu : Control {
         DisableButtonInput(YesExitGameButton);
         DisableButtonsInput();
         await UIFadeHelper.FadeOutControl(ExitGameConfirmationPanel, 0.6f);
-        ExitGameConfirmationPanel.Visible = false;
         await FadeInInGamenMenu();
         EnableButtonInput(NoExitGameButton);
         EnableButtonInput(YesExitGameButton);
@@ -569,7 +562,6 @@ public partial class MainMenu : Control {
         DisableButtonInput(languagesGoBackButton);
         GetTree().CallGroup("popups", "close_all");
         await UIFadeHelper.FadeOutControl(LanguageOptionsContainer, 0.6f);
-        LanguageOptionsContainer.Visible = false;
         EnableButtonInput(languagesGoBackButton);
         DisableButtonsInput();
         await UIFadeHelper.FadeInControl(MainOptionsContainer, 0.6f);

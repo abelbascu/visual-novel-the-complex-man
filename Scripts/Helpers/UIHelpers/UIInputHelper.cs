@@ -38,6 +38,7 @@ public static class UIInputHelper
     {
         control.MouseFilter = isEnableInput ? Control.MouseFilterEnum.Stop : Control.MouseFilterEnum.Ignore;
         control.FocusMode = isEnableInput ? Control.FocusModeEnum.All : Control.FocusModeEnum.None;
+        //FALTARIA SETPROCESSINPUT TAMBIEN
     }
 
     private static void SetWindowInputState(Window window, bool isEnableInput)

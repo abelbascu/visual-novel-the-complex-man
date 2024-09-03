@@ -162,7 +162,7 @@ public partial class UIManager : Control {
         fadeOverlay.Modulate = new Color(1, 1, 1, 1);  // Start fully transparent
         await UIFadeHelper.FadeOutControl(fadeOverlay, duration);
         fadeOverlay.Visible = false;
-        // becasue even if we hide the scen it still processes input behind.
+        // becasue even if we hide the scene it still processes input behind.
         fadeOverlay.SetProcessInput(false);
         //colorRect.SetProcessInput(false);
 

@@ -5,9 +5,9 @@ using System.Linq;  // This is needed for the Select method
 
 public static class UIFadeHelper {
     public static async Task FadeInControl(Control control, float duration = 0.6f) {
-        GD.Print($"FadeInControl started for {control.Name}");
+        //GD.Print($"FadeInControl started for {control.Name}");
         await FadeControl(control, 0f, 1f, duration);
-        GD.Print($"FadeInControl completed for {control.Name}");
+        //GD.Print($"FadeInControl completed for {control.Name}");
     }
 
     public static async Task FadeOutControl(Control control, float duration = 0.6f) {
@@ -15,7 +15,7 @@ public static class UIFadeHelper {
     }
 
     private static async Task FadeControl(Control control, float fromAlpha, float toAlpha, float duration) {
-        GD.Print($"FadeControl started for {control.Name}: from {fromAlpha} to {toAlpha}");
+        //GD.Print($"FadeControl started for {control.Name}: from {fromAlpha} to {toAlpha}");
         control.Modulate = new Color(control.Modulate.R, control.Modulate.G, control.Modulate.B, fromAlpha);
         control.Visible = true;
 
@@ -23,12 +23,10 @@ public static class UIFadeHelper {
         tween.SetTrans(Tween.TransitionType.Sine);
         tween.SetEase(Tween.EaseType.InOut);
 
-
-
         tween.TweenProperty(control, "modulate:a", toAlpha, duration);
 
         await control.ToSignal(tween, Tween.SignalName.Finished);
-        GD.Print($"FadeControl completed for {control.Name}");
+        //GD.Print($"FadeControl completed for {control.Name}");
 
         if (toAlpha == 0f) {
             control.Visible = false;

@@ -180,7 +180,7 @@ public partial class SaveGameScreen : MarginContainer {
 
         // Ensure the save game screen is fully transparent before showing
         Modulate = new Color(1, 1, 1, 0);
-        
+
         Show();
         await UIFadeHelper.FadeInControl(this, 1.0f);
 
@@ -189,6 +189,7 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.MouseFilter = MouseFilterEnum.Stop;
     }
 
+
     private void SetSlotButtonsState(bool enabled) {
         foreach (var child in slotsContainer.GetChildren()) {
             if (child is SaveGameSlot slot) {
@@ -196,11 +197,11 @@ public partial class SaveGameScreen : MarginContainer {
                 if (button != null) {
                     button.SetProcessInput(enabled);
                     button.MouseFilter = enabled ? MouseFilterEnum.Stop : MouseFilterEnum.Ignore;
+                    button.FocusMode = enabled ? FocusModeEnum.All : FocusModeEnum.None;
                 }
             }
         }
     }
-
 
     private void PopulateSaveOrLoadSlots(bool isLoadScreen) {
         List<LoadSaveManager.GameState> saveGames = LoadSaveManager.Instance.GetSavedGames();
@@ -248,8 +249,6 @@ public partial class SaveGameScreen : MarginContainer {
     }
 
     private void OnSaveRequested(int slotNumber) {
-        //-------------------TRIGGER GAME STATE CHANGE -----------------------------
-        //--------------------------------------------------------------------------
 
         if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed)) {
             GameStateManager.Instance.Fire(Trigger.SAVE_GAME, AUTODSAVE_DISABLED_CONST);
@@ -257,15 +256,19 @@ public partial class SaveGameScreen : MarginContainer {
     }
 
     private void OnLoadRequested(string saveFilePath) {
-        if(GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+        if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
             UIManager.Instance.mainMenu.Hide();
         else
             UIManager.Instance.mainMenu.MainOptionsContainer.Hide();
+
+        SetSlotButtonsState(false);
+
         GameStateManager.Instance.Fire(Trigger.LOAD_GAME, saveFilePath);
-       // Hide();
+        // Hide();
     }
 
     public void RefreshSaveSlots() {
         PopulateSaveOrLoadSlots(false);
     }
+
 }

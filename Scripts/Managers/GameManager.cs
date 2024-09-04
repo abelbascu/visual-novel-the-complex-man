@@ -174,24 +174,20 @@ public partial class GameManager : Control {
     }
 
     public async Task Resume_Game_From_Ingame_Menu_Closed() {
+        
         await UIManager.Instance.mainMenu.CloseInGameMenu();
     }
 
     public async Task Load_Game(string saveFilePath) {
-        // UIManager.Instance.HideAllUIElements();
-        //WE NEED CHANGE TO THE 'LOADING' STATE WHILE DATA IS BEING LOADED. WE NEED TO IMPLEMENT AN ANIMATED LOADING SYMBOL TO WARN THE USER.
+ 
         UIManager.Instance.menuOverlay.Visible = false;
         LoadSaveManager.Instance.LoadGame(saveFilePath);
-        if (UIManager.Instance.mainMenu.IsVisibleInTree()) {
-            await UIManager.Instance.mainMenu.CloseMainMenu();
-        }
         await UIFadeHelper.FadeOutControl(UIManager.Instance.saveGameScreen, 1.5f);
 
         GameStateManager.Instance.Fire(Trigger.COMPLETE_LOADING_BASED_ON_GAME_MODE, GameStateManager.Instance.GetLastGameMode());
     }
 
     public async Task Initialize_Load_Screen() {
-
 
         UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.LOAD_SCREEN);
     }
@@ -203,16 +199,6 @@ public partial class GameManager : Control {
             await UIManager.Instance.mainMenu.CloseInGameMenu();
             
         await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
-    }
-
-    public void Enter_Dialogue_Mode() {
-        if (GameStateManager.Instance.CurrentState == State.InDialogueMode) {
-            UIManager.Instance.dialogueBoxUI.TopLevel = true;
-            UIManager.Instance.playerChoicesBoxUI.TopLevel = true;
-            UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
-
-        }
-
     }
 
     public void Complete_Loading_Based_On_Game_Mode(State LastGameMode) {
@@ -247,6 +233,16 @@ public partial class GameManager : Control {
         } else
             DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
     }
+    public void Enter_Dialogue_Mode() {
+        if (GameStateManager.Instance.CurrentState == State.InDialogueMode) {
+            UIManager.Instance.dialogueBoxUI.TopLevel = true;
+            UIManager.Instance.playerChoicesBoxUI.TopLevel = true;
+            UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
+
+        }
+
+    }
+
 
     public void Initialize_Save_Screen() {
         UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.SAVE_SCREEN);

@@ -13,25 +13,42 @@ public partial class InGameMenuButton : MarginContainer {
     }
 
     public async Task OnTextureButtonPressed() {
-        textureButton.SetProcessInput(false); //WE NEED TO PUT THIS TO LINES AFTER THE INGAME MENU HAS BEEN COMPLETELY DISPLAYED
-        textureButton.MouseFilter = MouseFilterEnum.Ignore; //OTHERWISE IF THE USER CLICKS THE INGAME BUTTON REPEATEDLY IT BREAKS
+
+        DisableIngameMenuButton();
 
         if (UIManager.Instance.mainMenu.MainOptionsContainer.Visible == false &&
                 GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
-            // await UIManager.Instance.mainMenu.DisplayInGameMenu();
+            //we pause timer here and not withing display menu method because when we show some submenus
+            //we hide the ingame menu and then show it again when closing the submenus.
+            //we just want to pause it every time that we are not in dialogue mode for now.
+            LoadSaveManager.Instance.PauseGameTimer();
+            await UIManager.Instance.mainMenu.DisplayInGameMenu();
             GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
-            textureButton.SetProcessInput(true); //WE NEED TO PUT THIS TO LINES AFTER THE INGAME MENU HAS BEEN COMPLETELY DISPLAYED
-            textureButton.MouseFilter = MouseFilterEnum.Stop; //OTHERWISE IF THE USER CLICKS THE INGAME BUTTON REPEATEDLY IT BREAKS
-
         } else {
-            textureButton.SetProcessInput(false);
-            textureButton.MouseFilter = MouseFilterEnum.Ignore;
+            LoadSaveManager.Instance.ResumeGameTimer();
             await UIManager.Instance.mainMenu.CloseInGameMenu();
-            UIManager.Instance.mainMenu.Visible = false;
             GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
-            textureButton.SetProcessInput(true);
-            textureButton.MouseFilter = MouseFilterEnum.Stop;
+            UIManager.Instance.mainMenu.Visible = false;
         }
+
+        EnableIngameMenuButton();
+
         UIManager.Instance.UpdateUILayout();
     }
+
+
+    public void DisableIngameMenuButton() {
+        textureButton.SetProcessInput(false);
+        textureButton.MouseFilter = MouseFilterEnum.Ignore;
+        textureButton.FocusMode = FocusModeEnum.None;
+    }
+
+    public void EnableIngameMenuButton() {
+        textureButton.SetProcessInput(true);
+        textureButton.MouseFilter = MouseFilterEnum.Stop;
+        textureButton.FocusMode = FocusModeEnum.All;
+        Visible = true;
+    }
+
+
 }

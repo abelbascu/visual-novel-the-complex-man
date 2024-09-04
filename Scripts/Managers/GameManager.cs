@@ -128,6 +128,7 @@ public partial class GameManager : Control {
 
     public async Task Resume_To_Dialogue_Mode() {
         //at the moment we can only go back to dialogue mode when we close the ingame menu
+        LoadSaveManager.Instance.ResumeGameTimer();
         await Close_Ingame_Menu();
     }
 
@@ -192,6 +193,8 @@ public partial class GameManager : Control {
         if (GameStateManager.Instance.CurrentState == State.InDialogueMode) {
             UIManager.Instance.dialogueBoxUI.TopLevel = true;
             UIManager.Instance.playerChoicesBoxUI.TopLevel = true;
+            UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
+
         }
 
     }
@@ -255,10 +258,20 @@ public partial class GameManager : Control {
         await UIManager.Instance.mainMenu.DisplayLanguageMenu();
     }
 
-    public async Task Save_Game(bool isAutosave) {
-        await LoadSaveManager.Instance.SaveGame(isAutosave);
+    public async Task Save_Game() {
+        //await LoadSaveManager.Instance.SaveGame(isAutosave);
+        await LoadSaveManager.Instance.PerformManualSave();
     }
 
+    public async Task Autosave_Game() {
+        UIManager.Instance.inGameMenuButton.DisableIngameMenuButton();
+        UIManager.Instance.mainMenu.HideIngameMenuIcon();
+        await LoadSaveManager.Instance.PerformAutosave();
+    }
+
+    public void Autosave_Completed() {
+        UIManager.Instance.mainMenu.ShowIngameMenuIcon();
+    }
 
     public async Task ResumeGame() {
         await UIManager.Instance.mainMenu.CloseInGameMenu();
@@ -277,16 +290,6 @@ public partial class GameManager : Control {
     }
 
 
-    public void Autosave_Game() {
-        //Save_Game(isAutoSave); This is not needed, as the game executes the autosave automatically every x time.
-        UIManager.Instance.mainMenu.HideIngameMenuIcon();
-        //GameStateManager.Instance.Fire(Trigger.AUTOSAVE_COMPLETED);
-        // GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
-    }
-
-    public void Autosave_Completed() {
-        UIManager.Instance.mainMenu.ShowIngameMenuIcon();
-    }
 
     public void NotifyAutosaveCompleted() {
         //SHOW A MESSAGE AT THE BOTTOM RIGHT THAT THE AUTOSAVE WAS COMPLETED

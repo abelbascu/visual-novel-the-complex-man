@@ -21,8 +21,8 @@ public partial class LoadSaveManager : Node {
     private const int AutosaveInterval = 15; // 5 minutes in seconds
     private float timeSinceLastAutosave = 0;
     private float totalTimeElapsedSinceGameStart;
-    private RichTextLabel autosaveLabel;
-    public MarginContainer autosaveLabelContainer;
+    private RichTextLabel autosaveStatusLabel;
+    public MarginContainer autosaveStatusLabelContainer;
     public const bool AUTOSAVING_COMPLETED_CONST = false;
     public const bool SAVING_COMPLETED_CONST = false;
     public const bool CURRENTLY_AUTOSAVING_CONST = true;
@@ -80,67 +80,65 @@ public partial class LoadSaveManager : Node {
         CallDeferred(nameof(SubscribeToEvents));
         CreateAutoSaveStatusLabel();
 
-        fadeIn = new UITextTweenFadeIn();
-        fadeOut = new UITextTweenFadeOut();
-        AddChild(fadeIn);
-        AddChild(fadeOut);
+        fadeIn = new UITextTweenFadeIn(); //TO REMOVE
+        fadeOut = new UITextTweenFadeOut(); //TO REMO
+        AddChild(fadeIn);   //TO REMOVE
+        AddChild(fadeOut); //TO REMOVE
     }
 
     private void CreateAutoSaveStatusLabel() {
 
-        autosaveLabelContainer = new MarginContainer {
+        autosaveStatusLabelContainer = new MarginContainer {
             CustomMinimumSize = new Vector2(400, 75),
             Visible = true,
             AnchorsPreset = (int)Control.LayoutPreset.TopWide
         };
-        AddChild(autosaveLabelContainer);
-        // autosaveLabelContainer.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft, Control.LayoutPresetMode.KeepSize);
-        MoveChild(autosaveLabelContainer, -1);  // Move to top of the hierarchy
-
+        AddChild(autosaveStatusLabelContainer);
+        // autosaveStatusLabelContainer.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft, Control.LayoutPresetMode.KeepSize);
+        MoveChild(autosaveStatusLabelContainer, -1);  // Move to top of the hierarchy
 
         // Create and set up the autosave label
-        autosaveLabel = new RichTextLabel {
+        autosaveStatusLabel = new RichTextLabel {
             CustomMinimumSize = new Vector2(400, 75),
             BbcodeEnabled = true,
             FitContent = true,
             AutowrapMode = TextServer.AutowrapMode.Off,
             Visible = true, //we set it to true so fade in/out can operate on the text.
         };
-        autosaveLabel.CustomMinimumSize = new Vector2(0, 75);
-        autosaveLabel.AddThemeFontSizeOverride("normal_font_size", 28);
-        autosaveLabel.AddThemeColorOverride("default_color", paleYellow);
-        autosaveLabel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
-        autosaveLabelContainer.AddThemeConstantOverride("margin_left", 10);
-         autosaveLabelContainer.AddThemeConstantOverride("margin_right", 10);
-        autosaveLabel.SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
-        autosaveLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-        autosaveLabelContainer.AddChild(autosaveLabel);
+        autosaveStatusLabel.CustomMinimumSize = new Vector2(0, 75);
+        autosaveStatusLabel.AddThemeFontSizeOverride("normal_font_size", 28);
+        autosaveStatusLabel.AddThemeColorOverride("default_color", paleYellow);
+        autosaveStatusLabel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
+        autosaveStatusLabelContainer.AddThemeConstantOverride("margin_left", 10);
+        autosaveStatusLabelContainer.AddThemeConstantOverride("margin_right", 10);
+        autosaveStatusLabel.SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
+        autosaveStatusLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        autosaveStatusLabelContainer.AddChild(autosaveStatusLabel);
     }
 
     private void SubscribeToEvents() {
         DialogueManager.Instance.DialogueVisited += OnDialogueVisited;
         UIManager.Instance.mainMenu.StartNewGameButtonPressed += StartGameTimer;
         GameLoaded += StartGameTimer;
-        UIManager.Instance.mainMenu.MainMenuOpened += PauseGameTimer;
-        UIManager.Instance.mainMenu.InGameMenuOpened += PauseGameTimer;
-        UIManager.Instance.mainMenu.MainMenuClosed += ResumeGameTimer;
-        UIManager.Instance.mainMenu.InGameMenuClosed += ResumeGameTimer;
+        // UIManager.Instance.mainMenu.MainMenuOpened += PauseGameTimer;
+        // UIManager.Instance.mainMenu.InGameMenuOpened += PauseGameTimer;
+        //UIManager.Instance.mainMenu.MainMenuClosed += ResumeGameTimer;
+        //UIManager.Instance.mainMenu.InGameMenuClosed += ResumeGameTimer;
     }
 
     private void StartGameTimer() {
         gameStartTime = DateTime.Now;
     }
 
-    private void PauseGameTimer() {
-        if (GameStateManager.Instance.PreviousState != State.InDialogueMode) { return; }
-        else {
-            totalPlayTime += DateTime.Now - gameStartTime;
-            gameStartTime = DateTime.Now;
-        }
+    public void PauseGameTimer() {
+        totalPlayTime += DateTime.Now - gameStartTime;
+        gameStartTime = DateTime.Now;
     }
 
-    private void ResumeGameTimer() {
+
+    public void ResumeGameTimer() {
         gameStartTime = DateTime.Now;
+        timeSinceLastAutosave = 0;
     }
 
 
@@ -149,27 +147,104 @@ public partial class LoadSaveManager : Node {
         SavePersistentData();
     }
 
+    private bool isAutosaving = false;
+
     public override async void _Process(double delta) {
 
-        if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
+        if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None) && !isAutosaving) {
             timeSinceLastAutosave += (float)delta;
             if (timeSinceLastAutosave >= AutosaveInterval) {
+                isAutosaving = true;
+                UIManager.Instance.inGameMenuButton.DisableIngameMenuButton();
                 _ = PerformAutosave();
             }
         }
     }
 
-    private async Task PerformAutosave() {
+    public async Task PerformAutosave() {
 
         if (!GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
+            isAutosaving = false;
+            UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
             return; // Don't start autosave if we're not in the correct state
         }
 
-        GameStateManager.Instance.Fire(Trigger.AUTOSAVE_GAME);
-        await SaveGame(true);
-        GameStateManager.Instance.Fire(Trigger.AUTOSAVE_COMPLETED);
-        GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
-        timeSinceLastAutosave = 0;
+        try {
+            isAutosaving = true;
+            UIManager.Instance.inGameMenuButton.DisableIngameMenuButton();
+
+            GameStateManager.Instance.Fire(Trigger.AUTOSAVE_GAME);
+
+            await ShowSaveStatus();
+            await SaveGame(true);
+
+            GameStateManager.Instance.Fire(Trigger.AUTOSAVE_COMPLETED);
+            await ShowSaveStatus();
+
+            GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+        } catch (Exception ex) {
+            GD.PrintErr($"Error during autosave: {ex.Message}");
+            await ShowSaveStatus(true, "Autosave failed. Please check eror logs");
+        } finally {
+            isAutosaving = false;
+            timeSinceLastAutosave = 0;
+
+            if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
+                UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
+            }
+        }
+    }
+
+    public async Task PerformManualSave() {
+        try {
+            //GameStateManager.Instance.Fire(Trigger.SAVE_GAME);
+            await ShowSaveStatus();
+
+            await SaveGame(false);
+
+            GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED);
+            await ShowSaveStatus();
+
+            UIManager.Instance.saveGameScreen.RefreshSaveSlots();
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
+
+        } catch (Exception ex) {
+            GD.PrintErr($"Error during manual save: {ex.Message}");
+            await ShowSaveStatus(true, "Save failed. Please check error logs");
+        }
+    }
+
+
+    public async Task ShowSaveStatus(bool isError = false, string errorMessage = null) {
+        string message;
+        RichTextLabel label;
+
+        if (isError) {
+            message = $"{TranslationServer.Translate("SAVE_ERROR")}: {errorMessage}";
+            label = GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed)
+                ? UIManager.Instance.saveGameScreen.SaveStatusLabel
+                : autosaveStatusLabel;
+        } else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.AutoSaving)) {
+            message = TranslationServer.Translate(autosaving_TRANSLATE);
+            label = autosaveStatusLabel;
+        } else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.AutoSavingCompleted)) {
+            message = TranslationServer.Translate(autosaveCompletedSuccess_TRANSLATE);
+            label = autosaveStatusLabel;
+        } else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.Saving)) {
+            message = TranslationServer.Translate("SAVING_GAME");
+            label = UIManager.Instance.saveGameScreen.SaveStatusLabel;
+        } else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SavingCompleted)) {
+            message = TranslationServer.Translate("GAME_SAVED_SUCCESS");
+            label = UIManager.Instance.saveGameScreen.SaveStatusLabel;
+        } else {
+            throw new InvalidOperationException("Invalid save state");
+        }
+
+        label.Text = $"[center]{message}[/center]";
+        label.Visible = true;
+
+        await fadeIn.FadeIn(label);
+        await fadeOut.FadeOut(label);
     }
 
 
@@ -177,62 +252,59 @@ public partial class LoadSaveManager : Node {
         string message = isSaving ? $"{autosaving_TRANSLATE}" : $"{autosaveCompletedSuccess_TRANSLATE}";
 
         CallDeferred(nameof(UpdateAutosaveLabel), message);
-        await fadeIn.FadeIn(autosaveLabel);
-        await fadeOut.FadeOut(autosaveLabel);
+        await fadeIn.FadeIn(autosaveStatusLabel);
+        await fadeOut.FadeOut(autosaveStatusLabel);
 
         if (!isSaving)
-            await fadeOut.FadeOut(autosaveLabel); /// where is the fade in first for AUTOSAVE COMPLETED TEXT???
+            await fadeOut.FadeOut(autosaveStatusLabel); /// where is the fade in first for AUTOSAVE COMPLETED TEXT???
     }
 
     private void UpdateAutosaveLabel(string text) {
-        autosaveLabel.Text = $"[center]{TranslationServer.Translate(text)}[/center]";   
+        autosaveStatusLabel.Text = $"[center]{TranslationServer.Translate(text)}[/center]";
     }
 
     public async Task SaveGame(bool isAutosave) {
 
-        //-------------BEFORE SAVING THE GAME, SHOW THE 'SAVING' TEXT TO THE USER----------------------
-
-        // Show "Saving" message for manual saves
-        //as soon as the ingame menu is open we have already set autosave to false in MainMenu.DisplayInGameMenu()
-        if (isAutosave) {
-            totalPlayTime += DateTime.Now - gameStartTime;
-            await ShowAutosaveStatusLabel(CURRENTLY_AUTOSAVING_CONST);
+        try {
+            if (isAutosave)
+                totalPlayTime += DateTime.Now - gameStartTime;
             //is is manual save
-        } else {
-            //contrary to autosave, we trigger the manual save Fire.Trigger when save button is pressed, no need to call it here
-            await UIManager.Instance.saveGameScreen.ShowSaveStatusLabel(CURRENTLY_SAVING_CONST);
-        }
 
-        //--------------------------------DO THE ACTUAL SAVING HERE-------------------------------------
+            var gameState = CreateGameState();
+            gameState.IsAutosave = isAutosave;
+            string prefix = isAutosave ? AutosavePrefix : "save_";
+            string saveFilePath = GetNextFilePath(prefix);
+            gameState.SlotNumber = int.Parse(Path.GetFileNameWithoutExtension(saveFilePath).Substring(prefix.Length));
 
-        var gameState = CreateGameState();
-        gameState.IsAutosave = isAutosave;
-        string prefix = isAutosave ? AutosavePrefix : "save_";
-        string saveFilePath = GetNextFilePath(prefix);
-        gameState.SlotNumber = int.Parse(Path.GetFileNameWithoutExtension(saveFilePath).Substring(prefix.Length));
+            await Task.Run(() => SaveGameState(gameState, saveFilePath));
+            UpdatePersistentData(gameState);
 
-        SaveGameState(gameState, saveFilePath);
-        UpdatePersistentData(gameState);
+            GD.Print($"{(isAutosave ? "Autosave" : "Manual save")} completed: {saveFilePath}");
 
-        GD.Print($"{(isAutosave ? "Autosave" : "Manual save")} completed: {saveFilePath}");
+            if (isAutosave)
+                gameStartTime = DateTime.Now;
 
-        //-----------TELL THE USER THE SAVE WAS COMPLETE AND TRIGGER GAME STATE CHANGES--------------------------
-
-        if (isAutosave) {
-            await ShowAutosaveStatusLabel(AUTOSAVING_COMPLETED_CONST);
-            gameStartTime = DateTime.Now;
-            //timeSinceLastAutosave = 0;
-        } else {
-            await UIManager.Instance.saveGameScreen.ShowSaveStatusLabel(SAVING_COMPLETED_CONST);
-            GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED);
-            GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
+        } catch (Exception ex) {
+            string errorMessage = $"Error during {(isAutosave ? "autosave" : "save")}: {ex.Message}";
+            GD.PrintErr(errorMessage);
+            if (isAutosave) {
+                await ShowSaveStatus(true, $"Autosave failed: {ex.Message}");
+            } else {
+                await ShowSaveStatus(true, $"Save failed: {ex.Message}");
+            }
+            throw; // Re-throw the exception to be caught in PerformAutosave or the manual save process
         }
     }
 
     private void SaveGameState(GameState gameState, string filePath) {
-        var json = JsonSerializer.Serialize(gameState);
-        var encryptedData = EncryptData(json);
-        File.WriteAllBytes(filePath, encryptedData);
+
+        try {
+            var json = JsonSerializer.Serialize(gameState);
+            var encryptedData = EncryptData(json);
+            File.WriteAllBytes(filePath, encryptedData);
+        } catch (Exception ex) {
+            throw new Exception($"Faile to save game state: {ex.Message}", ex);
+        }
     }
 
     private GameState CreateGameState() {
@@ -312,7 +384,6 @@ public partial class LoadSaveManager : Node {
     public void LoadGame(string saveFilePath) {
         var gameState = LoadGameState(saveFilePath);
         if (gameState != null) {
-            // GameStateManager.Instance.ENTER_LOADING_SUBSTATE();
             ApplyGameState(gameState);
         }
         GameLoaded.Invoke(); //do not remove, we need it to start game timer.

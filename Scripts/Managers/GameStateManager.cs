@@ -90,7 +90,7 @@ public partial class GameStateManager : Node {
 
             //in dialogue mode > display ingame menu
             {(State.InDialogueMode, SubState.None, State.InGameMenuDisplayed, SubState.None, Trigger.DISPLAY_INGAME_MENU),
-                () => GameManager.Instance.Display_Ingame_Menu()},
+                () =>{}},
             //in game menu > enter dialogue node
             {(State.InGameMenuDisplayed, SubState.None, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
                 () => GameManager.Instance.Enter_Dialogue_Mode()},
@@ -102,7 +102,7 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Display_Save_Screen()},
             //display save screen > saving 
             {(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, State.InGameMenuDisplayed, SubState.Saving, Trigger.SAVE_GAME),
-                new Action<bool>(isAutosave => GameManager.Instance.Save_Game(isAutosave))},
+                new Action<bool>(isAutosave => GameManager.Instance.Save_Game())},
             //saving > saving completed
             {(State.InGameMenuDisplayed, SubState.Saving, State.InGameMenuDisplayed, SubState.SavingCompleted, Trigger.SAVING_COMPLETED),
                 () => {}},  

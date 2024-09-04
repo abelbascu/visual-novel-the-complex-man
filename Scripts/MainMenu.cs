@@ -61,7 +61,6 @@ public partial class MainMenu : Control {
 
     public override void _Ready() {
 
-        //CallDeferred("DisableInput");
         GetUINodes();
         SetupButtonEvents();
         ApplyCustomStyles();
@@ -333,28 +332,25 @@ public partial class MainMenu : Control {
         MainMenuOpened?.Invoke();
     }
 
+    public async Task CloseMainMenu() {
+        DisableButtonsInput();
+        MainOptionsContainer.SetProcessInput(false);
+        await FadeOutMainMenu();
+        //this calls to resume the game timer
+        MainMenuClosed?.Invoke();
+    }
+
     public async Task FadeInMainMenu() {
         await Task.WhenAll(
-            UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f),
-            UIFadeHelper.FadeInControl(mainMenuBackgroundImage, 1.0f));
+            UIFadeHelper.FadeInControl(MainOptionsContainer, 0.7f),
+            UIFadeHelper.FadeInControl(mainMenuBackgroundImage, 0.7f));
     }
 
     private async Task FadeOutMainMenu() {
         await Task.WhenAll(
-            UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f),
-            UIFadeHelper.FadeOutControl(mainMenuBackgroundImage, 1.0f));
+            UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.7f),
+            UIFadeHelper.FadeOutControl(mainMenuBackgroundImage, 0.7f));
     }
-
-    private async Task FadeInInGamenMenu() => await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);
-    private async Task FadeOutInGameMenu() => await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
-
-    private void EnableInput() => SetProcessInput(true);
-    //public void DisableInput() => SetProcessInput(false);
-
-    private void SetInputHandled() => GetViewport().SetInputAsHandled();
-    public void HideIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = false;
-    public void ShowIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = true;
-
 
     public async Task DisplayInGameMenu() {
         DisableButtonsInput();
@@ -379,6 +375,14 @@ public partial class MainMenu : Control {
         InGameMenuOpened?.Invoke();
     }
 
+    private async Task FadeInInGamenMenu() => await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);
+    private async Task FadeOutInGameMenu() => await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
+
+    public void HideIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = false;
+    public void ShowIngameMenuIcon() {
+        UIManager.Instance.inGameMenuButton.Visible = true;
+    }
+
     public async Task CloseInGameMenu() {
         DisableButtonsInput();
         MainOptionsContainer.SetProcessInput(false);
@@ -386,13 +390,6 @@ public partial class MainMenu : Control {
         MainOptionsContainer.SetProcessInput(false);
         await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
         InGameMenuClosed?.Invoke();
-    }
-
-    public async Task CloseMainMenu() {
-        DisableButtonsInput();
-        MainOptionsContainer.SetProcessInput(false);
-        await FadeOutMainMenu();
-        MainMenuClosed?.Invoke();
     }
 
     private async Task OnStartNewGameButtonPressed() {

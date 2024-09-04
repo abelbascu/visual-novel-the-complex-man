@@ -12,7 +12,7 @@ public partial class SaveGameScreen : MarginContainer {
     private MarginContainer marginContainer;
     private Button goBackButton;
     private RichTextLabel noSavesAvailableLabel;
-    private RichTextLabel SaveStatusLabel;
+    public RichTextLabel SaveStatusLabel;
     private string noSavesTRANSLATE = "NO_SAVES_AVAILABLE";
     private string savingGameTRANSLATE = "SAVING_GAME";
     private string gamesavedSuccessTRANSLATE = "GAME_SAVED_SUCCESS";
@@ -170,8 +170,6 @@ public partial class SaveGameScreen : MarginContainer {
         else
             GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
-
-    ColorRect saveGameScreenOverlay = new ColorRect();
 
 
     public async Task DisplaySaveScreen() {

@@ -411,6 +411,7 @@ public partial class MainMenu : Control {
 
     private async Task OnSaveGameButtonPressed() {
         DisableButtonsInput();
+        HideIngameMenuIcon();
         await CloseInGameMenu();
         GameStateManager.Instance.Fire(Trigger.INITIALIZE_SAVE_SCREEN);
     }

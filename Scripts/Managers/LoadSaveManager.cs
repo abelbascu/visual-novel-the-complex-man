@@ -94,7 +94,6 @@ public partial class LoadSaveManager : Node {
             AnchorsPreset = (int)Control.LayoutPreset.TopWide
         };
         AddChild(autosaveStatusLabelContainer);
-        // autosaveStatusLabelContainer.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.TopLeft, Control.LayoutPresetMode.KeepSize);
         MoveChild(autosaveStatusLabelContainer, -1);  // Move to top of the hierarchy
 
         // Create and set up the autosave label
@@ -120,10 +119,6 @@ public partial class LoadSaveManager : Node {
         DialogueManager.Instance.DialogueVisited += OnDialogueVisited;
         UIManager.Instance.mainMenu.StartNewGameButtonPressed += StartGameTimer;
         GameLoaded += StartGameTimer;
-        // UIManager.Instance.mainMenu.MainMenuOpened += PauseGameTimer;
-        // UIManager.Instance.mainMenu.InGameMenuOpened += PauseGameTimer;
-        //UIManager.Instance.mainMenu.MainMenuClosed += ResumeGameTimer;
-        //UIManager.Instance.mainMenu.InGameMenuClosed += ResumeGameTimer;
     }
 
     private void StartGameTimer() {

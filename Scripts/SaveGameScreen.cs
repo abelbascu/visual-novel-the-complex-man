@@ -129,8 +129,8 @@ public partial class SaveGameScreen : MarginContainer {
     }
 
     private async Task OnGoBackButtonPressed() {
-        goBackButton.SetProcessInput(false);
-        goBackButton.MouseFilter = MouseFilterEnum.Ignore;
+        DisableUserInput();
+        SetSlotButtonsState(false);
         await UIFadeHelper.FadeOutControl(this, 0.6f);
         goBackButton.SetProcessInput(true);
         goBackButton.MouseFilter = MouseFilterEnum.Stop;

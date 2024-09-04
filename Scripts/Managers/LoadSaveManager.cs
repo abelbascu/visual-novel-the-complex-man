@@ -199,7 +199,7 @@ public partial class LoadSaveManager : Node {
 
             UIManager.Instance.saveGameScreen.RefreshSaveSlots();
             GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED);
-            
+
             await ShowSaveStatus();
 
             GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
@@ -318,7 +318,6 @@ public partial class LoadSaveManager : Node {
         }
     }
 
-
     private void UpdatePersistentData(GameState gameState) {
         persistentData.GamesPlayed++;
         SavePersistentData();
@@ -369,6 +368,10 @@ public partial class LoadSaveManager : Node {
         }
         GameLoaded.Invoke(); //do not remove, we need it to start game timer.
     }
+
+    //----------------------------------------------------------------------------------------------------
+    //--------------------------------------------------LOAD GAME ----------------------------------------
+    //----------------------------------------------------------------------------------------------------
 
     private GameState LoadGameState(string filePath) {
 

@@ -198,12 +198,10 @@ public partial class GameManager : Control {
 
     public async Task Load_Game(string saveFilePath) {
 
-        
-
         UIManager.Instance.menuOverlay.Visible = false;
         LoadSaveManager.Instance.LoadGame(saveFilePath);
-        await UIFadeHelper.FadeOutControl(UIManager.Instance.saveGameScreen, 1.5f);
-
+        await UIManager.Instance.FadeInScreenOverlay(1.5f);
+        UIManager.Instance.saveGameScreen.Hide();
         GameStateManager.Instance.Fire(Trigger.COMPLETE_LOADING_BASED_ON_GAME_MODE, GameStateManager.Instance.GetLastGameMode());
     }
 
@@ -221,10 +219,12 @@ public partial class GameManager : Control {
         await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
     }
 
-    public void Complete_Loading_Based_On_Game_Mode(State LastGameMode) {
+    public async Task Complete_Loading_Based_On_Game_Mode(State LastGameMode) {
+
+
         switch (LastGameMode) {
             case State.InDialogueMode:
-                Initialize_Dialogue_Mode_Settings_On_Loaded_Game();
+                await Initialize_Dialogue_Mode_Settings_On_Loaded_Game();
                 GameStateManager.Instance.Fire(Trigger.LOADING_COMPLETED); //WE NEED TO ADD THIS ONE ON EVERY NEW CASE!!
                 GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
                 break;
@@ -232,26 +232,30 @@ public partial class GameManager : Control {
             default:
                 //if gamemode was not saved correctly, we try to load the last saved dialogue or player choices 
                 LastGameMode = State.InDialogueMode;
-                Initialize_Dialogue_Mode_Settings_On_Loaded_Game();
+                await Initialize_Dialogue_Mode_Settings_On_Loaded_Game();
                 GameStateManager.Instance.Fire(Trigger.LOADING_COMPLETED); //WE NEED TO ADD THIS ONE ON EVERY NEW CASE!!
                 GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
                 break;
-
         }
     }
-    public void Initialize_Dialogue_Mode_Settings_On_Loaded_Game() {
+
+    //THIS LOOKS LIKE SHOULD BE MOVED TO DIALOGUE MANAGER
+    //THIS LOOKS LIKE SHOULD BE MOVED TO DIALOGUE MANAGER
+    public async Task Initialize_Dialogue_Mode_Settings_On_Loaded_Game() {
         UIManager.Instance.inGameMenuButton.Show();
         //A BIT HACKY FIX where if the currentDialogObj is a PlayerChoice, and the user clicked on it and then saved the game, and if its DestinationDialogueID are PlayerChoices,
         //it means that they were all already saved in a List and displayed to the screen, so when loading that saved game it should not display that currentDialogObj, but only its associated playerChoices
         if (DialogueManager.Instance.playerChoicesList != null && DialogueManager.Instance.currentDialogueObject.Actor == "1") //if the current dialogue object it's a single player choice
         {
-            //notice that we don't use DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) to avoid displaying the already visited player choice that is still hold in the current dialogue object
+            //notice that we don't use DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) to avoid displaying the already visited player choice that is still saved in the current dialogue object
             //until the player selects a new player choice. Notice that most times, after an NPC or actor dialogue, a group of player choices may be displayed, but it may also happen that after a 
             //player choice is displayed, more new player chocies are displayed. We are solving this rare case here. 
             DialogueManager.Instance.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, DialogueManager.Instance.SetIsPlayerChoiceBeingPrinted);
             VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath, VisualManager.Instance.visualType);
         } else
             DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
+
+        await UIManager.Instance.FadeOutScreenOverlay(1.5f);
     }
 
 
@@ -263,14 +267,11 @@ public partial class GameManager : Control {
         await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
     }
 
-
-
     public async Task Display_Language_Menu() {
         await UIManager.Instance.mainMenu.DisplayLanguageMenu();
     }
 
     public async Task Save_Game() {
-        //await LoadSaveManager.Instance.SaveGame(isAutosave);
         await LoadSaveManager.Instance.PerformManualSave();
     }
 
@@ -288,28 +289,9 @@ public partial class GameManager : Control {
         await UIManager.Instance.mainMenu.CloseInGameMenu();
     }
 
-    public async Task Exit_To_Main_Menu() {
-        // CloseInGameMenu();
-        // UIManager.Instance.HideAllUIElements();
-        VisualManager.Instance.RemoveImage();
-        //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN 
-        await UIManager.Instance.mainMenu.DisplayMainMenu();
-    }
-
     public void Exit_Game() {
         GetTree().Quit();
     }
 
-
-
-    public void NotifyAutosaveCompleted() {
-        //SHOW A MESSAGE AT THE BOTTOM RIGHT THAT THE AUTOSAVE WAS COMPLETED
-    }
-
-
-    // public void Display_Credits()
-    // {
-
-    // }
 
 }

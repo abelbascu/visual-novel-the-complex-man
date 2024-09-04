@@ -55,35 +55,6 @@ public partial class SaveGameScreen : MarginContainer {
         UIThemeHelper.ApplyCustomStyleToButton(goBackButton);
     }
 
-
-    public async Task ShowSaveStatusLabel(bool isBeingSaved = false) {
-
-        DisableUserInput();
-
-        SaveStatusLabel.Visible = true;
-
-        // Use CallDeferred to ensure the label is updated in the next frame
-        CallDeferred(nameof(UpdateSaveStatusLabel), isBeingSaved ? $"{savingGameTRANSLATE}" : $"{gamesavedSuccessTRANSLATE}");
-
-        await fadeIn.FadeIn(SaveStatusLabel);
-        await fadeOut.FadeOut(SaveStatusLabel);
-
-        if (!isBeingSaved) {
-            EnableUserInput();  //enable user input until saving is complete 
-            RefreshSaveSlots();
-            HideSaveStatusLabel();
-        }
-    }
-
-    private void UpdateSaveStatusLabel(string text) {
-        SaveStatusLabel.Text = $"[center]{TranslationServer.Translate(text)}[/center]";
-    }
-
-    public void HideSaveStatusLabel() {
-
-        SaveStatusLabel.Visible = false;
-    }
-
     private void DisableUserInput() {
 
         goBackButton.Disabled = true;
@@ -106,6 +77,21 @@ public partial class SaveGameScreen : MarginContainer {
             saveGameSlot.EnableButton();
         }
     }
+
+    private void SetSlotButtonsState(bool enabled) {
+        foreach (var child in slotsContainer.GetChildren()) {
+            if (child is SaveGameSlot slot) {
+                var button = slot.GetNode<Button>("MarginContainer2/HBoxContainer/Button");
+                if (button != null) {
+                    button.SetProcessInput(enabled);
+                    button.MouseFilter = enabled ? MouseFilterEnum.Stop : MouseFilterEnum.Ignore;
+                    button.FocusMode = enabled ? FocusModeEnum.All : FocusModeEnum.None;
+                    button.Modulate = enabled ? Colors.White : Colors.Gray;
+                }
+            }
+        }
+    }
+
 
     private void SaveStatusLabelTheme() {
         var normalStyle = new StyleBoxFlat {
@@ -175,6 +161,8 @@ public partial class SaveGameScreen : MarginContainer {
     public async Task DisplaySaveScreen() {
 
         SetSlotButtonsState(false);
+        DisableUserInput();
+
         goBackButton.SetProcessInput(false); //avoid hitting the ga back button repeatedly
         goBackButton.MouseFilter = MouseFilterEnum.Ignore;
 
@@ -185,23 +173,15 @@ public partial class SaveGameScreen : MarginContainer {
         await UIFadeHelper.FadeInControl(this, 1.0f);
 
         SetSlotButtonsState(true);
-        goBackButton.SetProcessInput(true);
-        goBackButton.MouseFilter = MouseFilterEnum.Stop;
+        EnableUserInput();
     }
 
-
-    private void SetSlotButtonsState(bool enabled) {
-        foreach (var child in slotsContainer.GetChildren()) {
-            if (child is SaveGameSlot slot) {
-                var button = slot.GetNode<Button>("MarginContainer2/HBoxContainer/Button");
-                if (button != null) {
-                    button.SetProcessInput(enabled);
-                    button.MouseFilter = enabled ? MouseFilterEnum.Stop : MouseFilterEnum.Ignore;
-                    button.FocusMode = enabled ? FocusModeEnum.All : FocusModeEnum.None;
-                }
-            }
-        }
+    public void EnableInputAfterSavingComplete() {
+        SetSlotButtonsState(true);
+        EnableUserInput();
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
+
 
     private void PopulateSaveOrLoadSlots(bool isLoadScreen) {
         List<LoadSaveManager.GameState> saveGames = LoadSaveManager.Instance.GetSavedGames();
@@ -230,7 +210,6 @@ public partial class SaveGameScreen : MarginContainer {
         }
     }
 
-
     private void AddSaveOrLoadSlot(LoadSaveManager.GameState gameState, int slotNumber, bool isLoadScreen) {
         var slotInstance = saveGameSlotScene.Instantiate<SaveGameSlot>();
 
@@ -250,18 +229,39 @@ public partial class SaveGameScreen : MarginContainer {
 
     private void OnSaveRequested(int slotNumber) {
 
+        DisableUserInput();
+        SetSlotButtonsState(false);
+
         if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed)) {
             GameStateManager.Instance.Fire(Trigger.SAVE_GAME, AUTODSAVE_DISABLED_CONST);
         }
+
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private void OnLoadRequested(string saveFilePath) {
+
         if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
             UIManager.Instance.mainMenu.Hide();
         else
             UIManager.Instance.mainMenu.MainOptionsContainer.Hide();
 
+        DisableUserInput();
         SetSlotButtonsState(false);
+
 
         GameStateManager.Instance.Fire(Trigger.LOAD_GAME, saveFilePath);
         // Hide();

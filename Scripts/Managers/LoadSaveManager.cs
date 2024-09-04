@@ -243,21 +243,6 @@ public partial class LoadSaveManager : Node {
     }
 
 
-    public async Task ShowAutosaveStatusLabel(bool isSaving) {
-        string message = isSaving ? $"{autosaving_TRANSLATE}" : $"{autosaveCompletedSuccess_TRANSLATE}";
-
-        CallDeferred(nameof(UpdateAutosaveLabel), message);
-        await fadeIn.FadeIn(autosaveStatusLabel);
-        await fadeOut.FadeOut(autosaveStatusLabel);
-
-        if (!isSaving)
-            await fadeOut.FadeOut(autosaveStatusLabel); /// where is the fade in first for AUTOSAVE COMPLETED TEXT???
-    }
-
-    private void UpdateAutosaveLabel(string text) {
-        autosaveStatusLabel.Text = $"[center]{TranslationServer.Translate(text)}[/center]";
-    }
-
     public async Task SaveGame(bool isAutosave) {
 
         try {

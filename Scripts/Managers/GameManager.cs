@@ -198,6 +198,8 @@ public partial class GameManager : Control {
 
     public async Task Load_Game(string saveFilePath) {
 
+        
+
         UIManager.Instance.menuOverlay.Visible = false;
         LoadSaveManager.Instance.LoadGame(saveFilePath);
         await UIFadeHelper.FadeOutControl(UIManager.Instance.saveGameScreen, 1.5f);

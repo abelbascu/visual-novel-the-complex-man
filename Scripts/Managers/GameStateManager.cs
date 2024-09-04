@@ -105,7 +105,7 @@ public partial class GameStateManager : Node {
                 new Action<bool>(isAutosave => GameManager.Instance.Save_Game())},
             //saving > saving completed
             {(State.InGameMenuDisplayed, SubState.Saving, State.InGameMenuDisplayed, SubState.SavingCompleted, Trigger.SAVING_COMPLETED),
-                () => {}},  
+                () => UIManager.Instance.saveGameScreen.EnableInputAfterSavingComplete()},  
             //saving completed > display save screen (it's already displayed, we don't execute any method)
             {(State.InGameMenuDisplayed, SubState.SavingCompleted, State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, Trigger.DISPLAY_SAVE_SCREEN),
                 () => {}},

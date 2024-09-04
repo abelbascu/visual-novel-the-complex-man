@@ -57,7 +57,6 @@ public class GameStateMachine {
         SAVING_COMPLETED,
         AUTOSAVE_GAME,
         AUTOSAVE_COMPLETED,
-        RESUME_TO_DIALOGUE_MODE,
         RESUME_GAME_FROM_AUTOSAVE,
         GO_BACK_TO_MENU, //from any submenu inside main OR ingame menu
         DISPLAY_EXIT_TO_MAIN_MENU_CONFIRMATION_POPUP,

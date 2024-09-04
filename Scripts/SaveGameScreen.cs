@@ -257,9 +257,12 @@ public partial class SaveGameScreen : MarginContainer {
     }
 
     private void OnLoadRequested(string saveFilePath) {
-
+        if(GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+            UIManager.Instance.mainMenu.Hide();
+        else
+            UIManager.Instance.mainMenu.MainOptionsContainer.Hide();
         GameStateManager.Instance.Fire(Trigger.LOAD_GAME, saveFilePath);
-        Hide();
+       // Hide();
     }
 
     public void RefreshSaveSlots() {

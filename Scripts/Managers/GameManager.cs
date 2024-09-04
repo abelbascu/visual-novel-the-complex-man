@@ -185,8 +185,24 @@ public partial class GameManager : Control {
         if (UIManager.Instance.mainMenu.IsVisibleInTree()) {
             await UIManager.Instance.mainMenu.CloseMainMenu();
         }
+        await UIFadeHelper.FadeOutControl(UIManager.Instance.saveGameScreen, 1.5f);
 
         GameStateManager.Instance.Fire(Trigger.COMPLETE_LOADING_BASED_ON_GAME_MODE, GameStateManager.Instance.GetLastGameMode());
+    }
+
+    public async Task Initialize_Load_Screen() {
+
+
+        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.LOAD_SCREEN);
+    }
+
+    public async Task Display_Load_Screen() {
+        if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+            await UIManager.Instance.mainMenu.CloseMainMenu();
+        else
+            await UIManager.Instance.mainMenu.CloseInGameMenu();
+            
+        await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
     }
 
     public void Enter_Dialogue_Mode() {
@@ -240,18 +256,6 @@ public partial class GameManager : Control {
         await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
     }
 
-    public async Task Initialize_Load_Screen() {
-        if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
-            await UIManager.Instance.mainMenu.CloseMainMenu();
-        else
-            await UIManager.Instance.mainMenu.CloseInGameMenu();
-
-        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.LOAD_SCREEN);
-    }
-
-    public async Task Display_Load_Screen() {
-        await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
-    }
 
 
     public async Task Display_Language_Menu() {

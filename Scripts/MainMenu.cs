@@ -260,6 +260,7 @@ public partial class MainMenu : Control {
         DisableButtonInput(exitGameButton);
         DisableButtonInput(creditsButton);
         DisableButtonInput(exitToMainMenuButton);
+        DisableButtonInput(settingsButton);
     }
 
     private void EnableButtonsInput() {
@@ -271,6 +272,7 @@ public partial class MainMenu : Control {
         EnableButtonInput(exitGameButton);
         EnableButtonInput(creditsButton);
         EnableButtonInput(exitToMainMenuButton);
+        EnableButtonInput(settingsButton);
     }
 
     private void DisableButtonInput(Button button) {

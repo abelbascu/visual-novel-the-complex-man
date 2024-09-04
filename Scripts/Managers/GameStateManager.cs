@@ -105,10 +105,10 @@ public partial class GameStateManager : Node {
                 new Action<bool>(isAutosave => GameManager.Instance.Save_Game())},
             //saving > saving completed
             {(State.InGameMenuDisplayed, SubState.Saving, State.InGameMenuDisplayed, SubState.SavingCompleted, Trigger.SAVING_COMPLETED),
-                () => UIManager.Instance.saveGameScreen.EnableInputAfterSavingComplete()},  
+                () => {}},  
             //saving completed > display save screen (it's already displayed, we don't execute any method)
             {(State.InGameMenuDisplayed, SubState.SavingCompleted, State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, Trigger.DISPLAY_SAVE_SCREEN),
-                () => {}},
+                () => UIManager.Instance.saveGameScreen.EnableInputAfterSavingComplete()},
             //save screen > go back to ingame menu
             {(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
                 () => GameManager.Instance.Go_Back_To_Menu()},        

@@ -197,10 +197,10 @@ public partial class LoadSaveManager : Node {
 
             await SaveGame(false);
 
-            GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED);
             await ShowSaveStatus();
 
             UIManager.Instance.saveGameScreen.RefreshSaveSlots();
+            GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED);
             GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
 
         } catch (Exception ex) {

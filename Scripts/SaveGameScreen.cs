@@ -92,7 +92,6 @@ public partial class SaveGameScreen : MarginContainer {
         }
     }
 
-
     private void SaveStatusLabelTheme() {
         var normalStyle = new StyleBoxFlat {
             BgColor = Colors.NavyBlue,
@@ -179,7 +178,6 @@ public partial class SaveGameScreen : MarginContainer {
     public void EnableInputAfterSavingComplete() {
         SetSlotButtonsState(true);
         EnableUserInput();
-        GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
 
 
@@ -237,20 +235,6 @@ public partial class SaveGameScreen : MarginContainer {
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private void OnLoadRequested(string saveFilePath) {
 

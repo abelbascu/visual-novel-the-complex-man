@@ -32,6 +32,11 @@ public partial class LoadSaveManager : Node {
     private readonly Color paleYellow = new Color(1, 1, 0.8f, 1);
     private string autosaving_TRANSLATE = "AUTOSAVING";
     private string autosaveCompletedSuccess_TRANSLATE = "AUTOSAVE_COMPLETED_SUCCESS";
+    private string savingGameTRANSLATE = "SAVING_GAME";
+    private string gamesavedSuccessTRANSLATE = "GAME_SAVED_SUCCESS";
+    private string errorSaveMessageTitleTRANSLATE ="SAVE_ERROR";
+    private string errorAutosaveMessageTRANSLATE = "AUTOSAVE_ERROR";
+    private string errorManualSaveMessageTRANSLATE = "MANUAL_SAVE_ERROR";
 
     public int DialoguesVisitedID;
 
@@ -179,7 +184,7 @@ public partial class LoadSaveManager : Node {
             GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
         } catch (Exception ex) {
             GD.PrintErr($"Error during autosave: {ex.Message}");
-            await ShowSaveStatus(true, "Autosave failed. Please check eror logs");
+            await ShowSaveStatus(true, errorAutosaveMessageTRANSLATE);
         } finally {
             isAutosaving = false;
             timeSinceLastAutosave = 0;
@@ -206,7 +211,7 @@ public partial class LoadSaveManager : Node {
 
         } catch (Exception ex) {
             GD.PrintErr($"Error during manual save: {ex.Message}");
-            await ShowSaveStatus(true, "Save failed. Please check error logs");
+            await ShowSaveStatus(true, errorManualSaveMessageTRANSLATE);
         }
     }
 
@@ -216,7 +221,7 @@ public partial class LoadSaveManager : Node {
         RichTextLabel label;
 
         if (isError) {
-            message = $"{TranslationServer.Translate("SAVE_ERROR")}: {errorMessage}";
+            message = $"{TranslationServer.Translate(errorSaveMessageTitleTRANSLATE)}: {errorMessage}";
             label = GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed)
                 ? UIManager.Instance.saveGameScreen.SaveStatusLabel
                 : autosaveStatusLabel;
@@ -227,10 +232,10 @@ public partial class LoadSaveManager : Node {
             message = TranslationServer.Translate(autosaveCompletedSuccess_TRANSLATE);
             label = autosaveStatusLabel;
         } else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.Saving)) {
-            message = TranslationServer.Translate("SAVING_GAME");
+            message = TranslationServer.Translate(savingGameTRANSLATE);
             label = UIManager.Instance.saveGameScreen.SaveStatusLabel;
         } else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SavingCompleted)) {
-            message = TranslationServer.Translate("GAME_SAVED_SUCCESS");
+            message = TranslationServer.Translate(gamesavedSuccessTRANSLATE);
             label = UIManager.Instance.saveGameScreen.SaveStatusLabel;
         } else {
             throw new InvalidOperationException("Invalid save state");

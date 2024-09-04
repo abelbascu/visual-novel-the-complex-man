@@ -126,11 +126,6 @@ public partial class GameManager : Control {
         await UIManager.Instance.mainMenu.CloseInGameMenu();
     }
 
-    public async Task Resume_To_Dialogue_Mode() {
-        //at the moment we can only go back to dialogue mode when we close the ingame menu
-        LoadSaveManager.Instance.ResumeGameTimer();
-        await Close_Ingame_Menu();
-    }
 
     public async Task Go_Back_To_Menu() {
         GetTree().CallGroup("popups", "close_all");
@@ -155,6 +150,29 @@ public partial class GameManager : Control {
         // UIManager.Instance.inputNameScreen.Show();
     }
 
+
+    //REFACTOR THE TWO METHODS BELOW
+    //REFACTOR THE TWO METHODS BELOW
+    //REFACTOR THE TWO METHODS BELOW
+
+    // public async Task Resume_To_Dialogue_Mode() {
+    //     //at the moment we can only go back to dialogue mode when we close the ingame menu
+    //     LoadSaveManager.Instance.ResumeGameTimer();
+    //     await Close_Ingame_Menu();
+    //     UIManager.Instance.dialogueBoxUI.TopLevel = true;
+    //     UIManager.Instance.playerChoicesBoxUI.TopLevel = true;
+    //     UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
+    // }
+
+    public void Enter_Dialogue_Mode() {
+        if (GameStateManager.Instance.CurrentState == State.InDialogueMode) {
+            LoadSaveManager.Instance.ResumeGameTimer();
+            UIManager.Instance.dialogueBoxUI.TopLevel = true;
+            UIManager.Instance.playerChoicesBoxUI.TopLevel = true;
+            UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
+        }
+    }
+
     public async Task Display_New_Game_Dialogues() {
 
         //WE NEED A FADE IN HERE
@@ -174,12 +192,12 @@ public partial class GameManager : Control {
     }
 
     public async Task Resume_Game_From_Ingame_Menu_Closed() {
-        
+
         await UIManager.Instance.mainMenu.CloseInGameMenu();
     }
 
     public async Task Load_Game(string saveFilePath) {
- 
+
         UIManager.Instance.menuOverlay.Visible = false;
         LoadSaveManager.Instance.LoadGame(saveFilePath);
         await UIFadeHelper.FadeOutControl(UIManager.Instance.saveGameScreen, 1.5f);
@@ -197,7 +215,7 @@ public partial class GameManager : Control {
             await UIManager.Instance.mainMenu.CloseMainMenu();
         else
             await UIManager.Instance.mainMenu.CloseInGameMenu();
-            
+
         await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
     }
 
@@ -232,15 +250,6 @@ public partial class GameManager : Control {
             VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath, VisualManager.Instance.visualType);
         } else
             DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
-    }
-    public void Enter_Dialogue_Mode() {
-        if (GameStateManager.Instance.CurrentState == State.InDialogueMode) {
-            UIManager.Instance.dialogueBoxUI.TopLevel = true;
-            UIManager.Instance.playerChoicesBoxUI.TopLevel = true;
-            UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
-
-        }
-
     }
 
 

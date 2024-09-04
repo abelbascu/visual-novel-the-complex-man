@@ -49,7 +49,7 @@ public partial class GameStateManager : Node {
     public void ResumeGameMode() {
         switch (LastGameMode) {
             case State.InDialogueMode:
-                Fire(Trigger.RESUME_TO_DIALOGUE_MODE);
+                Fire(Trigger.ENTER_DIALOGUE_MODE);
                 break;
             // Add cases for other game modes as needed
             default:
@@ -111,10 +111,7 @@ public partial class GameStateManager : Node {
                 () => {}},
             //save screen > go back to ingame menu
             {(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => GameManager.Instance.Go_Back_To_Menu()},
-            //ingame menu > dialogue mode
-            {(State.InGameMenuDisplayed, SubState.None, State.InDialogueMode, SubState.None, Trigger.RESUME_TO_DIALOGUE_MODE),
-                () => GameManager.Instance.Resume_To_Dialogue_Mode()},           
+                () => GameManager.Instance.Go_Back_To_Menu()},        
             //ingame menu > initialize load screen
             {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.LoadScreenInitialized, Trigger.INITIALIZE_LOAD_SCREEN),
                 () => GameManager.Instance.Initialize_Load_Screen()},

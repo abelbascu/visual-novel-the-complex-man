@@ -25,10 +25,12 @@ public partial class InGameMenuButton : MarginContainer {
             await UIManager.Instance.mainMenu.DisplayInGameMenu();
             GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
         } else {
-            LoadSaveManager.Instance.ResumeGameTimer();
-            await UIManager.Instance.mainMenu.CloseInGameMenu();
-            GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+            //LoadSaveManager.Instance.ResumeGameTimer();
+            // await UIManager.Instance.mainMenu.CloseInGameMenu();
+            UIManager.Instance.mainMenu.MainOptionsContainer.Visible = false;
             UIManager.Instance.mainMenu.Visible = false;
+            GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+
         }
 
         EnableIngameMenuButton();

@@ -14,8 +14,6 @@ public partial class SaveGameScreen : MarginContainer {
     private RichTextLabel noSavesAvailableLabel;
     public RichTextLabel SaveStatusLabel;
     private string noSavesTRANSLATE = "NO_SAVES_AVAILABLE";
-    private string savingGameTRANSLATE = "SAVING_GAME";
-    private string gamesavedSuccessTRANSLATE = "GAME_SAVED_SUCCESS";
     private const bool AUTODSAVE_DISABLED_CONST = false;
     private const bool AUTOSAVE_ENABLED_CONST = true;
     private SaveGameSlot saveGameSlot; //this is added at compile time, we get it in AddSaveOrLoadSlot method

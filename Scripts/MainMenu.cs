@@ -1,23 +1,20 @@
 using Godot;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.Diagnostics.SymbolStore;
+using System.Threading.Tasks;
+using static GameStateMachine;
 
 public partial class MainMenu : Control {
 
-    [Export] public string language { get; set; } = "";
-    private string previousLanguage = "";
-    ConfirmationDialog exitGameConfirmationDialog;
-    ConfirmationDialog exitToMainMenuConfirmationDialog;
+    //UIElements
+    Panel ExitGameConfirmationPanel;
+    Panel ExitToMainMenuPanel;
     ConfirmationDialog creditsConfirmationDialog;
-    VBoxContainer MainOptionsContainer;
-    VBoxContainer LanguageOptionsContainer;
-    private Dictionary<Button, string> buttonLocalizationKeys = new();
-    private Dictionary<Button, string> buttonLanguageKeys = new();
-    public Action StartNewGameButtonPressed;
-    public Action SaveGameButtonPressed;
-    public Action LoadGameButtonPressed;
+    public VBoxContainer MainOptionsContainer;
+    public VBoxContainer LanguageOptionsContainer;
+    public TextureRect mainMenuBackgroundImage;
+
+    //Buttons
     Button startNewGameButton;
     Button saveGameButton;
     Button continueGameButton;
@@ -27,22 +24,58 @@ public partial class MainMenu : Control {
     Button exitGameButton;
     Button exitToMainMenuButton;
     Button settingsButton;
-    public TextureRect mainMenuBackgroundImage;
-    public const bool LOAD_SCREEN = true;
-    public const bool SAVE_SCREEN = false;
+    Button languagesGoBackButton;
+    Button YesExitGameButton;
+    Button NoExitGameButton;
+    Button YesExitToMainMenuButton;
+    Button NoExitToMainMenuButton;
+    Button englishButton;
+    Button frenchButton;
+    Button catalanButton;
+
+    //Button containers
+    private HBoxContainer YesNoButtonsHBoxContainer;
+    private HBoxContainer YesNoExitToMenuButtonsHBoxContainer;
+
+    //Constants
+    public bool LOAD_SCREEN = true;
+    public bool SAVE_SCREEN = false;
+
+    //Events
     public Action MainMenuOpened;
     public Action InGameMenuOpened;
     public Action MainMenuClosed;
     public Action InGameMenuClosed;
+    public Action StartNewGameButtonPressed;
+    public Action SaveGameButtonPressed;
+    public Action LoadGameButtonPressed;
+
+    //Translations
+    private string wantToQuitGameTRANSLATE = "WANT_QUIT_GAME?";
+    private string wantToQuitToMainMenuTRANSLATE = "WANT_QUIT_TO_MAIN_MENU?";
+
+    //Text labels
+    private RichTextLabel WantToQuitGameLabel;
+    private RichTextLabel WantToQuitToMainMenuLabel;
 
 
     public override void _Ready() {
 
-        mainMenuBackgroundImage = GetNode<TextureRect>("BackgroundImage");
+        GetUINodes();
+        SetupButtonEvents();
+        ApplyCustomStyles();
 
-        this.Show();
-        //displaying the UI boxes with the options
+        //assign the loc keys so each time the language changes the text property is updated
+        WantToQuitGameLabel.Text = wantToQuitGameTRANSLATE;
+        WantToQuitToMainMenuLabel.Text = wantToQuitToMainMenuTRANSLATE;
+    }
+
+    private void GetUINodes() {
+
+        //main buttons container
         MainOptionsContainer = GetNode<VBoxContainer>("MainOptionsContainer");
+
+        //main buttons
         startNewGameButton = GetNode<Button>("MainOptionsContainer/StartNewGameButton");
         saveGameButton = GetNode<Button>("MainOptionsContainer/SaveGameButton"); ;
         continueGameButton = GetNode<Button>("MainOptionsContainer/ContinueButton"); ;
@@ -50,261 +83,506 @@ public partial class MainMenu : Control {
         languageButton = GetNode<Button>("MainOptionsContainer/LanguageButton");
         settingsButton = GetNode<Button>("MainOptionsContainer/SettingsButton"); ;
         creditsButton = GetNode<Button>("MainOptionsContainer/CreditsButton");
-        exitGameButton = GetNode<Button>("MainOptionsContainer/ExitGameButton");
         exitToMainMenuButton = GetNode<Button>("MainOptionsContainer/ExitToMainMenuButton");
+        exitGameButton = GetNode<Button>("MainOptionsContainer/ExitGameButton");
 
-        exitGameConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/ExitGameButton/ExitGameConfirmationDialog");
-        exitToMainMenuConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/ExitToMainMenuButton/ExitToMainMenuConfirmationDialog");
+        //exit game panel
+        ExitGameConfirmationPanel = GetNode<Panel>("%ExitGameConfirmationPanel");
+        YesExitGameButton = GetNode<Button>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer/YesExitGameButton");
+        NoExitGameButton = GetNode<Button>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer/NoExitGameButton");
+        WantToQuitGameLabel = GetNode<RichTextLabel>("ExitGameConfirmationPanel/VBoxContainer/MarginContainer/WantToQuitGameLabel");
+        YesNoButtonsHBoxContainer = GetNode<HBoxContainer>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer");
 
-        creditsConfirmationDialog = GetNode<ConfirmationDialog>("MainOptionsContainer/CreditsButton/CreditsConfirmationDialog");
+        //exit to main menu panel
+        ExitToMainMenuPanel = GetNode<Panel>("ExitToMainMenuPanel");
+        YesExitToMainMenuButton = GetNode<Button>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/YesExitToMainMenuButton");
+        NoExitToMainMenuButton = GetNode<Button>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/NoExitToMainMenuButton");
+        WantToQuitToMainMenuLabel = GetNode<RichTextLabel>("ExitToMainMenuPanel/VBoxContainer/MarginContainer/WantToExitToMainMenuLabel");
+        YesNoExitToMenuButtonsHBoxContainer = GetNode<HBoxContainer>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer");
 
-        //trigger events depending on the option clicked
-        startNewGameButton.Pressed += OnStartNewGameButtonPressed;
-        continueGameButton.Pressed += OnContinueButtonPressed;
-        saveGameButton.Pressed += OnSaveGameButtonPressed;
-        loadGameButton.Pressed += OnLoadGameButtonPressed;
-        languageButton.Pressed += OnLanguageButtonPressed;
-        creditsButton.Pressed += OnCreditsButtonPressed;
-        exitGameButton.Pressed += OnExitGameButtonPressed;
-        exitToMainMenuButton.Pressed += OnExitToMainMenuButtonPressed;
-        exitGameConfirmationDialog.Canceled += OnExitGameCancelButtonPressed;
-        exitGameConfirmationDialog.Confirmed += OnExitGameConfirmButtonPressed;
-        exitToMainMenuConfirmationDialog.Confirmed += OnExitToMainMenuConfirmButtonPressed;
-        exitToMainMenuConfirmationDialog.Canceled += OnExitToMainMenuCancelButtonPressed;
-
-        creditsConfirmationDialog.Canceled += OnCreditsCancelOrConfirmButtonPressed;
-        creditsConfirmationDialog.Confirmed += OnCreditsCancelOrConfirmButtonPressed;
-
+        //languages panel
         LanguageOptionsContainer = GetNode<VBoxContainer>("LanguageOptionsContainer");
-        Button englishButton = GetNode<Button>("LanguageOptionsContainer/EnglishButton");
-        Button frenchButton = GetNode<Button>("LanguageOptionsContainer/FrenchButton");
-        Button catalanButton = GetNode<Button>("LanguageOptionsContainer/CatalanButton");
-        Button goBackButton = GetNode<Button>("LanguageOptionsContainer/GoBackButton");
+        englishButton = GetNode<Button>("LanguageOptionsContainer/EnglishButton");
+        frenchButton = GetNode<Button>("LanguageOptionsContainer/FrenchButton");
+        catalanButton = GetNode<Button>("LanguageOptionsContainer/CatalanButton");
+        languagesGoBackButton = GetNode<Button>("LanguageOptionsContainer/GoBackButton");
 
+        //credits
+        creditsConfirmationDialog = GetNode<ConfirmationDialog>("CreditsConfirmationDialog");
+
+        //main menu background image
+        mainMenuBackgroundImage = GetNode<TextureRect>("BackgroundImage");
+    }
+
+    private void SetupButtonEvents() {
+
+        //main buttons events
+        startNewGameButton.Pressed += () => _ = OnStartNewGameButtonPressed();
+        continueGameButton.Pressed += () => _ = OnContinueButtonPressed();
+        saveGameButton.Pressed += () => _ = OnSaveGameButtonPressed();
+        loadGameButton.Pressed += () => _ = OnLoadGameButtonPressed();
+        languageButton.Pressed += () => _ = OnLanguageButtonPressed();
+        creditsButton.Pressed += () => _ = OnCreditsButtonPressed();
+        exitToMainMenuButton.Pressed += OnExitToMainMenuButtonPressed;
+        exitGameButton.Pressed += () => _ = OnExitGameButtonPressed();
+
+        //exit to main menu events
+        YesExitToMainMenuButton.Pressed += () => _ = OnExitToMainMenuConfirmButtonPressed();
+        NoExitToMainMenuButton.Pressed += () => _ = OnExitToMainMenuCancelButtonPressed();
+
+        //exit game events
+        NoExitGameButton.Pressed += () => _ = OnExitGameCancelButtonPressed();
+        YesExitGameButton.Pressed += () => _ = OnExitGameConfirmButtonPressed();
+
+        //credits events
+        creditsConfirmationDialog.Canceled += () => _ = OnCreditsCancelOrConfirmButtonPressed();
+        creditsConfirmationDialog.Confirmed += () => _ = OnCreditsCancelOrConfirmButtonPressed();
+
+        //languages events
         englishButton.Pressed += OnEnglishButtonPressed;
         frenchButton.Pressed += OnFrenchButtonPressed;
         catalanButton.Pressed += OnCatalanButtonPressed;
-        goBackButton.Pressed += OnGoBackButtonPressed;
+        languagesGoBackButton.Pressed += () => _ = OnLanguagesGoBackButtonPressed();
+    }
 
+    private void ApplyCustomStyles() {
+
+        SetFullRect();
+        EnableRichTextLabels();
+        StyleHBoxContainers();
+        ApplyCustomStyleToAllButtons();
+        StylePanelsAndDialogs();
+    }
+
+    private void SetFullRect() {
         AnchorRight = 1;
         AnchorBottom = 1;
         OffsetRight = 0;
         OffsetBottom = 0;
-
-        //***** SET LANGUAGE HERE *****
-        //we check what language the user has in his Windows OS
-        string currentCultureName = System.Globalization.CultureInfo.CurrentCulture.Name;
-        string[] parts = currentCultureName.Split('-');
-        language = parts[0];
-        TranslationServer.SetLocale(language);
-        //for testing purposes, will change the language directly here so we do not have to tinker witn Windows locale settings each time
-        language = "en";
-        TranslationServer.SetLocale(language);
-
-        //below, we grab the locale keys before they are overwritten by the fallback locale translation,
-        //otherwise we wouldn't be able to switch to another locale as the keys would be destroyed.
-        //remember the original keys and translations for menu buttons are in a google sheet at https://docs.google.com/spreadsheets/d/1HsAar1VdxVkJbuKUa3ElxSN0yZES2YfNUrk2yA7EeMM/edit?gid=0#gid=0
-        //an example START_NEW_GAME, WANT_QUIT_GAME? are keys that have its corresponding translation columns in the google sheet. 
-        //This google sheet is exported as csv files and added to Godot's filesystem, then again added to the Localizatoin tab in project settings
-        foreach (Button button in MainOptionsContainer.GetChildren()) {
-            string initialText = button.Text;
-            //[button] is the button name in Godot's editor, the .Text is a key manually added that should have a match with a key in the translations file in the filesystem
-            buttonLocalizationKeys[button] = initialText;
-            GD.Print($"Button name: {button.Name}, Key: {initialText}, Locale: {TranslationServer.GetLocale()}");
-        }
-
-        foreach (Button button in LanguageOptionsContainer.GetChildren()) {
-            string initialText = button.Text;
-            //[button] is the button name in Godot's editor, the .Text is a key manually added that should have a match with a key in the translations file in the filesystem
-            buttonLanguageKeys[button] = initialText;
-            GD.Print($"Button name: {button.Name}, Key: {initialText}, Locale: {TranslationServer.GetLocale()}");
-        }
-
-        ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
-        ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
     }
 
-    private void ApplyCustomStyleToButtonsInContainer(VBoxContainer container) {
+    private void EnableRichTextLabels() {
+        WantToQuitGameLabel.BbcodeEnabled = true;
+        WantToQuitToMainMenuLabel.BbcodeEnabled = true;
+    }
+
+    private void StyleHBoxContainers() {
+        StyleHBoxContainer(YesNoButtonsHBoxContainer);
+        StyleHBoxContainer(YesNoExitToMenuButtonsHBoxContainer);
+    }
+
+    private void StyleHBoxContainer(HBoxContainer container) {
+        container.SizeFlagsHorizontal = SizeFlags.ShrinkCenter;
+        container.AddThemeConstantOverride("margin_left", 20);
+        container.AddThemeConstantOverride("margin_right", 20);
+        container.AddThemeConstantOverride("margin_bottom", 50);
+        container.AddThemeConstantOverride("separation", 20);
+    }
+
+    private void ApplyCustomStyleToAllButtons() {
+        //apply a default blue style with white rounded edges for panels and buttons
+        ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
+        ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
+        ApplyCustomStyleToButtonsInContainer(ExitToMainMenuPanel);
+        ApplyCustomStyleToButtonsInContainer(ExitGameConfirmationPanel);
+    }
+
+    private void StylePanelsAndDialogs() {
+        UIThemeHelper.ApplyCustomStyleToPanel(ExitToMainMenuPanel);
+        UIThemeHelper.ApplyCustomStyleToPanel(ExitGameConfirmationPanel);
+        UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
+    }
+
+    private void ApplyCustomStyleToButtonsInContainer(Control container) {
         foreach (var child in container.GetChildren()) {
             if (child is Button button) {
-                UIManager.Instance.ApplyCustomStyleToButton(button);
+                UIThemeHelper.ApplyCustomStyleToButton(button);
+            } else if (child is Control) {
+                // Recursively apply style to children of this control
+                ApplyCustomStyleToButtonsInContainer(child as Control);
             }
         }
     }
 
-    //we constantly check if the dev (me!) changes the locale via the export variable 'language' in the editor
-    public override void _Process(double delta) {
-        base._Process(delta);
+    //when user selects language on main menu, this is called
+    public async Task UpdateTextsBasedOnLocale(string language) {
 
-        if (language != previousLanguage) {
-            previousLanguage = language;
-            TranslationServer.SetLocale(language);
-            GD.Print("new game locale: " + TranslationServer.GetLocale());
-            UpdateButtonTexts();
-            if(UIManager.Instance.dialogueBoxUI.IsVisibleInTree() == true)
-                DialogueManager.Instance.DisplayDialogue(DialogueManager.Instance.currentDialogueObject);
-            if(UIManager.Instance.playerChoicesBoxUI.IsVisibleInTree() == true)
-                UIManager.Instance.playerChoicesBoxUI.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, TranslationServer.GetLocale());
+        TranslationServer.SetLocale(language);
+        //put language buttons in grey
+        await SetLanguageButtonsVisualStateAsync(false);
+
+        //then disable them
+        foreach (Button button in LanguageOptionsContainer.GetChildren()) {
+            DisableButtonInput(button);
+        }
+
+        //if there is a dialogue on screen, translate it as soon as language is changed
+        if (UIManager.Instance.dialogueBoxUI.IsVisibleInTree()) {
+            DialogueManager.Instance.DisplayDialogue(DialogueManager.Instance.currentDialogueObject);
+            await WaitForDialogueCompletion();
+        }
+
+        //if there are player choices on screen, translate them as soon as language is changed
+        if (UIManager.Instance.playerChoicesBoxUI.IsVisibleInTree()) {
+            UIManager.Instance.playerChoicesBoxUI.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, TranslationServer.GetLocale());
+            await WaitForPlayerChoiceCompletion();
+        }
+
+        //enable language buttons again
+        foreach (Button button in LanguageOptionsContainer.GetChildren()) {
+            EnableButtonInput(button);
+        }
+
+        //language buttons to to default color
+        await SetLanguageButtonsVisualStateAsync(true);
+    }
+
+    //while dialogue is still being displayed to the new language, wait
+    private async Task WaitForDialogueCompletion() {
+        while (DialogueManager.Instance.isDialogueBeingPrinted) {
+            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         }
     }
 
-    private void UpdateButtonTexts() {
-        foreach (Button button in buttonLocalizationKeys.Keys) {
-            string localizationKey = buttonLocalizationKeys[button];
-            //as we changed the locale in the editor and it was detected in _Process(), now we are telling Godot to get the proper translation based on the new locale
-            string translatedText = TranslationServer.Translate(localizationKey);
-            //and we add the proper translation to the current button that we previously saved in a dictionary in _Ready()
-            button.Text = translatedText;
-            //GD.Print($"Button Text: {translatedText}, Key: {localizationKey}, Locale: {TranslationServer.GetLocale()}");
-        }
-
-        //for when the language options are displayed, if the user changes language, change the language locale of the buttons too
-        foreach (Button button in buttonLanguageKeys.Keys) {
-            string localizationKey = buttonLanguageKeys[button];
-            //as we changed the locale in the editor and it was detected in _Process(), now we are telling Godot to get the proper translation based on the new locale
-            string translatedText = TranslationServer.Translate(localizationKey);
-            //and we add the proper translation to the current button that we previously saved in a dictionary in _Ready()
-            button.Text = translatedText;
-            //GD.Print($"Button Text: {translatedText}, Key: {localizationKey}, Locale: {TranslationServer.GetLocale()}");
+    //while player choices is still being displayed to the new language, wait
+    private async Task WaitForPlayerChoiceCompletion() {
+        while (DialogueManager.Instance.IsPlayerChoiceBeingPrinted) {
+            await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
         }
     }
 
-    public void DisplayMainMenu() {
+    private void SetLanguageButtonsVisualState(bool enabled) {
+        foreach (Button button in LanguageOptionsContainer.GetChildren()) {
+            button.Modulate = enabled ? Colors.White : Colors.Gray;
+        }
+    }
+
+    private async Task SetLanguageButtonsVisualStateAsync(bool enabled) {
+        SetLanguageButtonsVisualState(enabled);
+        await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+    }
+
+    //when the user clicks on any menu button, let's disable all buttons
+    //to prevent race conditions and breaking the state machine.
+    private void DisableAllButtons() => SetAllButtonsState(false);
+    private void EnableAllButtons() => SetAllButtonsState(true);
+
+    private void SetAllButtonsState(bool enabled) {
+        SetButtonActiveState(continueGameButton, enabled);
+        SetButtonActiveState(loadGameButton, enabled);
+        SetButtonActiveState(saveGameButton, enabled);
+        SetButtonActiveState(startNewGameButton, enabled);
+        SetButtonActiveState(languageButton, enabled);
+        SetButtonActiveState(exitGameButton, enabled);
+        SetButtonActiveState(creditsButton, enabled);
+        SetButtonActiveState(exitToMainMenuButton, enabled);
+        SetButtonActiveState(settingsButton, enabled);
+    }
+
+    private void SetButtonActiveState(Button button, bool enable) {
+        button.SetProcessInput(enable);
+        button.MouseFilter = enable ? MouseFilterEnum.Stop : MouseFilterEnum.Ignore;
+        button.FocusMode = enable ? FocusModeEnum.All : FocusModeEnum.None;
+
+    }
+
+    public async Task DisplayMainMenu() {
+
+        DisableAllButtons();
+        SetupForMainMenu();
+        await FadeInMainMenu();
+        EnableAllButtons();
+        //this calls to pause the game timer, more sense on ingame menu
+        //but can be used to autosave game while user exits current game
+        MainMenuOpened?.Invoke();
+    }
+
+    private void SetupForMainMenu() {
+        SetDialogueUIElementsTopLevel(false);
+        ClearPendingInputEvents();
+        SetupMainMenuBackground();
+        SetupMainMenuButtonVisibility();
+        //only displayed in dialogue mode, or future game modes
+        UIManager.Instance.inGameMenuButton.Hide();
+        //a mask to avoid clicking on the dialoguebox/player choices
+        //when ingame menu is open. If in main menu, disable it.
+        UIManager.Instance.menuOverlay.Visible = false;
+        SetMainMenuUIMainComponentsVisibility();
+    }
+
+    private void SetDialogueUIElementsTopLevel(bool isTopLevel) {
+        //put interfering UI elements behind
+        //Dialogue Mode UI elements
+        UIManager.Instance.dialogueBoxUI.TopLevel = false;
+        UIManager.Instance.playerChoicesBoxUI.TopLevel = false;
+    }
+
+    private void ClearPendingInputEvents() {
+        GetViewport().SetInputAsHandled();
+    }
+
+    private void SetupMainMenuBackground() {
+        //if we come back from a current play, remove the dialogue mode image
+        VisualManager.Instance.RemoveImage();
+        //then load the main menu own image
+        mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/splash screen the dragon riddle.png");
+        mainMenuBackgroundImage.Modulate = new Color(1, 1, 1, 1);  // This sets it to ffffff (fully opaque)
+        mainMenuBackgroundImage.SetAnchorsPreset(LayoutPreset.FullRect);
+        mainMenuBackgroundImage.Visible = true;
+    }
+
+    private void SetupMainMenuButtonVisibility() {
+        //specific main menu buttons, not ingame menu
         startNewGameButton.Show();
         exitGameButton.Show();
         saveGameButton.Hide();
         continueGameButton.Hide();
         exitToMainMenuButton.Hide();
-        mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/DialogueOrPlayerChoice/cosmos ether.png");
-        LoadSaveManager.Instance.ToggleAutosave(false);
-        UIManager.Instance.inGameMenuButton.Hide();
-        UIManager.Instance.menuOverlay.Visible = false; //a mask to avoid clicking on the dialoguebox when menus are open
+    }
+
+    private void SetMainMenuUIMainComponentsVisibility() {
+        MainOptionsContainer.TopLevel = true;
         MainOptionsContainer.Show();
+        mainMenuBackgroundImage.Show();
         Show();
-        MainMenuOpened?.Invoke();
     }
 
-    public void DisplayInGameMenu() {
-        saveGameButton.Show();
-        continueGameButton.Show();
-        exitToMainMenuButton.Show();
-        startNewGameButton.Hide();
-        exitGameButton.Hide();
-        mainMenuBackgroundImage.Texture = null;
-        UIManager.Instance.menuOverlay.Visible = true; //put overlay to prevent reading input from other UI elements behind this mask
-        LoadSaveManager.Instance.ToggleAutosave(false);
-        Show();
-        InGameMenuOpened?.Invoke();
-    }
 
-    public void CloseInGameMenu() {
-        UIManager.Instance.menuOverlay.Visible = false;
-        LoadSaveManager.Instance.ToggleAutosave(true);
-        Hide();
-        InGameMenuClosed?.Invoke();
-    }
-
-    public void CloseMainMenu() {
-        Hide();
+    public async Task CloseMainMenu() {
+        DisableAllButtons();
+        MainOptionsContainer.SetProcessInput(false);
+        await FadeOutMainMenu();
+        //this calls to resume the game timer
         MainMenuClosed?.Invoke();
     }
 
-    private void OnSaveGameButtonPressed() {
-        // SaveGameButtonPressed.Invoke();
-        UIManager.Instance.saveGameScreen.ShowScreen(SAVE_SCREEN);
-
+    public async Task FadeInMainMenu() {
+        await Task.WhenAll(
+            UIFadeHelper.FadeInControl(MainOptionsContainer, 0.7f),
+            UIFadeHelper.FadeInControl(mainMenuBackgroundImage, 0.7f));
     }
 
-    private void OnLoadGameButtonPressed() {
-        // LoadGameButtonPressed.Invoke();
-        UIManager.Instance.saveGameScreen.ShowScreen(LOAD_SCREEN);
-        //Hide();
+    private async Task FadeOutMainMenu() {
+        await Task.WhenAll(
+            UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.7f),
+            UIFadeHelper.FadeOutControl(mainMenuBackgroundImage, 0.7f));
     }
 
-    private void OnStartNewGameButtonPressed() {
-        StartNewGameButtonPressed?.Invoke();
-        Hide();
+    public async Task DisplayInGameMenu() {
+        DisableAllButtons();
+        SetupUIForInGameMenu(); 
+        MainOptionsContainer.Show();
+        MainOptionsContainer.Modulate = new Color(1, 1, 1, 1);  // Full opacity
+        MainOptionsContainer.TopLevel = true;
+        await UIFadeHelper.FadeInControl(MainOptionsContainer, 0.6f);
+        MainOptionsContainer.SetProcessInput(true);
+        EnableAllButtons();
+        ShowIngameMenuIcon();
+        InGameMenuOpened?.Invoke();
     }
 
-    private void OnContinueButtonPressed() {
-        CloseInGameMenu();
+    private void SetupUIForInGameMenu() {
+        SetDialogueUIElementsTopLevel(false);
+        MainOptionsContainer.SetProcessInput(false);
+        Show();
+        SetInGameMenuButtonVisibility();
+        mainMenuBackgroundImage.Texture = null;
+        //put overlay to prevent reading input from other UI elements behind this mask
+        UIManager.Instance.menuOverlay.Visible = true;
     }
 
-    private void OnLanguageButtonPressed() {
-        MainOptionsContainer.Hide();
-        LanguageOptionsContainer.Show();
+    private void SetInGameMenuButtonVisibility() {
+        saveGameButton.Visible = true;
+        continueGameButton.Visible = true;
+        exitToMainMenuButton.Visible = true;
+        startNewGameButton.Visible = false;
+        exitGameButton.Visible = false;
     }
 
-    private void OnCreditsButtonPressed() {
+    public void HideIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = false;
+    public void ShowIngameMenuIcon() => UIManager.Instance.inGameMenuButton.Visible = true;
+    
+
+    public async Task CloseInGameMenu() {
+        DisableAllButtons();
+        MainOptionsContainer.SetProcessInput(false);
+        UIManager.Instance.menuOverlay.Visible = false;
+        await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
+        InGameMenuClosed?.Invoke();
+    }
+
+    private async Task OnStartNewGameButtonPressed() {
+        DisableAllButtons();
+        HideIngameMenuIcon();
+        await FadeOutMainMenu();
+        StartNewGameButtonPressed.Invoke();
+        GameStateManager.Instance.Fire(Trigger.START_NEW_GAME);
+    }
+
+    private async Task OnContinueButtonPressed() {
+        DisableAllButtons();
+        ShowIngameMenuIcon();
+        await CloseInGameMenu();
+        GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+        SetButtonActiveState(continueGameButton, true);
+    }
+
+    private async Task OnSaveGameButtonPressed() {
+        DisableAllButtons();
+        HideIngameMenuIcon();
+        await CloseInGameMenu();
+        GameStateManager.Instance.Fire(Trigger.INITIALIZE_SAVE_SCREEN);
+    }
+
+    private async Task OnLoadGameButtonPressed() {
+        HideIngameMenuIcon();
+        DisableAllButtons();
+        GameStateManager.Instance.Fire(Trigger.INITIALIZE_LOAD_SCREEN);
+    }
+
+    private async Task OnLanguageButtonPressed() {
+        HideIngameMenuIcon();
+        DisableAllButtons();
+        await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_LANGUAGE_MENU);
+        EnableAllButtons();
+    }
+
+    public async Task DisplayLanguageMenu() {
+        LanguageOptionsContainer.Visible = true;
+        LanguageOptionsContainer.TopLevel = true;
+        await UIFadeHelper.FadeInControl(LanguageOptionsContainer);
+    }
+
+    private async void OnEnglishButtonPressed() => await UpdateTextsBasedOnLocale("en");
+    private async void OnFrenchButtonPressed() => await UpdateTextsBasedOnLocale("fr");
+    private async void OnCatalanButtonPressed() => await UpdateTextsBasedOnLocale("ca");
+
+    private async Task OnCreditsButtonPressed() {
+        HideIngameMenuIcon();
+        DisableAllButtons();
+        await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_CREDITS);
         creditsConfirmationDialog.Show();
-        MainOptionsContainer.Hide();
-
+        await UIFadeHelper.FadeInWindow(creditsConfirmationDialog, 0.4f);
     }
 
-    private void OnExitGameButtonPressed() {
-        ShowExitGameConfirmationPopup();
-
+    private async Task OnCreditsCancelOrConfirmButtonPressed() {
+        await UIFadeHelper.FadeOutWindow(creditsConfirmationDialog, 0.2f);
+        await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);
+        EnableAllButtons();
+        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
 
-    public void OnExitToMainMenuButtonPressed() {
-        ShowExitToMainMenuConfirmationPopup();
+    public async void OnExitToMainMenuButtonPressed() {
+        DisableAllButtons();
+        HideIngameMenuIcon();
+        await ShowExitToMainMenuConfirmationPopup();
     }
 
-    public void ShowExitGameConfirmationPopup() {
-        MainOptionsContainer.Hide();
-        exitGameConfirmationDialog.Show();
+    public async Task ShowExitToMainMenuConfirmationPopup() {
+        DisableAllButtons();
+        SetButtonActiveState(NoExitToMainMenuButton, false);
+        SetButtonActiveState(YesExitToMainMenuButton, false);
+        await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
+        ExitToMainMenuPanel.Visible = true;
+        ExitToMainMenuPanel.TopLevel = true;
+        await UIFadeHelper.FadeInControl(ExitToMainMenuPanel, 0.5f);
+        SetButtonActiveState(NoExitToMainMenuButton, true);
+        SetButtonActiveState(YesExitToMainMenuButton, true);
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_EXIT_TO_MAIN_MENU_CONFIRMATION_POPUP);
     }
 
-    public void ShowExitToMainMenuConfirmationPopup() {
-        MainOptionsContainer.Hide();
-        exitToMainMenuConfirmationDialog.Show();
+    private async Task OnExitToMainMenuConfirmButtonPressed() {
+        SetButtonActiveState(NoExitToMainMenuButton, false);
+        SetButtonActiveState(YesExitToMainMenuButton, false);
+        HideIngameMenuIcon();
+        await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.5f);
+
+        GD.Print($"Last Game mode before exit to Main Menu: {GameStateManager.Instance.LastGameMode}");
+
+        if (GameStateManager.Instance.LastGameMode == State.InDialogueMode) {
+            await HandleExitFromDialogueMode();
+        }
+
+        EnableAllButtons();
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
     }
 
-    //triggered by confirmationDialog.Confirmed event
-    private void OnExitGameConfirmButtonPressed() {
-        GetTree().Quit(); // Exit the game
+    private async Task HandleExitFromDialogueMode()
+    {
+            UIManager.Instance.fadeOverlay.TopLevel = true;
+            await UIManager.Instance.FadeInScreenOverlay(1.5f);
+            UIManager.Instance.dialogueBoxUI.Hide();
+            UIManager.Instance.playerChoicesBoxUI.Hide();
+            VisualManager.Instance.RemoveImage();
     }
 
-    //triggered by confirmationDialog.Canceled event
-    private void OnExitGameCancelButtonPressed() {
-        // Close the confirmation popup
+    private async Task OnExitToMainMenuCancelButtonPressed() {
+        SetButtonActiveState(NoExitToMainMenuButton, false);
+        SetButtonActiveState(YesExitToMainMenuButton, false);
+        await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.6f);
+        ShowIngameMenuIcon();
+        SetButtonActiveState(NoExitToMainMenuButton, false);
+        SetButtonActiveState(YesExitToMainMenuButton, false);
+        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
+        EnableAllButtons();
+    }
+
+    private async Task OnExitGameButtonPressed() {
+        SetButtonActiveState(exitGameButton, false);
+        DisableAllButtons();
+        HideIngameMenuIcon();
+        await ShowExitGameConfirmationPopup();
+        EnableAllButtons();
+        SetButtonActiveState(exitGameButton, true);
+    }
+
+    public async Task ShowExitGameConfirmationPopup() {
+        DisableAllButtons();
+        await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
+        ExitGameConfirmationPanel.Visible = true;
+        ExitGameConfirmationPanel.TopLevel = true;
+        SetButtonActiveState(NoExitGameButton, false);
+        SetButtonActiveState(YesExitGameButton, false);
+        await UIFadeHelper.FadeInControl(ExitGameConfirmationPanel, 0.6f);
+        SetButtonActiveState(NoExitGameButton, true);
+        SetButtonActiveState(YesExitGameButton, true);
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_EXIT_GAME_MENU_CONFIRMATION_POPUP);
+    }
+
+    private async Task OnExitGameConfirmButtonPressed() {
+        SetButtonActiveState(NoExitGameButton, false);
+        SetButtonActiveState(YesExitGameButton, false);
+        HideIngameMenuIcon();
+        await UIFadeHelper.FadeOutControl(ExitGameConfirmationPanel, 1.2f);
+        GameStateManager.Instance.Fire(Trigger.EXIT_GAME);
+    }
+
+    private async Task OnExitGameCancelButtonPressed() {
+        SetButtonActiveState(NoExitGameButton, false);
+        SetButtonActiveState(YesExitGameButton, false);
+        DisableAllButtons();
+        await UIFadeHelper.FadeOutControl(ExitGameConfirmationPanel, 0.6f);
+        await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);
+        SetButtonActiveState(NoExitGameButton, true);
+        SetButtonActiveState(YesExitGameButton, true);
+        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
+        EnableAllButtons();
+    }
+
+    private async Task OnLanguagesGoBackButtonPressed() {
+        if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
+            ShowIngameMenuIcon();
+
+        SetButtonActiveState(languagesGoBackButton, false);
         GetTree().CallGroup("popups", "close_all");
-        MainOptionsContainer.Show();
-    }
-
-    private void OnExitToMainMenuConfirmButtonPressed() {
-        CloseInGameMenu();
-        UIManager.Instance.HideAllUIElements();
-        VisualManager.Instance.RemoveImage();
-        //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN //HERE WE NEED TO HIDE ANYTHING THAT IS DISPLAYED ON SCREEN 
-        DisplayMainMenu();
-    }
-
-    private void OnExitToMainMenuCancelButtonPressed() {
-        GetTree().CallGroup("popups", "close_all");
-        MainOptionsContainer.Show();
-    }
-
-    private void OnCreditsCancelOrConfirmButtonPressed() {
-        GetTree().CallGroup("popups", "close_all");
-        MainOptionsContainer.Show();
-    }
-
-    private void OnEnglishButtonPressed() {
-        language = "en";
-    }
-
-    private void OnFrenchButtonPressed() {
-        language = "fr";
-    }
-
-    private void OnCatalanButtonPressed() {
-        language = "ca";
-    }
-
-    private void OnGoBackButtonPressed() {
-        LanguageOptionsContainer.Hide();
-        MainOptionsContainer.Show();
+        await UIFadeHelper.FadeOutControl(LanguageOptionsContainer, 0.6f);
+        SetButtonActiveState(languagesGoBackButton, true);
+        DisableAllButtons();
+        await UIFadeHelper.FadeInControl(MainOptionsContainer, 0.6f);
+        EnableAllButtons();
+        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
     }
 }
 

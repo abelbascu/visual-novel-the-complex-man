@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Dynamic;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 public partial class DialogueManager : Control {
 
@@ -77,6 +78,8 @@ public partial class DialogueManager : Control {
         }
         dialogueBoxUI = UIManager.Instance.GetDialogueBoxUI();
         playerChoicesBoxUI = UIManager.Instance.GetPlayerChoicesBoxUI();
+        dialogueBoxUI.MouseFilter = MouseFilterEnum.Stop;
+        playerChoicesBoxUI.MouseFilter = MouseFilterEnum.Stop;
     }
 
     private void LoadDialogueObjects(string filePath) {
@@ -121,7 +124,7 @@ public partial class DialogueManager : Control {
 
     public void DisplayDialogue(DialogueObject currentDialogueObject) {
         if (isDialogueBeingPrinted) //is we are currently printing a dialogue in the DialogueBoxUI, do nothing
-            return;
+           return;
         isDialogueBeingPrinted = true;
         if (dialogueBoxUI == null) {
             DisplayDialogueBoxUI();
@@ -133,18 +136,15 @@ public partial class DialogueManager : Control {
 
         dialogueBoxUI.DisplayDialogueLine(currentDialogueObject, TranslationServer.GetLocale());
         Actors actor;
-        if (Enum.TryParse(currentDialogueObject.Actor, out actor))
-        {
-        string speakerName = GetSpeakerName(actor);
-        dialogueBoxUI.DisplaySpeakerName(speakerName);
+        if (Enum.TryParse(currentDialogueObject.Actor, out actor)) {
+            string speakerName = GetSpeakerName(actor);
+            dialogueBoxUI.DisplaySpeakerName(speakerName);
         }
     }
 
-    
-    public string GetSpeakerName(Actors actor)
-    {
-        return actor switch
-        {
+
+    public string GetSpeakerName(Actors actor) {
+        return actor switch {
             Actors.Player => "Player",
             Actors.Narrator => "Narrator",
             _ => "Unknown Speaker"
@@ -172,6 +172,7 @@ public partial class DialogueManager : Control {
     public void DisplayDialogueBoxUI() {
         // Ensure the dialogue box is visible
         dialogueBoxUI.Visible = true;
+        dialogueBoxUI.TopLevel = true;
         //once all chars of the dialogue text are displayed in the container, we can show the next dialogue.
         dialogueBoxUI.FinishedDisplayingDialogueLine += DialogueManager.Instance.OnTextBoxFinishedDisplayingDialogueLine;
     }
@@ -183,6 +184,7 @@ public partial class DialogueManager : Control {
         //VBoxContainer playerChoìces = instance as VBoxContainer;
         playerChoicesBoxUI = instance as PlayerChoicesBoxUI;
         playerChoicesBoxUI.Show();
+        playerChoicesBoxUI.TopLevel = true;
         //once all chars of the dialogue text are displayed in the container, we can show the next line.
         playerChoicesBoxUI.FinishedDisplayingPlayerChoice += DialogueManager.Instance.OnTextBoxFinishedDisplayingPlayerChoices;
     }
@@ -207,11 +209,11 @@ public partial class DialogueManager : Control {
     }
 
     public void OnTextBoxFinishedDisplayingPlayerChoices() {
-        IsPlayerChoiceBeingPrinted = false;  
+        IsPlayerChoiceBeingPrinted = false;
     }
 
     public void OnTextBoxFinishedDisplayingDialogueLine() {
-        isDialogueBeingPrinted = false;  
+        isDialogueBeingPrinted = false;
     }
 
     public void RemoveFromPlayerChoicesList(DialogueObject dialogObj) {
@@ -336,7 +338,7 @@ public partial class DialogueManager : Control {
 
     public void OnPlayerChoiceButtonUIPressed(DialogueObject playerChoiceObject) {
 
-         DialogueVisited.Invoke(playerChoiceObject.ID);
+        DialogueVisited.Invoke(playerChoiceObject.ID);
 
         //we need to remove first the dialogObject on playerChoicesList with the same ID as playerChoiceObject.ID
         playerChoicesList.RemoveAll(dialogObj => dialogObj.ID == playerChoiceObject.ID);
@@ -399,7 +401,7 @@ public partial class DialogueManager : Control {
         }
 
         //at the moment we'll count player choices as dialogue objevts to count the Total number of dialogues visited;
-       // DialogueVisited.Invoke(playerChoiceObject.ID);
+        // DialogueVisited.Invoke(playerChoiceObject.ID);
     }
 
     public void RemoveAllNoGroupChildrenFromSameNoGroupParent(DialogueObject playerChoiceObject) {

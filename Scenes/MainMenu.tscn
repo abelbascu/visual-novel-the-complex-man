@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://c8t14jwiqekss"]
+[gd_scene load_steps=2 format=3 uid="uid://d38a20qw7dyh0"]
 
 [ext_resource type="Script" path="res://Scripts/MainMenu.cs" id="1_2ygpx"]
-[ext_resource type="Texture2D" uid="uid://bf2g14vt6hibs" path="res://Visuals/DialogueOrPlayerChoice/cosmos ether.png" id="2_15dhf"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -10,9 +9,15 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 4
-size_flags_vertical = 8
 script = ExtResource("1_2ygpx")
+
+[node name="CreditsConfirmationDialog" type="ConfirmationDialog" parent="."]
+auto_translate_mode = 1
+title = ""
+initial_position = 2
+size = Vector2i(800, 80)
+dialog_text = "CREDITS_INFO"
+dialog_autowrap = true
 
 [node name="BackgroundImage" type="TextureRect" parent="."]
 layout_mode = 1
@@ -21,21 +26,20 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_15dhf")
-expand_mode = 3
+expand_mode = 1
 
 [node name="MainOptionsContainer" type="VBoxContainer" parent="."]
 layout_direction = 2
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = -1
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -224.0
-offset_top = -284.0
-offset_right = 180.0
-offset_bottom = 53.0
+offset_left = -212.0
+offset_top = -162.0
+offset_right = 211.0
+offset_bottom = 437.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -54,8 +58,7 @@ text = "CONTINUE
 [node name="SaveGameButton" type="Button" parent="MainOptionsContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
-text = "SAVE_GAME
-"
+text = "SAVE_GAME"
 
 [node name="LoadGameButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
@@ -82,42 +85,17 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "CREDITS"
 
-[node name="CreditsConfirmationDialog" type="ConfirmationDialog" parent="MainOptionsContainer/CreditsButton"]
-title = ""
-position = Vector2i(740, 500)
-size = Vector2i(500, 100)
-dialog_text = "CREDITS_INFO"
-
 [node name="ExitToMainMenuButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "EXIT_TO_MAIN_MENU"
 
-[node name="ExitToMainMenuConfirmationDialog" type="ConfirmationDialog" parent="MainOptionsContainer/ExitToMainMenuButton"]
-title = ""
-position = Vector2i(760, 540)
-size = Vector2i(400, 100)
-always_on_top = true
-ok_button_text = "YES"
-dialog_text = "WANT_QUIT_TO_MAIN_MENU?"
-cancel_button_text = "NO"
-
 [node name="ExitGameButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "EXIT_TO_DESKTOP"
-
-[node name="ExitGameConfirmationDialog" type="ConfirmationDialog" parent="MainOptionsContainer/ExitGameButton"]
-auto_translate_mode = 1
-title = ""
-position = Vector2i(760, 540)
-size = Vector2i(400, 100)
-always_on_top = true
-ok_button_text = "YES"
-dialog_text = "WANT_QUIT_GAME?"
-cancel_button_text = "NO"
 
 [node name="LanguageOptionsContainer" type="VBoxContainer" parent="."]
 visible = false
@@ -128,12 +106,18 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -202.0
+offset_left = -246.5
 offset_top = -168.5
-offset_right = 202.0
+offset_right = 246.5
 offset_bottom = 168.5
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="GoBackButton" type="Button" parent="LanguageOptionsContainer"]
+layout_mode = 2
+theme_override_colors/icon_normal_color = Color(0, 0.854902, 0, 1)
+theme_override_font_sizes/font_size = 40
+text = "GO_BACK"
 
 [node name="EnglishButton" type="Button" parent="LanguageOptionsContainer"]
 layout_mode = 2
@@ -159,8 +143,114 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "UNDEFINED_LANGUAGE1"
 
-[node name="GoBackButton" type="Button" parent="LanguageOptionsContainer"]
+[node name="ExitGameConfirmationPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+auto_translate_mode = 1
+visible = false
 layout_mode = 2
-theme_override_colors/icon_normal_color = Color(0, 0.854902, 0, 1)
-theme_override_font_sizes/font_size = 40
-text = "GO_BACK"
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -352.0
+offset_top = -136.0
+offset_right = 348.0
+offset_bottom = 218.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ExitGameConfirmationPanel"]
+layout_mode = 1
+offset_right = 700.0
+offset_bottom = 354.0
+
+[node name="MarginContainer" type="MarginContainer" parent="ExitGameConfirmationPanel/VBoxContainer"]
+custom_minimum_size = Vector2(500, 200)
+layout_mode = 2
+
+[node name="WantToQuitGameLabel" type="RichTextLabel" parent="ExitGameConfirmationPanel/VBoxContainer/MarginContainer"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/normal_font_size = 38
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="YesNoButtonsHBoxContainer" type="HBoxContainer" parent="ExitGameConfirmationPanel/VBoxContainer"]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="YesExitGameButton" type="Button" parent="ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer"]
+custom_minimum_size = Vector2(200, 75)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 38
+text = "YES"
+
+[node name="NoExitGameButton" type="Button" parent="ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer"]
+custom_minimum_size = Vector2(200, 75)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 38
+text = "NO"
+
+[node name="ExitToMainMenuPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+auto_translate_mode = 1
+visible = false
+layout_mode = 2
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -352.0
+offset_top = -66.0
+offset_right = 348.0
+offset_bottom = 288.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ExitToMainMenuPanel"]
+layout_mode = 1
+offset_right = 700.0
+offset_bottom = 354.0
+
+[node name="MarginContainer" type="MarginContainer" parent="ExitToMainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(500, 200)
+layout_mode = 2
+
+[node name="WantToExitToMainMenuLabel" type="RichTextLabel" parent="ExitToMainMenuPanel/VBoxContainer/MarginContainer"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/normal_font_size = 38
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="YesNoExitToMenuButtonsHBoxContainer" type="HBoxContainer" parent="ExitToMainMenuPanel/VBoxContainer"]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="YesExitToMainMenuButton" type="Button" parent="ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer"]
+custom_minimum_size = Vector2(200, 75)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 38
+text = "YES"
+
+[node name="NoExitToMainMenuButton" type="Button" parent="ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer"]
+custom_minimum_size = Vector2(200, 75)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 38
+text = "NO"

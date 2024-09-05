@@ -7,6 +7,9 @@ using System.Text.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Reflection.Metadata;
+using System.Threading;
+using System.Threading.Tasks;
+using static GameStateMachine;
 
 public partial class LoadSaveManager : Node {
 
@@ -15,14 +18,28 @@ public partial class LoadSaveManager : Node {
     private const string SaveDirectory = "saves";
     private const string PersistentDataFile = "persistent_data.dat";
     private const string AutosavePrefix = "autosave_";
-    private const int AutosaveInterval = 300; // 5 minutes in seconds
+    private const int AutosaveInterval = 15; // 5 minutes in seconds
     private float timeSinceLastAutosave = 0;
     private float totalTimeElapsedSinceGameStart;
-    // private const bool AUTOSAVE_ENABLED = true;
-    // private const bool AUTOSAVE_DISABLED = false;
-    private bool isAutoSave = true;
+    private RichTextLabel autosaveStatusLabel;
+    public MarginContainer autosaveStatusLabelContainer;
+    public const bool AUTOSAVING_COMPLETED_CONST = false;
+    public const bool SAVING_COMPLETED_CONST = false;
+    public const bool CURRENTLY_AUTOSAVING_CONST = true;
+    public const bool CURRENTLY_SAVING_CONST = true;
+    private UITextTweenFadeIn fadeIn;
+    private UITextTweenFadeOut fadeOut;
+    private readonly Color paleYellow = new Color(1, 1, 0.8f, 1);
+    private string autosaving_TRANSLATE = "AUTOSAVING";
+    private string autosaveCompletedSuccess_TRANSLATE = "AUTOSAVE_COMPLETED_SUCCESS";
+    private string savingGameTRANSLATE = "SAVING_GAME";
+    private string gamesavedSuccessTRANSLATE = "GAME_SAVED_SUCCESS";
+    private string errorSaveMessageTitleTRANSLATE ="SAVE_ERROR";
+    private string errorAutosaveMessageTRANSLATE = "AUTOSAVE_ERROR";
+    private string errorManualSaveMessageTRANSLATE = "MANUAL_SAVE_ERROR";
 
     public int DialoguesVisitedID;
+
 
     public class GameState {
         public int SlotNumber { get; set; }
@@ -48,9 +65,8 @@ public partial class LoadSaveManager : Node {
 
     private PersistentData persistentData;
 
-    private DateTime gameStartTime;
+    private DateTime gameStartTime = DateTime.Now;
     private TimeSpan totalPlayTime = TimeSpan.Zero;
-    private bool isGameActive = false;
 
     public Action GameLoaded;
 
@@ -67,88 +83,230 @@ public partial class LoadSaveManager : Node {
         Directory.CreateDirectory(saveDirectoryPath);
         LoadPersistentData();
         CallDeferred(nameof(SubscribeToEvents));
+        CreateAutoSaveStatusLabel();
+
+        fadeIn = new UITextTweenFadeIn(); //TO REMOVE
+        fadeOut = new UITextTweenFadeOut(); //TO REMO
+        AddChild(fadeIn);   //TO REMOVE
+        AddChild(fadeOut); //TO REMOVE
+    }
+
+    private void CreateAutoSaveStatusLabel() {
+
+        autosaveStatusLabelContainer = new MarginContainer {
+            CustomMinimumSize = new Vector2(400, 75),
+            Visible = true,
+            AnchorsPreset = (int)Control.LayoutPreset.TopWide
+        };
+        AddChild(autosaveStatusLabelContainer);
+        MoveChild(autosaveStatusLabelContainer, -1);  // Move to top of the hierarchy
+
+        // Create and set up the autosave label
+        autosaveStatusLabel = new RichTextLabel {
+            CustomMinimumSize = new Vector2(400, 75),
+            BbcodeEnabled = true,
+            FitContent = true,
+            AutowrapMode = TextServer.AutowrapMode.Off,
+            Visible = true, //we set it to true so fade in/out can operate on the text.
+        };
+        autosaveStatusLabel.CustomMinimumSize = new Vector2(0, 75);
+        autosaveStatusLabel.AddThemeFontSizeOverride("normal_font_size", 28);
+        autosaveStatusLabel.AddThemeColorOverride("default_color", paleYellow);
+        autosaveStatusLabel.SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
+        autosaveStatusLabelContainer.AddThemeConstantOverride("margin_left", 10);
+        autosaveStatusLabelContainer.AddThemeConstantOverride("margin_right", 10);
+        autosaveStatusLabel.SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
+        autosaveStatusLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+        autosaveStatusLabelContainer.AddChild(autosaveStatusLabel);
     }
 
     private void SubscribeToEvents() {
         DialogueManager.Instance.DialogueVisited += OnDialogueVisited;
         UIManager.Instance.mainMenu.StartNewGameButtonPressed += StartGameTimer;
         GameLoaded += StartGameTimer;
-        UIManager.Instance.mainMenu.MainMenuOpened += PauseGameTimer;
-        UIManager.Instance.mainMenu.InGameMenuOpened += PauseGameTimer;
-        UIManager.Instance.mainMenu.MainMenuClosed += ResumeGameTimer;
-        UIManager.Instance.mainMenu.InGameMenuClosed += ResumeGameTimer;
     }
 
     private void StartGameTimer() {
         gameStartTime = DateTime.Now;
-        isGameActive = true;
     }
 
-    private void PauseGameTimer() {
-        if (isGameActive) {
-            totalPlayTime += DateTime.Now - gameStartTime;
-            isGameActive = false;
-        }
+    public void PauseGameTimer() {
+        totalPlayTime += DateTime.Now - gameStartTime;
+        gameStartTime = DateTime.Now;
     }
 
-    private void ResumeGameTimer() {
-        if (!isGameActive) {
-            gameStartTime = DateTime.Now;
-            isGameActive = true;
-        }
+
+    public void ResumeGameTimer() {
+        gameStartTime = DateTime.Now;
+        timeSinceLastAutosave = 0;
     }
+
 
     private void OnDialogueVisited(int dialogueObjectID) {
         persistentData.DialoguesVisitedForAllGames.Add(dialogueObjectID);
         SavePersistentData();
     }
 
-    public override void _Process(double delta) {
-        if (isAutoSave) {
+    private bool isAutosaving = false;
+
+    public override async void _Process(double delta) {
+
+        if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None) && !isAutosaving) {
             timeSinceLastAutosave += (float)delta;
             if (timeSinceLastAutosave >= AutosaveInterval) {
-                SaveGame(isAutoSave);
-                timeSinceLastAutosave = 0;
+                isAutosaving = true;
+                UIManager.Instance.inGameMenuButton.DisableIngameMenuButton();
+                _ = PerformAutosave();
             }
         }
     }
 
-    public void ToggleAutosave(bool isAutosave) {
-        isAutoSave = isAutosave; // I NEED TO REFACTOR THIS LINE I NEED TO REFACTOR THIS LINE I NEED TO REFACTOR THIS LINE I NEED TO REFACTOR THIS LINE
-        if (isAutoSave) {
-            timeSinceLastAutosave = 0; // Reset the timer when enabling
+    public async Task PerformAutosave() {
+
+        if (!GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
+            isAutosaving = false;
+            UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
+            return; // Don't start autosave if we're not in the correct state
+        }
+
+        try {
+            isAutosaving = true;
+            UIManager.Instance.inGameMenuButton.DisableIngameMenuButton();
+
+            GameStateManager.Instance.Fire(Trigger.AUTOSAVE_GAME);
+
+            await ShowSaveStatus();
+            await SaveGame(true);
+
+            GameStateManager.Instance.Fire(Trigger.AUTOSAVE_COMPLETED);
+            await ShowSaveStatus();
+
+            GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+        } catch (Exception ex) {
+            GD.PrintErr($"Error during autosave: {ex.Message}");
+            await ShowSaveStatus(true, errorAutosaveMessageTRANSLATE);
+        } finally {
+            isAutosaving = false;
+            timeSinceLastAutosave = 0;
+
+            if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
+                UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
+            }
         }
     }
 
-    public void SaveGame(bool isAutosave) {
-        //as soon as the ingame menu is open we have already set autosave to false in MainMenu.DisplayInGameMenu()
-        if (isAutosave == false) 
-            PauseGameTimer();
-        //if the ingame menu is closed and the game is active, autosave will jump to this line
-        else
-        {
-            totalPlayTime += DateTime.Now - gameStartTime;
-            gameStartTime = DateTime.Now;
+    public async Task PerformManualSave() {
+        try {
+            //GameStateManager.Instance.Fire(Trigger.SAVE_GAME);
+            await ShowSaveStatus();
+
+            await SaveGame(false);
+
+            UIManager.Instance.saveGameScreen.RefreshSaveSlots();
+            GameStateManager.Instance.Fire(Trigger.SAVING_COMPLETED);
+
+            await ShowSaveStatus();
+
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
+
+        } catch (Exception ex) {
+            GD.PrintErr($"Error during manual save: {ex.Message}");
+            await ShowSaveStatus(true, errorManualSaveMessageTRANSLATE);
+        }
+    }
+
+
+    public async Task ShowSaveStatus(bool isError = false, string errorMessage = null) {
+        string message;
+        RichTextLabel label;
+
+        if (isError) {
+            message = $"{TranslationServer.Translate(errorSaveMessageTitleTRANSLATE)}: {errorMessage}";
+            label = GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed)
+                ? UIManager.Instance.saveGameScreen.SaveStatusLabel
+                : autosaveStatusLabel;
+        } else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.AutoSaving)) {
+            message = TranslationServer.Translate(autosaving_TRANSLATE);
+            label = autosaveStatusLabel;
+        } else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.AutoSavingCompleted)) {
+            message = TranslationServer.Translate(autosaveCompletedSuccess_TRANSLATE);
+            label = autosaveStatusLabel;
+        } else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.Saving)) {
+            message = TranslationServer.Translate(savingGameTRANSLATE);
+            label = UIManager.Instance.saveGameScreen.SaveStatusLabel;
+        } else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SavingCompleted)) {
+            message = TranslationServer.Translate(gamesavedSuccessTRANSLATE);
+            label = UIManager.Instance.saveGameScreen.SaveStatusLabel;
+        } else {
+            throw new InvalidOperationException("Invalid save state");
         }
 
-        var gameState = CreateGameState();
-        gameState.IsAutosave = isAutosave;
-        string prefix = isAutosave ? AutosavePrefix : "save_";
-        string saveFilePath = GetNextFilePath(prefix);
-        gameState.SlotNumber = int.Parse(Path.GetFileNameWithoutExtension(saveFilePath).Substring(prefix.Length));
-        SaveGameState(gameState, saveFilePath);
-        UpdatePersistentData(gameState);
-        if (isAutosave) {
-            GD.Print("Autosave completed: " + saveFilePath);
-        } else
-            GD.Print("Manual save completed: " + saveFilePath);
+        label.Text = $"[center]{message}[/center]";
+        label.Visible = true;
+
+        await fadeIn.FadeIn(label);
+        await fadeOut.FadeOut(label);
+    }
+
+
+    public async Task SaveGame(bool isAutosave) {
+
+        try {
+            if (isAutosave)
+                totalPlayTime += DateTime.Now - gameStartTime;
+            //is is manual save
+
+            var gameState = CreateGameState();
+            gameState.IsAutosave = isAutosave;
+            string prefix = isAutosave ? AutosavePrefix : "save_";
+            string saveFilePath = GetNextFilePath(prefix);
+            gameState.SlotNumber = int.Parse(Path.GetFileNameWithoutExtension(saveFilePath).Substring(prefix.Length));
+
+            await Task.Run(() => SaveGameState(gameState, saveFilePath));
+            UpdatePersistentData(gameState);
+
+            GD.Print($"{(isAutosave ? "Autosave" : "Manual save")} completed: {saveFilePath}");
+
+            if (isAutosave)
+                gameStartTime = DateTime.Now;
+
+        } catch (Exception ex) {
+            string errorMessage = $"Error during {(isAutosave ? "autosave" : "save")}: {ex.Message}";
+            GD.PrintErr(errorMessage);
+            if (isAutosave) {
+                await ShowSaveStatus(true, $"Autosave failed: {ex.Message}");
+            } else {
+                await ShowSaveStatus(true, $"Save failed: {ex.Message}");
+            }
+            throw; // Re-throw the exception to be caught in PerformAutosave or the manual save process
+        }
     }
 
     private void SaveGameState(GameState gameState, string filePath) {
-        var json = JsonSerializer.Serialize(gameState);
-        var encryptedData = EncryptData(json);
-        File.WriteAllBytes(filePath, encryptedData);
+
+        try {
+            var json = JsonSerializer.Serialize(gameState);
+            var encryptedData = EncryptData(json);
+            File.WriteAllBytes(filePath, encryptedData);
+        } catch (Exception ex) {
+            throw new Exception($"Faile to save game state: {ex.Message}", ex);
+        }
     }
+
+    private GameState CreateGameState() {
+        return new GameState {
+            CurrentDialogueObject = DialogueManager.Instance.currentDialogueObject,
+            CurrentDialogueObjectID = DialogueManager.Instance.currentDialogueObject.ID,
+            CurrentConversationID = DialogueManager.Instance.currentConversationID,
+            PlayerChoicesList = DialogueManager.Instance.playerChoicesList.Select(d => d.ID).ToList(),
+            SaveTime = DateTime.Now,
+            TimePlayed = GetCurrentPlayTime(),
+            DialoguesVisitedForAllGamesPercentage = CalculateDialoguesVisiteForAllGamesdPercentage(),
+            VisualPath = VisualManager.Instance.VisualPath,
+            VisualType = VisualManager.Instance.visualType
+        };
+    }
+
 
     public void LoadPersistentData() {
         string persistentDataPath = Path.Combine(OS.GetUserDataDir(), PersistentDataFile);
@@ -163,21 +321,6 @@ public partial class LoadSaveManager : Node {
                 EndingsSeen = new HashSet<int>()
             };
         }
-    }
-
-    private GameState CreateGameState() {
-        return new GameState {
-            CurrentDialogueObject = DialogueManager.Instance.currentDialogueObject,
-            CurrentDialogueObjectID = DialogueManager.Instance.currentDialogueObject.ID,
-            CurrentConversationID = DialogueManager.Instance.currentConversationID,
-            LanguageCode = TranslationServer.GetLocale(),
-            PlayerChoicesList = DialogueManager.Instance.playerChoicesList.Select(d => d.ID).ToList(),
-            SaveTime = DateTime.Now,
-            TimePlayed = GetCurrentPlayTime(),
-            DialoguesVisitedForAllGamesPercentage = CalculateDialoguesVisiteForAllGamesdPercentage(),
-            VisualPath = VisualManager.Instance.VisualPath,
-            VisualType = VisualManager.Instance.visualType
-        };
     }
 
     private void UpdatePersistentData(GameState gameState) {
@@ -228,10 +371,12 @@ public partial class LoadSaveManager : Node {
         if (gameState != null) {
             ApplyGameState(gameState);
         }
-        ToggleAutosave(true);
-        GameLoaded.Invoke();
-
+        GameLoaded.Invoke(); //do not remove, we need it to start game timer.
     }
+
+    //----------------------------------------------------------------------------------------------------
+    //--------------------------------------------------LOAD GAME ----------------------------------------
+    //----------------------------------------------------------------------------------------------------
 
     private GameState LoadGameState(string filePath) {
 
@@ -250,22 +395,10 @@ public partial class LoadSaveManager : Node {
     private void ApplyGameState(GameState gameState) {
         DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject(gameState.CurrentConversationID, gameState.CurrentDialogueObjectID);
         DialogueManager.Instance.currentConversationID = gameState.CurrentConversationID;
-        TranslationServer.SetLocale(gameState.LanguageCode);
+        //TranslationServer.SetLocale(gameState.LanguageCode);
         DialogueManager.Instance.playerChoicesList = gameState.PlayerChoicesList.Select(id => DialogueManager.Instance.GetDialogueObject(gameState.CurrentConversationID, id)).ToList();
-        UIManager.Instance.inGameMenuButton.Show();
         VisualManager.Instance.VisualPath = gameState.VisualPath;
         VisualManager.Instance.visualType = gameState.VisualType;
-        //A BIT HACKY FIX where if the currentDialogObj is a PlayerChoice, and the user clicked on it and then saved the game, and if its DestinationDialogueID are PlayerChoices,
-        //it means that they were all already saved in a List and displayed to the screen, so when loading that saved game it should not display that currentDialogObj, but only its associated playerChoices
-        if (DialogueManager.Instance.playerChoicesList != null && DialogueManager.Instance.currentDialogueObject.Actor == "1") //if the current dialogue object it's a single player choice
-        {
-            //notice that we don't use DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) to avoid displaying the already visited player choice that is still hold in the current dialogue object
-            //until the player selects a new player choice. Notice that most times, after an NPC or actor dialogue, a group of player choices may be displayed, but it may also happen that after a 
-            //player choice is displayed, more new player chocies are displayed. We are solving this rare case here. 
-            DialogueManager.Instance.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, DialogueManager.Instance.SetIsPlayerChoiceBeingPrinted);
-            VisualManager.Instance.DisplayVisual(gameState.VisualPath, gameState.VisualType);
-        } else
-            DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
 
         SetCurrentPlayTime(gameState.TimePlayed);
     }

@@ -33,14 +33,16 @@ layout_mode = 2
 [node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer/MarginContainer1/VBoxContainer"]
 custom_minimum_size = Vector2(800, 100)
 layout_mode = 2
-theme_override_font_sizes/normal_font_size = 40
-text = "You can't enter the tavern without telling your name, traveller..."
+theme_override_font_sizes/normal_font_size = 38
+bbcode_enabled = true
+text = "INPUT_YOUR_NAME_TOP_TITLE"
+scroll_active = false
 
 [node name="LineEdit" type="LineEdit" parent="MarginContainer/MarginContainer1/VBoxContainer"]
 custom_minimum_size = Vector2(1200, 100)
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
-placeholder_text = "<Type your name here>"
+placeholder_text = "TYPE_YOUR_NAME_HERE"
 caret_blink = true
 caret_force_displayed = true
 
@@ -51,10 +53,9 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 
 [node name="ConfirmationDialog" type="ConfirmationDialog" parent="MarginContainer/MarginContainer2"]
-title = "Confirm your name"
+title = ""
 initial_position = 4
 size = Vector2i(764, 300)
-visible = true
 min_size = Vector2i(200, 300)
 max_size = Vector2i(800, 300)
 ok_button_text = ""

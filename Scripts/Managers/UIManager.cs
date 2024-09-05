@@ -1,9 +1,4 @@
 using Godot;
-using System;
-using System.IO;
-using System.Text.Json;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 public partial class UIManager : Control {
@@ -28,10 +23,64 @@ public partial class UIManager : Control {
     public Control menuOverlay;
     public SaveGameScreen saveGameScreen;
     public InputNameScreen inputNameScreen;
+    public SplashScreen splashScreen;
+    public Control fadeOverlay;
+
+
+    private void ConnectAllControlsGuiInput(Control parent) {
+        foreach (var node in parent.GetChildren()) {
+            if (node is Control control) {
+                control.GuiInput += (InputEvent @event) => OnControlGuiInput(@event, control);
+                ConnectAllControlsGuiInput(control);
+            }
+        }
+    }
+
+    private void OnControlGuiInput(InputEvent @event, Control clickedControl) {
+        if (@event is InputEventMouseButton mouseEvent &&
+            mouseEvent.Pressed &&
+            mouseEvent.ButtonIndex == MouseButton.Left) {
+            HandleClick(clickedControl);
+        }
+    }
+
+    private void HandleClick(Control clickedControl) {
+        GD.Print($"Clicked on: {clickedControl.Name} (Type: {clickedControl.GetType().Name})");
+        // Add your custom click handling logic here
+    }
 
     public override void _Ready() {
 
+        // Connect to the GUI input event of all child controls
+        ConnectAllControlsGuiInput(this);
+
+        fadeOverlay = new Control {
+            Name = "FadeOverlay",
+            MouseFilter = MouseFilterEnum.Ignore,
+            AnchorRight = 1,
+            AnchorBottom = 1
+        };
+
+        // Add a ColorRect as a child of the fadeOverlay
+        var colorRect = new ColorRect {
+            Color = Colors.Black,
+            MouseFilter = MouseFilterEnum.Ignore,
+            AnchorRight = 1,
+            AnchorBottom = 1
+        };
+        fadeOverlay.AddChild(colorRect);
+        // becasue even if we hide the scen it still processes input behind.
+
+
+        AddChild(fadeOverlay);
+        MoveChild(fadeOverlay, -1);  // Move to top (last child)
+
+        // Initially set the overlay to be transparent
+        fadeOverlay.Modulate = new Color(1, 1, 1, 0);
+
         MouseFilter = MouseFilterEnum.Ignore;
+
+        splashScreen = GetNode<SplashScreen>("SplashScreen");
 
         mainMenu = GetNode<MainMenu>("MainMenu");
         mainMenu.Hide();
@@ -97,14 +146,47 @@ public partial class UIManager : Control {
         AddChild(menuOverlay);
     }
 
-    public void HideAllUIElements() {
-        var uiManager = this;
-        foreach (Control child in uiManager.GetChildren()) {
-            if (child != this && child is Control controlNode) {
-                controlNode.Visible = false;
-            }
-        }
+
+    public async Task FadeInScreenOverlay(float duration = 1.2f) {
+        fadeOverlay.Visible = true;
+        fadeOverlay.TopLevel = true;
+        fadeOverlay.Modulate = new Color(1, 1, 1, 0);  // Start fully opaque
+        await UIFadeHelper.FadeInControl(fadeOverlay, duration);
+        fadeOverlay.Visible = false;
+        fadeOverlay.TopLevel = false;
     }
+
+    public async Task FadeOutScreenOverlay(float duration = 2.2f) {
+        fadeOverlay.Visible = true;
+        fadeOverlay.TopLevel = true;
+        fadeOverlay.Modulate = new Color(1, 1, 1, 1);  // Start fully transparent
+        await UIFadeHelper.FadeOutControl(fadeOverlay, duration);
+        fadeOverlay.Visible = false;
+        // becasue even if we hide the scene it still processes input behind.
+        fadeOverlay.SetProcessInput(false);
+        //colorRect.SetProcessInput(false);
+
+        fadeOverlay.TopLevel = false;
+        //fadeOverlay.Free();
+
+    }
+
+    public void ShowSplashScreen() {
+        splashScreen.Show();
+    }
+
+    public void HideSplashScreen() {
+        splashScreen.Hide();
+    }
+
+    // public void HideAllUIElements() {
+    //     var uiManager = this;
+    //     foreach (Control child in uiManager.GetChildren()) {
+    //         if (child != this && child is Control controlNode) {
+    //             controlNode.Visible = false;
+    //         }
+    //     }
+    // }
 
     private void SetupNodeOrder() {
         // Ensure VisualsManager is below UI elements in the scene tree
@@ -126,19 +208,14 @@ public partial class UIManager : Control {
         // Ensure the ingame menu and the ingame menu icon are on top of the overlay
         MoveChild(mainMenu, GetChildCount() - 1);
         //for whatever reason i need to put this line last for the ingame menu button to work
-        //if i put it between the menuOverlay and mainMenu lines, it doesn't work.
         MoveChild(inGameMenuButton, GetChildCount() - 1);
+        //if i put it between the menuOverlay and mainMenu lines, it doesn't work.
         MoveChild(saveGameScreen, GetChildCount() - 1);
-
     }
 
     // Call this method whenever you show or hide UI elements
     public void UpdateUILayout() {
         EnsureOverlayOnTop();
-    }
-
-    public void DisplayMainMenu() {
-        mainMenu.Show();
     }
 
     public override void _EnterTree() {
@@ -157,63 +234,5 @@ public partial class UIManager : Control {
     public PlayerChoicesBoxUI GetPlayerChoicesBoxUI() {
         return playerChoicesBoxUI;
     }
-
-
-    public void ApplyCustomStyleToButton(Button button) {
-        var normalStyle = new StyleBoxFlat {
-            BgColor = Colors.NavyBlue,
-            CornerRadiusTopLeft = 10,
-            CornerRadiusTopRight = 10,
-            CornerRadiusBottomLeft = 10,
-            CornerRadiusBottomRight = 10,
-            BorderColor = Colors.White,
-            BorderWidthBottom = 2,
-            BorderWidthTop = 2,
-            BorderWidthLeft = 2,
-            BorderWidthRight = 2
-        };
-        button.AddThemeStyleboxOverride("normal", normalStyle);
-
-        Color customBlue = new Color(
-            0f / 255f,  // Red component
-            71f / 255f,  // Green component
-            171f / 255f   // Blue component
-        );
-
-        // Hover state
-        var hoverStyle = new StyleBoxFlat {
-            BgColor = customBlue,
-            CornerRadiusTopLeft = 10,
-            CornerRadiusTopRight = 10,
-            CornerRadiusBottomLeft = 10,
-            CornerRadiusBottomRight = 10,
-            BorderColor = Colors.White,
-            BorderWidthBottom = 2,
-            BorderWidthTop = 2,
-            BorderWidthLeft = 2,
-            BorderWidthRight = 2
-        };
-
-        button.AddThemeStyleboxOverride("hover", hoverStyle);
-
-
-        // Pressed state
-        var pressedStyle = new StyleBoxFlat {
-            BgColor = Colors.DarkBlue,
-            CornerRadiusTopLeft = 10,
-            CornerRadiusTopRight = 10,
-            CornerRadiusBottomLeft = 10,
-            CornerRadiusBottomRight = 10,
-            BorderColor = Colors.White,
-            BorderWidthBottom = 2,
-            BorderWidthTop = 2,
-            BorderWidthLeft = 2,
-            BorderWidthRight = 2
-        };
-
-        button.AddThemeStyleboxOverride("pressed", pressedStyle);
-
-        // Set font size
-        button.AddThemeFontSizeOverride("font_size", 40);
-    }
 }
+

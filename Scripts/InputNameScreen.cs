@@ -1,61 +1,31 @@
 using Godot;
 using System;
+using static GameStateMachine;
+using System.Threading.Tasks;
 
 public partial class InputNameScreen : Control {
     private RichTextLabel questionLabel;
     private LineEdit nameInput;
     private ConfirmationDialog confirmationDialog;
     private string username;
-    private ColorRect fadeRect;
-    //private AnimationPlayer animationPlayer;
     private RichTextLabel richTextLabel;
     private MarginContainer marginContainer;
+    private bool isNameConfirmed = false;
+    private string inputYourNameTitleTRANSLATE = "INPUT_YOUR_NAME_TOP_TITLE"; //You can't enter the tavern without telling your name, traveller...
+    private string inputYourNameCancelButtonText_TRANSLATE = "INPUT_YOUR_NAME_CANCEL_BUTTON_TEXT"; //"No, {0} is not my name!\nLet me change it!"
+    private string inputYourNameOKButtonText_TRANSLATE = "INPUT_YOUR_NAME_OK_BUTTON_TEXT"; //Yes, {0} is my name!.\nLet me enter the tavern!"
+    private string inputYourNameConfirmNameText_TRANSLATE = "INPUT_YOUR_NAME_CONFIRM_NAME"; //[center]Are you sure that {username} is your final name?[/center]\n[center]You won't be able to change it during this current play![/center]"
+    private RichTextLabel richText;
 
-    [Export] public float FadeDuration { get; set; } = 2.0f;
+    [Export] public float FadeDuration { get; set; } = 0.5f;
 
-    public override void _Ready() {
-        // Get references to existing nodes
-        marginContainer = GetNode<MarginContainer>("MarginContainer");
-        var vBoxContainer = marginContainer.GetNode<VBoxContainer>("MarginContainer1/VBoxContainer");
-        questionLabel = vBoxContainer.GetNode<RichTextLabel>("RichTextLabel");
-        nameInput = vBoxContainer.GetNode<LineEdit>("LineEdit");
-        confirmationDialog = marginContainer.GetNode<ConfirmationDialog>("MarginContainer2/ConfirmationDialog");
-        // confirmationDialog.DialogText = $"[center]Are you sure that this is your final name?[/center]\n[center]You won't be able to change it during this current play![/center]";
-
-        // Set up the nodes
-        //SetupQuestionLabel();
-        SetupNameInput();
-        SetupConfirmationDialog();
-        SetupFadeEffect();
-
-        Hide();
-    }
-
-    public void Show() {
-        base.Show();
-        CallDeferred(nameof(SetInitialFocus));
-        FadeIn();
-    }
-
-    private void SetInitialFocus() {
-        nameInput.GrabFocus();
-    }
-
-    private void SetupQuestionLabel() {
-        // questionLabel.Text = "What's your name, traveller?";
-    }
-
-    private void SetupNameInput() {
-        // nameInput.PlaceholderText = "Enter your name";
-        nameInput.TextSubmitted += OnNameSubmitted;
-    }
-
-    private void SetupConfirmationDialog() {
-        confirmationDialog.Confirmed += OnConfirmName;
+    private void SetupConfirmationDialogTheme() {
+        confirmationDialog.Confirmed += () => _ = OnConfirmName();
         confirmationDialog.Canceled += OnCancelConfirmation;
         confirmationDialog.Visible = false; // Ensure the dialog is initially hidden
-                                            // Center the text in the confirmation dialog 
-
+        // Prevent the dialog from closing itself, we'll handle that
+        // confirmationDialog.GetOkButton().Pressed += () => confirmationDialog.Visible = false;
+        // confirmationDialog.GetCancelButton().Pressed += () => confirmationDialog.Visible = false;
         // Create a MarginContainer to hold the RichTextLabel
         var marginContainer = new MarginContainer();
         marginContainer.AnchorsPreset = (int)Control.LayoutPreset.FullRect;
@@ -74,22 +44,88 @@ public partial class InputNameScreen : Control {
         richTextLabel.AddThemeConstantOverride("margin_bottom", 150);
 
         marginContainer.AddChild(richTextLabel);
+
     }
 
 
-    private void SetupFadeEffect() {
-        fadeRect = new ColorRect();
-        fadeRect.Color = Colors.Black;
-        fadeRect.MouseFilter = Control.MouseFilterEnum.Ignore;
-        //fadeRect.Color = new Color(0, 0, 0, 0); // Start fully transparent
-        fadeRect.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        AddChild(fadeRect);
+    public override void _Ready() {
+
+        marginContainer = GetNode<MarginContainer>("MarginContainer");
+        var vBoxContainer = marginContainer.GetNode<VBoxContainer>("MarginContainer1/VBoxContainer");
+        nameInput = vBoxContainer.GetNode<LineEdit>("LineEdit");
+        confirmationDialog = marginContainer.GetNode<ConfirmationDialog>("MarginContainer2/ConfirmationDialog");
+        richText = vBoxContainer.GetNode<RichTextLabel>("RichTextLabel");
+
+        ListenForNameConfirmation();
+        SetupConfirmationDialogTheme();
+
+        this.Visible = false;
+
+        //seems a godot bug, i needed to put the key in the Godot Editor
+        // string titleText =  TranslationServer.Translate(inputYourNameTitleTRANSLATE);
+        // richText.Text = titleText; 
+    }
+
+    public async Task Show() {
+        base.Show();
+        ResetNameInputScreen();
+        CallDeferred(nameof(SetInitialFocus));
+        await FadeIn();
+    }
+
+    private async Task FadeIn() {
+        await UIFadeHelper.FadeInControl(this, 1.3f);
+    }
+
+    private void ResetNameInputScreen() {
+        isNameConfirmed = false;
+        //process again
+        //confirmationDialog.ProcessMode = Node.ProcessModeEnum.Inherit;
+        UIInputHelper.EnableParentChildrenInput(this);
+        nameInput.Text = "";
+        nameInput.Editable = true;
+        nameInput.FocusMode = Control.FocusModeEnum.All;
+        confirmationDialog.ProcessMode = Node.ProcessModeEnum.Inherit;
+        nameInput.ProcessMode = confirmationDialog.ProcessMode = Node.ProcessModeEnum.Inherit;
+    }
+
+    private void SetInitialFocus() {
+        nameInput.GrabFocus();
+    }
+
+    private void ListenForNameConfirmation() {
+        // nameInput.PlaceholderText = "Enter your name";
+        //player confirms by hitting the OK button on the LineEdit textobx or hitting the Enter key
+        nameInput.TextSubmitted += OnNameSubmitted;
+        nameInput.FocusEntered += () => GD.Print("LineEdit focus entered");
+        nameInput.FocusExited += () => GD.Print("LineEdit focus exited");
+        nameInput.GuiInput += OnNameInputGuiInput;
+    }
+
+    //_GuiInput is called for GUI events that are not consumed by child controls,
+    //that's why we listen specifically to 'nameInput' GuiInput, the box to type in the name.
+    private void OnNameInputGuiInput(InputEvent @event) {
+        if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left) {
+            GD.Print("Mouse clicked on LineEdit");
+            nameInput.GrabFocus();
+            GetViewport().SetInputAsHandled();
+        }
     }
 
     public override void _UnhandledKeyInput(InputEvent @event) {
+        if (isNameConfirmed) return;
         if (@event is InputEventKey eventKey && eventKey.Pressed && eventKey.Keycode == Key.Enter) {
             ShowConfirmationDialog();
             GetViewport().SetInputAsHandled(); //I DON'T KNOW WHY WE NEED THIS
+        }
+    }
+
+    public override void _Process(double delta) {
+        if (IsVisibleInTree() && !isNameConfirmed) {
+            if (!nameInput.HasFocus()) {
+                GD.Print("LineEdit lost focus, attempting to regrab");
+                nameInput.GrabFocus();
+            }
         }
     }
 
@@ -97,13 +133,16 @@ public partial class InputNameScreen : Control {
         ShowConfirmationDialog();
     }
 
+
+
     private void ShowConfirmationDialog() {
         username = nameInput.Text;
         if (!string.IsNullOrWhiteSpace(username)) {
             //confirmationDialog.DialogText = $"Are you sure that '{username}' is your name? It can be a curse or a blessing...";
-            confirmationDialog.CancelButtonText = $"No, {username} is not my name!.\nLet me change it!";
-            confirmationDialog.OkButtonText = $"Yes, {username} is my name!.\nLet me enter the tavern!";
-            richTextLabel.Text = $"[center]Are you sure that {username} is your final name?[/center]\n[center]You won't be able to change it during this current play![/center]";
+            //confirmationDialog.CancelButtonText = $"No, {username} is not my name!.\nLet me change it!";
+            confirmationDialog.CancelButtonText = string.Format(Tr(inputYourNameCancelButtonText_TRANSLATE), username);
+            confirmationDialog.OkButtonText = string.Format(Tr(inputYourNameOKButtonText_TRANSLATE), username);
+            richTextLabel.Text = string.Format(Tr(inputYourNameConfirmNameText_TRANSLATE), username);
             confirmationDialog.Visible = true; // Make sure the dialog is visible
             //confirmationDialog.PopupCentered();
         } else {
@@ -112,109 +151,27 @@ public partial class InputNameScreen : Control {
         }
     }
 
-    private void OnConfirmName() {
+    private async Task OnConfirmName() {
+        nameInput.Editable = false;
+        nameInput.FocusMode = Control.FocusModeEnum.None;
+        nameInput.ProcessMode = Node.ProcessModeEnum.Disabled;
+        confirmationDialog.ProcessMode = Node.ProcessModeEnum.Disabled;
+
+        if (isNameConfirmed) return; // Prevent multiple confirmations
+        isNameConfirmed = true;
         GD.Print($"Name confirmed: {username}");
-        FadeOut();
+        confirmationDialog.ProcessMode = Node.ProcessModeEnum.Disabled;
+        nameInput.ProcessMode = confirmationDialog.ProcessMode = Node.ProcessModeEnum.Disabled;
+        UIInputHelper.DisableParentChildrenInput(this);
+        // Hide the confirmation dialog
+        confirmationDialog.Visible = false;
+        await UIFadeHelper.FadeOutControl(this, 1.3f);
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_NEW_GAME_DIALOGUES);
+        Visible = false;
     }
 
     private void OnCancelConfirmation() {
         confirmationDialog.Visible = false; // Hide the dialog when cancelled
         nameInput.GrabFocus();
-    }
-
-    private void FadeOut() {
-        GD.Print("Starting fade out (transparent to black)");
-        fadeRect.Color = new Color(0, 0, 0, 0);
-        fadeRect.Visible = true;
-        var tween = CreateTween();
-        tween.Finished += OnFadeOutFinished;
-        tween.TweenProperty(fadeRect, "color:a", 1.0, FadeDuration);
-    }
-
-    private void OnFadeOutFinished() {
-        GD.Print("Fade out complete (now black)");
-
-        SetupGameElements();
-        FadeInGameElements();
-    }
-
-    private void SetupGameElements() {
-
-        // Ensure the fade rect is still visible and black
-        fadeRect.Color = Colors.Black;
-        fadeRect.Visible = true;
-
-        // Hide other elements of the InputNameScreen
-        foreach (var child in GetChildren()) {
-            if (child != fadeRect && child is Control controlChild) {
-                controlChild.Visible = false;
-            }
-        }
-
-        // Set up game elements (but keep them covered by the fade rect)
-        UIManager.Instance.inGameMenuButton.Show();
-        DialogueManager.Instance.currentDialogueID = DialogueManager.STARTING_DIALOGUE_ID;
-        DialogueManager.Instance.currentConversationID = DialogueManager.STARTING_CONVO_ID;
-        DialogueManager.Instance.currentDialogueObject = DialogueManager.Instance.GetDialogueObject
-            (DialogueManager.Instance.currentConversationID, DialogueManager.Instance.currentDialogueID);
-        DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
-        LoadSaveManager.Instance.ToggleAutosave(true);
-
-         fadeRect.MouseFilter = MouseFilterEnum.Ignore; //AT THIS POINT WE ALLOW THE USER TO CLICK ON THE DIALOGUE BOX, AS THE FADE IN IS LONGER TO CREATE A BIT OF ZEITGEIST STORYTELLING ANTICIPATION SMOOTHNESS
-
-        // Move the fadeRect to be on top of the new elements
-        CallDeferred(nameof(PositionScreenAndStartFadeIn));
-    }
-
-    private void PositionScreenAndStartFadeIn()
-    {
-        // Get the parent (which should be UIManager)
-        var uiManager = GetParent();
-        if (uiManager == null)
-        {
-            GD.PrintErr("Failed to find parent UIManager. Check the scene hierarchy.");
-            return;
-        }
-        // Move this InputNameScreen to the top of UIManager's children
-        uiManager.MoveChild(this, -1);
-        // Ensure this InputNameScreen covers the entire UI area
-        SetAnchorsAndOffsetsPreset(Control.LayoutPreset.FullRect);
-        // Start the fade in to reveal the new elements
-        FadeInGameElements();
-    }
-
-    private void FadeInGameElements() {
-        GD.Print("Starting fade in to reveal game elements");
-       
-        var tween = CreateTween();
-        GD.Print($"staring value of crrent alpha: {fadeRect.Color.A}");
-        tween.TweenProperty(fadeRect, "color:a", 0.0, 3.5f);
-        tween.Finished += OnFadeInGameElementsFinished;
-
-        var timer = GetTree().CreateTimer(FadeDuration / 2);
-        timer.Timeout += () => GD.Print($"Fade in halfway point. Current alpha: {fadeRect.Color.A}");
-    }
-
-    private void OnFadeInGameElementsFinished() {
-        GD.Print("Fade in complete, game elements now visible");
-        fadeRect.Visible = false;
-        //fadeRect.QueueFree();
-        Hide();
-    }
-
-    public void FadeIn() {
-
-        GD.Print("Starting fade in (black to transparent)");
-        fadeRect.Visible = true;
-        fadeRect.Color = Colors.Black;
-        var tween = CreateTween();
-        tween.TweenProperty(fadeRect, "color:a", 0.0, FadeDuration);
-        tween.Finished += OnFadeInFinished;
-    }
-
-    private void OnFadeInFinished() {
-        GD.Print("Fade in complete (now transparent)");
-        fadeRect.Visible = false;
-
     }
 }

@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://cvocyopgp11fy"]
+[gd_scene load_steps=8 format=3 uid="uid://cvocyopgp11fy"]
 
 [ext_resource type="PackedScene" uid="uid://dl6434d1nw4pd" path="res://Scenes/GameManager.tscn" id="1_osvxv"]
 [ext_resource type="PackedScene" uid="uid://r3pxhv2eilfb" path="res://Scenes/DialogueManager.tscn" id="2_8t2uu"]
+[ext_resource type="PackedScene" uid="uid://dhfsuoy8nhjcv" path="res://Scenes/InputManager.tscn" id="2_ab3s8"]
 [ext_resource type="PackedScene" uid="uid://bauqxmelp0rdi" path="res://Scenes/UIManager.tscn" id="3_dlnf0"]
 [ext_resource type="PackedScene" uid="uid://dkdksf6fpe1un" path="res://Scenes/GameStateManager.tscn" id="3_dyufh"]
 [ext_resource type="PackedScene" uid="uid://bdujstyj1wupr" path="res://Scenes/LoadSaveManager.tscn" id="3_ijh4o"]
@@ -22,6 +23,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="InputManager" parent="GameManager" instance=ExtResource("2_ab3s8")]
 
 [node name="DialogueManager" parent="GameManager" instance=ExtResource("2_8t2uu")]
 

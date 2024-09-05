@@ -50,12 +50,14 @@ theme_override_font_sizes/font_size = 40
 text = "START_NEW_GAME"
 
 [node name="ContinueButton" type="Button" parent="MainOptionsContainer"]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "CONTINUE
 "
 
 [node name="SaveGameButton" type="Button" parent="MainOptionsContainer"]
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "SAVE_GAME"
@@ -87,6 +89,7 @@ text = "CREDITS"
 
 [node name="ExitToMainMenuButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
+visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "EXIT_TO_MAIN_MENU"

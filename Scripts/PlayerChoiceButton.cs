@@ -10,8 +10,8 @@ public partial class PlayerChoiceButton : MarginContainer {
     private const float BUTTON_WIDTH = 700; // Adjust as needed
     private const float SINGLE_LINE_HEIGHT = 40; // Adjust based on your font size
     private const int LINE_SEPARATION = 5;
-    private StyleBoxFlat normalStyleBox;
-    private StyleBoxFlat hoverStyleBox;
+    public StyleBoxFlat normalStyleBox;
+    public StyleBoxFlat hoverStyleBox;
 
 
     public override void _Ready() {

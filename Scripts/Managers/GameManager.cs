@@ -12,6 +12,7 @@ public partial class GameManager : Control {
     public DialogueManager DialogueManager { get; private set; }
     public UIManager UIManager { get; private set; }
     public GameStateManager GameStateManager { get; private set; }
+    public InputManager InputManager { get; private set; }
     //public PlayerStateManager PlayerStateManager { get; private set; }
     // public MediaManager MediaManager { get; private set; }
     // public MinigameManager MinigameManager { get; private set; }
@@ -98,6 +99,7 @@ public partial class GameManager : Control {
         UIManager = GetNodeOrNull<UIManager>("UiManager");
         DialogueManager = GetNodeOrNull<DialogueManager>("DialogueManager");
         GameStateManager = GetNodeOrNull<GameStateManager>("GameStateManager");
+        InputManager = GetNodeOrNull<InputManager>("InputManager");
         //here we set the first FSM state
         GameStateManager.Instance.Fire(Trigger.DISPLAY_SPLASH_SCREEN);
     }

@@ -68,6 +68,18 @@ public partial class MainMenu : Control {
         //assign the loc keys so each time the language changes the text property is updated
         WantToQuitGameLabel.Text = wantToQuitGameTRANSLATE;
         WantToQuitToMainMenuLabel.Text = wantToQuitToMainMenuTRANSLATE;
+
+        GameStateManager.Instance.StateChanged += OnGameStateChanged;
+    }
+
+     private void OnGameStateChanged(GameStateMachine.State previousState, GameStateMachine.SubState previousSubstate, 
+                                    GameStateMachine.State newState, GameStateMachine.SubState newSubState, object[] arguments)
+    {
+        if (newState == GameStateMachine.State.MainMenuDisplayed || 
+            newState == GameStateMachine.State.InGameMenuDisplayed)
+        {
+            InputManager.Instance.SetInitialFocus();
+        }
     }
 
     private void GetUINodes() {
@@ -213,7 +225,7 @@ public partial class MainMenu : Control {
 
         //then disable them
         foreach (Button button in LanguageOptionsContainer.GetChildren()) {
-            DisableButtonInput(button);
+            SetButtonActiveState(button, false);
         }
 
         //if there is a dialogue on screen, translate it as soon as language is changed
@@ -230,7 +242,7 @@ public partial class MainMenu : Control {
 
         //enable language buttons again
         foreach (Button button in LanguageOptionsContainer.GetChildren()) {
-            EnableButtonInput(button);
+            SetButtonActiveState(button, true);
         }
 
         //language buttons to to default color

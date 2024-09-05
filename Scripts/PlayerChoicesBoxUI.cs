@@ -148,4 +148,16 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
             }
         }
     }
+
+    public List<PlayerChoiceButton> GetPlayerChoiceButtons() {
+        var buttons = new List<PlayerChoiceButton>();
+        if (globalMarginContainer != null && playerChoicesContainer != null) {
+            foreach (var child in playerChoicesContainer.GetChildren()) {
+                if (child is PlayerChoiceButton pcb) {
+                    buttons.Add(pcb);
+                }
+            }
+        }
+        return buttons;
+    }
 }

@@ -13,6 +13,27 @@ public static class UIThemeHelper {
     }
 
 
+    public static void ApplyFocusStyleToButton(Button button, bool isFocused) {
+        if (isFocused) {
+            var focusStyle = new StyleBoxFlat {
+                BgColor = Colors.DarkBlue,
+                CornerRadiusTopLeft = 10,
+                CornerRadiusTopRight = 10,
+                CornerRadiusBottomLeft = 10,
+                CornerRadiusBottomRight = 10,
+                BorderColor = Colors.White,
+                BorderWidthBottom = 3,
+                BorderWidthTop = 3,
+                BorderWidthLeft = 3,
+                BorderWidthRight = 3
+            };
+            button.AddThemeStyleboxOverride("focus", focusStyle);
+        } else {
+            button.RemoveThemeStyleboxOverride("focus");
+        }
+    }
+
+
     public static void ApplyCustomStyleToPanel(Panel panel) {
         var normalStyle = new StyleBoxFlat {
             BgColor = Colors.NavyBlue,
@@ -27,6 +48,41 @@ public static class UIThemeHelper {
             BorderWidthRight = 2
         };
         panel.AddThemeStyleboxOverride("panel", normalStyle);
+    }
+
+     public static StyleBoxFlat GetHoverStyleBox()
+    {
+        Color customBlue = new Color(0f / 255f, 71f / 255f, 171f / 255f);
+        return new StyleBoxFlat
+        {
+            BgColor = customBlue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
+    }
+
+    public static StyleBoxFlat GetNormalStyleBox()
+    {
+        return new StyleBoxFlat
+        {
+            BgColor = Colors.NavyBlue,
+            CornerRadiusTopLeft = 10,
+            CornerRadiusTopRight = 10,
+            CornerRadiusBottomLeft = 10,
+            CornerRadiusBottomRight = 10,
+            BorderColor = Colors.White,
+            BorderWidthBottom = 2,
+            BorderWidthTop = 2,
+            BorderWidthLeft = 2,
+            BorderWidthRight = 2
+        };
     }
 
     public static void ApplyCustomStyleToButton(Button button) {

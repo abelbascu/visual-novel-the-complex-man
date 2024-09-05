@@ -9,19 +9,22 @@ using System.Linq.Expressions;
 
 public partial class GameStateManager : Node {
 
-
-    // public enum GameMode {
-    //     None,
-    //     Dialogue,
-    //     Minigame,
-    //     Cutscene,
-    // }
-
     public static GameStateManager Instance { get; private set; }
     private GameStateMachine stateMachine;
-    //public event Action<State, SubState, State, SubState, object[]> OnStateChanged;
+
+    //use this so other classes can subscribe to state changes
+    public event Action<State, SubState, State, SubState, object[]> StateChanged {
+        add { stateMachine.StateChanged += value; }
+        remove { stateMachine.StateChanged -= value; }
+    }
+
     private Dictionary<(State, SubState, State, SubState, Trigger), Delegate> stateTransitions;
-    public State LastGameMode {get; private set;}
+    public State LastGameMode { get; private set; }
+
+
+    public GameStateManager() {
+        stateMachine = new GameStateMachine();
+    }
 
     public override void _EnterTree() {
         if (Instance == null) {
@@ -32,7 +35,6 @@ public partial class GameStateManager : Node {
     }
 
     public override void _Ready() {
-        stateMachine = new GameStateMachine();
         ConfigureStateTransitions();
         //ConfigureStateTransitionActions();
         stateMachine.StateChanged += OnStateChanged;

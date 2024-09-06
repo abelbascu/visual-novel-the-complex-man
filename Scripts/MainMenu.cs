@@ -34,7 +34,7 @@ public partial class MainMenu : Control {
     Button catalanButton;
 
     //Button containers
-    private HBoxContainer YesNoButtonsHBoxContainer;
+    public HBoxContainer YesNoButtonsHBoxContainer;
     private HBoxContainer YesNoExitToMenuButtonsHBoxContainer;
 
     //Constants
@@ -69,18 +69,18 @@ public partial class MainMenu : Control {
         WantToQuitGameLabel.Text = wantToQuitGameTRANSLATE;
         WantToQuitToMainMenuLabel.Text = wantToQuitToMainMenuTRANSLATE;
 
-        GameStateManager.Instance.StateChanged += OnGameStateChanged;
+        // GameStateManager.Instance.StateChanged += OnGameStateChanged;
     }
 
-     private void OnGameStateChanged(GameStateMachine.State previousState, GameStateMachine.SubState previousSubstate, 
-                                    GameStateMachine.State newState, GameStateMachine.SubState newSubState, object[] arguments)
-    {
-        if (newState == GameStateMachine.State.MainMenuDisplayed || 
-            newState == GameStateMachine.State.InGameMenuDisplayed)
-        {
-            InputManager.Instance.SetInitialFocus();
-        }
-    }
+    //  private void OnGameStateChanged(GameStateMachine.State previousState, GameStateMachine.SubState previousSubstate, 
+    //                                 GameStateMachine.State newState, GameStateMachine.SubState newSubState, object[] arguments)
+    // {
+    //     if (newState == GameStateMachine.State.MainMenuDisplayed || 
+    //         newState == GameStateMachine.State.InGameMenuDisplayed)
+    //     {
+    //         InputManager.Instance.SetInitialFocus();
+    //     }
+    // }
 
     private void GetUINodes() {
 
@@ -541,7 +541,7 @@ public partial class MainMenu : Control {
         EnableAllButtons();
     }
 
-    private async Task OnExitGameButtonPressed() {
+    public async Task OnExitGameButtonPressed() {
         SetButtonActiveState(exitGameButton, false);
         DisableAllButtons();
         HideIngameMenuIcon();
@@ -571,7 +571,7 @@ public partial class MainMenu : Control {
         GameStateManager.Instance.Fire(Trigger.EXIT_GAME);
     }
 
-    private async Task OnExitGameCancelButtonPressed() {
+    public async Task OnExitGameCancelButtonPressed() {
         SetButtonActiveState(NoExitGameButton, false);
         SetButtonActiveState(YesExitGameButton, false);
         DisableAllButtons();

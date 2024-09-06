@@ -7,7 +7,7 @@ public partial class SplashScreen : Control {
 
     public bool isExecuting = false;
 
-    private TextureRect backgroundTexture;
+    public TextureRect backgroundTexture {get; private set;}
     private RichTextLabel pressAnyKeyLabel;
     private UITextTweenFadeIn fadeIn;
     private UITextTweenFadeOut fadeOut;

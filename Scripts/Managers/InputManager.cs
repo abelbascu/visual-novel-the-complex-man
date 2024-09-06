@@ -7,6 +7,7 @@ using SubState = GameStateMachine.SubState;
 using System.Threading.Tasks;
 
 public partial class InputManager : Node {
+
     public static InputManager Instance { get; private set; }
     private Control currentFocusedMenu;
     private int currentFocusedIndex = -1;
@@ -33,76 +34,103 @@ public partial class InputManager : Node {
         GameStateManager.Instance.StateChanged += OnGameStateChanged;
     }
 
+
     public override void _Input(InputEvent @event) {
         float currentTime = (float)Time.GetTicksMsec() / 1000.0f;
         if (currentTime - lastInputTime < INPUT_DELAY) return;
 
-        switch (GameStateManager.Instance.CurrentState) {
-            case State.MainMenuDisplayed:
-            case State.InGameMenuDisplayed:
-                HandleMenuInput(@event);
-                break;
-            case State.InDialogueMode:
-                HandleDialogueInput(@event);
-                break;
-            case State.SplashScreenDisplayed:
-                HandleSplashScreenInput(@event);
-                break;
+        if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.None) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.None)
+            || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)
+            || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed))
+            HandleMenuInput(@event);
+        else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None))
+            HandleDialogueInput(@event);
+        else if (GameStateManager.Instance.IsInState(State.SplashScreenDisplayed, SubState.None))
+            HandleSplashScreenInput(@event);
+    }
+
+
+    private void OnGameStateChanged(GameStateMachine.State previousState, GameStateMachine.SubState previousSubstate,
+                                    GameStateMachine.State newState, GameStateMachine.SubState newSubState, object[] arguments) {
+        UpdateFocusableControls(newState, newSubState);
+    }
+
+
+    private void UpdateFocusableControls(State currentState, SubState subState) {
+        focusableControls.Clear();
+        currentFocusedIndex = -1;
+        currentFocusedMenu = null;
+
+        if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.None) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.None)) {
+            currentFocusedMenu = UIManager.Instance.mainMenu;
+            CollectFocusableControls(currentFocusedMenu);
+        } else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)) {
+            currentFocusedMenu = UIManager.Instance.mainMenu.ExitGameConfirmationPanel;
+            CollectFocusableControls(currentFocusedMenu);
+        } else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed)) {
+            currentFocusedMenu = UIManager.Instance.mainMenu.LanguageOptionsContainer;
+            CollectFocusableControls(currentFocusedMenu);
+        } else if (GameStateManager.Instance.IsInState(State.SplashScreenDisplayed, SubState.None)) {
+            currentFocusedMenu = UIManager.Instance.splashScreen;
+            focusableControls.Add(UIManager.Instance.splashScreen.backgroundTexture);
         }
     }
 
-private void HandleMenuInput(InputEvent @event)
-{
-    bool isVertical = GameStateManager.Instance.CurrentSubstate != SubState.ExitGameConfirmationPopupDisplayed;
-
-    if (isVertical)
-    {
-        if (@event.IsActionPressed("ui_up") || 
-            (@event is InputEventJoypadMotion joypadMotionUp && 
-             joypadMotionUp.Axis == JoyAxis.LeftY && 
-             joypadMotionUp.AxisValue < -STICK_THRESHOLD))
-        {
-            HandleVerticalNavigation(true);
-            lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
-        }
-        else if (@event.IsActionPressed("ui_down") || 
-                 (@event is InputEventJoypadMotion joypadMotionDown && 
-                  joypadMotionDown.Axis == JoyAxis.LeftY && 
-                  joypadMotionDown.AxisValue > STICK_THRESHOLD))
-        {
-            HandleVerticalNavigation(false);
-            lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
-        }
-    }
-    else
-    {
-        if (@event.IsActionPressed("ui_left") || 
-            (@event is InputEventJoypadMotion joypadMotionLeft && 
-             joypadMotionLeft.Axis == JoyAxis.LeftX && 
-             joypadMotionLeft.AxisValue < -STICK_THRESHOLD))
-        {
-            HandleHorizontalNavigation(true);
-            lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
-        }
-        else if (@event.IsActionPressed("ui_right") || 
-                 (@event is InputEventJoypadMotion joypadMotionRight && 
-                  joypadMotionRight.Axis == JoyAxis.LeftX && 
-                  joypadMotionRight.AxisValue > STICK_THRESHOLD))
-        {
-            HandleHorizontalNavigation(false);
-            lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
+    private void CollectFocusableControls(Control container) {
+        foreach (var child in container.GetChildren()) {
+            if (child is Button button && button.Visible) {
+                focusableControls.Add(button);
+            } else if (child is Control control) {
+                CollectFocusableControls(control);
+            }
         }
     }
 
-    if (@event.IsActionPressed("ui_accept"))
-    {
-        HandleAccept();
+
+    private List<Control> GetVisibleFocusableControls() {
+        return focusableControls.FindAll(control => control.Visible);
     }
-    else if (@event.IsActionPressed("ui_cancel"))
-    {
-        HandleCancel();
+
+
+    private void HandleMenuInput(InputEvent @event) {
+        bool isVertical = GameStateManager.Instance.CurrentSubstate != SubState.ExitGameConfirmationPopupDisplayed;
+
+        if (isVertical) {
+            if (@event.IsActionPressed("ui_up") ||
+                (@event is InputEventJoypadMotion joypadMotionUp &&
+                 joypadMotionUp.Axis == JoyAxis.LeftY &&
+                 joypadMotionUp.AxisValue < -STICK_THRESHOLD)) {
+                HandleVerticalNavigation(true);
+                lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
+            } else if (@event.IsActionPressed("ui_down") ||
+                       (@event is InputEventJoypadMotion joypadMotionDown &&
+                        joypadMotionDown.Axis == JoyAxis.LeftY &&
+                        joypadMotionDown.AxisValue > STICK_THRESHOLD)) {
+                HandleVerticalNavigation(false);
+                lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
+            }
+        } else {
+            if (@event.IsActionPressed("ui_left") ||
+                (@event is InputEventJoypadMotion joypadMotionLeft &&
+                 joypadMotionLeft.Axis == JoyAxis.LeftX &&
+                 joypadMotionLeft.AxisValue < -STICK_THRESHOLD)) {
+                HandleHorizontalNavigation(true);
+                lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
+            } else if (@event.IsActionPressed("ui_right") ||
+                       (@event is InputEventJoypadMotion joypadMotionRight &&
+                        joypadMotionRight.Axis == JoyAxis.LeftX &&
+                        joypadMotionRight.AxisValue > STICK_THRESHOLD)) {
+                HandleHorizontalNavigation(false);
+                lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
+            }
+        }
+
+        if (@event.IsActionPressed("ui_accept")) {
+            HandleAccept();
+        } else if (@event.IsActionPressed("ui_cancel")) {
+            HandleCancel();
+        }
     }
-}
 
     private void HandleVerticalNavigation(bool isUp) {
         var visibleControls = GetVisibleFocusableControls();
@@ -144,18 +172,20 @@ private void HandleMenuInput(InputEvent @event)
         }
     }
 
-    private void HandleCancel() {
+    private async Task HandleCancel() {
         if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed) {
             if (GameStateManager.Instance.CurrentSubstate == SubState.ExitGameConfirmationPopupDisplayed) {
-                GameStateManager.Instance.Fire(GameStateMachine.Trigger.GO_BACK_TO_MENU);
-            } else {
-                GameStateManager.Instance.Fire(GameStateMachine.Trigger.DISPLAY_EXIT_GAME_MENU_CONFIRMATION_POPUP);
+                await UIManager.Instance.mainMenu.OnExitGameCancelButtonPressed();
+
+                //if the ingame menu is displayed, we close it or open it
+            } else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed || GameStateManager.Instance.CurrentState == State.InDialogueMode) {
+                if (GameStateManager.Instance.CurrentSubstate == SubState.None) {
+                    await UIManager.Instance.inGameMenuButton.OnTextureButtonPressed();
+                }
             }
-        } else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed) {
-            if (GameStateManager.Instance.CurrentSubstate == SubState.None) {
-                GameStateManager.Instance.Fire(GameStateMachine.Trigger.ENTER_DIALOGUE_MODE);
-            } else {
-                GameStateManager.Instance.Fire(GameStateMachine.Trigger.GO_BACK_TO_MENU);
+        } else if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed || GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed) {
+            if (GameStateManager.Instance.CurrentSubstate == SubState.LanguageMenuDisplayed) {
+                await UIManager.Instance.mainMenu.OnLanguagesGoBackButtonPressed();
             }
         }
     }
@@ -172,34 +202,28 @@ private void HandleMenuInput(InputEvent @event)
         }
     }
 
-  private void HandlePlayerChoicesInput(InputEvent @event)
-{
-    var choices = UIManager.Instance.playerChoicesBoxUI.GetPlayerChoiceButtons();
-    if (choices.Count == 0) return;
+    private void HandlePlayerChoicesInput(InputEvent @event) {
+        var choices = UIManager.Instance.playerChoicesBoxUI.GetPlayerChoiceButtons();
+        if (choices.Count == 0) return;
 
-    if (@event.IsActionPressed("ui_up") || 
-        (@event is InputEventJoypadMotion joypadMotionUp && 
-         joypadMotionUp.Axis == JoyAxis.LeftY && 
-         joypadMotionUp.AxisValue < -STICK_THRESHOLD))
-    {
-        currentPlayerChoiceIndex = (currentPlayerChoiceIndex - 1 + choices.Count) % choices.Count;
-        HighlightPlayerChoice(currentPlayerChoiceIndex, choices);
-        lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
+        if (@event.IsActionPressed("ui_up") ||
+            (@event is InputEventJoypadMotion joypadMotionUp &&
+             joypadMotionUp.Axis == JoyAxis.LeftY &&
+             joypadMotionUp.AxisValue < -STICK_THRESHOLD)) {
+            currentPlayerChoiceIndex = (currentPlayerChoiceIndex - 1 + choices.Count) % choices.Count;
+            HighlightPlayerChoice(currentPlayerChoiceIndex, choices);
+            lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
+        } else if (@event.IsActionPressed("ui_down") ||
+                   (@event is InputEventJoypadMotion joypadMotionDown &&
+                    joypadMotionDown.Axis == JoyAxis.LeftY &&
+                    joypadMotionDown.AxisValue > STICK_THRESHOLD)) {
+            currentPlayerChoiceIndex = (currentPlayerChoiceIndex + 1) % choices.Count;
+            HighlightPlayerChoice(currentPlayerChoiceIndex, choices);
+            lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
+        } else if (@event.IsActionPressed("ui_accept")) {
+            SelectCurrentPlayerChoice(choices);
+        }
     }
-    else if (@event.IsActionPressed("ui_down") || 
-             (@event is InputEventJoypadMotion joypadMotionDown && 
-              joypadMotionDown.Axis == JoyAxis.LeftY && 
-              joypadMotionDown.AxisValue > STICK_THRESHOLD))
-    {
-        currentPlayerChoiceIndex = (currentPlayerChoiceIndex + 1) % choices.Count;
-        HighlightPlayerChoice(currentPlayerChoiceIndex, choices);
-        lastInputTime = (float)Time.GetTicksMsec() / 1000.0f;
-    }
-    else if (@event.IsActionPressed("ui_accept"))
-    {
-        SelectCurrentPlayerChoice(choices);
-    }
-}
 
     private void HandleSplashScreenInput(InputEvent @event) {
         if (@event.IsActionPressed("ui_accept")) {
@@ -249,41 +273,5 @@ private void HandleMenuInput(InputEvent @event)
             var selectedChoice = choices[currentPlayerChoiceIndex];
             DialogueManager.Instance.OnPlayerChoiceButtonUIPressed(selectedChoice.dialogueObject);
         }
-    }
-
-    private List<Control> GetVisibleFocusableControls() {
-        return focusableControls.FindAll(control => control.Visible);
-    }
-
-    private void UpdateFocusableControls(State currentState, SubState subState) {
-        focusableControls.Clear();
-        currentFocusedIndex = -1;
-
-        switch (currentState) {
-            case State.MainMenuDisplayed:
-            case State.InGameMenuDisplayed:
-                currentFocusedMenu = UIManager.Instance.mainMenu;
-                CollectFocusableControls(UIManager.Instance.mainMenu.MainOptionsContainer);
-                break;
-            case State.SplashScreenDisplayed:
-                currentFocusedMenu = UIManager.Instance.splashScreen;
-                focusableControls.Add(UIManager.Instance.splashScreen.backgroundTexture);
-                break;
-        }
-    }
-
-    private void CollectFocusableControls(Control container) {
-        foreach (var child in container.GetChildren()) {
-            if (child is Button button && button.Visible) {
-                focusableControls.Add(button);
-            } else if (child is Control control) {
-                CollectFocusableControls(control);
-            }
-        }
-    }
-
-    private void OnGameStateChanged(GameStateMachine.State previousState, GameStateMachine.SubState previousSubstate,
-                                    GameStateMachine.State newState, GameStateMachine.SubState newSubState, object[] arguments) {
-        UpdateFocusableControls(newState, newSubState);
     }
 }

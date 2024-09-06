@@ -133,12 +133,10 @@ public partial class GameManager : Control {
         GetTree().CallGroup("popups", "close_all");
 
         if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed) {
-            await UIManager.Instance.mainMenu.DisplayMainMenu();
-        } else {
+            await UIManager.Instance.mainMenu.DisplayMainMenuContainerOnly();
+        } else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed) {
             await UIManager.Instance.mainMenu.DisplayInGameMenu();
         }
-        //     UIManager.Instance.mainMenu.MainOptionsContainer.TopLevel = true;
-        //     UIManager.Instance.mainMenu.MainOptionsContainer.Show();
     }
 
     public async Task Starting_New_Game() {
@@ -152,20 +150,6 @@ public partial class GameManager : Control {
         // UIManager.Instance.inputNameScreen.Show();
     }
 
-
-    //REFACTOR THE TWO METHODS BELOW
-    //REFACTOR THE TWO METHODS BELOW
-    //REFACTOR THE TWO METHODS BELOW
-
-    // public async Task Resume_To_Dialogue_Mode() {
-    //     //at the moment we can only go back to dialogue mode when we close the ingame menu
-    //     LoadSaveManager.Instance.ResumeGameTimer();
-    //     await Close_Ingame_Menu();
-    //     UIManager.Instance.dialogueBoxUI.TopLevel = true;
-    //     UIManager.Instance.playerChoicesBoxUI.TopLevel = true;
-    //     UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
-    // }
-
     public void Enter_Dialogue_Mode() {
         if (GameStateManager.Instance.CurrentState == State.InDialogueMode) {
             LoadSaveManager.Instance.ResumeGameTimer();
@@ -176,9 +160,6 @@ public partial class GameManager : Control {
     }
 
     public async Task Display_New_Game_Dialogues() {
-
-        //WE NEED A FADE IN HERE
-        //WE NEED A FADE IN HERE
 
         DialogueManager.Instance.currentDialogueID = DialogueManager.STARTING_DIALOGUE_ID;
         DialogueManager.Instance.currentConversationID = DialogueManager.STARTING_CONVO_ID;

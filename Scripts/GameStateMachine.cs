@@ -19,6 +19,7 @@ public class GameStateMachine {
 
     public enum SubState {
         None,
+        DisplayingMainMenu,
         LoadScreenInitialized,
         LoadScreenDisplayed,
         Loading,
@@ -40,6 +41,7 @@ public class GameStateMachine {
     public enum Trigger {
         DISPLAY_SPLASH_SCREEN,
         DISPLAY_MAIN_MENU,
+        MAIN_MENU_DISPLAYED,
         DISPLAY_INGAME_MENU,
         START_NEW_GAME,
         DISPLAY_ENTER_YOUR_NAME_SCREEN,

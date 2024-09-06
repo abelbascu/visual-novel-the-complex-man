@@ -73,7 +73,7 @@ public partial class GameStateManager : Node {
             {(State.None, SubState.None, State.SplashScreenDisplayed, SubState.None, Trigger.DISPLAY_SPLASH_SCREEN),
                 () => GameManager.Instance.Display_Splash_Screen()},
             // splashscreen > main Menu
-            {(State.SplashScreenDisplayed, SubState.None, State.MainMenuDisplayed, SubState.None, Trigger.DISPLAY_MAIN_MENU),
+            {(State.SplashScreenDisplayed, SubState.None, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
                 () => GameManager.Instance.Display_Main_Menu()},
             //main Menu > start new game
             {(State.MainMenuDisplayed, SubState.None, State.StartingNewGame, SubState.None, Trigger.START_NEW_GAME),
@@ -112,7 +112,7 @@ public partial class GameStateManager : Node {
             {(State.InGameMenuDisplayed, SubState.SavingCompleted, State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, Trigger.DISPLAY_SAVE_SCREEN),
                 () => UIManager.Instance.saveGameScreen.EnableInputAfterSavingComplete()},
             //save screen > go back to ingame menu
-            {(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
+            {(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.DISPLAY_MAIN_MENU),
                 () => GameManager.Instance.Go_Back_To_Menu()},        
             //ingame menu > initialize load screen
             {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.LoadScreenInitialized, Trigger.INITIALIZE_LOAD_SCREEN),
@@ -121,7 +121,7 @@ public partial class GameStateManager : Node {
              {(State.InGameMenuDisplayed, SubState.LoadScreenInitialized, State.InGameMenuDisplayed, SubState.LoadScreenDisplayed, Trigger.DISPLAY_LOAD_SCREEN),
                 () => GameManager.Instance.Display_Load_Screen()},
             //load screen > go back to ingame menu    
-             {(State.InGameMenuDisplayed, SubState.LoadScreenDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
+             {(State.InGameMenuDisplayed, SubState.LoadScreenDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.DISPLAY_MAIN_MENU),
                 () => GameManager.Instance.Go_Back_To_Menu()},
              //load Screen > loading
             {(State.InGameMenuDisplayed, SubState.LoadScreenDisplayed, State.InGameMenuDisplayed, SubState.Loading, Trigger.LOAD_GAME),
@@ -139,22 +139,19 @@ public partial class GameStateManager : Node {
             {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed, Trigger.DISPLAY_LANGUAGE_MENU),
                 () => GameManager.Instance.Display_Language_Menu()},
             //language menu > go back to ingame menu
-            {(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => {}},
+            {(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.DISPLAY_MAIN_MENU),
+                () => GameManager.Instance.Go_Back_To_Menu()},
             //ingame menu > game credits
              {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.CreditsDisplayed, Trigger.DISPLAY_CREDITS),
                 () => {}},
             //game credits > go back to ingame menu    
-             {(State.InGameMenuDisplayed, SubState.CreditsDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => {}},
+             {(State.InGameMenuDisplayed, SubState.CreditsDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.DISPLAY_MAIN_MENU),
+                () => GameManager.Instance.Go_Back_To_Menu()},
             //ingame menu > exit to main menu confirmation popup
             {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, Trigger.DISPLAY_EXIT_TO_MAIN_MENU_CONFIRMATION_POPUP),
                 () => {}},
-            //exit to main menu confirmation popup > display main menu
-            {(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.None, Trigger.DISPLAY_MAIN_MENU),
-                () => GameManager.Instance.Display_Main_Menu()},
             //exit to main menu confirmation popup > back to ingame menu
-            {(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
+            {(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.DISPLAY_INGAME_MENU),
                 () => GameManager.Instance.Go_Back_To_Menu()},
 
             //-----AUTOSAVE-----//  
@@ -178,7 +175,7 @@ public partial class GameStateManager : Node {
              {(State.MainMenuDisplayed, SubState.LoadScreenInitialized, State.MainMenuDisplayed, SubState.LoadScreenDisplayed, Trigger.DISPLAY_LOAD_SCREEN),
                 () => GameManager.Instance.Display_Load_Screen()},
             //load screen > go back to main menu    
-             {(State.MainMenuDisplayed, SubState.LoadScreenDisplayed, State.MainMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
+             {(State.MainMenuDisplayed, SubState.LoadScreenDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
                 () => GameManager.Instance.Go_Back_To_Menu()},
              //load Screen > loading
             {(State.MainMenuDisplayed, SubState.LoadScreenDisplayed, State.MainMenuDisplayed, SubState.Loading, Trigger.LOAD_GAME),
@@ -196,24 +193,37 @@ public partial class GameStateManager : Node {
             {(State.MainMenuDisplayed, SubState.None, State.MainMenuDisplayed, SubState.LanguageMenuDisplayed, Trigger.DISPLAY_LANGUAGE_MENU),
                 () => GameManager.Instance.Display_Language_Menu()},
             //language menu > go back to main menu
-            {(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed, State.MainMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => {}},
+            {(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
+                () =>  GameManager.Instance.Go_Back_To_Menu()},
+
             //main menu > game credits
              {(State.MainMenuDisplayed, SubState.None, State.MainMenuDisplayed, SubState.CreditsDisplayed, Trigger.DISPLAY_CREDITS),
                 () => {}},
+
             //game credits > go back to main menu    
-             {(State.MainMenuDisplayed, SubState.CreditsDisplayed, State.MainMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => {}},
+             {(State.MainMenuDisplayed, SubState.CreditsDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
+                () => GameManager.Instance.Go_Back_To_Menu()},
+          
+
             //main menu > exit game confirmation popup
             {(State.MainMenuDisplayed, SubState.None, State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed, Trigger.DISPLAY_EXIT_GAME_MENU_CONFIRMATION_POPUP),
                 () => {}},
             //exit game confirmation popup > exit game
             {(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.ExitingGame, Trigger.EXIT_GAME),
                 () => GameManager.Instance.Exit_Game()},
-            //exit game confirmation popup > back to ingame menu
-            {(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.None, Trigger.GO_BACK_TO_MENU),
-                () => {}}
 
+            //exit game confirmation popup > back to ingame menu
+            {(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
+                () =>  GameManager.Instance.Go_Back_To_Menu()},
+
+
+            //exit to main menu confirmation popup > display main menu
+            {(State.MainMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
+                () => GameManager.Instance.Go_Back_To_Menu()},
+
+
+            {(State.MainMenuDisplayed, SubState.DisplayingMainMenu, State.MainMenuDisplayed, SubState.None, Trigger.MAIN_MENU_DISPLAYED),
+                () => {}},
         };
 
         // Configure transitions in the state machine

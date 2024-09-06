@@ -134,8 +134,7 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.MouseFilter = MouseFilterEnum.Stop;
         Hide();
 
-        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
-        //UIManager.Instance.
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
     }
 
     public void SetUpSaveOrLoadScreen(bool isLoadScreen) {

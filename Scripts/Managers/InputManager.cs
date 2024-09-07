@@ -173,21 +173,24 @@ public partial class InputManager : Node {
     }
 
     private async Task HandleCancel() {
-        if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed) {
-            if (GameStateManager.Instance.CurrentSubstate == SubState.ExitGameConfirmationPopupDisplayed) {
-                await UIManager.Instance.mainMenu.OnExitGameCancelButtonPressed();
 
-                //if the ingame menu is displayed, we close it or open it
-            } else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed || GameStateManager.Instance.CurrentState == State.InDialogueMode) {
-                if (GameStateManager.Instance.CurrentSubstate == SubState.None) {
-                    await UIManager.Instance.inGameMenuButton.OnTextureButtonPressed();
-                }
+        if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)) {
+                await UIManager.Instance.mainMenu.OnExitGameCancelButtonPressed();
+                return;
             }
-        } else if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed || GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed) {
-            if (GameStateManager.Instance.CurrentSubstate == SubState.LanguageMenuDisplayed) {
+
+        //if the ingame menu is displayed, we close it or open it
+        else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed || GameStateManager.Instance.CurrentState == State.InDialogueMode)
+            if (GameStateManager.Instance.CurrentSubstate == SubState.None)
+                await UIManager.Instance.inGameMenuButton.OnTextureButtonPressed();
+
+        else if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed || GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
+            if (GameStateManager.Instance.CurrentSubstate == SubState.LanguageMenuDisplayed)
                 await UIManager.Instance.mainMenu.OnLanguagesGoBackButtonPressed();
-            }
-        }
+            // else if(GameStateManager.Instance.CurrentSubstate == SubState.LoadScreenDisplayed)
+            //     await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
+
+
     }
 
     private void HandleDialogueInput(InputEvent @event) {

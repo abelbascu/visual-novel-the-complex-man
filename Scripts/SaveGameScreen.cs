@@ -24,8 +24,6 @@ public partial class SaveGameScreen : MarginContainer {
 
     public override void _Ready() {
 
-        fadeIn = new UITextTweenFadeIn();
-        fadeOut = new UITextTweenFadeOut();
 
         saveGameSlotScene = GD.Load<PackedScene>("res://Scenes/SaveGameSlot.tscn");
         scrollContainer = GetNode<ScrollContainer>("MarginContainer/ScrollContainer");
@@ -58,6 +56,7 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.Disabled = true;
         goBackButton.FocusMode = Control.FocusModeEnum.None;
         goBackButton.MouseFilter = Control.MouseFilterEnum.Ignore;
+        goBackButton.SetProcessInput(false);
 
         if (saveGameSlot != null) {
             saveGameSlot.DisableButton();
@@ -70,6 +69,7 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.FocusMode = Control.FocusModeEnum.All;
         goBackButton.MouseFilter = Control.MouseFilterEnum.Stop;
         goBackButton.ProcessMode = Node.ProcessModeEnum.Inherit;
+        goBackButton.SetProcessInput(true);
 
         if (saveGameSlot != null) {
             saveGameSlot.EnableButton();
@@ -126,13 +126,13 @@ public partial class SaveGameScreen : MarginContainer {
         slotsContainer.AddChild(noSavesAvailableLabel);
     }
 
-    private async Task OnGoBackButtonPressed() {
+    public async Task OnGoBackButtonPressed() {
         DisableUserInput();
         SetSlotButtonsState(false);
         await UIFadeHelper.FadeOutControl(this, 0.6f);
+        Hide();
         goBackButton.SetProcessInput(true);
         goBackButton.MouseFilter = MouseFilterEnum.Stop;
-        Hide();
 
         GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
     }

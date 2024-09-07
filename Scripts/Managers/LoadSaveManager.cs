@@ -244,8 +244,8 @@ public partial class LoadSaveManager : Node {
         label.Text = $"[center]{message}[/center]";
         label.Visible = true;
 
-        await fadeIn.FadeIn(label);
-        await fadeOut.FadeOut(label);
+        await UIFadeHelper.FadeInControl(label);
+        await UIFadeHelper.FadeOutControl(label);
     }
 
 

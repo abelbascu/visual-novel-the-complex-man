@@ -49,13 +49,14 @@ public partial class InputManager : Control {
 
         if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.None) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.None)
             || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)
+            || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed)
             || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed))
             HandleMenuInput(@event);
         else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None))
             HandleDialogueInput(@event);
         else if (GameStateManager.Instance.IsInState(State.SplashScreenDisplayed, SubState.None))
             HandleSplashScreenInput(@event);
-        else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LoadScreenDisplayed))
+        else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LoadScreenDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LoadScreenDisplayed))
             HandleLoadScreeenInput(@event);
     }
 
@@ -86,6 +87,9 @@ public partial class InputManager : Control {
         } else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)) {
             currentFocusedMenu = UIManager.Instance.mainMenu.ExitGameConfirmationPanel;
             CollectFocusableControls(currentFocusedMenu);
+        } else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed)) {
+            currentFocusedMenu = UIManager.Instance.mainMenu.ExitToMainMenuPanel;
+            CollectFocusableControls(currentFocusedMenu);
         } else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed)) {
             currentFocusedMenu = UIManager.Instance.mainMenu.LanguageOptionsContainer;
             CollectFocusableControls(currentFocusedMenu);
@@ -93,6 +97,7 @@ public partial class InputManager : Control {
             currentFocusedMenu = UIManager.Instance.splashScreen;
             focusableControls.Add(UIManager.Instance.splashScreen.backgroundTexture);
         }
+
     }
 
     private void CollectFocusableControls(Control container) {
@@ -112,7 +117,7 @@ public partial class InputManager : Control {
 
 
     private void HandleMenuInput(InputEvent @event) {
-        bool isVertical = GameStateManager.Instance.CurrentSubstate != SubState.ExitGameConfirmationPopupDisplayed;
+        bool isVertical = GameStateManager.Instance.CurrentSubstate != SubState.ExitGameConfirmationPopupDisplayed && GameStateManager.Instance.CurrentSubstate != SubState.ExitToMainMenuConfirmationPopupDisplayed;
 
         if (isVertical) {
             if (@event.IsActionPressed("ui_up") ||
@@ -170,7 +175,7 @@ public partial class InputManager : Control {
 
     private void HandleHorizontalNavigation(bool isLeft) {
         List<Button> buttons = new();
-        foreach (var child in UIManager.Instance.mainMenu.YesNoButtonsHBoxContainer.GetChildren()) {
+        foreach (var child in focusableControls) {
             if (child is Button button) {
                 buttons.Add(button);
             }

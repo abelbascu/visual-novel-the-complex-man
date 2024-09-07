@@ -137,7 +137,11 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.SetProcessInput(true);
         goBackButton.MouseFilter = MouseFilterEnum.Stop;
 
-        GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+        if(GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+             GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+        else if(GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
+
         InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
     }
 

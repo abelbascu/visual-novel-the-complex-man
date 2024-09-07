@@ -20,6 +20,7 @@ public class GameStateMachine {
     public enum SubState {
         None,
         DisplayingMainMenu,
+        DisplayingIngameMenu,
         LoadScreenInitialized,
         LoadScreenDisplayed,
         Loading,

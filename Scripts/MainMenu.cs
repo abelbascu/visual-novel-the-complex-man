@@ -550,8 +550,10 @@ public partial class MainMenu : Control {
         SetButtonActiveState(languagesGoBackButton, true);
         DisableAllButtons();
 
-        //await UIFadeHelper.FadeInControl(MainOptionsContainer, 0.6f);
-        GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+        if(GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+        else if(GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
         //EnableAllButtons();
     }
 

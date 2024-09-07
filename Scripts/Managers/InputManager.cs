@@ -18,6 +18,12 @@ public partial class InputManager : Control {
     private const float INPUT_DELAY = 0.2f;
     private const float STICK_THRESHOLD = 0.5f;
 
+    private bool isGamePadAndKeyboardInputEnabled = true;
+
+    public void SetGamePadAndKeyboardInputEnabled(bool enabled) {
+        isGamePadAndKeyboardInputEnabled = enabled;
+    }
+
     public override void _EnterTree() {
         if (Instance == null) {
             Instance = this;
@@ -39,6 +45,8 @@ public partial class InputManager : Control {
         float currentTime = (float)Time.GetTicksMsec() / 1000.0f;
         if (currentTime - lastInputTime < INPUT_DELAY) return;
 
+        if (!isGamePadAndKeyboardInputEnabled) return;
+
         if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.None) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.None)
             || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)
             || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed))
@@ -47,15 +55,15 @@ public partial class InputManager : Control {
             HandleDialogueInput(@event);
         else if (GameStateManager.Instance.IsInState(State.SplashScreenDisplayed, SubState.None))
             HandleSplashScreenInput(@event);
-        else if(GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LoadScreenDisplayed))
+        else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LoadScreenDisplayed))
             HandleLoadScreeenInput(@event);
     }
 
-        private async Task HandleLoadScreeenInput(InputEvent @event) {
+    private async Task HandleLoadScreeenInput(InputEvent @event) {
         // if (@event.IsActionPressed("ui_accept")) {
         //     GameStateManager.Instance.Fire(GameStateMachine.Trigger.DISPLAY_MAIN_MENU);
         // }
-        if(@event.IsActionPressed("ui_cancel")) {
+        if (@event.IsActionPressed("ui_cancel")) {
             await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
         }
     }
@@ -186,20 +194,20 @@ public partial class InputManager : Control {
     private async Task HandleMenuCancel() {
 
         if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)) {
-                await UIManager.Instance.mainMenu.OnExitGameCancelButtonPressed();
-                return;
-            }
+            await UIManager.Instance.mainMenu.OnExitGameCancelButtonPressed();
+            return;
+        }
 
         //if the ingame menu is displayed, we close it or open it
         else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed || GameStateManager.Instance.CurrentState == State.InDialogueMode)
             if (GameStateManager.Instance.CurrentSubstate == SubState.None)
                 await UIManager.Instance.inGameMenuButton.OnTextureButtonPressed();
 
-        else if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed || GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
-            if (GameStateManager.Instance.CurrentSubstate == SubState.LanguageMenuDisplayed)
-                await UIManager.Instance.mainMenu.OnLanguagesGoBackButtonPressed();
-            // else if(GameStateManager.Instance.CurrentSubstate == SubState.LoadScreenDisplayed)
-            //     await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
+            else if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed || GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
+                if (GameStateManager.Instance.CurrentSubstate == SubState.LanguageMenuDisplayed)
+                    await UIManager.Instance.mainMenu.OnLanguagesGoBackButtonPressed();
+        // else if(GameStateManager.Instance.CurrentSubstate == SubState.LoadScreenDisplayed)
+        //     await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
 
 
     }
@@ -239,9 +247,9 @@ public partial class InputManager : Control {
         }
     }
 
-    private void HandleSplashScreenInput(InputEvent @event) {
+    private async Task HandleSplashScreenInput(InputEvent @event) {
         if (@event.IsActionPressed("ui_accept")) {
-            GameStateManager.Instance.Fire(GameStateMachine.Trigger.DISPLAY_MAIN_MENU);
+            await UIManager.Instance.splashScreen.TransitionToMainMenu();
         }
     }
 

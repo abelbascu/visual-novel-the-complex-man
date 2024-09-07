@@ -57,6 +57,7 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.FocusMode = Control.FocusModeEnum.None;
         goBackButton.MouseFilter = Control.MouseFilterEnum.Ignore;
         goBackButton.SetProcessInput(false);
+        ProcessMode = ProcessModeEnum.Disabled;
 
         if (saveGameSlot != null) {
             saveGameSlot.DisableButton();
@@ -70,6 +71,7 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.MouseFilter = Control.MouseFilterEnum.Stop;
         goBackButton.ProcessMode = Node.ProcessModeEnum.Inherit;
         goBackButton.SetProcessInput(true);
+        ProcessMode = ProcessModeEnum.Inherit;
 
         if (saveGameSlot != null) {
             saveGameSlot.EnableButton();
@@ -127,6 +129,7 @@ public partial class SaveGameScreen : MarginContainer {
     }
 
     public async Task OnGoBackButtonPressed() {
+        InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
         DisableUserInput();
         SetSlotButtonsState(false);
         await UIFadeHelper.FadeOutControl(this, 0.6f);
@@ -135,6 +138,7 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.MouseFilter = MouseFilterEnum.Stop;
 
         GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+        InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
     }
 
     public void SetUpSaveOrLoadScreen(bool isLoadScreen) {
@@ -147,6 +151,11 @@ public partial class SaveGameScreen : MarginContainer {
         // Populate with appropriate slots
         PopulateSaveOrLoadSlots(isLoadScreen);
 
+        SetSlotButtonsState(false);
+        DisableUserInput();
+
+        InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
+
         if (isLoadScreen)
             GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
         else
@@ -156,11 +165,10 @@ public partial class SaveGameScreen : MarginContainer {
     //beware that we use this method to also displayed the Load Screen!!
     public async Task DisplaySaveScreen() {
 
-        SetSlotButtonsState(false);
-        DisableUserInput();
-
+        goBackButton.Visible = false;
         goBackButton.SetProcessInput(false); //avoid hitting the ga back button repeatedly
         goBackButton.MouseFilter = MouseFilterEnum.Ignore;
+        goBackButton.ProcessMode = ProcessModeEnum.Disabled;
 
         // Ensure the save game screen is fully transparent before showing
         Modulate = new Color(1, 1, 1, 0);
@@ -170,6 +178,11 @@ public partial class SaveGameScreen : MarginContainer {
 
         SetSlotButtonsState(true);
         EnableUserInput();
+        goBackButton.Visible = true;
+        InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
+        //HERE I WANT TO ACTIVATE AGAIN INPUT WITH GAMEPAD AND KEYBOARD, NOT ONLY MOUSE.
+
+
     }
 
     public void EnableInputAfterSavingComplete() {

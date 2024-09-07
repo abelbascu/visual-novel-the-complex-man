@@ -186,7 +186,7 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Display_Load_Screen()},
             //load screen > go back to main menu    
              {(State.MainMenuDisplayed, SubState.LoadScreenDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
-                () => GameManager.Instance.Go_Back_To_Menu()},
+                () => GameManager.Instance.Display_Main_Menu()},
              //load Screen > loading
             {(State.MainMenuDisplayed, SubState.LoadScreenDisplayed, State.MainMenuDisplayed, SubState.Loading, Trigger.LOAD_GAME),
                 new Action<string>(filePath => GameManager.Instance.Load_Game(filePath))},

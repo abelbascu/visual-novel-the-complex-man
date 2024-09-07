@@ -10,6 +10,7 @@ public partial class InGameMenuButton : MarginContainer {
     public override void _Ready() {
         textureButton = GetNode<TextureButton>("TextureButton");
         textureButton.Pressed += () => _ = OnTextureButtonPressed();
+        textureButton.Visible = false;
     }
 
     public async Task OnTextureButtonPressed() {
@@ -22,13 +23,13 @@ public partial class InGameMenuButton : MarginContainer {
             //we hide the ingame menu and then show it again when closing the submenus.
             //we just want to pause it every time that we are not in dialogue mode for now.
             LoadSaveManager.Instance.PauseGameTimer();
-            await UIManager.Instance.mainMenu.DisplayInGameMenu();
+            //await UIManager.Instance.mainMenu.DisplayInGameMenu();
             GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
         } else {
             //LoadSaveManager.Instance.ResumeGameTimer();
             // await UIManager.Instance.mainMenu.CloseInGameMenu();
-            UIManager.Instance.mainMenu.MainOptionsContainer.Visible = false;
-            UIManager.Instance.mainMenu.Visible = false;
+            await UIManager.Instance.mainMenu.CloseInGameMenu();
+            // UIManager.Instance.mainMenu.Visible = false;
             GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
 
         }
@@ -43,13 +44,14 @@ public partial class InGameMenuButton : MarginContainer {
         textureButton.SetProcessInput(false);
         textureButton.MouseFilter = MouseFilterEnum.Ignore;
         textureButton.FocusMode = FocusModeEnum.None;
+        //textureButton.Visible = false;
     }
 
     public void EnableIngameMenuButton() {
         textureButton.SetProcessInput(true);
         textureButton.MouseFilter = MouseFilterEnum.Stop;
         textureButton.FocusMode = FocusModeEnum.All;
-        Visible = true;
+        textureButton.Visible = true;
     }
 
 

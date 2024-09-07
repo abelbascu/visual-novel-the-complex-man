@@ -92,7 +92,10 @@ public partial class GameStateManager : Node {
 
             //in dialogue mode > display ingame menu
             {(State.InDialogueMode, SubState.None, State.InGameMenuDisplayed, SubState.None, Trigger.DISPLAY_INGAME_MENU),
+                () =>GameManager.Instance.Display_Ingame_Menu()},
+            {(State.InDialogueMode, SubState.None, State.InGameMenuDisplayed, SubState.None, Trigger.INGAME_MENU_DISPLAYED),
                 () =>{}},
+
             //in game menu > enter dialogue node
             {(State.InGameMenuDisplayed, SubState.None, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
                 () => GameManager.Instance.Enter_Dialogue_Mode()},
@@ -152,7 +155,14 @@ public partial class GameStateManager : Node {
                 () => {}},
             //exit to main menu confirmation popup > back to ingame menu
             {(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, State.InGameMenuDisplayed, SubState.None, Trigger.DISPLAY_INGAME_MENU),
-                () => GameManager.Instance.Go_Back_To_Menu()},
+                () => GameManager.Instance.Display_Ingame_Menu()},
+            {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.None, Trigger.INGAME_MENU_DISPLAYED),
+                () => {}},
+            {(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
+                () => GameManager.Instance.Display_Main_Menu()},
+                
+
+            
 
             //-----AUTOSAVE-----//  
 

@@ -225,6 +225,8 @@ public partial class GameManager : Control {
     //THIS LOOKS LIKE SHOULD BE MOVED TO DIALOGUE MANAGER
     //THIS LOOKS LIKE SHOULD BE MOVED TO DIALOGUE MANAGER
     public async Task Initialize_Dialogue_Mode_Settings_On_Loaded_Game() {
+
+        UIManager.Instance.inGameMenuButton.DisableIngameMenuButton();
         UIManager.Instance.inGameMenuButton.Show();
         //A BIT HACKY FIX where if the currentDialogObj is a PlayerChoice, and the user clicked on it and then saved the game, and if its DestinationDialogueID are PlayerChoices,
         //it means that they were all already saved in a List and displayed to the screen, so when loading that saved game it should not display that currentDialogObj, but only its associated playerChoices
@@ -239,6 +241,7 @@ public partial class GameManager : Control {
             DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
 
         await UIManager.Instance.FadeOutScreenOverlay(1.5f);
+        UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
     }
 
 

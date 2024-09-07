@@ -434,6 +434,7 @@ public partial class MainMenu : Control {
         MainOptionsContainer.SetProcessInput(true);
         EnableAllButtons();
         ShowIngameMenuIcon();
+        GameStateManager.Instance.Fire(Trigger.INGAME_MENU_DISPLAYED);
         InGameMenuOpened?.Invoke();
     }
 
@@ -482,6 +483,7 @@ public partial class MainMenu : Control {
         MainOptionsContainer.SetProcessInput(false);
         UIManager.Instance.menuOverlay.Visible = false;
         await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
+        MainOptionsContainer.Visible = false;
         InGameMenuClosed?.Invoke();
     }
 
@@ -582,10 +584,12 @@ public partial class MainMenu : Control {
     public async Task ShowExitToMainMenuConfirmationPopup() {
         DisableAllButtons();
         SetButtonActiveState(NoExitToMainMenuButton, false);
-        SetButtonActiveState(YesExitToMainMenuButton, false);
+        SetContainerButtonsVisibility(MainOptionsContainer, false);
         await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
+        SetButtonActiveState(YesExitToMainMenuButton, false);
         ExitToMainMenuPanel.Visible = true;
         ExitToMainMenuPanel.TopLevel = true;
+        SetContainerButtonsVisibility(YesNoExitToMenuButtonsHBoxContainer, true);
         await UIFadeHelper.FadeInControl(ExitToMainMenuPanel, 0.5f);
         SetButtonActiveState(NoExitToMainMenuButton, true);
         SetButtonActiveState(YesExitToMainMenuButton, true);
@@ -623,7 +627,7 @@ public partial class MainMenu : Control {
         ShowIngameMenuIcon();
         SetButtonActiveState(NoExitToMainMenuButton, false);
         SetButtonActiveState(YesExitToMainMenuButton, false);
-        GameStateManager.Instance.Fire(Trigger.GO_BACK_TO_MENU);
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
         EnableAllButtons();
     }
 

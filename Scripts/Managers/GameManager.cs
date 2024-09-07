@@ -119,6 +119,10 @@ public partial class GameManager : Control {
         await UIManager.Instance.mainMenu.DisplayMainMenu();
     }
 
+    public async Task Display_Main_Menu_Container_Only() {
+        await UIManager.Instance.mainMenu.DisplayMainMenuContainerOnly();
+    }
+
     public async Task Display_Ingame_Menu() {
 
         await UIManager.Instance.mainMenu.DisplayInGameMenu();

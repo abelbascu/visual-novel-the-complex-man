@@ -204,7 +204,7 @@ public partial class GameStateManager : Node {
                 () => GameManager.Instance.Display_Language_Menu()},
             //language menu > go back to main menu
             {(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
-                () =>  GameManager.Instance.Go_Back_To_Menu()},
+                () =>  GameManager.Instance.Display_Main_Menu_Container_Only()},
 
             //main menu > game credits
              {(State.MainMenuDisplayed, SubState.None, State.MainMenuDisplayed, SubState.CreditsDisplayed, Trigger.DISPLAY_CREDITS),
@@ -212,7 +212,7 @@ public partial class GameStateManager : Node {
 
             //game credits > go back to main menu    
              {(State.MainMenuDisplayed, SubState.CreditsDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
-                () => GameManager.Instance.Go_Back_To_Menu()},
+                () => GameManager.Instance.Display_Main_Menu_Container_Only()},
           
 
             //main menu > exit game confirmation popup
@@ -224,12 +224,12 @@ public partial class GameStateManager : Node {
 
             //exit game confirmation popup > back to ingame menu
             {(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
-                () =>  GameManager.Instance.Go_Back_To_Menu()},
+                () =>  GameManager.Instance.Display_Main_Menu_Container_Only()},
 
 
             //exit to main menu confirmation popup > display main menu
             {(State.MainMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
-                () => GameManager.Instance.Go_Back_To_Menu()},
+                () => GameManager.Instance.Display_Main_Menu_Container_Only()},
 
 
             {(State.MainMenuDisplayed, SubState.DisplayingMainMenu, State.MainMenuDisplayed, SubState.None, Trigger.MAIN_MENU_DISPLAYED),

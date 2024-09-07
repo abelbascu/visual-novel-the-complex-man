@@ -153,7 +153,7 @@ public partial class SaveGameScreen : MarginContainer {
             GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
 
-
+    //beware that we use this method to also displayed the Load Screen!!
     public async Task DisplaySaveScreen() {
 
         SetSlotButtonsState(false);

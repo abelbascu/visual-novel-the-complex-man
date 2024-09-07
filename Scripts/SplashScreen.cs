@@ -93,6 +93,9 @@ public partial class SplashScreen : Control {
 
         //await fadeOut.FadeOut(backgroundTexture, 1.5f);
         GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+
+        Visible = false;
+        pressAnyKeyLabel.Visible = false;
     }
 
 }

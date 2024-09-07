@@ -325,9 +325,9 @@ public partial class MainMenu : Control {
 
         DisableAllButtons();
         SetupMainMenuBackground();
+        SetupForMainMenu();
         await FadeInMainMenu();
         EnableAllButtons();
-        SetupForMainMenu();
         //this calls to pause the game timer, more sense on ingame menu
         //but can be used to autosave game while user exits current game
         GameStateManager.Instance.Fire(Trigger.MAIN_MENU_DISPLAYED);
@@ -352,6 +352,13 @@ public partial class MainMenu : Control {
         //when ingame menu is open. If in main menu, disable it.
         UIManager.Instance.menuOverlay.Visible = false;
         SetMainMenuUIMainComponentsVisibility();
+    }
+
+    private void SetMainMenuUIMainComponentsVisibility() {
+        MainOptionsContainer.TopLevel = true;
+        MainOptionsContainer.Show();
+        mainMenuBackgroundImage.Show();
+        Show();
     }
 
     private void SetDialogueUIElementsTopLevel(bool isTopLevel) {
@@ -389,12 +396,6 @@ public partial class MainMenu : Control {
         exitToMainMenuButton.Hide();
     }
 
-    private void SetMainMenuUIMainComponentsVisibility() {
-        MainOptionsContainer.TopLevel = true;
-        MainOptionsContainer.Show();
-        mainMenuBackgroundImage.Show();
-        Show();
-    }
 
 
     public async Task CloseMainMenu() {
@@ -407,8 +408,8 @@ public partial class MainMenu : Control {
 
     public async Task FadeInMainMenu() {
         await Task.WhenAll(
-            UIFadeHelper.FadeInControl(MainOptionsContainer, 0.7f),
-            UIFadeHelper.FadeInControl(mainMenuBackgroundImage, 0.7f));
+            UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f),
+            UIFadeHelper.FadeInControl(mainMenuBackgroundImage, 1.0f));
     }
 
     private async Task FadeOutMainMenu() {

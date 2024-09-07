@@ -18,7 +18,7 @@ public partial class LoadSaveManager : Node {
     private const string SaveDirectory = "saves";
     private const string PersistentDataFile = "persistent_data.dat";
     private const string AutosavePrefix = "autosave_";
-    private const int AutosaveInterval = 15; // 5 minutes in seconds
+    private const int AutosaveInterval = 300; // 5 minutes in seconds
     private float timeSinceLastAutosave = 0;
     private float totalTimeElapsedSinceGameStart;
     private RichTextLabel autosaveStatusLabel;

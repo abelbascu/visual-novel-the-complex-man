@@ -6,7 +6,7 @@ using State = GameStateMachine.State;
 using SubState = GameStateMachine.SubState;
 using System.Threading.Tasks;
 
-public partial class InputManager : Node {
+public partial class InputManager : Control {
 
     public static InputManager Instance { get; private set; }
     private Control currentFocusedMenu;
@@ -47,6 +47,17 @@ public partial class InputManager : Node {
             HandleDialogueInput(@event);
         else if (GameStateManager.Instance.IsInState(State.SplashScreenDisplayed, SubState.None))
             HandleSplashScreenInput(@event);
+        else if(GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LoadScreenDisplayed))
+            HandleLoadScreeenInput(@event);
+    }
+
+        private async Task HandleLoadScreeenInput(InputEvent @event) {
+        // if (@event.IsActionPressed("ui_accept")) {
+        //     GameStateManager.Instance.Fire(GameStateMachine.Trigger.DISPLAY_MAIN_MENU);
+        // }
+        if(@event.IsActionPressed("ui_cancel")) {
+            await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
+        }
     }
 
 
@@ -126,9 +137,9 @@ public partial class InputManager : Node {
         }
 
         if (@event.IsActionPressed("ui_accept")) {
-            HandleAccept();
+            HandleMenuAccept();
         } else if (@event.IsActionPressed("ui_cancel")) {
-            HandleCancel();
+            HandleMenuCancel();
         }
     }
 
@@ -164,7 +175,7 @@ public partial class InputManager : Node {
         buttons[newIndex].GrabFocus();
     }
 
-    private void HandleAccept() {
+    private void HandleMenuAccept() {
         if (currentFocusedIndex >= 0 && currentFocusedIndex < focusableControls.Count) {
             if (focusableControls[currentFocusedIndex] is Button button) {
                 button.EmitSignal(Button.SignalName.Pressed);
@@ -172,7 +183,7 @@ public partial class InputManager : Node {
         }
     }
 
-    private async Task HandleCancel() {
+    private async Task HandleMenuCancel() {
 
         if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)) {
                 await UIManager.Instance.mainMenu.OnExitGameCancelButtonPressed();

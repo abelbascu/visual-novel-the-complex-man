@@ -2,5 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/Managers/InputManager.cs" id="1_aoim5"]
 
-[node name="InputManager" type="Node"]
+[node name="InputManager" type="Control"]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_aoim5")

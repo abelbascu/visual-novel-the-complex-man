@@ -68,7 +68,7 @@ public partial class InputManager : Control {
                 HandleSplashScreenInput(@event);
             } else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LoadScreenDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LoadScreenDisplayed))
                 HandleLoadScreeenInput(@event);
-            else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenInitialized))
+            else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed))
                 HandleSaveScreenInput(@event);
 
             lastInputTime = currentTime;

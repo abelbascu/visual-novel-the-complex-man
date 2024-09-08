@@ -15,7 +15,7 @@ public partial class InputManager : Control {
     private int currentPlayerChoiceIndex = -1;
 
     private float lastInputTime = 0f;
-    private const float INPUT_DELAY = 0.2f;
+    private const float INPUT_DELAY = 0.25f;
     private const float STICK_THRESHOLD = 0.5f;
 
     private bool isGamePadAndKeyboardInputEnabled = true;
@@ -50,13 +50,12 @@ public partial class InputManager : Control {
         float currentTime = (float)Time.GetTicksMsec() / 1000.0f;
         if (currentTime - lastInputTime < INPUT_DELAY) return;
 
-        if (!isGamePadAndKeyboardInputEnabled || isInputLocked) return;
+        if (!isGamePadAndKeyboardInputEnabled) return;
 
         isInputLocked = true;
 
         //GD.Print($"Current State: {GameStateManager.Instance.CurrentState}, Current Substate: {GameStateManager.Instance.CurrentSubstate}");
 
-        try {
             if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.None) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.None)
                 || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)
                 || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed)
@@ -72,12 +71,6 @@ public partial class InputManager : Control {
                 HandleSaveScreenInput(@event);
 
             lastInputTime = currentTime;
-        } finally {
-            
-            isInputLocked = false;
-        }
-
-
     }
 
     private async Task HandleSaveScreenInput(InputEvent @event) {

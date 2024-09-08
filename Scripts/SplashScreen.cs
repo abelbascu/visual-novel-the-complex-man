@@ -65,9 +65,10 @@ public partial class SplashScreen : Control {
 
 
     public async Task TransitionToMainMenu() {
+        
+        InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
 
-        // becasue even if we hide the scen it still processes input behind.
-        SetProcessInput(false);
+        await EnsureInputIsDIsabled();
 
         pressAnyKeyLabel.Visible = false;
 
@@ -79,6 +80,13 @@ public partial class SplashScreen : Control {
         Visible = false;
         pressAnyKeyLabel.Visible = false;
         GetViewport().SetInputAsHandled();
+
+        InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
+    }
+
+    private async Task EnsureInputIsDIsabled() {
+         SetProcessInput(false);
+         await Task.CompletedTask;
     }
 
 }

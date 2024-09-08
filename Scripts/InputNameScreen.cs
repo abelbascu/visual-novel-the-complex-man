@@ -60,6 +60,7 @@ public partial class InputNameScreen : Control {
         SetupConfirmationDialogTheme();
 
         this.Visible = false;
+        nameInput.SetProcessInput(false);
 
         //seems a godot bug, i needed to put the key in the Godot Editor
         // string titleText =  TranslationServer.Translate(inputYourNameTitleTRANSLATE);
@@ -69,6 +70,7 @@ public partial class InputNameScreen : Control {
     public async Task Show() {
         base.Show();
         ResetNameInputScreen();
+        nameInput.SetProcessInput(true);
         CallDeferred(nameof(SetInitialFocus));
         await FadeIn();
     }

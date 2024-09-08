@@ -123,6 +123,7 @@ public class GameStateMachine {
     public void Fire(Trigger trigger, params object[] arguments) {
 
         var currentKey = (currentState, currentSubState);
+    
         if (!transitions.ContainsKey(currentKey) || !transitions[currentKey].ContainsKey(trigger)) {
             throw new InvalidOperationException($"No valid transition from {currentState}.{currentSubState} with trigger {trigger}");
         }

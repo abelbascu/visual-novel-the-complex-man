@@ -28,7 +28,6 @@ public partial class SplashScreen : Control {
         backgroundTexture.Modulate = new Color(1, 1, 1, 0); // Start fully transparent
         pressAnyKeyLabel = GetNode<RichTextLabel>("MarginContainer/RichTextLabel");
 
-        backgroundTexture.GuiInput += OnBackgroundGuiInput;
         fadeIn = new UITextTweenFadeIn();
         fadeOut = new UITextTweenFadeOut();
 
@@ -64,23 +63,6 @@ public partial class SplashScreen : Control {
         isExecuting = false;
     }
 
-    public override void _Input(InputEvent @event) {
-
-        if (@event.IsActionPressed("action_key")) {
-            // Consume the event
-            GetViewport().SetInputAsHandled();
-            // CallDeferred("TransitionToMainMenu");
-            TransitionToMainMenu();
-        }
-    }
-
-    public void OnBackgroundGuiInput(InputEvent @event) {
-        if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed) {
-            // Consume the event
-            GetViewport().SetInputAsHandled();
-            TransitionToMainMenu();
-        }
-    }
 
     public async Task TransitionToMainMenu() {
 
@@ -96,6 +78,7 @@ public partial class SplashScreen : Control {
 
         Visible = false;
         pressAnyKeyLabel.Visible = false;
+        GetViewport().SetInputAsHandled();
     }
 
 }

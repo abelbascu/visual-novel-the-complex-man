@@ -112,7 +112,6 @@ public partial class GameManager : Control {
     public async Task Display_Main_Menu() {
         //UIManager.HideSplashScreen();
 
-
         if (UIManager.Instance.mainMenu.MainOptionsContainer.Visible == true)
             await UIManager.Instance.mainMenu.CloseInGameMenu();
 

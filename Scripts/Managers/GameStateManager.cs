@@ -243,6 +243,8 @@ public partial class GameStateManager : Node {
     private void OnStateChanged(State previousState, SubState previousSubstate, State newState, SubState newSubState, object[] arguments) {
         var transitionKey = (previousState, previousSubstate, newState, newSubState, stateMachine.LastTrigger);
 
+        GD.Print($"ALL STATES: {previousState}, {previousSubstate}, {newState}, {newSubState}, {stateMachine.LastTrigger}");
+
         if (newState.ToString().Contains("Mode")) {
             LastGameMode = newState;
         }

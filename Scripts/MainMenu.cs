@@ -274,6 +274,8 @@ public partial class MainMenu : Control {
         await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
     }
 
+
+    //ENABLE-DISABLE BUTTONS METHODS
     //when the user clicks on any menu button, let's disable all buttons
     //to prevent race conditions and breaking the state machine.
     private void DisableAllButtons() => SetAllButtonsState(false);
@@ -295,6 +297,7 @@ public partial class MainMenu : Control {
         button.SetProcessInput(enable);
         button.MouseFilter = enable ? MouseFilterEnum.Stop : MouseFilterEnum.Ignore;
         button.FocusMode = enable ? FocusModeEnum.All : FocusModeEnum.None;
+        //button.Visible = enable;
     }
 
     public void SetContainerButtonsVisibility(Control container, bool isButtonsVisible) {
@@ -306,7 +309,6 @@ public partial class MainMenu : Control {
             } else if (child is Control control)
                 SetContainerButtonsVisibility(control, isButtonsVisible);
         }
-
     }
 
 
@@ -327,9 +329,10 @@ public partial class MainMenu : Control {
         SetupMainMenuBackground();
         SetupForMainMenu();
         await FadeInMainMenu();
-        EnableAllButtons();
+        //EnableAllButtons(); WE WERE ENABLING SOME HIDDEN BUTTONS AND THIS AFFECTED THE INPUT MANAGER READING HOW MANY BUTTONS WERE AVAILABLE!
         //this calls to pause the game timer, more sense on ingame menu
         //but can be used to autosave game while user exits current game
+
         GameStateManager.Instance.Fire(Trigger.MAIN_MENU_DISPLAYED);
         MainMenuOpened?.Invoke();
     }

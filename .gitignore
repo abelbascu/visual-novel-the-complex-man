@@ -17,3 +17,4 @@ mono_crash.*.json
 .vscode/.vs/.vscode/v17/.wsuo
 .vscode/.vs/slnx.sqlite
 Visual Novel The Complex Man.csproj.old
+cloc-1.64.exe

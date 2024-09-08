@@ -19,9 +19,14 @@ public partial class InputManager : Control {
     private const float STICK_THRESHOLD = 0.5f;
 
     private bool isGamePadAndKeyboardInputEnabled = true;
+    private bool isInputLocked = false;
 
     public void SetGamePadAndKeyboardInputEnabled(bool enabled) {
         isGamePadAndKeyboardInputEnabled = enabled;
+    }
+
+    public void UnlockInput() {
+        isInputLocked = false;
     }
 
     public override void _EnterTree() {
@@ -45,19 +50,40 @@ public partial class InputManager : Control {
         float currentTime = (float)Time.GetTicksMsec() / 1000.0f;
         if (currentTime - lastInputTime < INPUT_DELAY) return;
 
-        if (!isGamePadAndKeyboardInputEnabled) return;
+        if (!isGamePadAndKeyboardInputEnabled || isInputLocked) return;
 
-        if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.None) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.None)
-            || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)
-            || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed)
-            || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed))
-            HandleMenuInput(@event);
-        else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None))
-            HandleDialogueInput(@event);
-        else if (GameStateManager.Instance.IsInState(State.SplashScreenDisplayed, SubState.None))
-            HandleSplashScreenInput(@event);
-        else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LoadScreenDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LoadScreenDisplayed))
-            HandleLoadScreeenInput(@event);
+        isInputLocked = true;
+
+        //GD.Print($"Current State: {GameStateManager.Instance.CurrentState}, Current Substate: {GameStateManager.Instance.CurrentSubstate}");
+
+        try {
+            if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.None) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.None)
+                || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)
+                || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed)
+                || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed))
+                HandleMenuInput(@event);
+            else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None))
+                HandleDialogueInput(@event);
+            else if (GameStateManager.Instance.IsInState(State.SplashScreenDisplayed, SubState.None)) {
+                HandleSplashScreenInput(@event);
+            } else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LoadScreenDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LoadScreenDisplayed))
+                HandleLoadScreeenInput(@event);
+            else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenInitialized))
+                HandleSaveScreenInput(@event);
+
+            lastInputTime = currentTime;
+        } finally {
+            
+            isInputLocked = false;
+        }
+
+
+    }
+
+    private async Task HandleSaveScreenInput(InputEvent @event) {
+        if (@event.IsActionPressed("ui_cancel")) {
+            await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
+        }
     }
 
     private async Task HandleLoadScreeenInput(InputEvent @event) {
@@ -69,6 +95,11 @@ public partial class InputManager : Control {
         }
     }
 
+    private async Task HandleSplashScreenInput(InputEvent @event) {
+        if (@event.IsActionPressed("ui_accept")) {
+            await UIManager.Instance.splashScreen.TransitionToMainMenu();
+        }
+    }
 
     private void OnGameStateChanged(GameStateMachine.State previousState, GameStateMachine.SubState previousSubstate,
                                     GameStateMachine.State newState, GameStateMachine.SubState newSubState, object[] arguments) {
@@ -109,7 +140,6 @@ public partial class InputManager : Control {
             }
         }
     }
-
 
     private List<Control> GetVisibleFocusableControls() {
         return focusableControls.FindAll(control => control.Visible);
@@ -252,11 +282,6 @@ public partial class InputManager : Control {
         }
     }
 
-    private async Task HandleSplashScreenInput(InputEvent @event) {
-        if (@event.IsActionPressed("ui_accept")) {
-            await UIManager.Instance.splashScreen.TransitionToMainMenu();
-        }
-    }
 
     private void HighlightMenuButton(int index) {
         var visibleControls = GetVisibleFocusableControls();

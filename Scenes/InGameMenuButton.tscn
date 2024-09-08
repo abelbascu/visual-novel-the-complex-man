@@ -19,6 +19,7 @@ scale = Vector2(0.15, 0.195)
 script = ExtResource("1_6s4mo")
 
 [node name="TextureRect" type="TextureRect" parent="."]
+visible = false
 material = SubResource("CanvasItemMaterial_w2emj")
 layout_mode = 2
 

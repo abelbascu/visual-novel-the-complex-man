@@ -30,6 +30,10 @@ public partial class PlayerChoiceButton : MarginContainer {
             SizeFlagsHorizontal = SizeFlags.Fill,
             SizeFlagsVertical = SizeFlags.ShrinkCenter,
             CustomMinimumSize = new Vector2(BUTTON_WIDTH, SINGLE_LINE_HEIGHT) // Set initial minimum size
+            //HERE WE COULD SET THE NAME OF THE BUTTON FOR TRACKING PURPOSES LATER FOR THE INPUT MANAGER
+            //HERE WE COULD SET THE NAME OF THE BUTTON FOR TRACKING PURPOSES LATER FOR THE INPUT MANAGER
+            //HERE WE COULD SET THE NAME OF THE BUTTON FOR TRACKING PURPOSES LATER FOR THE INPUT MANAGER
+            //HERE WE COULD SET THE NAME OF THE BUTTON FOR TRACKING PURPOSES LATER FOR THE INPUT MANAGER
 
         };
         AddChild(button);

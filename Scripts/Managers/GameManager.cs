@@ -193,7 +193,12 @@ public partial class GameManager : Control {
 
     public async Task Initialize_Load_Screen() {
 
-        UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.LOAD_SCREEN);
+        bool isLoadScreen = await UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.LOAD_SCREEN);
+
+        if (isLoadScreen)
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
+        else
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
 
     public async Task Display_Load_Screen() {

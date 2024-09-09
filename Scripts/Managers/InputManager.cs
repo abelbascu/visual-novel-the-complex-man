@@ -27,6 +27,7 @@ public partial class InputManager : Control {
 
     private bool isGamePadAndKeyboardInputEnabled = true;
     private bool isInputLocked = false;
+    private bool isProcessingInput = false;
 
     public void SetGamePadAndKeyboardInputEnabled(bool enabled) {
         isGamePadAndKeyboardInputEnabled = enabled;
@@ -45,64 +46,121 @@ public partial class InputManager : Control {
     }
 
     public override void _ExitTree() {
-        GameStateManager.Instance.StateChanged -= OnGameStateChanged;
+
+        GameStateManager.Instance.StateChanged -= (prevState, prevSubState, newState, newSubState, args) => {
+            _ = OnGameStateChanged(prevState, prevSubState, newState, newSubState, args);
+        };
     }
 
     public override void _Ready() {
-        GameStateManager.Instance.StateChanged += OnGameStateChanged;
+        GameStateManager.Instance.StateChanged += (prevState, prevSubState, newState, newSubState, args) => {
+            _ = OnGameStateChanged(prevState, prevSubState, newState, newSubState, args);
+        };
+    }
+
+    public void EnableInput() {
+        MouseFilter = MouseFilterEnum.Stop;
+        isGamePadAndKeyboardInputEnabled = true;
+    }
+
+    public void DisableInput() {
+        MouseFilter = MouseFilterEnum.Ignore;
+        isGamePadAndKeyboardInputEnabled = false;
     }
 
 
     public override void _Input(InputEvent @event) {
-        // float currentTime = (float)Time.GetTicksMsec() / 1000.0f;
-        // if (currentTime - lastInputTime < INPUT_DELAY) return;
 
-        if (!isGamePadAndKeyboardInputEnabled || isInputLocked) return;
-
-        isInputLocked = true; //QUE HAGO CON ESTO???
+        GD.Print($"_GuiInput called with event: {@event}");
 
         if (@event is InputEventMouseMotion mouseMotion) {
             HandleMouseMotion(mouseMotion);
-        } else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.None) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.None)
-              || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)
-              || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed)
-              || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed))
-            HandleMenuInput(@event);
-        else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None))
-            HandleDialogueInput(@event);
-        else if (GameStateManager.Instance.IsInState(State.SplashScreenDisplayed, SubState.None)) {
-            HandleSplashScreenInput(@event);
-        } else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LoadScreenDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LoadScreenDisplayed))
-            HandleLoadScreeenInput(@event);
-        else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed))
-            HandleSaveScreenInput(@event);
+            return; // We don't want to AcceptEvent for mouse motion
+        }
 
-        // lastInputTime = currentTime;
-        isInputLocked = false;
+        if (!isGamePadAndKeyboardInputEnabled || isProcessingInput) return;
+
+        if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left) {
+            isProcessingInput = true;
+            _ = ProcessInputAsync(@event);
+            AcceptEvent();
+        } else if (isGamePadAndKeyboardInputEnabled) {
+            if (@event.IsActionPressed("ui_accept") || @event.IsActionPressed("ui_cancel") || @event.IsActionPressed("ui_left") || @event.IsActionPressed("ui_right") || @event.IsActionPressed("ui_up") || @event.IsActionPressed("ui_down")) {
+                isProcessingInput = true;
+                _ = ProcessInputAsync(@event);
+                AcceptEvent();
+            }
+        }
     }
+
+    private async Task ProcessInputAsync(InputEvent @event) {
+        try {
+            if (GameStateManager.Instance.IsInState(GameStateMachine.State.SplashScreenDisplayed, GameStateMachine.SubState.None)) {
+                await HandleSplashScreenInput(@event);
+            } else if (GameStateManager.Instance.IsInState(GameStateMachine.State.MainMenuDisplayed, GameStateMachine.SubState.LoadScreenDisplayed) ||
+                       GameStateManager.Instance.IsInState(GameStateMachine.State.InGameMenuDisplayed, GameStateMachine.SubState.LoadScreenDisplayed)) {
+                //await HandleLoadScreenInput(@event);
+                 await HandleMenuInput(@event);
+            } // Add more state checks and handlers as needed
+              else if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.None) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.None)
+            || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)
+            || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed)
+            || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed)) {
+                await HandleMenuInput(@event);
+
+            }
+        } finally {
+            isProcessingInput = false;
+        }
+    }
+
+    //         else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None))
+    //     HandleDialogueInput(@event);
+
+
+    // else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed))
+    //     HandleSaveScreenInput(@event);
+
+
 
     private async Task HandleSaveScreenInput(InputEvent @event) {
         if (@event.IsActionPressed("ui_cancel")) {
             await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
-        }
-    }
-
-    private async Task HandleLoadScreeenInput(InputEvent @event) {
-        // if (@event.IsActionPressed("ui_accept")) {
-        //     GameStateManager.Instance.Fire(GameStateMachine.Trigger.DISPLAY_MAIN_MENU);
-        // }
-        if (@event.IsActionPressed("ui_cancel")) {
-            await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
+            MouseFilter = MouseFilterEnum.Stop;
         }
     }
 
     private async Task HandleSplashScreenInput(InputEvent @event) {
-        if (@event.IsActionPressed("ui_accept")) {
-            await UIManager.Instance.splashScreen.TransitionToMainMenu();
+        await UIManager.Instance.splashScreen.TransitionToMainMenu();
+    }
+
+    private async Task HandleLoadScreenInput(InputEvent @event) {
+        if (@event.IsActionPressed("ui_cancel")) {
+            await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
+        } else if (@event is InputEventMouseButton mouseButton && mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left) {
+            await HandleMouseClick();
+        } else if (@event.IsActionPressed("ui_accept")) {
+            await HandleMenuInput(@event);
         }
     }
 
-    private void OnGameStateChanged(GameStateMachine.State previousState, GameStateMachine.SubState previousSubstate,
+
+    // private async Task HandleLoadScreeenInput(InputEvent @event) {
+    //     // if (@event.IsActionPressed("ui_accept")) {
+    //     //     GameStateManager.Instance.Fire(GameStateMachine.Trigger.DISPLAY_MAIN_MENU);
+    //     // }
+    //     if (@event.IsActionPressed("ui_cancel")) {
+    //         await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
+    //     }
+    // }
+
+    // private async Task HandleSplashScreenInput(InputEvent @event) {
+    //     if (@event.IsActionPressed("ui_accept") && GameStateManager.Instance.IsInState(State.SplashScreenDisplayed, SubState.None)) {
+    //         await UIManager.Instance.splashScreen.TransitionToMainMenu();
+    //     }
+    // }
+
+    private async Task OnGameStateChanged(GameStateMachine.State previousState, GameStateMachine.SubState previousSubstate,
                                     GameStateMachine.State newState, GameStateMachine.SubState newSubState, object[] arguments) {
 
         // Store the current index if we're leaving a main menu or in-game menu
@@ -112,15 +170,16 @@ public partial class InputManager : Control {
             lastInGameMenuIndex = currentFocusedIndex;
         }
 
+        await UpdateFocusableControls(newState, newSubState);
+        await ClearButtonHighlights();
 
-        UpdateFocusableControls(newState, newSubState);
     }
 
 
     private int lastMainMenuIndex = -1;
     private int lastInGameMenuIndex = -1;
 
-    private void UpdateFocusableControls(State currentState, SubState subState) {
+    private async Task UpdateFocusableControls(State currentState, SubState subState) {
         focusableControls.Clear();
         currentFocusedIndex = -1; // Start with no button focused
         currentFocusedMenu = null;
@@ -133,6 +192,18 @@ public partial class InputManager : Control {
                 : 0;
         } else if (currentState == State.InGameMenuDisplayed && subState == SubState.None) {
             currentFocusedMenu = UIManager.Instance.mainMenu; // Assuming you have an inGameMenu
+            CollectFocusableControls(currentFocusedMenu);
+            currentFocusedIndex = (lastInGameMenuIndex >= 0 && lastInGameMenuIndex < focusableControls.Count)
+                ? lastInGameMenuIndex
+                : 0;
+
+                //ADD subState == SubState.LoadScreenInitialized
+                //ADD subState == SubState.LoadScreenInitialized
+                //ADD subState == SubState.LoadScreenInitialized
+                //ADD subState == SubState.LoadScreenInitialized
+                //ADD subState == SubState.LoadScreenInitialized
+        } else if (currentState == State.MainMenuDisplayed && subState == SubState.LoadScreenDisplayed) {
+            currentFocusedMenu = UIManager.Instance.saveGameScreen; // Assuming you have an inGameMenu
             CollectFocusableControls(currentFocusedMenu);
             currentFocusedIndex = (lastInGameMenuIndex >= 0 && lastInGameMenuIndex < focusableControls.Count)
                 ? lastInGameMenuIndex
@@ -162,7 +233,7 @@ public partial class InputManager : Control {
             currentFocusedIndex = -1;
         }
 
-        ClearButtonHighlights();
+        await ClearButtonHighlights();
     }
 
     private void CollectFocusableControls(Control container) {
@@ -179,57 +250,67 @@ public partial class InputManager : Control {
         return focusableControls.FindAll(control => control.Visible);
     }
 
-  private void HandleMouseMotion(InputEventMouseMotion mouseMotion) {
-    int newFocusedIndex = -1;
-    for (int i = 0; i < focusableControls.Count; i++) {
-        if (focusableControls[i] is Button button && button.GetGlobalRect().HasPoint(mouseMotion.GlobalPosition)) {
-            newFocusedIndex = i;
-            break;
-        }
-    }
-
-    if (newFocusedIndex != currentFocusedIndex) {
-        // Clear previous highlight
-        if (currentFocusedIndex != -1 && currentFocusedIndex < focusableControls.Count) {
-            ApplyButtonStyle(focusableControls[currentFocusedIndex] as Button, false);
+    private async Task HandleMouseMotion(InputEventMouseMotion mouseMotion) {
+        int newFocusedIndex = -1;
+        for (int i = 0; i < focusableControls.Count; i++) {
+            if (focusableControls[i] is Button button && button.GetGlobalRect().HasPoint(mouseMotion.GlobalPosition)) {
+                newFocusedIndex = i;
+                break;
+            }
         }
 
-        // Set new highlight
-        currentFocusedIndex = newFocusedIndex;
-        if (currentFocusedIndex != -1) {
-            ApplyButtonStyle(focusableControls[currentFocusedIndex] as Button, true);
-        }
-    }
-}
+        if (newFocusedIndex != currentFocusedIndex) {
+            // Clear previous highlight
+            if (currentFocusedIndex != -1 && currentFocusedIndex < focusableControls.Count) {
+                await ApplyButtonStyle(focusableControls[currentFocusedIndex] as Button, false);
+            }
 
-    private void ClearButtonHighlights() {
-        foreach (var control in focusableControls) {
-            if (control is Button button) {
-                ApplyButtonStyle(button, false);
-                button.ReleaseFocus();
+            // Set new highlight
+            currentFocusedIndex = newFocusedIndex;
+            if (currentFocusedIndex != -1) {
+                await ApplyButtonStyle(focusableControls[currentFocusedIndex] as Button, true);
             }
         }
     }
 
-    private void HandleMouseClick() {
-      if (currentFocusedIndex != -1 && currentFocusedIndex < focusableControls.Count) {
-        HandleMenuAccept();
+    private async Task ClearButtonHighlights() {
+        foreach (var control in focusableControls) {
+            if (control is Button button) {
+                await ApplyButtonStyle(button, false);
+                button.ReleaseFocus();
+            }
+        }
+        await Task.CompletedTask;
     }
+
+    private async Task HandleMouseClick() {
+        if (currentFocusedIndex != -1 && currentFocusedIndex < focusableControls.Count) {
+            await HandleMenuAccept();
+        } else {
+            // Check if the click is on any button, even if it wasn't the last hovered one
+            for (int i = 0; i < focusableControls.Count; i++) {
+                if (focusableControls[i] is Button button && button.GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
+                    currentFocusedIndex = i;
+                    await HandleMenuAccept();
+                    return;
+                }
+            }
+        }
 
         // If we reach here, the click was outside any menu button
         // No need to do anything, as Godot will handle clicks on other UI elements
     }
 
 
-    private void HandleMenuInput(InputEvent @event) {
+    private async Task HandleMenuInput(InputEvent @event) {
         float currentTime = (float)Time.GetTicksMsec() / 1000.0f;
         bool isVertical = GameStateManager.Instance.CurrentSubstate != SubState.ExitGameConfirmationPopupDisplayed &&
                           GameStateManager.Instance.CurrentSubstate != SubState.ExitToMainMenuConfirmationPopupDisplayed;
 
         if (@event is InputEventMouseButton mouseButton && mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left) {
-        HandleMouseClick();
-        return;
-    }
+            await HandleMouseClick();
+            return;
+        }
 
         if (isVertical) {
             if (CanProcessInput(currentTime) &&
@@ -237,14 +318,14 @@ public partial class InputManager : Control {
                  (@event is InputEventJoypadMotion joypadMotionUp &&
                   joypadMotionUp.Axis == JoyAxis.LeftY &&
                   joypadMotionUp.AxisValue < -STICK_THRESHOLD))) {
-                HandleVerticalNavigation(true);
+                await HandleVerticalNavigation(true);
                 lastInputTime = currentTime;
             } else if (CanProcessInput(currentTime) &&
                        (Input.IsActionPressed("ui_down") ||
                         (@event is InputEventJoypadMotion joypadMotionDown &&
                          joypadMotionDown.Axis == JoyAxis.LeftY &&
                          joypadMotionDown.AxisValue > STICK_THRESHOLD))) {
-                HandleVerticalNavigation(false);
+                await HandleVerticalNavigation(false);
                 lastInputTime = currentTime;
             }
         } else {
@@ -253,22 +334,22 @@ public partial class InputManager : Control {
                  (@event is InputEventJoypadMotion joypadMotionLeft &&
                   joypadMotionLeft.Axis == JoyAxis.LeftX &&
                   joypadMotionLeft.AxisValue < -STICK_THRESHOLD))) {
-                HandleHorizontalNavigation(true);
+                await HandleHorizontalNavigation(true);
                 lastInputTime = currentTime;
             } else if (CanProcessInput(currentTime) &&
                        (Input.IsActionPressed("ui_right") ||
                         (@event is InputEventJoypadMotion joypadMotionRight &&
                          joypadMotionRight.Axis == JoyAxis.LeftX &&
                          joypadMotionRight.AxisValue > STICK_THRESHOLD))) {
-                HandleHorizontalNavigation(false);
+                await HandleHorizontalNavigation(false);
                 lastInputTime = currentTime;
             }
         }
 
         if (Input.IsActionJustPressed("ui_accept")) {
-            HandleMenuAccept();
+            await HandleMenuAccept();
         } else if (Input.IsActionJustPressed("ui_cancel")) {
-            HandleMenuCancel();
+            await HandleMenuCancel();
         }
     }
 
@@ -276,48 +357,15 @@ public partial class InputManager : Control {
         return currentTime - lastInputTime >= INPUT_COOLDOWN;
     }
 
-    private void HandleVerticalNavigation(bool isUp) {
-        var visibleControls = GetVisibleFocusableControls();
-        if (visibleControls.Count == 0) return;
-
-        int currentVisibleIndex = currentFocusedIndex != -1 ? visibleControls.IndexOf(focusableControls[currentFocusedIndex]) : -1;
-
-        if (currentVisibleIndex == -1) {
-            currentVisibleIndex = isUp ? visibleControls.Count - 1 : 0;
-        } else {
-            currentVisibleIndex = (currentVisibleIndex + (isUp ? -1 : 1) + visibleControls.Count) % visibleControls.Count;
-        }
-
-        currentFocusedIndex = focusableControls.IndexOf(visibleControls[currentVisibleIndex]);
-        HighlightMenuButton(currentFocusedIndex);
-    }
-
-    private void HandleHorizontalNavigation(bool isLeft) {
-        var visibleControls = GetVisibleFocusableControls();
-        if (visibleControls.Count == 0) return;
-
-        int currentVisibleIndex = currentFocusedIndex != -1 ? visibleControls.IndexOf(focusableControls[currentFocusedIndex]) : -1;
-
-        if (currentVisibleIndex == -1) {
-            currentVisibleIndex = isLeft ? visibleControls.Count - 1 : 0;
-        } else {
-            currentVisibleIndex = (currentVisibleIndex + (isLeft ? -1 : 1) + visibleControls.Count) % visibleControls.Count;
-        }
-
-        currentFocusedIndex = focusableControls.IndexOf(visibleControls[currentVisibleIndex]);
-        HighlightMenuButton(currentFocusedIndex);
-    }
-
-    private bool isProcessingInput = false;
 
     private DateTime lastAcceptTime = DateTime.MinValue;
     private const int DEBOUNCE_MILLISECONDS = 500; // Adjust this value as needed
 
     // ... (existing code)
 
-    private async void HandleMenuAccept() {
+    private async Task HandleMenuAccept() {
         DateTime now = DateTime.Now;
-        if (isProcessingInput || (now - lastAcceptTime).TotalMilliseconds < DEBOUNCE_MILLISECONDS) {
+        if ((now - lastAcceptTime).TotalMilliseconds < DEBOUNCE_MILLISECONDS) {
             return;
         }
 
@@ -337,6 +385,9 @@ public partial class InputManager : Control {
                     button.EmitSignal(Button.SignalName.Pressed);
 
                     await tcs.Task;
+
+                    // Wait for any pending state changes to complete
+                    await Task.Yield();
                 } finally {
                     isProcessingInput = false;
                 }
@@ -361,6 +412,41 @@ public partial class InputManager : Control {
         // else if(GameStateManager.Instance.CurrentSubstate == SubState.LoadScreenDisplayed)
         //     await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
     }
+
+    private async Task HandleVerticalNavigation(bool isUp) {
+        var visibleControls = GetVisibleFocusableControls();
+        if (visibleControls.Count == 0) return;
+
+        int currentVisibleIndex = currentFocusedIndex != -1 ? visibleControls.IndexOf(focusableControls[currentFocusedIndex]) : -1;
+
+        if (currentVisibleIndex == -1) {
+            currentVisibleIndex = isUp ? visibleControls.Count - 1 : 0;
+        } else {
+            currentVisibleIndex = (currentVisibleIndex + (isUp ? -1 : 1) + visibleControls.Count) % visibleControls.Count;
+        }
+
+        currentFocusedIndex = focusableControls.IndexOf(visibleControls[currentVisibleIndex]);
+        await HighlightMenuButton(currentFocusedIndex);
+    }
+
+    private async Task HandleHorizontalNavigation(bool isLeft) {
+        var visibleControls = GetVisibleFocusableControls();
+        if (visibleControls.Count == 0) return;
+
+        int currentVisibleIndex = currentFocusedIndex != -1 ? visibleControls.IndexOf(focusableControls[currentFocusedIndex]) : -1;
+
+        if (currentVisibleIndex == -1) {
+            currentVisibleIndex = isLeft ? visibleControls.Count - 1 : 0;
+        } else {
+            currentVisibleIndex = (currentVisibleIndex + (isLeft ? -1 : 1) + visibleControls.Count) % visibleControls.Count;
+        }
+
+        currentFocusedIndex = focusableControls.IndexOf(visibleControls[currentVisibleIndex]);
+        await HighlightMenuButton(currentFocusedIndex);
+    }
+
+
+
 
 
     private void HandleDialogueInput(InputEvent @event) {
@@ -399,15 +485,15 @@ public partial class InputManager : Control {
     }
 
 
-    private void HighlightMenuButton(int index) {
+    private async Task HighlightMenuButton(int index) {
         for (int i = 0; i < focusableControls.Count; i++) {
             if (focusableControls[i] is Button button) {
-                ApplyButtonStyle(button, i == index);
+                await ApplyButtonStyle(button, i == index);
             }
         }
     }
 
-    private void ApplyButtonStyle(Button button, bool isHighlighted) {
+    private async Task ApplyButtonStyle(Button button, bool isHighlighted) {
 
         if (button == null) return;
 
@@ -422,6 +508,7 @@ public partial class InputManager : Control {
             button.AddThemeStyleboxOverride("hover", normalStyle);
             button.AddThemeStyleboxOverride("focus", normalStyle);
         }
+        await Task.CompletedTask;
     }
 
     private void HighlightPlayerChoice(int index, List<PlayerChoiceButton> choices) {

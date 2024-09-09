@@ -16,6 +16,7 @@ public partial class InGameMenuButton : MarginContainer {
     public async Task OnTextureButtonPressed() {
 
         DisableIngameMenuButton();
+        InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
 
         if (UIManager.Instance.mainMenu.MainOptionsContainer.Visible == false &&
                 GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
@@ -25,12 +26,19 @@ public partial class InGameMenuButton : MarginContainer {
             LoadSaveManager.Instance.PauseGameTimer();
             //await UIManager.Instance.mainMenu.DisplayInGameMenu();
             GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
+            DisableIngameMenuButton();
+            await UIFadeHelper.FadeInControl(textureButton, 0.3f);
+            EnableIngameMenuButton();
         } else {
             //LoadSaveManager.Instance.ResumeGameTimer();
             // await UIManager.Instance.mainMenu.CloseInGameMenu();
             await UIManager.Instance.mainMenu.CloseInGameMenu();
             // UIManager.Instance.mainMenu.Visible = false;
             GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+            DisableIngameMenuButton();
+            await UIFadeHelper.FadeOutControl(textureButton, 0.3f);
+            EnableIngameMenuButton();
+            InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
 
         }
 
@@ -44,6 +52,7 @@ public partial class InGameMenuButton : MarginContainer {
         textureButton.SetProcessInput(false);
         textureButton.MouseFilter = MouseFilterEnum.Ignore;
         textureButton.FocusMode = FocusModeEnum.None;
+        textureButton.SetProcessInput(false);
         //textureButton.Visible = false;
     }
 
@@ -51,6 +60,7 @@ public partial class InGameMenuButton : MarginContainer {
         textureButton.SetProcessInput(true);
         textureButton.MouseFilter = MouseFilterEnum.Stop;
         textureButton.FocusMode = FocusModeEnum.All;
+        textureButton.SetProcessInput(true);
         textureButton.Visible = true;
     }
 

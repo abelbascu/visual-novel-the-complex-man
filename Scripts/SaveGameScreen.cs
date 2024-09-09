@@ -137,15 +137,15 @@ public partial class SaveGameScreen : MarginContainer {
         goBackButton.SetProcessInput(true);
         goBackButton.MouseFilter = MouseFilterEnum.Stop;
 
-        if(GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
-             GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
-        else if(GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
+        if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+            GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+        else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
             GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
 
         InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
     }
 
-    public void SetUpSaveOrLoadScreen(bool isLoadScreen) {
+    public async Task<bool> SetUpSaveOrLoadScreen(bool isLoadScreen) {
         // Clear existing slots
         foreach (Node child in slotsContainer.GetChildren()) {
             child.QueueFree();
@@ -153,17 +153,21 @@ public partial class SaveGameScreen : MarginContainer {
         CreateNoSavesAvailableLabel();
 
         // Populate with appropriate slots
-        PopulateSaveOrLoadSlots(isLoadScreen);
+        await PopulateSaveOrLoadSlots(isLoadScreen);
 
         SetSlotButtonsState(false);
         DisableUserInput();
 
+        //give time to disable the slots before we continue
+        await Task.Yield();
+
+        //give time to disable the slots before we continue
+        // await Task.CompletedTask;
+
         InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
 
-        if (isLoadScreen)
-            GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
-        else
-            GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
+        return isLoadScreen;
+
     }
 
     //beware that we use this method to also displayed the Load Screen!!
@@ -195,7 +199,7 @@ public partial class SaveGameScreen : MarginContainer {
     }
 
 
-    private void PopulateSaveOrLoadSlots(bool isLoadScreen) {
+    private async Task PopulateSaveOrLoadSlots(bool isLoadScreen) {
         List<LoadSaveManager.GameState> saveGames = LoadSaveManager.Instance.GetSavedGames();
 
         //we first clean the screen of any remaining save or load button.
@@ -214,15 +218,15 @@ public partial class SaveGameScreen : MarginContainer {
             noSavesAvailableLabel.Visible = false;
             //if it's the Save screen, add a Save button on first row
             if (!isLoadScreen)
-                AddSaveOrLoadSlot(null, saveGames.Count + 1, isLoadScreen);
+                await AddSaveOrLoadSlot(null, saveGames.Count + 1, isLoadScreen);
 
             for (int i = 0; i < saveGames.Count; i++) {
-                AddSaveOrLoadSlot(saveGames[i], saveGames[i].SlotNumber, isLoadScreen);
+                await AddSaveOrLoadSlot(saveGames[i], saveGames[i].SlotNumber, isLoadScreen);
             }
         }
     }
 
-    private void AddSaveOrLoadSlot(LoadSaveManager.GameState gameState, int slotNumber, bool isLoadScreen) {
+    private async Task AddSaveOrLoadSlot(LoadSaveManager.GameState gameState, int slotNumber, bool isLoadScreen) {
         var slotInstance = saveGameSlotScene.Instantiate<SaveGameSlot>();
 
         slotsContainer.AddChild(slotInstance);
@@ -237,6 +241,8 @@ public partial class SaveGameScreen : MarginContainer {
         slotInstance.LoadRequested += OnLoadRequested;
 
         saveGameSlot = slotInstance;
+
+        await Task.CompletedTask;
     }
 
     private void OnSaveRequested(int slotNumber) {

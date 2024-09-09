@@ -7,7 +7,7 @@ public partial class SplashScreen : Control {
 
     public bool isExecuting = false;
 
-    public TextureRect backgroundTexture {get; private set;}
+    public TextureRect backgroundTexture { get; private set; }
     private RichTextLabel pressAnyKeyLabel;
     private UITextTweenFadeIn fadeIn;
     private UITextTweenFadeOut fadeOut;
@@ -32,7 +32,7 @@ public partial class SplashScreen : Control {
         fadeOut = new UITextTweenFadeOut();
 
         // Use CallDeferred with a lambda to call the async method
-        _ =FadeInScreen();
+        _ = FadeInScreen();
     }
 
     public async Task FadeInScreen() {
@@ -41,13 +41,12 @@ public partial class SplashScreen : Control {
         SetProcessInput(true);
     }
 
-    public async Task FadeOutScreen()
-{
-    SetProcessInput(false);
-    pressAnyKeyLabel.Visible = false;
-    await fadeOut.FadeOut(backgroundTexture, 0.5f);
-    Visible = false;
-}
+    public async Task FadeOutScreen() {
+        SetProcessInput(false);
+        pressAnyKeyLabel.Visible = false;
+        await fadeOut.FadeOut(backgroundTexture, 0.5f);
+        Visible = false;
+    }
 
     public override void _Process(double delta) {
         base._Process(delta);
@@ -65,7 +64,11 @@ public partial class SplashScreen : Control {
 
 
     public async Task TransitionToMainMenu() {
-        
+
+
+        GetViewport().SetInputAsHandled();
+        MouseFilter = MouseFilterEnum.Ignore;
+
         InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
 
         await EnsureInputIsDIsabled();
@@ -82,11 +85,13 @@ public partial class SplashScreen : Control {
         GetViewport().SetInputAsHandled();
 
         InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
+        MouseFilter = MouseFilterEnum.Stop;
+
     }
 
     private async Task EnsureInputIsDIsabled() {
-         SetProcessInput(false);
-         await Task.CompletedTask;
+        SetProcessInput(false);
+        await Task.CompletedTask;
     }
 
 }

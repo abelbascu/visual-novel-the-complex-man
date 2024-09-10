@@ -98,7 +98,8 @@ public partial class InputManager : Control {
             if (GameStateManager.Instance.IsInState(GameStateMachine.State.SplashScreenDisplayed, GameStateMachine.SubState.None)) {
                 await HandleSplashScreenInput(@event);
             } else if (GameStateManager.Instance.IsInState(GameStateMachine.State.MainMenuDisplayed, GameStateMachine.SubState.LoadScreenDisplayed) ||
-                       GameStateManager.Instance.IsInState(GameStateMachine.State.InGameMenuDisplayed, GameStateMachine.SubState.LoadScreenDisplayed)) {
+                       GameStateManager.Instance.IsInState(GameStateMachine.State.InGameMenuDisplayed, GameStateMachine.SubState.LoadScreenDisplayed) ||
+                       GameStateManager.Instance.IsInState(GameStateMachine.State.InGameMenuDisplayed, GameStateMachine.SubState.SaveScreenDisplayed)) {
                 //await HandleLoadScreenInput(@event);
                  await HandleMenuInput(@event);
             } // Add more state checks and handlers as needed
@@ -107,58 +108,20 @@ public partial class InputManager : Control {
             || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed)
             || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed)) {
                 await HandleMenuInput(@event);
-
+            }
+            else if(GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)){
+                
             }
         } finally {
             isProcessingInput = false;
         }
     }
 
-    //         else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None))
-    //     HandleDialogueInput(@event);
-
-
-    // else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed))
-    //     HandleSaveScreenInput(@event);
-
-
-
-    private async Task HandleSaveScreenInput(InputEvent @event) {
-        if (@event.IsActionPressed("ui_cancel")) {
-            await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
-            MouseFilter = MouseFilterEnum.Stop;
-        }
-    }
-
+ 
     private async Task HandleSplashScreenInput(InputEvent @event) {
         await UIManager.Instance.splashScreen.TransitionToMainMenu();
     }
 
-    private async Task HandleLoadScreenInput(InputEvent @event) {
-        if (@event.IsActionPressed("ui_cancel")) {
-            await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
-        } else if (@event is InputEventMouseButton mouseButton && mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left) {
-            await HandleMouseClick();
-        } else if (@event.IsActionPressed("ui_accept")) {
-            await HandleMenuInput(@event);
-        }
-    }
-
-
-    // private async Task HandleLoadScreeenInput(InputEvent @event) {
-    //     // if (@event.IsActionPressed("ui_accept")) {
-    //     //     GameStateManager.Instance.Fire(GameStateMachine.Trigger.DISPLAY_MAIN_MENU);
-    //     // }
-    //     if (@event.IsActionPressed("ui_cancel")) {
-    //         await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
-    //     }
-    // }
-
-    // private async Task HandleSplashScreenInput(InputEvent @event) {
-    //     if (@event.IsActionPressed("ui_accept") && GameStateManager.Instance.IsInState(State.SplashScreenDisplayed, SubState.None)) {
-    //         await UIManager.Instance.splashScreen.TransitionToMainMenu();
-    //     }
-    // }
 
     private async Task OnGameStateChanged(GameStateMachine.State previousState, GameStateMachine.SubState previousSubstate,
                                     GameStateMachine.State newState, GameStateMachine.SubState newSubState, object[] arguments) {
@@ -186,13 +149,13 @@ public partial class InputManager : Control {
 
         if (currentState == State.MainMenuDisplayed && subState == SubState.None) {
             currentFocusedMenu = UIManager.Instance.mainMenu;
-            CollectFocusableControls(currentFocusedMenu);
+            CollectFocusableMenuControls(currentFocusedMenu);
             currentFocusedIndex = (lastMainMenuIndex >= 0 && lastMainMenuIndex < focusableControls.Count)
                 ? lastMainMenuIndex
                 : 0;
         } else if (currentState == State.InGameMenuDisplayed && subState == SubState.None) {
             currentFocusedMenu = UIManager.Instance.mainMenu; // Assuming you have an inGameMenu
-            CollectFocusableControls(currentFocusedMenu);
+            CollectFocusableMenuControls(currentFocusedMenu);
             currentFocusedIndex = (lastInGameMenuIndex >= 0 && lastInGameMenuIndex < focusableControls.Count)
                 ? lastInGameMenuIndex
                 : 0;
@@ -204,25 +167,25 @@ public partial class InputManager : Control {
                 //ADD subState == SubState.LoadScreenInitialized
         } else if (currentState == State.MainMenuDisplayed && subState == SubState.LoadScreenDisplayed) {
             currentFocusedMenu = UIManager.Instance.saveGameScreen; // Assuming you have an inGameMenu
-            CollectFocusableControls(currentFocusedMenu);
+            CollectFocusableMenuControls(currentFocusedMenu);
             currentFocusedIndex = (lastInGameMenuIndex >= 0 && lastInGameMenuIndex < focusableControls.Count)
                 ? lastInGameMenuIndex
                 : 0;
         } else if (currentState == State.MainMenuDisplayed && subState == SubState.ExitGameConfirmationPopupDisplayed) {
             currentFocusedMenu = UIManager.Instance.mainMenu.ExitGameConfirmationPanel;
-            CollectFocusableControls(currentFocusedMenu);
+            CollectFocusableMenuControls(currentFocusedMenu);
             currentFocusedIndex = 0; // Focus on the first button in the submenu
         } else if (currentState == State.InGameMenuDisplayed && subState == SubState.ExitGameConfirmationPopupDisplayed) {
             currentFocusedMenu = UIManager.Instance.mainMenu.ExitGameConfirmationPanel;
-            CollectFocusableControls(currentFocusedMenu);
+            CollectFocusableMenuControls(currentFocusedMenu);
             currentFocusedIndex = 0; // Focus on the first button in the submenu
         } else if (currentState == State.InGameMenuDisplayed && subState == SubState.ExitToMainMenuConfirmationPopupDisplayed) {
             currentFocusedMenu = UIManager.Instance.mainMenu.ExitToMainMenuPanel;
-            CollectFocusableControls(currentFocusedMenu);
+            CollectFocusableMenuControls(currentFocusedMenu);
             currentFocusedIndex = 0; // Focus on the first button in the submenu
         } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && subState == SubState.LanguageMenuDisplayed) {
             currentFocusedMenu = UIManager.Instance.mainMenu.LanguageOptionsContainer;
-            CollectFocusableControls(currentFocusedMenu);
+            CollectFocusableMenuControls(currentFocusedMenu);
             currentFocusedIndex = 0; // Focus on the first button in the submenu
         } else if (currentState == State.SplashScreenDisplayed && subState == SubState.None) {
             currentFocusedMenu = UIManager.Instance.splashScreen;
@@ -236,12 +199,12 @@ public partial class InputManager : Control {
         await ClearButtonHighlights();
     }
 
-    private void CollectFocusableControls(Control container) {
+    private void CollectFocusableMenuControls(Control container) {
         foreach (var child in container.GetChildren()) {
             if (child is Button button && button.Visible) {
                 focusableControls.Add(button);
             } else if (child is Control control) {
-                CollectFocusableControls(control);
+                CollectFocusableMenuControls(control);
             }
         }
     }
@@ -444,9 +407,6 @@ public partial class InputManager : Control {
         currentFocusedIndex = focusableControls.IndexOf(visibleControls[currentVisibleIndex]);
         await HighlightMenuButton(currentFocusedIndex);
     }
-
-
-
 
 
     private void HandleDialogueInput(InputEvent @event) {

@@ -15,23 +15,23 @@ public partial class MainMenu : Control {
     public TextureRect mainMenuBackgroundImage;
 
     //Buttons
-    Button startNewGameButton;
-    Button saveGameButton;
-    Button continueGameButton;
-    Button loadGameButton;
-    Button languageButton;
-    Button creditsButton;
-    Button exitGameButton;
-    Button exitToMainMenuButton;
-    Button settingsButton;
-    Button languagesGoBackButton;
-    Button YesExitGameButton;
-    Button NoExitGameButton;
-    Button YesExitToMainMenuButton;
-    Button NoExitToMainMenuButton;
-    Button englishButton;
-    Button frenchButton;
-    Button catalanButton;
+    InteractableUIButton startNewGameButton;
+    InteractableUIButton saveGameButton;
+    InteractableUIButton continueGameButton;
+    InteractableUIButton loadGameButton;
+    InteractableUIButton languageButton;
+    InteractableUIButton creditsButton;
+    InteractableUIButton exitGameButton;
+    InteractableUIButton exitToMainMenuButton;
+    InteractableUIButton settingsButton;
+    InteractableUIButton languagesGoBackButton;
+    InteractableUIButton YesExitGameButton;
+    InteractableUIButton NoExitGameButton;
+    InteractableUIButton YesExitToMainMenuButton;
+    InteractableUIButton NoExitToMainMenuButton;
+    InteractableUIButton englishButton;
+    InteractableUIButton frenchButton;
+    InteractableUIButton catalanButton;
 
     //Button containers
     public HBoxContainer YesNoButtonsHBoxContainer;
@@ -88,36 +88,36 @@ public partial class MainMenu : Control {
         MainOptionsContainer = GetNode<VBoxContainer>("MainOptionsContainer");
 
         //main buttons
-        startNewGameButton = GetNode<Button>("MainOptionsContainer/StartNewGameButton");
-        saveGameButton = GetNode<Button>("MainOptionsContainer/SaveGameButton"); ;
-        continueGameButton = GetNode<Button>("MainOptionsContainer/ContinueButton"); ;
-        loadGameButton = GetNode<Button>("MainOptionsContainer/LoadGameButton");
-        languageButton = GetNode<Button>("MainOptionsContainer/LanguageButton");
-        settingsButton = GetNode<Button>("MainOptionsContainer/SettingsButton"); ;
-        creditsButton = GetNode<Button>("MainOptionsContainer/CreditsButton");
-        exitToMainMenuButton = GetNode<Button>("MainOptionsContainer/ExitToMainMenuButton");
-        exitGameButton = GetNode<Button>("MainOptionsContainer/ExitGameButton");
+        startNewGameButton = GetNode<InteractableUIButton>("MainOptionsContainer/StartNewGameButton");
+        saveGameButton = GetNode<InteractableUIButton>("MainOptionsContainer/SaveGameButton"); ;
+        continueGameButton = GetNode<InteractableUIButton>("MainOptionsContainer/ContinueButton"); ;
+        loadGameButton = GetNode<InteractableUIButton>("MainOptionsContainer/LoadGameButton");
+        languageButton = GetNode<InteractableUIButton>("MainOptionsContainer/LanguageButton");
+        settingsButton = GetNode<InteractableUIButton>("MainOptionsContainer/SettingsButton"); ;
+        creditsButton = GetNode<InteractableUIButton>("MainOptionsContainer/CreditsButton");
+        exitToMainMenuButton = GetNode<InteractableUIButton>("MainOptionsContainer/ExitToMainMenuButton");
+        exitGameButton = GetNode<InteractableUIButton>("MainOptionsContainer/ExitGameButton");
 
         //exit game panel
         ExitGameConfirmationPanel = GetNode<Panel>("%ExitGameConfirmationPanel");
-        YesExitGameButton = GetNode<Button>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer/YesExitGameButton");
-        NoExitGameButton = GetNode<Button>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer/NoExitGameButton");
+        YesExitGameButton = GetNode<InteractableUIButton>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer/YesExitGameButton");
+        NoExitGameButton = GetNode<InteractableUIButton>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer/NoExitGameButton");
         WantToQuitGameLabel = GetNode<RichTextLabel>("ExitGameConfirmationPanel/VBoxContainer/MarginContainer/WantToQuitGameLabel");
         YesNoButtonsHBoxContainer = GetNode<HBoxContainer>("ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer");
 
         //exit to main menu panel
         ExitToMainMenuPanel = GetNode<Panel>("ExitToMainMenuPanel");
-        YesExitToMainMenuButton = GetNode<Button>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/YesExitToMainMenuButton");
-        NoExitToMainMenuButton = GetNode<Button>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/NoExitToMainMenuButton");
+        YesExitToMainMenuButton = GetNode<InteractableUIButton>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/YesExitToMainMenuButton");
+        NoExitToMainMenuButton = GetNode<InteractableUIButton>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer/NoExitToMainMenuButton");
         WantToQuitToMainMenuLabel = GetNode<RichTextLabel>("ExitToMainMenuPanel/VBoxContainer/MarginContainer/WantToExitToMainMenuLabel");
         YesNoExitToMenuButtonsHBoxContainer = GetNode<HBoxContainer>("ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer");
 
         //languages panel
         LanguageOptionsContainer = GetNode<VBoxContainer>("LanguageOptionsContainer");
-        englishButton = GetNode<Button>("LanguageOptionsContainer/EnglishButton");
-        frenchButton = GetNode<Button>("LanguageOptionsContainer/FrenchButton");
-        catalanButton = GetNode<Button>("LanguageOptionsContainer/CatalanButton");
-        languagesGoBackButton = GetNode<Button>("LanguageOptionsContainer/GoBackButton");
+        englishButton = GetNode<InteractableUIButton>("LanguageOptionsContainer/EnglishButton");
+        frenchButton = GetNode<InteractableUIButton>("LanguageOptionsContainer/FrenchButton");
+        catalanButton = GetNode<InteractableUIButton>("LanguageOptionsContainer/CatalanButton");
+        languagesGoBackButton = GetNode<InteractableUIButton>("LanguageOptionsContainer/GoBackButton");
 
         //credits
         creditsConfirmationDialog = GetNode<ConfirmationDialog>("CreditsConfirmationDialog");
@@ -207,7 +207,7 @@ public partial class MainMenu : Control {
 
     private void ApplyCustomStyleToButtonsInContainer(Control container) {
         foreach (var child in container.GetChildren()) {
-            if (child is Button button) {
+            if (child is InteractableUIButton button) {
                 UIThemeHelper.ApplyCustomStyleToButton(button);
             } else if (child is Control) {
                 // Recursively apply style to children of this control
@@ -224,7 +224,7 @@ public partial class MainMenu : Control {
         await SetLanguageButtonsVisualStateAsync(false);
 
         //then disable them
-        foreach (Button button in LanguageOptionsContainer.GetChildren()) {
+        foreach (InteractableUIButton button in LanguageOptionsContainer.GetChildren()) {
             SetButtonActiveState(button, false);
         }
 
@@ -241,7 +241,7 @@ public partial class MainMenu : Control {
         }
 
         //enable language buttons again
-        foreach (Button button in LanguageOptionsContainer.GetChildren()) {
+        foreach (InteractableUIButton button in LanguageOptionsContainer.GetChildren()) {
             SetButtonActiveState(button, true);
         }
 
@@ -278,7 +278,7 @@ public partial class MainMenu : Control {
     //ENABLE-DISABLE BUTTONS METHODS
     //when the user clicks on any menu button, let's disable all buttons
     //to prevent race conditions and breaking the state machine.
-    private void DisableAllButtons() => SetAllButtonsState(false);
+    public void DisableAllButtons() => SetAllButtonsState(false);
     private void EnableAllButtons() => SetAllButtonsState(true);
 
     private void SetAllButtonsState(bool enabled) {
@@ -293,7 +293,7 @@ public partial class MainMenu : Control {
         SetButtonActiveState(settingsButton, enabled);
     }
 
-    private void SetButtonActiveState(Button button, bool enable) {
+    private void SetButtonActiveState(InteractableUIButton button, bool enable) {
         button.SetProcessInput(enable);
         button.MouseFilter = enable ? MouseFilterEnum.Stop : MouseFilterEnum.Ignore;
         button.FocusMode = enable ? FocusModeEnum.All : FocusModeEnum.None;
@@ -303,7 +303,7 @@ public partial class MainMenu : Control {
     public void SetContainerButtonsVisibility(Control container, bool isButtonsVisible) {
 
         foreach (var child in container.GetChildren()) {
-            if (child is Button button) {
+            if (child is InteractableUIButton button) {
                 button.Visible = isButtonsVisible;
                 GD.Print($"{button.Name} is now Visible:{button.Visible}");
             } else if (child is Control control)

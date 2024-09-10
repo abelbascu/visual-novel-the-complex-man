@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://df8r024e7wb0b"]
+[gd_scene load_steps=3 format=3 uid="uid://df8r024e7wb0b"]
 
 [ext_resource type="Script" path="res://Scripts/SaveGameScreen.cs" id="1_vav5h"]
+[ext_resource type="Script" path="res://Scripts/InteractableUIButton.cs" id="2_0t62v"]
 
 [node name="SaveGameScreen" type="MarginContainer"]
 anchors_preset = 15
@@ -61,3 +62,4 @@ size_flags_horizontal = 8
 size_flags_vertical = 0
 theme_override_font_sizes/font_size = 40
 text = "GO_BACK"
+script = ExtResource("2_0t62v")

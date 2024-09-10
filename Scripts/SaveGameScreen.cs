@@ -10,7 +10,7 @@ public partial class SaveGameScreen : MarginContainer {
     private ScrollContainer scrollContainer;
     public VBoxContainer slotsContainer;
     private MarginContainer marginContainer;
-    private Button goBackButton;
+    private InteractableUIButton goBackButton;
     private RichTextLabel noSavesAvailableLabel;
     public RichTextLabel SaveStatusLabel;
     private string noSavesTRANSLATE = "NO_SAVES_AVAILABLE";
@@ -20,6 +20,7 @@ public partial class SaveGameScreen : MarginContainer {
     private const int NOTIFY_SAVE_STATUS_LABEL_FONT_SIZE = 40;
     private UITextTweenFadeIn fadeIn;
     private UITextTweenFadeOut fadeOut;
+    public bool IsInteractable => Visible;
 
 
     public override void _Ready() {
@@ -37,7 +38,7 @@ public partial class SaveGameScreen : MarginContainer {
         marginContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
         marginContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 
-        goBackButton = GetNode<Button>("MarginContainer2/GoBackButton");
+        goBackButton = GetNode<InteractableUIButton>("MarginContainer2/GoBackButton");
         goBackButton.Pressed += () => _ = OnGoBackButtonPressed();
         goBackButton.SetProcessInput(false);
 
@@ -81,7 +82,7 @@ public partial class SaveGameScreen : MarginContainer {
     private void SetSlotButtonsState(bool enabled) {
         foreach (var child in slotsContainer.GetChildren()) {
             if (child is SaveGameSlot slot) {
-                var button = slot.GetNode<Button>("MarginContainer2/HBoxContainer/Button");
+                var button = slot.GetNode<InteractableUIButton>("MarginContainer2/HBoxContainer/Button");
                 if (button != null) {
                     button.SetProcessInput(enabled);
                     button.MouseFilter = enabled ? MouseFilterEnum.Stop : MouseFilterEnum.Ignore;

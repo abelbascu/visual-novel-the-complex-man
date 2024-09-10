@@ -184,6 +184,7 @@ public partial class GameManager : Control {
 
     public async Task Load_Game(string saveFilePath) {
 
+        //UIManager.Instance.mainMenu.DisableAllButtons();
         UIManager.Instance.menuOverlay.Visible = false;
         LoadSaveManager.Instance.LoadGame(saveFilePath);
         await UIManager.Instance.FadeInScreenOverlay(1.5f);

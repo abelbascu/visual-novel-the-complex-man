@@ -1,10 +1,11 @@
 using Godot;
 using System;
 
-public partial class DialogueLineLabel : RichTextLabel {
+public partial class DialogueLineLabel : RichTextLabel, IInteractableUI {
 
-    public Action LabelPressed;
+    public Action Pressed { get; set; }
     private const int LINE_SEPARATION = 5;
+    public bool IsInteractable => Visible;
 
 
     // Called when the node enters the scene tree for the first time.
@@ -13,7 +14,7 @@ public partial class DialogueLineLabel : RichTextLabel {
         MouseFilter = MouseFilterEnum.Stop;
         SetProcessInput(true);
 
-        LabelPressed += OnLabelPressed;
+        Pressed += OnPressed;
 
         BbcodeEnabled = true;
         FitContent = true;
@@ -33,14 +34,14 @@ public partial class DialogueLineLabel : RichTextLabel {
             mouseEvent.Pressed) {
             // Check if the click is within the bounds of the Label
             // if (this.GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
-            LabelPressed.Invoke();
+            Pressed.Invoke();
             GD.Print("Label area clicked!");
             GetViewport().SetInputAsHandled(); // Prevent the click from propagating
             //}
         }
     }
 
-    public void OnLabelPressed() {
+    public void OnPressed() {
         DialogueManager.Instance.OnDialogueBoxUIPressed();
     }
 

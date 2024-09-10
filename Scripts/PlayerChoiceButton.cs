@@ -3,7 +3,7 @@ using System;
 
 public partial class PlayerChoiceButton : MarginContainer {
     public DialogueObject dialogueObject { get; private set; }
-    private Button button;
+    private InteractableUIButton button;
     private RichTextLabel textLabel;
     private Color normalColor = Colors.White;
     private Color hoverColor = Colors.Yellow;
@@ -26,15 +26,11 @@ public partial class PlayerChoiceButton : MarginContainer {
         AddThemeConstantOverride("margin_bottom", 5);
 
         // Create and add TextureButton
-        button = new Button {
+        button = new InteractableUIButton {
             SizeFlagsHorizontal = SizeFlags.Fill,
             SizeFlagsVertical = SizeFlags.ShrinkCenter,
             CustomMinimumSize = new Vector2(BUTTON_WIDTH, SINGLE_LINE_HEIGHT) // Set initial minimum size
-            //HERE WE COULD SET THE NAME OF THE BUTTON FOR TRACKING PURPOSES LATER FOR THE INPUT MANAGER
-            //HERE WE COULD SET THE NAME OF THE BUTTON FOR TRACKING PURPOSES LATER FOR THE INPUT MANAGER
-            //HERE WE COULD SET THE NAME OF THE BUTTON FOR TRACKING PURPOSES LATER FOR THE INPUT MANAGER
-            //HERE WE COULD SET THE NAME OF THE BUTTON FOR TRACKING PURPOSES LATER FOR THE INPUT MANAGER
-
+         
         };
         AddChild(button);
 

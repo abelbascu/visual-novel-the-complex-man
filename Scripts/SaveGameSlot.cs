@@ -16,7 +16,7 @@ public partial class SaveGameSlot : HBoxContainer {
     private RichTextLabel timePlayedLabel;
     private RichTextLabel gameCompletedPercentageLabel;
 
-    public Button actionButton;
+    public InteractableUIButton actionButton;
     private MarginContainer marginContainer;
     private MarginContainer buttonContainer;
     private int slotNumber;
@@ -99,7 +99,7 @@ public partial class SaveGameSlot : HBoxContainer {
         gameCompletedPercentageLabel = GetNode<RichTextLabel>("MarginContainer/HBoxContainer/VBoxContainer2/MarginContainer2/GameCompletedPercent");
         thumbnailTextureRect = GetNode<TextureRect>("MarginContainer2/HBoxContainer/TextureRect");
         buttonContainer = GetNode<MarginContainer>("MarginContainer2");
-        actionButton = GetNode<Button>("MarginContainer2/HBoxContainer/Button");
+        actionButton = GetNode<InteractableUIButton>("MarginContainer2/HBoxContainer/Button");
         marginContainer = GetNode<MarginContainer>("MarginContainer");
 
         actionButton.Pressed += OnActionButtonPressed;

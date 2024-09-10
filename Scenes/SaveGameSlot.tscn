@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://b8rhgw7tu7jo4"]
+[gd_scene load_steps=4 format=3 uid="uid://b8rhgw7tu7jo4"]
 
 [ext_resource type="Script" path="res://Scripts/SaveGameSlot.cs" id="1_d8hvf"]
 [ext_resource type="Texture2D" uid="uid://dvmxcg1hidawy" path="res://Visuals/UI/dialogue box UI bckg transparent resized.png" id="2_n78ic"]
+[ext_resource type="Script" path="res://Scripts/InteractableUIButton.cs" id="3_gfcvr"]
 
 [node name="SaveGameSlot" type="HBoxContainer"]
 custom_minimum_size = Vector2(1200, 200)
@@ -86,6 +87,7 @@ layout_mode = 2
 [node name="Button" type="Button" parent="MarginContainer2/HBoxContainer"]
 custom_minimum_size = Vector2(400, 100)
 layout_mode = 2
+script = ExtResource("3_gfcvr")
 
 [node name="TextureRect" type="TextureRect" parent="MarginContainer2/HBoxContainer"]
 custom_minimum_size = Vector2(300, 0)

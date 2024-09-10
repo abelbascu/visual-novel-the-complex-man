@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://d38a20qw7dyh0"]
+[gd_scene load_steps=3 format=3 uid="uid://d38a20qw7dyh0"]
 
 [ext_resource type="Script" path="res://Scripts/MainMenu.cs" id="1_2ygpx"]
+[ext_resource type="Script" path="res://Scripts/InteractableUIButton.cs" id="2_0autq"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -48,6 +49,7 @@ layout_mode = 2
 theme_override_colors/icon_normal_color = Color(0, 0.854902, 0, 1)
 theme_override_font_sizes/font_size = 40
 text = "START_NEW_GAME"
+script = ExtResource("2_0autq")
 
 [node name="ContinueButton" type="Button" parent="MainOptionsContainer"]
 visible = false
@@ -55,18 +57,21 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "CONTINUE
 "
+script = ExtResource("2_0autq")
 
 [node name="SaveGameButton" type="Button" parent="MainOptionsContainer"]
 visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "SAVE_GAME"
+script = ExtResource("2_0autq")
 
 [node name="LoadGameButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "LOAD_GAME"
+script = ExtResource("2_0autq")
 
 [node name="LanguageButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
@@ -74,18 +79,21 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "LANGUAGE"
 autowrap_mode = 3
+script = ExtResource("2_0autq")
 
 [node name="SettingsButton" type="Button" parent="MainOptionsContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "SETTINGS
 "
+script = ExtResource("2_0autq")
 
 [node name="CreditsButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "CREDITS"
+script = ExtResource("2_0autq")
 
 [node name="ExitToMainMenuButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
@@ -93,12 +101,14 @@ visible = false
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "EXIT_TO_MAIN_MENU"
+script = ExtResource("2_0autq")
 
 [node name="ExitGameButton" type="Button" parent="MainOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "EXIT_TO_DESKTOP"
+script = ExtResource("2_0autq")
 
 [node name="LanguageOptionsContainer" type="VBoxContainer" parent="."]
 visible = false
@@ -121,30 +131,35 @@ layout_mode = 2
 theme_override_colors/icon_normal_color = Color(0, 0.854902, 0, 1)
 theme_override_font_sizes/font_size = 40
 text = "GO_BACK"
+script = ExtResource("2_0autq")
 
 [node name="EnglishButton" type="Button" parent="LanguageOptionsContainer"]
 layout_mode = 2
 theme_override_colors/icon_normal_color = Color(0, 0.854902, 0, 1)
 theme_override_font_sizes/font_size = 40
 text = "ENGLISH_BUTTON"
+script = ExtResource("2_0autq")
 
 [node name="FrenchButton" type="Button" parent="LanguageOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "FRENCH_BUTTON"
+script = ExtResource("2_0autq")
 
 [node name="CatalanButton" type="Button" parent="LanguageOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "CATALAN_BUTTON"
+script = ExtResource("2_0autq")
 
 [node name="UndefinedLanguageButton1" type="Button" parent="LanguageOptionsContainer"]
 auto_translate_mode = 1
 layout_mode = 2
 theme_override_font_sizes/font_size = 40
 text = "UNDEFINED_LANGUAGE1"
+script = ExtResource("2_0autq")
 
 [node name="ExitGameConfirmationPanel" type="Panel" parent="."]
 unique_name_in_owner = true
@@ -193,6 +208,7 @@ size_flags_horizontal = 0
 size_flags_vertical = 8
 theme_override_font_sizes/font_size = 38
 text = "YES"
+script = ExtResource("2_0autq")
 
 [node name="NoExitGameButton" type="Button" parent="ExitGameConfirmationPanel/VBoxContainer/YesNoButtonsHBoxContainer"]
 custom_minimum_size = Vector2(200, 75)
@@ -201,6 +217,7 @@ size_flags_horizontal = 8
 size_flags_vertical = 8
 theme_override_font_sizes/font_size = 38
 text = "NO"
+script = ExtResource("2_0autq")
 
 [node name="ExitToMainMenuPanel" type="Panel" parent="."]
 unique_name_in_owner = true
@@ -249,6 +266,7 @@ size_flags_horizontal = 0
 size_flags_vertical = 8
 theme_override_font_sizes/font_size = 38
 text = "YES"
+script = ExtResource("2_0autq")
 
 [node name="NoExitToMainMenuButton" type="Button" parent="ExitToMainMenuPanel/VBoxContainer/YesNoExitToMenuButtonsHBoxContainer"]
 custom_minimum_size = Vector2(200, 75)
@@ -257,3 +275,4 @@ size_flags_horizontal = 8
 size_flags_vertical = 8
 theme_override_font_sizes/font_size = 38
 text = "NO"
+script = ExtResource("2_0autq")

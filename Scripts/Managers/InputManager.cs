@@ -284,6 +284,11 @@ public partial class InputManager : Control {
   }
 
         // if (focusableControls[i] is IInteractableUI focusable && focusableControls[i].GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
+//TODO: r
+//? what's this
+//! take care
+//* this is important
+
   private async Task HandleMouseClick() {
 
     if (currentFocusedIndex != -1 && currentFocusedIndex < focusableControls.Count) {
@@ -373,6 +378,7 @@ public partial class InputManager : Control {
     if (currentFocusedIndex >= 0 && currentFocusedIndex < focusableControls.Count) {
       Control focusedControl = focusableControls[currentFocusedIndex];
       if (focusedControl is IInteractableUI interactable) {
+            await interactable.Interact();
         // try {
         //   isProcessingInput = true;
         //   lastAcceptTime = now;
@@ -391,7 +397,6 @@ public partial class InputManager : Control {
 
         //   }
         //   else {
-            await interactable.Interact();
         //   }
 
 
@@ -445,6 +450,7 @@ public partial class InputManager : Control {
     }
 
     currentFocusedIndex = focusableControls.IndexOf(visibleControls[currentVisibleIndex]);
+     GD.Print($"newFocusedIndex: {currentFocusedIndex}, control: {focusableControls[currentFocusedIndex].Name}");
     await HighlightMenuButton(currentFocusedIndex);
   }
 
@@ -461,6 +467,7 @@ public partial class InputManager : Control {
     }
 
     currentFocusedIndex = focusableControls.IndexOf(visibleControls[currentVisibleIndex]);
+     GD.Print($"newFocusedIndex: {currentFocusedIndex}, control: {focusableControls[currentFocusedIndex].Name}");
     await HighlightMenuButton(currentFocusedIndex);
   }
 

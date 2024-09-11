@@ -10,11 +10,11 @@ public partial class InGameMenuButton : MarginContainer {
 
     public override void _Ready() {
         textureButton = GetNode<InteractableUITextureButton>("TextureButton");
-        textureButton.Pressed += () => _ = OnTextureButtonPressed();
+        textureButton.Pressed += () => _ = OnPressed();
         textureButton.Visible = false;
     }
 
-    public async Task OnTextureButtonPressed() {
+    public async Task OnPressed() {
 
         DisableIngameMenuButton();
         InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);

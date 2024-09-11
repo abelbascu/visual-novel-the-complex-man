@@ -1,52 +1,59 @@
 using Godot;
 using System;
+using System.Threading.Tasks;
 
 public partial class DialogueLineLabel : RichTextLabel, IInteractableUI {
 
-    public Action Pressed { get; set; }
-    private const int LINE_SEPARATION = 5;
-    public bool IsInteractable => Visible;
+  public Action Pressed { get; set; }
+  private const int LINE_SEPARATION = 5;
+  public bool IsInteractable => Visible;
 
 
-    // Called when the node enters the scene tree for the first time.
-    public override void _Ready() {
+  // Called when the node enters the scene tree for the first time.
+  public override void _Ready() {
 
-        MouseFilter = MouseFilterEnum.Stop;
-        SetProcessInput(true);
-        FocusMode = FocusModeEnum.All;
+    MouseFilter = MouseFilterEnum.Stop;
+    SetProcessInput(true);
+    FocusMode = FocusModeEnum.All;
 
-        Pressed += OnPressed;
+    Pressed += OnPressed;
 
-        BbcodeEnabled = true;
-        FitContent = true;
-        ScrollActive = false;
+    BbcodeEnabled = true;
+    FitContent = true;
+    ScrollActive = false;
 
-        SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        SizeFlagsVertical = SizeFlags.ExpandFill;
+    SizeFlagsHorizontal = SizeFlags.ExpandFill;
+    SizeFlagsVertical = SizeFlags.ExpandFill;
 
-        AddThemeConstantOverride("line_separation", LINE_SEPARATION);
-        AddThemeFontSizeOverride("normal_font_size", 28);
-    }
+    AddThemeConstantOverride("line_separation", LINE_SEPARATION);
+    AddThemeFontSizeOverride("normal_font_size", 28);
+  }
 
-    public override void _GuiInput(InputEvent @event) {
-        if (@event is InputEventMouseButton mouseEvent &&
-            (mouseEvent.ButtonIndex == MouseButton.Left ||
-            mouseEvent.ButtonIndex == MouseButton.Right) &&
-            mouseEvent.Pressed) {
-            // Check if the click is within the bounds of the Label
-            // if (this.GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
-            Pressed.Invoke();
-            GD.Print("Label area clicked!");
-            GetViewport().SetInputAsHandled(); // Prevent the click from propagating
-            //}
-        }
-    }
+  public Task Interact() {
+    Pressed.Invoke();
+    return Task.CompletedTask;
+  }
 
-    public void OnPressed() {
-        DialogueManager.Instance.OnDialogueBoxUIPressed();
-    }
 
-    public void SetText(string text) {
-        Text = $"[left]{text}[/left]";
-    }
+//   public override void _GuiInput(InputEvent @event) {
+//     if (@event is InputEventMouseButton mouseEvent &&
+//         (mouseEvent.ButtonIndex == MouseButton.Left ||
+//         mouseEvent.ButtonIndex == MouseButton.Right) &&
+//         mouseEvent.Pressed) {
+//       // Check if the click is within the bounds of the Label
+//       // if (this.GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
+//       Pressed.Invoke();
+//       GD.Print("Label area clicked!");
+//       GetViewport().SetInputAsHandled(); // Prevent the click from propagating
+//                                          //}
+//     }
+//   }
+
+  public void OnPressed() {
+    DialogueManager.Instance.OnDialogueBoxUIPressed();
+  }
+
+  public void SetText(string text) {
+    Text = $"[left]{text}[/left]";
+  }
 }

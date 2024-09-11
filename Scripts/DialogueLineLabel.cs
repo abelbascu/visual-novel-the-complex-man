@@ -13,6 +13,7 @@ public partial class DialogueLineLabel : RichTextLabel, IInteractableUI {
 
         MouseFilter = MouseFilterEnum.Stop;
         SetProcessInput(true);
+        FocusMode = FocusModeEnum.All;
 
         Pressed += OnPressed;
 

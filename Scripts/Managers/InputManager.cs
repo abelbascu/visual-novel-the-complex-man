@@ -71,7 +71,7 @@ public partial class InputManager : Control {
 
     public override async void _Input(InputEvent @event) {
 
-        //GD.Print($"_GuiInput called with event: {@event}");
+        GD.Print($"_GuiInput called with event: {@event}");
 
         if (@event is InputEventMouseMotion mouseMotion) {
             HandleMouseMotion(mouseMotion);
@@ -186,7 +186,9 @@ public partial class InputManager : Control {
             focusableControls.Add(UIManager.Instance.splashScreen.backgroundTexture);
             currentFocusedIndex = 0;
         } else if (currentState == State.InDialogueMode && subState == SubState.None) {
-            currentFocusedMenu = UIManager.Instance;
+            CollectInteractableUIElements(UIManager.Instance.inGameMenuButton);
+            if(UIManager.Instance.dialogueBoxUI.Visible )
+            currentFocusedMenu = DialogueManager.Instance.dialogueBoxUI;
             CollectInteractableUIElements(currentFocusedMenu);
             currentFocusedIndex = 0; // Focus on the first button in the submenu
         } else {
@@ -207,9 +209,10 @@ public partial class InputManager : Control {
     //     }
     // }
 
+
     private void CollectInteractableUIElements(Node node) {
         if (node is IInteractableUI interactable && interactable.IsInteractable) {
-            focusableControls.Add(node as Control);
+            focusableControls.Add( node as Control);
         }
 
         foreach (var child in node.GetChildren()) {
@@ -221,13 +224,37 @@ public partial class InputManager : Control {
         return focusableControls.FindAll(control => control.Visible);
     }
 
+
+       private void ConnectAllControlsGuiInput(Control parent) {
+        foreach (var node in parent.GetChildren()) {
+            if (node is Control control) {
+                control.GuiInput += (InputEvent @event) => OnControlGuiInput(@event, control);
+                ConnectAllControlsGuiInput(control);
+            }
+        }
+    }
+
+    private void OnControlGuiInput(InputEvent @event, Control clickedControl) {
+        if (@event is InputEventMouseButton mouseEvent &&
+            mouseEvent.Pressed &&
+            mouseEvent.ButtonIndex == MouseButton.Left) {
+            HandleClick(clickedControl);
+        }
+    }
+
+        private void HandleClick(Control clickedControl) {
+        GD.Print($"Clicked on: {clickedControl.Name} (Type: {clickedControl.GetType().Name})");
+        // Add your custom click handling logic here
+    }
+
+
     private async Task HandleMouseMotion(InputEventMouseMotion mouseMotion) {
         int newFocusedIndex = -1;
         for (int i = 0; i < focusableControls.Count; i++) {
             if (focusableControls[i] is InteractableUIButton button && button.GetGlobalRect().HasPoint(mouseMotion.GlobalPosition)) {
                 newFocusedIndex = i;
                 currentFocusedIndex = newFocusedIndex;
-                GD.Print($"newFocusedIndex: {newFocusedIndex}");
+                GD.Print($"newFocusedIndex: {newFocusedIndex}, control: {focusableControls[i].Name}");
                 break;
             }
         }
@@ -263,7 +290,7 @@ public partial class InputManager : Control {
         } else {
             // Check if the click is on any button, even if it wasn't the last hovered one
             for (int i = 0; i < focusableControls.Count; i++) {
-                if (focusableControls[i] is InteractableUIButton button && button.GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
+                if (focusableControls[i] is IInteractableUI && focusableControls[i].GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
                     currentFocusedIndex = i;
                     await HandleMenuAccept();
                     return;

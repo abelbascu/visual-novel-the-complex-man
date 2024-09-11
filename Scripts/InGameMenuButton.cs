@@ -5,10 +5,11 @@ using static GameStateMachine;
 
 public partial class InGameMenuButton : MarginContainer {
 
-    TextureButton textureButton;
+    InteractableUITextureButton textureButton;
+    public bool IsInteractable => Visible;
 
     public override void _Ready() {
-        textureButton = GetNode<TextureButton>("TextureButton");
+        textureButton = GetNode<InteractableUITextureButton>("TextureButton");
         textureButton.Pressed += () => _ = OnTextureButtonPressed();
         textureButton.Visible = false;
     }

@@ -58,8 +58,14 @@ public partial class MainMenu : Control {
   private RichTextLabel WantToQuitGameLabel;
   private RichTextLabel WantToQuitToMainMenuLabel;
 
+  public InputBlocker inputBlocker{get; private set;}
+
+
+
 
   public override void _Ready() {
+
+    inputBlocker = new InputBlocker();
 
     GetUINodes();
     SetupButtonEvents();
@@ -331,14 +337,16 @@ public partial class MainMenu : Control {
 
 
   public async Task DisplayMainMenuContainerOnly() {
-    DisableAllButtons();
-    EnableAllButtons();
-    //this calls to pause the game timer, more sense on ingame menu
-    //but can be used to autosave game while user exits current game
-    SetupForMainMenu();
-    await UIFadeHelper.FadeInControl(MainOptionsContainer);
-    MainMenuOpened?.Invoke();
-    GameStateManager.Instance.Fire(Trigger.MAIN_MENU_DISPLAYED);
+    await inputBlocker.BlockNewInput(async () => {
+      DisableAllButtons();
+      //this calls to pause the game timer, more sense on ingame menu
+      //but can be used to autosave game while user exits current game
+      SetupForMainMenu();
+      await UIFadeHelper.FadeInControl(MainOptionsContainer);
+      EnableAllButtons();
+      MainMenuOpened?.Invoke();
+      GameStateManager.Instance.Fire(Trigger.MAIN_MENU_DISPLAYED);
+    });
   }
 
   public async Task DisplayMainMenu() {
@@ -440,24 +448,28 @@ public partial class MainMenu : Control {
   }
 
   public async Task DisplayInGameMenu() {
-    SetContainerButtonsVisibility(LanguageOptionsContainer, false);
-    SetContainerButtonsVisibility(ExitGameConfirmationPanel, false);
-    SetContainerButtonsVisibility(ExitToMainMenuPanel, false);
-    SetContainerButtonsVisibility(MainOptionsContainer, false);
 
-    SetupIngameMenuButtonVisibility();
+    await inputBlocker.BlockNewInput(async () => {
 
-    DisableAllButtons();
-    SetupUIForInGameMenu();
-    MainOptionsContainer.Show();
-    MainOptionsContainer.Modulate = new Color(1, 1, 1, 1);  // Full opacity
-    MainOptionsContainer.TopLevel = true;
-    await UIFadeHelper.FadeInControl(MainOptionsContainer, 0.6f);
-    MainOptionsContainer.SetProcessInput(true);
-    EnableAllButtons();
-    ShowIngameMenuIcon();
-    GameStateManager.Instance.Fire(Trigger.INGAME_MENU_DISPLAYED);
-    InGameMenuOpened?.Invoke();
+      SetContainerButtonsVisibility(LanguageOptionsContainer, false);
+      SetContainerButtonsVisibility(ExitGameConfirmationPanel, false);
+      SetContainerButtonsVisibility(ExitToMainMenuPanel, false);
+      SetContainerButtonsVisibility(MainOptionsContainer, false);
+
+      SetupIngameMenuButtonVisibility();
+
+      DisableAllButtons();
+      SetupUIForInGameMenu();
+      MainOptionsContainer.Show();
+      MainOptionsContainer.Modulate = new Color(1, 1, 1, 1);  // Full opacity
+      MainOptionsContainer.TopLevel = true;
+      await UIFadeHelper.FadeInControl(MainOptionsContainer, 0.6f);
+      MainOptionsContainer.SetProcessInput(true);
+      EnableAllButtons();
+      ShowIngameMenuIcon();
+      GameStateManager.Instance.Fire(Trigger.INGAME_MENU_DISPLAYED);
+      InGameMenuOpened?.Invoke();
+    });
   }
 
 
@@ -501,81 +513,96 @@ public partial class MainMenu : Control {
 
 
   public async Task CloseInGameMenu() {
-    DisableAllButtons();
-    MainOptionsContainer.SetProcessInput(false);
-    UIManager.Instance.menuOverlay.Visible = false;
-    await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
-    MainOptionsContainer.Visible = false;
-    InGameMenuClosed?.Invoke();
+    await inputBlocker.BlockNewInput(async () => {
+      DisableAllButtons();
+      MainOptionsContainer.SetProcessInput(false);
+      UIManager.Instance.menuOverlay.Visible = false;
+      await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
+      MainOptionsContainer.Visible = false;
+      InGameMenuClosed?.Invoke();
+    });
   }
 
   //Start new game
   private async Task OnStartNewGameButtonPressed() {
-    DisableAllButtons();
-    HideIngameMenuIcon();
-    await FadeOutMainMenu();
-    StartNewGameButtonPressed.Invoke();
-    GameStateManager.Instance.Fire(Trigger.START_NEW_GAME);
+    await inputBlocker.BlockNewInput(async () => {
+      DisableAllButtons();
+      HideIngameMenuIcon();
+      await FadeOutMainMenu();
+      StartNewGameButtonPressed.Invoke();
+      GameStateManager.Instance.Fire(Trigger.START_NEW_GAME);
+    });
   }
 
   //Continue game
   private async Task OnContinueButtonPressed() {
-    DisableAllButtons();
-    ShowIngameMenuIcon();
-    await CloseInGameMenu();
-    GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
-    SetButtonActiveState(continueGameButton, true);
+    await inputBlocker.BlockNewInput(async () => {
+      DisableAllButtons();
+      ShowIngameMenuIcon();
+      await CloseInGameMenu();
+      GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+      SetButtonActiveState(continueGameButton, true);
+    });
   }
 
   //Save game
   private async Task OnSaveGameButtonPressed() {
-    DisableAllButtons();
-    HideIngameMenuIcon();
-    await CloseInGameMenu();
-    GameStateManager.Instance.Fire(Trigger.INITIALIZE_SAVE_SCREEN);
+    await inputBlocker.BlockNewInput(async () => {
+      DisableAllButtons();
+      HideIngameMenuIcon();
+      await CloseInGameMenu();
+      GameStateManager.Instance.Fire(Trigger.INITIALIZE_SAVE_SCREEN);
+    });
   }
 
   //Load Game
   private async Task OnLoadGameButtonPressed() {
-    HideIngameMenuIcon();
-    DisableAllButtons();
-    GameStateManager.Instance.Fire(Trigger.INITIALIZE_LOAD_SCREEN);
+    await inputBlocker.BlockNewInput(async () => {
+      HideIngameMenuIcon();
+      DisableAllButtons();
+      GameStateManager.Instance.Fire(Trigger.INITIALIZE_LOAD_SCREEN);
+    });
   }
 
   //Language options
   private async Task OnLanguageButtonPressed() {
-    HideIngameMenuIcon();
-    DisableAllButtons();
-    await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
-    SetContainerButtonsVisibility(MainOptionsContainer, false);
-    SetContainerButtonsVisibility(LanguageOptionsContainer, true);
-    GameStateManager.Instance.Fire(Trigger.DISPLAY_LANGUAGE_MENU);
-    EnableAllButtons();
+    await inputBlocker.BlockNewInput(async () => {
+      HideIngameMenuIcon();
+      DisableAllButtons();
+      await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
+      SetContainerButtonsVisibility(MainOptionsContainer, false);
+      SetContainerButtonsVisibility(LanguageOptionsContainer, true);
+      GameStateManager.Instance.Fire(Trigger.DISPLAY_LANGUAGE_MENU);
+      EnableAllButtons();
+    });
   }
 
   public async Task DisplayLanguageMenu() {
-    LanguageOptionsContainer.Visible = true;
-    LanguageOptionsContainer.TopLevel = true;
-    await UIFadeHelper.FadeInControl(LanguageOptionsContainer);
+    await inputBlocker.BlockNewInput(async () => {
+      LanguageOptionsContainer.Visible = true;
+      LanguageOptionsContainer.TopLevel = true;
+      await UIFadeHelper.FadeInControl(LanguageOptionsContainer);
+    });
   }
 
   public async Task OnLanguagesGoBackButtonPressed() {
+    await inputBlocker.BlockNewInput(async () => {
+      if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
+        ShowIngameMenuIcon();
 
-    if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
-      ShowIngameMenuIcon();
+      SetButtonActiveState(languagesGoBackButton, false);
+      GetTree().CallGroup("popups", "close_all");
+      await UIFadeHelper.FadeOutControl(LanguageOptionsContainer, 0.6f);
 
-    SetButtonActiveState(languagesGoBackButton, false);
-    GetTree().CallGroup("popups", "close_all");
-    await UIFadeHelper.FadeOutControl(LanguageOptionsContainer, 0.6f);
+      SetButtonActiveState(languagesGoBackButton, true);
+      DisableAllButtons();
 
-    SetButtonActiveState(languagesGoBackButton, true);
-    DisableAllButtons();
-
-    if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
-      GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
-    else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
-      GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
-    //EnableAllButtons();
+      if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+      else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
+      //EnableAllButtons();
+    });
   }
 
   private async void OnEnglishButtonPressed() => await UpdateTextsBasedOnLocale("en");
@@ -584,125 +611,161 @@ public partial class MainMenu : Control {
 
   //Credits
   private async Task OnCreditsButtonPressed() {
-    HideIngameMenuIcon();
-    DisableAllButtons();
-    await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
-    GameStateManager.Instance.Fire(Trigger.DISPLAY_CREDITS);
-    creditsConfirmationDialog.Show();
-    await UIFadeHelper.FadeInWindow(creditsConfirmationDialog, 0.4f);
+    await inputBlocker.BlockNewInput(async () => {
+      HideIngameMenuIcon();
+      DisableAllButtons();
+      await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
+      GameStateManager.Instance.Fire(Trigger.DISPLAY_CREDITS);
+      creditsConfirmationDialog.Show();
+      await UIFadeHelper.FadeInWindow(creditsConfirmationDialog, 0.4f);
+    });
   }
 
   private async Task OnCreditsCancelOrConfirmButtonPressed() {
-    await UIFadeHelper.FadeOutWindow(creditsConfirmationDialog, 0.2f);
-    EnableAllButtons();
-    GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+    await inputBlocker.BlockNewInput(async () => {
+      DisableAllButtons();
+      await UIFadeHelper.FadeOutWindow(creditsConfirmationDialog, 0.2f);
+      //EnableAllButtons();
+      GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+    });
   }
 
   //Exit to Main Menu
   public async void OnExitToMainMenuButtonPressed() {
-    DisableAllButtons();
-    HideIngameMenuIcon();
-    await ShowExitToMainMenuConfirmationPopup();
+    await inputBlocker.BlockNewInput(async () => {
+      DisableAllButtons();
+      HideIngameMenuIcon();
+      await ShowExitToMainMenuConfirmationPopup();
+    });
   }
 
   public async Task ShowExitToMainMenuConfirmationPopup() {
-    DisableAllButtons();
-    SetButtonActiveState(NoExitToMainMenuButton, false);
-    SetContainerButtonsVisibility(MainOptionsContainer, false);
-    await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
-    SetButtonActiveState(YesExitToMainMenuButton, false);
-    ExitToMainMenuPanel.Visible = true;
-    ExitToMainMenuPanel.TopLevel = true;
-    SetContainerButtonsVisibility(YesNoExitToMenuButtonsHBoxContainer, true);
-    await UIFadeHelper.FadeInControl(ExitToMainMenuPanel, 0.5f);
-    SetButtonActiveState(NoExitToMainMenuButton, true);
-    SetButtonActiveState(YesExitToMainMenuButton, true);
-    GameStateManager.Instance.Fire(Trigger.DISPLAY_EXIT_TO_MAIN_MENU_CONFIRMATION_POPUP);
-  }
-
-  private async Task OnExitToMainMenuConfirmButtonPressed() {
-    SetButtonActiveState(NoExitToMainMenuButton, false);
-    SetButtonActiveState(YesExitToMainMenuButton, false);
-    HideIngameMenuIcon();
-    await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.5f);
-
-    GD.Print($"Last Game mode before exit to Main Menu: {GameStateManager.Instance.LastGameMode}");
-
-    if (GameStateManager.Instance.LastGameMode == State.InDialogueMode) {
-      await HandleExitFromDialogueMode();
-    }
-
-    EnableAllButtons();
-    GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
-  }
-
-  private async Task HandleExitFromDialogueMode() {
-    UIManager.Instance.fadeOverlay.TopLevel = true;
-    await UIManager.Instance.FadeInScreenOverlay(1.5f);
-    UIManager.Instance.dialogueBoxUI.Hide();
-    UIManager.Instance.playerChoicesBoxUI.Hide();
-    VisualManager.Instance.RemoveImage();
+    await inputBlocker.BlockNewInput(async () => {
+      DisableAllButtons();
+      SetButtonActiveState(NoExitToMainMenuButton, false);
+      SetContainerButtonsVisibility(MainOptionsContainer, false);
+      await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
+      SetButtonActiveState(YesExitToMainMenuButton, false);
+      ExitToMainMenuPanel.Visible = true;
+      ExitToMainMenuPanel.TopLevel = true;
+      SetContainerButtonsVisibility(YesNoExitToMenuButtonsHBoxContainer, true);
+      await UIFadeHelper.FadeInControl(ExitToMainMenuPanel, 0.5f);
+      SetButtonActiveState(NoExitToMainMenuButton, true);
+      SetButtonActiveState(YesExitToMainMenuButton, true);
+      GameStateManager.Instance.Fire(Trigger.DISPLAY_EXIT_TO_MAIN_MENU_CONFIRMATION_POPUP);
+    });
   }
 
   private async Task OnExitToMainMenuCancelButtonPressed() {
-    SetButtonActiveState(NoExitToMainMenuButton, false);
-    SetButtonActiveState(YesExitToMainMenuButton, false);
-    await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.6f);
-    ShowIngameMenuIcon();
-    SetButtonActiveState(NoExitToMainMenuButton, false);
-    SetButtonActiveState(YesExitToMainMenuButton, false);
-    GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
-    EnableAllButtons();
+    await inputBlocker.BlockNewInput(async () => {
+      SetButtonActiveState(NoExitToMainMenuButton, false);
+      SetButtonActiveState(YesExitToMainMenuButton, false);
+      await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.6f);
+      ShowIngameMenuIcon();
+      SetButtonActiveState(NoExitToMainMenuButton, false);
+      SetButtonActiveState(YesExitToMainMenuButton, false);
+      GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
+      EnableAllButtons();
+    });
   }
+
+  private async Task OnExitToMainMenuConfirmButtonPressed() {
+    await inputBlocker.BlockNewInput(async () => {
+      SetButtonActiveState(NoExitToMainMenuButton, false);
+      SetButtonActiveState(YesExitToMainMenuButton, false);
+      HideIngameMenuIcon();
+      await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.5f);
+
+      GD.Print($"Last Game mode before exit to Main Menu: {GameStateManager.Instance.LastGameMode}");
+
+      if (GameStateManager.Instance.LastGameMode == State.InDialogueMode) {
+        await HandleExitFromDialogueMode();
+      }
+
+      EnableAllButtons();
+      GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+    });
+  }
+
+  private async Task HandleExitFromDialogueMode() {
+    await inputBlocker.BlockNewInput(async () => {
+      UIManager.Instance.fadeOverlay.TopLevel = true;
+      await UIManager.Instance.FadeInScreenOverlay(1.5f);
+      UIManager.Instance.dialogueBoxUI.Hide();
+      UIManager.Instance.playerChoicesBoxUI.Hide();
+      VisualManager.Instance.RemoveImage();
+    });
+  }
+
 
   //Exit game
   public async Task OnExitGameButtonPressed() {
-    SetButtonActiveState(exitGameButton, false);
-    DisableAllButtons();
-    HideIngameMenuIcon();
-    await ShowExitGameConfirmationPopup();
-    EnableAllButtons();
-    SetButtonActiveState(exitGameButton, true);
+    await inputBlocker.BlockNewInput(async () => {
+      SetButtonActiveState(exitGameButton, false);
+      DisableAllButtons();
+      HideIngameMenuIcon();
+      SetContainerButtonsVisibility(ExitGameConfirmationPanel, true);
+      SetButtonActiveState(NoExitGameButton, true);
+      SetButtonActiveState(YesExitGameButton, true);
+      await ShowExitGameConfirmationPopup();
+      SetAllButtonsVisibility(false);
+      //EnableAllButtons();
+      // SetButtonActiveState(exitGameButton, true);
+    });
   }
 
   public async Task ShowExitGameConfirmationPopup() {
-    DisableAllButtons();
-    await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
-    SetContainerButtonsVisibility(MainOptionsContainer, false);
-    SetContainerButtonsVisibility(ExitGameConfirmationPanel, true);
-    ExitGameConfirmationPanel.Visible = true;
-    ExitGameConfirmationPanel.TopLevel = true;
-    SetButtonActiveState(NoExitGameButton, false);
-    SetButtonActiveState(YesExitGameButton, false);
-    await UIFadeHelper.FadeInControl(ExitGameConfirmationPanel, 0.6f);
-    SetButtonActiveState(NoExitGameButton, true);
-    SetButtonActiveState(YesExitGameButton, true);
-    GameStateManager.Instance.Fire(Trigger.DISPLAY_EXIT_GAME_MENU_CONFIRMATION_POPUP);
+
+    await inputBlocker.BlockNewInput(async () => {
+      DisableAllButtons();
+      await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
+      SetContainerButtonsVisibility(MainOptionsContainer, false);
+      SetContainerButtonsVisibility(ExitGameConfirmationPanel, true);
+      ExitGameConfirmationPanel.Visible = true;
+      ExitGameConfirmationPanel.TopLevel = true;
+      SetButtonActiveState(NoExitGameButton, false);
+      SetButtonActiveState(YesExitGameButton, false);
+      await UIFadeHelper.FadeInControl(ExitGameConfirmationPanel, 0.6f);
+      SetButtonActiveState(NoExitGameButton, true);
+      SetButtonActiveState(YesExitGameButton, true);
+      GameStateManager.Instance.Fire(Trigger.DISPLAY_EXIT_GAME_MENU_CONFIRMATION_POPUP);
+    });
   }
 
   private async Task OnExitGameConfirmButtonPressed() {
-    SetButtonActiveState(NoExitGameButton, false);
-    SetButtonActiveState(YesExitGameButton, false);
-    HideIngameMenuIcon();
-    await UIFadeHelper.FadeOutControl(ExitGameConfirmationPanel, 1.2f);
-    GameStateManager.Instance.Fire(Trigger.EXIT_GAME);
+
+    await inputBlocker.BlockNewInput(async () => {
+      SetButtonActiveState(NoExitGameButton, false);
+      SetButtonActiveState(YesExitGameButton, false);
+      HideIngameMenuIcon();
+      await UIFadeHelper.FadeOutControl(ExitGameConfirmationPanel, 1.2f);
+      GameStateManager.Instance.Fire(Trigger.EXIT_GAME);
+    });
   }
 
+
+  private bool isTransitioning = false;
+
   public async Task OnExitGameCancelButtonPressed() {
-    SetButtonActiveState(NoExitGameButton, false);
-    SetButtonActiveState(YesExitGameButton, false);
-    DisableAllButtons();
-    await UIFadeHelper.FadeOutControl(ExitGameConfirmationPanel, 0.6f);
 
-    //await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);
-    SetButtonActiveState(NoExitGameButton, true);
-    SetButtonActiveState(YesExitGameButton, true);
+    await inputBlocker.BlockNewInput(async () => {
+      SetButtonActiveState(NoExitGameButton, false);
+      SetButtonActiveState(YesExitGameButton, false);
+      DisableAllButtons();
+      await UIFadeHelper.FadeOutControl(ExitGameConfirmationPanel, 0.6f);
 
-    GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
-    EnableAllButtons();
+      //await UIFadeHelper.FadeInControl(MainOptionsContainer, 1.0f);
+      // SetButtonActiveState(NoExitGameButton, true);
+      // SetButtonActiveState(YesExitGameButton, true);
+
+      GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+      //EnableAllButtons();
+    });
+
   }
 
 }
+
 
 
 

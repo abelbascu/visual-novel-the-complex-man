@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://bmtre6kqrxwmu" path="res://Scenes/InputNameScreen.tscn" id="5_6qnj0"]
 [ext_resource type="PackedScene" uid="uid://11fx20rqcq14" path="res://Scenes/SplashScreen.tscn" id="6_l6sjf"]
 
-[node name="UiManager" type="Control"]
+[node name="UIManager" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0

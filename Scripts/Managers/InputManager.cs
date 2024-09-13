@@ -205,7 +205,7 @@ public partial class InputManager : Control {
       // GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
       currentFocusedMenu = UIManager.Instance.mainMenu; 
       GetInteractableUIElements(currentFocusedMenu);
-      currentFocusedIndex = 0;
+      currentFocusedIndex =  -1;
       // currentFocusedIndex = (lastInGameMenuIndex >= 0 && lastInGameMenuIndex < focusableControls.Count)
       //     ? lastInGameMenuIndex
       //     : -1;

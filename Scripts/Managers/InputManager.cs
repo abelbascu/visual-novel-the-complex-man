@@ -202,10 +202,10 @@ public partial class InputManager : Control {
           : -1;
       //INGAME MENU -------------------------------
     } else if (currentState == State.InGameMenuDisplayed && subState == SubState.None) {
-      GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
+      // GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
       currentFocusedMenu = UIManager.Instance.mainMenu; 
       GetInteractableUIElements(currentFocusedMenu);
-      currentFocusedIndex = -1;
+      currentFocusedIndex = 0;
       // currentFocusedIndex = (lastInGameMenuIndex >= 0 && lastInGameMenuIndex < focusableControls.Count)
       //     ? lastInGameMenuIndex
       //     : -1;
@@ -236,7 +236,7 @@ public partial class InputManager : Control {
       currentFocusedIndex = -1; // Focus on the first button in the submenu
       //DIALOGUE MODE------------------------------
     } else if (currentState == State.InDialogueMode && subState == SubState.None) {
-      GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
+      // GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
       if (UIManager.Instance.dialogueBoxUI.Visible)
         currentFocusedMenu = DialogueManager.Instance.dialogueBoxUI;
       // else if (UIManager.Instance.playerChoicesBoxUI.Visible)

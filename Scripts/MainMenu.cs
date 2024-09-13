@@ -312,8 +312,12 @@ public partial class MainMenu : Control {
     SetButtonVisibiityState(settingsButton, enabled);
   }
 
+  
+
   private void SetButtonVisibiityState(InteractableUIButton button, bool enable) {
-    button.Visible = enable;
+  
+  
+  button.Visible = enable;
   }
 
 

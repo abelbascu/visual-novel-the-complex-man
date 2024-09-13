@@ -6,6 +6,8 @@ using State = GameStateMachine.State;
 using SubState = GameStateMachine.SubState;
 using System.Threading.Tasks;
 
+//----------------------------------------------------------------------------------------------------------
+
 public partial class InputManager : Control {
 
   public static InputManager Instance { get; private set; }
@@ -34,8 +36,18 @@ public partial class InputManager : Control {
   //when we process input let's block further input
   //until we finish processing
   public bool isProcessingInput = false;
+  private bool isInputLocked = false;
 
+  //we put another extra measure as the main menu buttons
+  //still received input even if they are disabled
+  //!this creates copupling
+  private InputBlocker inputBlocker;
+  private void InitializeInputBlocker() {
+    var mainMenu = GetNode<MainMenu>("../UIManager/MainMenu");
+    inputBlocker = mainMenu.inputBlocker;
+  }
 
+  //------------------------------------------------------------------------------------------------------------
 
   public override void _EnterTree() {
     if (Instance == null) {
@@ -45,27 +57,6 @@ public partial class InputManager : Control {
     }
   }
 
-
-  private InputBlocker inputBlocker;
-     private void InitializeInputBlocker()
-    {
-        var mainMenu = GetNode<MainMenu>("../UIManager/MainMenu");
-
-        inputBlocker = mainMenu.inputBlocker;
-    }
-
-
-
-  public override void _Ready() {
-
-    CallDeferred(nameof(InitializeInputBlocker));
-
-    //subcribe when game changes state
-    GameStateManager.Instance.StateChanged += (prevState, prevSubState, newState, newSubState, args) => {
-      _ = OnGameStateChanged(prevState, prevSubState, newState, newSubState, args);
-    };
-  }
-
   public override void _ExitTree() {
 
     GameStateManager.Instance.StateChanged -= (prevState, prevSubState, newState, newSubState, args) => {
@@ -73,53 +64,76 @@ public partial class InputManager : Control {
     };
   }
 
+  //-----------------------------------------------------------------------------------------------------------
 
+  public override void _Ready() {
 
-  private bool isInputLocked = false;
+    CallDeferred(nameof(InitializeInputBlocker));
+
+    //subcribe when game changes state, so we can refresh the UI focusableControls list
+    GameStateManager.Instance.StateChanged += (prevState, prevSubState, newState, newSubState, args) => {
+      _ = OnGameStateChanged(prevState, prevSubState, newState, newSubState, args);
+    };
+  }
+
+  //--------------------------------------------------------------------------------------------------------------
 
   public override async void _Input(InputEvent @event) {
+
+    //-------------------- DO NOT PROCESS MORE INPUT IS WE ARE ALREADY PROCESSING IT -----------------------------
+
+    //if main menu is processing any input after a click or press, do not accept more input
+    //even if the user clicked the same button very faszt before the button was hidden
 
     if (inputBlocker == null || inputBlocker.IsBlocked) {
       GetViewport().SetInputAsHandled();
       return;
     }
 
-    //GD.Print($"_GuiInput called with event: {@event}");
     if (!isGamePadAndKeyboardInputEnabled || isProcessingInput || isInputLocked) {
       GetViewport().SetInputAsHandled();
       return;
     }
 
+    //----------------- READ INPUT FROM MOUSE, GAMEPAD OR KEYBOARD -----------------------------------------------
+
     //even if we are blocking input, user can still move the mouse
     if (@event is InputEventMouseMotion mouseMotion) {
-      HandleMouseMotion(mouseMotion);
+      HandleMouseMotion();
+
       GD.Print($"currentFocusIndex: {currentFocusedIndex}");
-      return; // We don't want to AcceptEvent for mouse motion
+      //GD.Print($"_GuiInput called with event: {@event}");
+
+      return;
     }
 
-    //if processing occurs, don't read any input
-
-    //the real input processing starts here
-    //this is for mouse input
+    //mouse input
     if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left) {
 
       await ProcessInputAsync(@event);
+      //stop propagating event
       AcceptEvent();
 
-      //this is for gamepad and keyboard input
+      //gamepad and keyboard input
     } else if (isGamePadAndKeyboardInputEnabled) {
-      if (@event.IsActionPressed("ui_accept") || @event.IsActionPressed("ui_cancel") || @event.IsActionPressed("ui_left") || @event.IsActionPressed("ui_right") || @event.IsActionPressed("ui_up") || @event.IsActionPressed("ui_down")) {
+      if (@event.IsActionPressed("ui_accept") || @event.IsActionPressed("ui_cancel") || @event.IsActionPressed("ui_left")
+      || @event.IsActionPressed("ui_right") || @event.IsActionPressed("ui_up") || @event.IsActionPressed("ui_down")) {
+
         isProcessingInput = true;
         _ = ProcessInputAsync(@event);
         AcceptEvent();
+
       }
     }
   }
+
+  //-------------------------------------------------------------------------------------------------------------------
 
   //depending on the game state, execute custom input methods
   private async Task ProcessInputAsync(InputEvent @event) {
 
     try {
+
       if (GameStateManager.Instance.IsInState(GameStateMachine.State.SplashScreenDisplayed, GameStateMachine.SubState.None)) {
         await HandleSplashScreenInput(@event);
       } else if (GameStateManager.Instance.IsInState(GameStateMachine.State.MainMenuDisplayed, GameStateMachine.SubState.LoadScreenDisplayed) ||
@@ -133,13 +147,7 @@ public partial class InputManager : Control {
       || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed)) {
         await HandleMenuInput(@event);
       } else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None))
-
         await HandleMenuInput(@event);
-      // } else {
-      //   focusableControls.Clear();
-      //     currentFocusedMenu = null;
-      //   currentFocusedIndex = -1;
-      // }
 
     } finally {
       isProcessingInput = false;
@@ -153,6 +161,7 @@ public partial class InputManager : Control {
   }
 
 
+  //every time that state changes, refresh the UI focusableControls list 
   private async Task OnGameStateChanged(GameStateMachine.State previousState, GameStateMachine.SubState previousSubstate,
                                   GameStateMachine.State newState, GameStateMachine.SubState newSubState, object[] arguments) {
 
@@ -168,6 +177,7 @@ public partial class InputManager : Control {
   }
 
 
+  //here we get the new control or scene where we extract the new UI focusable objects from
   private int lastMainMenuIndex = -1;
   private int lastInGameMenuIndex = -1;
 
@@ -178,45 +188,43 @@ public partial class InputManager : Control {
 
     if (currentState == State.MainMenuDisplayed && subState == SubState.None) {
       currentFocusedMenu = UIManager.Instance.mainMenu;
-      CollectInteractableUIElements(currentFocusedMenu);
+      GetInteractableUIElements(currentFocusedMenu);
       currentFocusedIndex = (lastMainMenuIndex >= 0 && lastMainMenuIndex < focusableControls.Count)
           ? lastMainMenuIndex
           : -1;
     } else if (currentState == State.InGameMenuDisplayed && subState == SubState.None) {
       currentFocusedMenu = UIManager.Instance.mainMenu; // Assuming you have an inGameMenu
-      CollectInteractableUIElements(currentFocusedMenu);
+      GetInteractableUIElements(currentFocusedMenu);
       currentFocusedIndex = (lastInGameMenuIndex >= 0 && lastInGameMenuIndex < focusableControls.Count)
           ? lastInGameMenuIndex
           : -1;
 
     } else if (currentState == State.MainMenuDisplayed && subState == SubState.LoadScreenDisplayed) {
       currentFocusedMenu = UIManager.Instance.saveGameScreen; // Assuming you have an inGameMenu
-      CollectInteractableUIElements(currentFocusedMenu);
-      currentFocusedIndex = (lastInGameMenuIndex >= 0 && lastInGameMenuIndex < focusableControls.Count)
-          ? lastInGameMenuIndex
-          : -1;
+      GetInteractableUIElements(currentFocusedMenu);
+      currentFocusedIndex = -1;
     } else if (currentState == State.MainMenuDisplayed && subState == SubState.ExitGameConfirmationPopupDisplayed) {
       currentFocusedMenu = UIManager.Instance.mainMenu.ExitGameConfirmationPanel;
-      CollectInteractableUIElements(currentFocusedMenu);
+      GetInteractableUIElements(currentFocusedMenu);
       currentFocusedIndex = -1; // Focus on the first button in the submenu
 
     } else if (currentState == State.InGameMenuDisplayed && subState == SubState.ExitToMainMenuConfirmationPopupDisplayed) {
       currentFocusedMenu = UIManager.Instance.mainMenu.ExitToMainMenuPanel;
-      CollectInteractableUIElements(currentFocusedMenu);
+      GetInteractableUIElements(currentFocusedMenu);
       currentFocusedIndex = -1; // Focus on the first button in the submenu
     } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && subState == SubState.LanguageMenuDisplayed) {
       currentFocusedMenu = UIManager.Instance.mainMenu.LanguageOptionsContainer;
-      CollectInteractableUIElements(currentFocusedMenu);
+      GetInteractableUIElements(currentFocusedMenu);
       currentFocusedIndex = -1; // Focus on the first button in the submenu
     } else if (currentState == State.SplashScreenDisplayed && subState == SubState.None) {
       currentFocusedMenu = UIManager.Instance.splashScreen;
       focusableControls.Add(UIManager.Instance.splashScreen.backgroundTexture);
       currentFocusedIndex = 0;
     } else if (currentState == State.InDialogueMode && subState == SubState.None) {
-      CollectInteractableUIElements(UIManager.Instance.inGameMenuButton);
+      GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
       if (UIManager.Instance.dialogueBoxUI.Visible)
         currentFocusedMenu = DialogueManager.Instance.dialogueBoxUI;
-      CollectInteractableUIElements(currentFocusedMenu);
+      GetInteractableUIElements(currentFocusedMenu);
       currentFocusedIndex = -1; // Focus on the first button in the submenu
     } else {
       // For any other state/substate combination, clear focus
@@ -226,24 +234,13 @@ public partial class InputManager : Control {
     await ClearButtonHighlights();
   }
 
-  // private void CollectFocusableMenuControls(Control container) {
-  //     foreach (var child in container.GetChildren()) {
-  //         if (child is Button button && button.Visible) {
-  //             focusableControls.Add(button);
-  //         } else if (child is Control control) {
-  //             CollectFocusableMenuControls(control);
-  //         }
-  //     }
-  // }
 
-
-  private void CollectInteractableUIElements(Node node) {
+  private void GetInteractableUIElements(Node node) {
     if (node is Control control && control is IInteractableUI && control.Visible == true) {
       focusableControls.Add(control);
     }
-
     foreach (var child in node.GetChildren()) {
-      CollectInteractableUIElements(child);
+      GetInteractableUIElements(child);
     }
   }
 
@@ -251,19 +248,13 @@ public partial class InputManager : Control {
     return focusableControls.FindAll(control => control.Visible);
   }
 
-
-  //     private void HandleClick(Control clickedControl) {
-  //     GD.Print($"Clicked on: {clickedControl.Name} (Type: {clickedControl.GetType().Name})");
-  // }
-
-
-  private async Task HandleMouseMotion(InputEventMouseMotion mouseMotion) {
+  private async void HandleMouseMotion() {
     int newFocusedIndex = -1;
     for (int i = 0; i < focusableControls.Count; i++) {
       if (focusableControls[i] is IInteractableUI && focusableControls[i] is Control focusable
       && focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) && focusable.Visible == true) {
         newFocusedIndex = i;
-        currentFocusedIndex = newFocusedIndex;
+        //currentFocusedIndex = newFocusedIndex;
         GD.Print($"newFocusedIndex: {newFocusedIndex}, control: {focusableControls[i].Name}");
         break;
       }
@@ -272,22 +263,25 @@ public partial class InputManager : Control {
     if (newFocusedIndex != currentFocusedIndex) {
       // Clear previous highlight
       if (currentFocusedIndex != -1 && currentFocusedIndex < focusableControls.Count) {
-        await ApplyButtonStyle(focusableControls[currentFocusedIndex] as Button, false);
+        await ApplyButtonStyle(focusableControls[currentFocusedIndex] as InteractableUIButton, false);
       }
 
+      //before the assignation, add this if, otherwise the highlighted button will be dehighlighted
+      if(newFocusedIndex != -1)
+        currentFocusedIndex = newFocusedIndex;
+
       // Set new highlight
-      currentFocusedIndex = newFocusedIndex;
       if (currentFocusedIndex != -1) {
-        await ApplyButtonStyle(focusableControls[currentFocusedIndex] as Button, true);
+        await ApplyButtonStyle(focusableControls[currentFocusedIndex] as InteractableUIButton, true);
       }
     }
   }
 
   private async Task ClearButtonHighlights() {
     foreach (var control in focusableControls) {
-      if (control is Button button) {
+      if (control is InteractableUIButton button) {
         await ApplyButtonStyle(button, false);
-        button.ReleaseFocus();
+        button.ReleaseFocus(); 
       }
     }
     await Task.CompletedTask;
@@ -488,13 +482,13 @@ public partial class InputManager : Control {
 
   private async Task HighlightMenuButton(int index) {
     for (int i = 0; i < focusableControls.Count; i++) {
-      if (focusableControls[i] is Button button) {
+      if (focusableControls[i] is InteractableUIButton button) {
         await ApplyButtonStyle(button, i == index);
       }
     }
   }
 
-  private async Task ApplyButtonStyle(Button button, bool isHighlighted) {
+  private async Task ApplyButtonStyle(InteractableUIButton button, bool isHighlighted) {
 
     if (button == null) return;
 

@@ -94,9 +94,8 @@ public partial class GameManager : Control {
   }
 
   private void GameInit() {
-    // Note: Despite being displayed as "UIManager" in the Godot editor, the actual internal
-    // node name is "UiManager" (with a lowercase 'i'). This seems to be a Godot bug.
-    UIManager = GetNodeOrNull<UIManager>("UiManager");
+   
+    UIManager = GetNodeOrNull<UIManager>("UIManager");
     DialogueManager = GetNodeOrNull<DialogueManager>("DialogueManager");
     GameStateManager = GetNodeOrNull<GameStateManager>("GameStateManager");
     InputManager = GetNodeOrNull<InputManager>("InputManager");

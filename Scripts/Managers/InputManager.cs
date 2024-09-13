@@ -370,7 +370,7 @@ public partial class InputManager : Control {
   //!-------------- HANDLE ACCEPT ---------------
   private async Task HandleMenuAccept() {
     DateTime now = DateTime.Now;
-    if ((now - lastAcceptTime).TotalMilliseconds < DEBOUNCE_MILLISECONDS || isProcessingInput) {
+    if ((now - lastAcceptTime).TotalMilliseconds < DEBOUNCE_MILLISECONDS) {
       return;
     }
 

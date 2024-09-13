@@ -22,9 +22,16 @@ public partial class SaveGameScreen : MarginContainer {
   private UITextTweenFadeOut fadeOut;
   public bool IsInteractable => Visible;
 
+  private InputBlocker inputBlocker;
+  private void InitializeInputBlocker() {
+    var mainMenu = GetNode<MainMenu>("../../UIManager/MainMenu");
+    inputBlocker = mainMenu.inputBlocker;
+  }
+
 
   public override void _Ready() {
 
+    CallDeferred(nameof(InitializeInputBlocker));
 
     saveGameSlotScene = GD.Load<PackedScene>("res://Scenes/SaveGameSlot.tscn");
     scrollContainer = GetNode<ScrollContainer>("MarginContainer/ScrollContainer");
@@ -130,49 +137,58 @@ public partial class SaveGameScreen : MarginContainer {
   }
 
   public async Task OnGoBackButtonPressed() {
-    InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
-    DisableUserInput();
-    SetSlotButtonsState(false);
-    await UIFadeHelper.FadeOutControl(this, 0.6f);
-    Hide();
-    goBackButton.SetProcessInput(true);
-    goBackButton.MouseFilter = MouseFilterEnum.Stop;
+   
+      InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
+      DisableUserInput();
+      SetSlotButtonsState(false);
+      await UIFadeHelper.FadeOutControl(this, 0.6f);
+      Hide();
+      goBackButton.SetProcessInput(true);
+      goBackButton.MouseFilter = MouseFilterEnum.Stop;
 
-    if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
-      GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
-    else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
-      GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
+      if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+      else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
 
-    InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
+      InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
+ 
   }
 
   public async Task<bool> SetUpSaveOrLoadScreen(bool isLoadScreen) {
-    // Clear existing slots
-    foreach (Node child in slotsContainer.GetChildren()) {
-      child.QueueFree();
-    }
-    CreateNoSavesAvailableLabel();
 
-    // Populate with appropriate slots
-    await PopulateSaveOrLoadSlots(isLoadScreen);
+    bool result = false;
 
-    SetSlotButtonsState(false);
-    DisableUserInput();
+  
+      // Clear existing slots
+      foreach (Node child in slotsContainer.GetChildren()) {
+        child.QueueFree();
+      }
+      CreateNoSavesAvailableLabel();
 
-    //give time to disable the slots before we continue
-    await Task.Yield();
+      // Populate with appropriate slots
+      await PopulateSaveOrLoadSlots(isLoadScreen);
 
-    //give time to disable the slots before we continue
-    // await Task.CompletedTask;
+      SetSlotButtonsState(false);
+      DisableUserInput();
 
-    InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
+      //give time to disable the slots before we continue
+      // await Task.Yield();
 
-    return isLoadScreen;
+      //give time to disable the slots before we continue
+      // await Task.CompletedTask;
+
+      InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
+
+      result = isLoadScreen;
+    return result;
 
   }
 
   //beware that we use this method to also displayed the Load Screen!!
   public async Task DisplaySaveScreen() {
+
+    GD.Print("Starting DDisplaySaveScreen");
 
     goBackButton.Visible = false;
     goBackButton.SetProcessInput(false); //avoid hitting the ga back button repeatedly
@@ -190,7 +206,8 @@ public partial class SaveGameScreen : MarginContainer {
     goBackButton.Visible = true;
     InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
     //HERE I WANT TO ACTIVATE AGAIN INPUT WITH GAMEPAD AND KEYBOARD, NOT ONLY MOUSE.
-
+    
+ GD.Print("Completing DDisplaySaveScreen, no triggers here");
 
   }
 

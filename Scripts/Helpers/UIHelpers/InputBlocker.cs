@@ -11,12 +11,15 @@ public class InputBlocker
     {
         if (isExecuting)
         {
+            GD.Print($"Now executing {action}");
             // If we're already executing a blocked action, just run the new action
             await action();
             return;
         }
 
+
         blockCount++;
+        GD.Print($"Number of async methods in cue {blockCount}");
         isExecuting = true;
         try
         {
@@ -24,7 +27,10 @@ public class InputBlocker
         }
         finally
         {
+            GD.Print($"Now finishing {action}");
             blockCount--;
+            if(blockCount < 0)
+                blockCount = 0;
             isExecuting = false;
         }
     }

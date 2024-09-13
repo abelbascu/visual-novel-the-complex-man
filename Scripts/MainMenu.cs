@@ -58,7 +58,7 @@ public partial class MainMenu : Control {
   private RichTextLabel WantToQuitGameLabel;
   private RichTextLabel WantToQuitToMainMenuLabel;
 
-  public InputBlocker inputBlocker{get; private set;}
+  public InputBlocker inputBlocker { get; private set; }
 
 
 
@@ -312,12 +312,12 @@ public partial class MainMenu : Control {
     SetButtonVisibiityState(settingsButton, enabled);
   }
 
-  
+
 
   private void SetButtonVisibiityState(InteractableUIButton button, bool enable) {
-  
-  
-  button.Visible = enable;
+
+
+    button.Visible = enable;
   }
 
 
@@ -555,8 +555,10 @@ public partial class MainMenu : Control {
       DisableAllButtons();
       HideIngameMenuIcon();
       await CloseInGameMenu();
+      GD.Print("In OnSaveGameButtonPressed triggering INITIALIZE_SAVE_SCREEN ");
       GameStateManager.Instance.Fire(Trigger.INITIALIZE_SAVE_SCREEN);
     });
+    GD.Print("We quit OnSaveGameButtonPressed");
   }
 
   //Load Game
@@ -564,8 +566,22 @@ public partial class MainMenu : Control {
     await inputBlocker.BlockNewInput(async () => {
       HideIngameMenuIcon();
       DisableAllButtons();
+      GD.Print("In OnLoadGameButtonPressed triggering INITIALIZE_LOAD_SCREEN ");
       GameStateManager.Instance.Fire(Trigger.INITIALIZE_LOAD_SCREEN);
     });
+    await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+     await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+     await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+    GD.Print("We quit OnLoadGameButtonPressed");
   }
 
   //Language options

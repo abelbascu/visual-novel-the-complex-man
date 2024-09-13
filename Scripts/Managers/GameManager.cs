@@ -22,6 +22,7 @@ public partial class GameManager : Control {
   private Control mainMenuScene;
   private MainMenu mainMenu;
 
+
   public enum GameState {
     MainMenu,
     Dialogue,
@@ -30,6 +31,8 @@ public partial class GameManager : Control {
   }
 
   public override void _Ready() {
+
+
     // Make GameManager fill its parent
     AnchorRight = 1;
     AnchorBottom = 1;
@@ -94,7 +97,7 @@ public partial class GameManager : Control {
   }
 
   private void GameInit() {
-   
+
     UIManager = GetNodeOrNull<UIManager>("UIManager");
     DialogueManager = GetNodeOrNull<DialogueManager>("DialogueManager");
     GameStateManager = GetNodeOrNull<GameStateManager>("GameStateManager");
@@ -198,21 +201,33 @@ public partial class GameManager : Control {
 
   public async Task Initialize_Load_Screen() {
 
-    bool isLoadScreen = await UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.LOAD_SCREEN);
+    bool isLoadScreen = false;
 
-    if (isLoadScreen)
+    GD.Print("In Initialize_Load_Screen, before calling SetUpSaveOrLoadScreen");
+    isLoadScreen = await UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.LOAD_SCREEN);
+
+    await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+
+    if (isLoadScreen) {
+      GD.Print("In Initialize_Load_Screen, before triggering DISPLAY_LOAD_SCREEN");
       GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
-    else
+    } else
       GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
   }
 
   public async Task Display_Load_Screen() {
+
+
     if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
       await UIManager.Instance.mainMenu.CloseMainMenu();
     else
       await UIManager.Instance.mainMenu.CloseInGameMenu();
-
+    GD.Print("In Display_Load_Screen, before triggering DisplaySaveScreen, no triggers here");
     await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
+
   }
 
   public async Task Complete_Loading_Based_On_Game_Mode(State LastGameMode) {
@@ -260,8 +275,10 @@ public partial class GameManager : Control {
   }
 
 
-  public void Initialize_Save_Screen() {
-    UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.SAVE_SCREEN);
+  public async Task Initialize_Save_Screen() {
+
+    await UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.SAVE_SCREEN);
+
   }
 
   public async Task Display_Save_Screen() {

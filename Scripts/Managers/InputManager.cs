@@ -47,6 +47,8 @@ public partial class InputManager : Control {
     inputBlocker = mainMenu.inputBlocker;
   }
 
+  private bool canMoveOnVertical = true;
+
   //------------------------------------------------------------------------------------------------------------
 
   public override void _EnterTree() {
@@ -149,20 +151,30 @@ public partial class InputManager : Control {
         await HandleMenuInput(@event);
       } else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
         if (UIManager.Instance.dialogueBoxUI.Visible && (@event.IsActionPressed("ui_up") || @event.IsActionPressed("ui_down"))) {
-          currentFocusedIndex = 1;
+          canMoveOnVertical = false;
           await HandleMenuInput(@event);
         } else if (UIManager.Instance.dialogueBoxUI.Visible)
-          await HandleMenuInput(@event)
-           else if (UIManager.Instance.playerChoicesBoxUI.Visible) {
-            //! ESTA MAL ESTO TENDIA QUE IR EN DIALOGUE MANAGER CADA VEZ QUE SE MUESTRE LA PLAYERCHOICE
-            focusableControls.Clear();
-            currentFocusedMenu = UIManager.Instance.playerChoicesBoxUI;
-            GetInteractableUIElements(currentFocusedMenu);
+          await HandleMenuInput(@event);
+        else if (UIManager.Instance.playerChoicesBoxUI.Visible) {
+          await ToSignal(GetTree(), "process_frame");
+          await ToSignal(GetTree(), "process_frame");
+          await ToSignal(GetTree(), "process_frame");
+          await ToSignal(GetTree(), "process_frame");
+          await ToSignal(GetTree(), "process_frame");
+          await ToSignal(GetTree(), "process_frame");
+          await ToSignal(GetTree(), "process_frame");
+          await ToSignal(GetTree(), "process_frame");
+          await ToSignal(GetTree(), "process_frame");
+          await ToSignal(GetTree(), "process_frame");
+          await ToSignal(GetTree(), "process_frame");
+          await ToSignal(GetTree(), "process_frame");
+          await UpdateFocusableControls();
           await HandleMenuInput(@event);
         }
       }
     } finally {
       isProcessingInput = false;
+      canMoveOnVertical = true;
     }
   }
 
@@ -172,6 +184,9 @@ public partial class InputManager : Control {
     isProcessingInput = false;
   }
 
+
+  private State currentState;
+  private SubState currentSubstate;
 
   //every time that state changes, refresh the UI focusableControls list 
   private async Task OnGameStateChanged(GameStateMachine.State previousState, GameStateMachine.SubState previousSubstate,
@@ -183,8 +198,12 @@ public partial class InputManager : Control {
     } else if (previousState == State.InGameMenuDisplayed && previousSubstate == SubState.None) {
       lastInGameMenuIndex = currentFocusedIndex;
     }
+
+    currentState = newState;
+    currentSubstate = newSubState;
+
     GD.Print($"In OnGameStateChanged() input manager, we now update FocusedControls for {newState}, {newSubState}");
-    await UpdateFocusableControls(newState, newSubState);
+    await UpdateFocusableControls();
     GD.Print("FocusableControlsUpdated");
     foreach (Control focusable in focusableControls)
       GD.Print($"{focusable.Name}");
@@ -196,26 +215,26 @@ public partial class InputManager : Control {
   private int lastMainMenuIndex = -1;
   private int lastInGameMenuIndex = -1;
 
-  private async Task UpdateFocusableControls(State currentState, SubState subState) {
+  public async Task UpdateFocusableControls() {
     focusableControls.Clear();
     currentFocusedIndex = -1; // Start with no button focused
     currentFocusedMenu = null;
 
     //SPLASH SCREEN -------------------------------
-    if (currentState == State.SplashScreenDisplayed && subState == SubState.None) {
+    if (currentState == State.SplashScreenDisplayed && currentSubstate == SubState.None) {
       currentFocusedMenu = UIManager.Instance.splashScreen;
       focusableControls.Add(UIManager.Instance.splashScreen.backgroundTexture);
       currentFocusedIndex = 0;
     }
     //MAIN MENU ---------------------------------
-    else if (currentState == State.MainMenuDisplayed && subState == SubState.None) {
+    else if (currentState == State.MainMenuDisplayed && currentSubstate == SubState.None) {
       currentFocusedMenu = UIManager.Instance.mainMenu;
       GetInteractableUIElements(currentFocusedMenu);
       currentFocusedIndex = (lastMainMenuIndex >= 0 && lastMainMenuIndex < focusableControls.Count)
           ? lastMainMenuIndex
           : -1;
       //INGAME MENU -------------------------------
-    } else if (currentState == State.InGameMenuDisplayed && subState == SubState.None) {
+    } else if (currentState == State.InGameMenuDisplayed && currentSubstate == SubState.None) {
       // GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
       currentFocusedMenu = UIManager.Instance.mainMenu;
       GetInteractableUIElements(currentFocusedMenu);
@@ -224,32 +243,32 @@ public partial class InputManager : Control {
       //     ? lastInGameMenuIndex
       //     : -1;
       //LOAD GAME ----------------------------------
-    } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && subState == SubState.LoadScreenDisplayed) {
+    } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && currentSubstate == SubState.LoadScreenDisplayed) {
       currentFocusedMenu = UIManager.Instance.saveGameScreen;
       GetInteractableUIElements(currentFocusedMenu);
       currentFocusedIndex = -1;
       //SAVE GAME --------------------------------
-    } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && subState == SubState.SaveScreenDisplayed) {
+    } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && currentSubstate == SubState.SaveScreenDisplayed) {
       currentFocusedMenu = UIManager.Instance.saveGameScreen;
       GetInteractableUIElements(currentFocusedMenu);
       currentFocusedIndex = -1;
       //EXIT GAME ---------------------------------
-    } else if (currentState == State.MainMenuDisplayed && subState == SubState.ExitGameConfirmationPopupDisplayed) {
+    } else if (currentState == State.MainMenuDisplayed && currentSubstate == SubState.ExitGameConfirmationPopupDisplayed) {
       currentFocusedMenu = UIManager.Instance.mainMenu.ExitGameConfirmationPanel;
       GetInteractableUIElements(currentFocusedMenu);
       currentFocusedIndex = -1; // Focus on the first button in the submenu
       //EXIT TO MAIN MENU ---------------------------
-    } else if (currentState == State.InGameMenuDisplayed && subState == SubState.ExitToMainMenuConfirmationPopupDisplayed) {
+    } else if (currentState == State.InGameMenuDisplayed && currentSubstate == SubState.ExitToMainMenuConfirmationPopupDisplayed) {
       currentFocusedMenu = UIManager.Instance.mainMenu.ExitToMainMenuPanel;
       GetInteractableUIElements(currentFocusedMenu);
       //LNAGUAGE OPTIONS -------------------------
       currentFocusedIndex = -1; // Focus on the first button in the submenu
-    } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && subState == SubState.LanguageMenuDisplayed) {
+    } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && currentSubstate == SubState.LanguageMenuDisplayed) {
       currentFocusedMenu = UIManager.Instance.mainMenu.LanguageOptionsContainer;
       GetInteractableUIElements(currentFocusedMenu);
       currentFocusedIndex = -1; // Focus on the first button in the submenu
       //DIALOGUE MODE------------------------------
-    } else if (currentState == State.InDialogueMode && subState == SubState.None) {
+    } else if (currentState == State.InDialogueMode && currentSubstate == SubState.None) {
       GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
       if (UIManager.Instance.dialogueBoxUI.Visible)
         currentFocusedMenu = DialogueManager.Instance.dialogueBoxUI;
@@ -349,7 +368,7 @@ public partial class InputManager : Control {
       return;
     }
 
-    if (isVertical) {
+    if (isVertical && canMoveOnVertical) {
       if (CanProcessInput(currentTime) &&
           (Input.IsActionPressed("ui_up") ||
            (@event is InputEventJoypadMotion joypadMotionUp &&

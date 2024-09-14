@@ -373,7 +373,8 @@ public partial class MainMenu : Control {
     SetContainerButtonsVisibility(ExitToMainMenuPanel, false);
     SetContainerButtonsVisibility(MainOptionsContainer, true);
 
-    SetupMainMenuButtonVisibility();
+  //!if i don't do this, the savegame and continue button appear as visible in the log...
+    CallDeferred(nameof(SetupMainMenuButtonVisibility));
 
     SetDialogueUIElementsTopLevel(false);
 

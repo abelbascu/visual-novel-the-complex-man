@@ -137,52 +137,55 @@ public partial class SaveGameScreen : MarginContainer {
   }
 
   public async Task OnGoBackButtonPressed() {
-   
-      InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
-      DisableUserInput();
-      SetSlotButtonsState(false);
-      await UIFadeHelper.FadeOutControl(this, 0.6f);
-      Hide();
-      goBackButton.SetProcessInput(true);
-      goBackButton.MouseFilter = MouseFilterEnum.Stop;
 
-      if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
-        GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
-      else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
-        GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
+    InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
+    DisableUserInput();
+    SetSlotButtonsState(false);
+    await UIFadeHelper.FadeOutControl(this, 0.6f);
+    Hide();
+    goBackButton.SetProcessInput(true);
+    goBackButton.MouseFilter = MouseFilterEnum.Stop;
 
-      InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
- 
+    if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+      GameStateManager.Instance.Fire(Trigger.DISPLAY_MAIN_MENU);
+    else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
+      GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
+
+    InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
+
   }
 
   public async Task<bool> SetUpSaveOrLoadScreen(bool isLoadScreen) {
+    GD.Print("On SaveGameScreen starting execution of SetUpSaveOrLoadScreen");
 
     bool result = false;
 
-  
-      // Clear existing slots
-      foreach (Node child in slotsContainer.GetChildren()) {
-        child.QueueFree();
-      }
-      CreateNoSavesAvailableLabel();
 
-      // Populate with appropriate slots
-      await PopulateSaveOrLoadSlots(isLoadScreen);
+    // Clear existing slots
+    foreach (Node child in slotsContainer.GetChildren()) {
+      child.QueueFree();
+    }
+    CreateNoSavesAvailableLabel();
 
-      SetSlotButtonsState(false);
-      DisableUserInput();
+    // Populate with appropriate slots
+    GD.Print("On SaveGameScreen starting execution of PopulateSaveOrLoadSlots");
+    await PopulateSaveOrLoadSlots(isLoadScreen);
+    GD.Print("On SaveGameScreen after  execution of PopulateSaveOrLoadSlots");
 
-      //give time to disable the slots before we continue
-      // await Task.Yield();
+    SetSlotButtonsState(false);
+    DisableUserInput();
 
-      //give time to disable the slots before we continue
-      // await Task.CompletedTask;
+    //give time to disable the slots before we continue
+    // await Task.Yield();
 
-      InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
+    //give time to disable the slots before we continue
+    // await Task.CompletedTask;
 
-      result = isLoadScreen;
+    InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
+
+    result = isLoadScreen;
+    GD.Print("On SaveGameScreen closing execution of SetUpSaveOrLoadScreen");
     return result;
-
   }
 
   //beware that we use this method to also displayed the Load Screen!!
@@ -206,8 +209,13 @@ public partial class SaveGameScreen : MarginContainer {
     goBackButton.Visible = true;
     InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
     //HERE I WANT TO ACTIVATE AGAIN INPUT WITH GAMEPAD AND KEYBOARD, NOT ONLY MOUSE.
-    
- GD.Print("Completing DDisplaySaveScreen, no triggers here");
+
+    GD.Print("Completing DisplaySaveScreen, no triggers here");
+    //!we need to create a DisplayingSaveScreen substate
+    //!ESTABA PONIENDO ESTE TRIGGER THE DISPLAY_SAVE_SCREEN AQUI CUANDO TAMBIEN USAMOS ESTA FUNCION 
+    //!PARA LOADSCREEN ME ESTABA VOLVIENDO LOCO! SEPARAR EN DOS METDOS!!
+   // GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
+
 
   }
 
@@ -297,8 +305,8 @@ public partial class SaveGameScreen : MarginContainer {
     // Hide();
   }
 
-  public void RefreshSaveSlots() {
-    PopulateSaveOrLoadSlots(false);
+  public async Task RefreshSaveSlots() {
+    await PopulateSaveOrLoadSlots(false);
   }
 
 }

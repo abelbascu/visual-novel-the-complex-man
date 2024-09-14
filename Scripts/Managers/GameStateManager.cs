@@ -103,6 +103,9 @@ public partial class GameStateManager : Node {
             //initialize save screen > display save screen
             {(State.InGameMenuDisplayed, SubState.SaveScreenInitialized, State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, Trigger.DISPLAY_SAVE_SCREEN),
                 () => GameManager.Instance.Display_Save_Screen()},
+
+            {(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, Trigger.DISPLAY_SAVE_SCREEN),
+                () => {}},
             //display save screen > saving 
             {(State.InGameMenuDisplayed, SubState.SaveScreenDisplayed, State.InGameMenuDisplayed, SubState.Saving, Trigger.SAVE_GAME),
                 new Action<bool>(isAutosave => GameManager.Instance.Save_Game())},

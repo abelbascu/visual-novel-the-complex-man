@@ -525,6 +525,7 @@ public partial class MainMenu : Control {
       MainOptionsContainer.Visible = false;
       InGameMenuClosed?.Invoke();
     });
+
   }
 
   //Start new game

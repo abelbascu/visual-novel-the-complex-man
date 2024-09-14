@@ -65,6 +65,7 @@ public partial class DialogueBoxUI : MarginContainer {
         // dialogueLineLabel.Text = "";
         dialogueLineLabel.Clear();
         DisplayLetter();
+        
     }
 
     public string GetLocaleDialogue(DialogueObject dialogueObj, string locale) {

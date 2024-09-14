@@ -9,60 +9,60 @@ using System.Linq.Expressions;
 
 public partial class GameStateManager : Node {
 
-    public static GameStateManager Instance { get; private set; }
-    private GameStateMachine stateMachine;
+  public static GameStateManager Instance { get; private set; }
+  private GameStateMachine stateMachine;
 
-    //use this so other classes can subscribe to state changes
-    public event Action<State, SubState, State, SubState, object[]> StateChanged {
-        add { stateMachine.StateChanged += value; }
-        remove { stateMachine.StateChanged -= value; }
+  //use this so other classes can subscribe to state changes
+  public event Action<State, SubState, State, SubState, object[]> StateChanged {
+    add { stateMachine.StateChanged += value; }
+    remove { stateMachine.StateChanged -= value; }
+  }
+
+  private Dictionary<(State, SubState, State, SubState, Trigger), Delegate> stateTransitions;
+  public State LastGameMode { get; private set; }
+
+
+  public GameStateManager() {
+    stateMachine = new GameStateMachine();
+  }
+
+  public override void _EnterTree() {
+    if (Instance == null) {
+      Instance = this;
+    } else {
+      QueueFree();
     }
+  }
 
-    private Dictionary<(State, SubState, State, SubState, Trigger), Delegate> stateTransitions;
-    public State LastGameMode { get; private set; }
+  public override void _Ready() {
+    ConfigureStateTransitions();
+    //ConfigureStateTransitionActions();
+    stateMachine.StateChanged += OnStateChanged;
+  }
 
+  public void Fire(Trigger trigger, params object[] args) {
+    stateMachine.Fire(trigger, args);
+  }
 
-    public GameStateManager() {
-        stateMachine = new GameStateMachine();
+  public State GetLastGameMode() {
+    return LastGameMode;
+  }
+
+  public void ResumeGameMode() {
+    switch (LastGameMode) {
+      case State.InDialogueMode:
+        Fire(Trigger.ENTER_DIALOGUE_MODE);
+        break;
+      // Add cases for other game modes as needed
+      default:
+        GD.Print($"Unknown game mode: {LastGameMode}");
+        break;
     }
+  }
 
-    public override void _EnterTree() {
-        if (Instance == null) {
-            Instance = this;
-        } else {
-            QueueFree();
-        }
-    }
-
-    public override void _Ready() {
-        ConfigureStateTransitions();
-        //ConfigureStateTransitionActions();
-        stateMachine.StateChanged += OnStateChanged;
-    }
-
-    public void Fire(Trigger trigger, params object[] args) {
-        stateMachine.Fire(trigger, args);
-    }
-
-    public State GetLastGameMode() {
-        return LastGameMode;
-    }
-
-    public void ResumeGameMode() {
-        switch (LastGameMode) {
-            case State.InDialogueMode:
-                Fire(Trigger.ENTER_DIALOGUE_MODE);
-                break;
-            // Add cases for other game modes as needed
-            default:
-                GD.Print($"Unknown game mode: {LastGameMode}");
-                break;
-        }
-    }
-
-    private void ConfigureStateTransitions() {
-        stateTransitions = new Dictionary<(State, SubState, State, SubState, Trigger), Delegate>
-        {
+  private void ConfigureStateTransitions() {
+    stateTransitions = new Dictionary<(State, SubState, State, SubState, Trigger), Delegate>
+    {
             //--------------------------------------------------------------------------------------------------------------------------------------//  
             //------------------------------------------------------GLOBAL GAME STATE CHART---------------------------------------------------------// 
             //--------------------------------------------------------------------------------------------------------------------------------------//   
@@ -136,6 +136,8 @@ public partial class GameStateManager : Node {
             //loading completed > enter dialogue mode
             {(State.InGameMenuDisplayed, SubState.LoadingCompleted, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
                 () =>GameManager.Instance.Enter_Dialogue_Mode()},
+            {(State.InDialogueMode, SubState.None, State.InDialogueMode, SubState.None, Trigger.ENTER_DIALOGUE_MODE),
+                () => {}},
             //in game menu > language menu
             {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed, Trigger.DISPLAY_LANGUAGE_MENU),
                 () => GameManager.Instance.Display_Language_Menu()},
@@ -234,62 +236,62 @@ public partial class GameStateManager : Node {
                 () => {}},
         };
 
-        // Configure transitions in the state machine
-        foreach (var transition in stateTransitions.Keys) {
-            stateMachine.ConfigureTransition(transition.Item1, transition.Item2, transition.Item3, transition.Item4, transition.Item5);
-        }
+    // Configure transitions in the state machine
+    foreach (var transition in stateTransitions.Keys) {
+      stateMachine.ConfigureTransition(transition.Item1, transition.Item2, transition.Item3, transition.Item4, transition.Item5);
+    }
+  }
+
+  private void OnStateChanged(State previousState, SubState previousSubstate, State newState, SubState newSubState, object[] arguments) {
+    var transitionKey = (previousState, previousSubstate, newState, newSubState, stateMachine.LastTrigger);
+
+    GD.Print($"ALL STATES: {previousState}, {previousSubstate}, {newState}, {newSubState}, {stateMachine.LastTrigger}");
+
+    if (newState.ToString().Contains("Mode")) {
+      LastGameMode = newState;
     }
 
-    private void OnStateChanged(State previousState, SubState previousSubstate, State newState, SubState newSubState, object[] arguments) {
-        var transitionKey = (previousState, previousSubstate, newState, newSubState, stateMachine.LastTrigger);
+    if (stateTransitions.TryGetValue(transitionKey, out var actions)) {
+      actions.DynamicInvoke(arguments);
+    } else {
+      // Handle default transitions or log unhandled transitions
+      GD.Print($"Unhandled transition: {previousState}.{previousSubstate} -> {newState}.{newSubState}, Trigger: {stateMachine.LastTrigger}");
 
-        GD.Print($"ALL STATES: {previousState}, {previousSubstate}, {newState}, {newSubState}, {stateMachine.LastTrigger}");
-
-        if (newState.ToString().Contains("Mode")) {
-            LastGameMode = newState;
-        }
-
-        if (stateTransitions.TryGetValue(transitionKey, out var actions)) {
-            actions.DynamicInvoke(arguments);
-        } else {
-            // Handle default transitions or log unhandled transitions
-            GD.Print($"Unhandled transition: {previousState}.{previousSubstate} -> {newState}.{newSubState}, Trigger: {stateMachine.LastTrigger}");
-
-            // Fall back to default state handlers if needed
-            HandleDefaultStateTransition(newState, newSubState);
-        }
+      // Fall back to default state handlers if needed
+      HandleDefaultStateTransition(newState, newSubState);
     }
+  }
 
-    private void HandleDefaultStateTransition(State newState, SubState newSubState) {
-        switch (newState) {
-            case State.SplashScreenDisplayed:
-                GameManager.Instance.Display_Splash_Screen();
-                break;
-            case State.MainMenuDisplayed:
-                GameManager.Instance.Display_Main_Menu();
-                break;
-            case State.StartingNewGame:
-                GameManager.Instance.Starting_New_Game();
-                break;
-            case State.EnterYourNameScreenDisplayed:
-                GameManager.Instance.Display_Enter_Your_Name_Screen();
-                break;
-            case State.EndingScreenDisplayed:
-                // Implement ending screen logic
-                break;
-            case State.ExitingGame:
-                // Implement game exit logic
-                break;
-        }
+  private void HandleDefaultStateTransition(State newState, SubState newSubState) {
+    switch (newState) {
+      case State.SplashScreenDisplayed:
+        GameManager.Instance.Display_Splash_Screen();
+        break;
+      case State.MainMenuDisplayed:
+        GameManager.Instance.Display_Main_Menu();
+        break;
+      case State.StartingNewGame:
+        GameManager.Instance.Starting_New_Game();
+        break;
+      case State.EnterYourNameScreenDisplayed:
+        GameManager.Instance.Display_Enter_Your_Name_Screen();
+        break;
+      case State.EndingScreenDisplayed:
+        // Implement ending screen logic
+        break;
+      case State.ExitingGame:
+        // Implement game exit logic
+        break;
     }
+  }
 
-    public bool IsInState(State state, SubState substate) {
-        return stateMachine.IsInState(state, substate);
-    }
-    public State CurrentState => stateMachine.CurrentState;
-    public SubState CurrentSubstate => stateMachine.CurrentSubState;
-    public State PreviousState => stateMachine.previousState;
-    public SubState PreviousSubstate => stateMachine.previousSubState;
+  public bool IsInState(State state, SubState substate) {
+    return stateMachine.IsInState(state, substate);
+  }
+  public State CurrentState => stateMachine.CurrentState;
+  public SubState CurrentSubstate => stateMachine.CurrentSubState;
+  public State PreviousState => stateMachine.previousState;
+  public SubState PreviousSubstate => stateMachine.previousSubState;
 }
 
 

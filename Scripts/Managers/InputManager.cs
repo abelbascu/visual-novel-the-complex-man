@@ -47,8 +47,6 @@ public partial class InputManager : Control {
     inputBlocker = mainMenu.inputBlocker;
   }
 
-  private bool canMoveOnVertical = true;
-
   //------------------------------------------------------------------------------------------------------------
 
   public override void _EnterTree() {
@@ -150,31 +148,11 @@ public partial class InputManager : Control {
       || GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed) || GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed)) {
         await HandleMenuInput(@event);
       } else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
-        if (UIManager.Instance.dialogueBoxUI.Visible && (@event.IsActionPressed("ui_up") || @event.IsActionPressed("ui_down"))) {
-          canMoveOnVertical = false;
-          await HandleMenuInput(@event);
-        } else if (UIManager.Instance.dialogueBoxUI.Visible)
-          await HandleMenuInput(@event);
-        else if (UIManager.Instance.playerChoicesBoxUI.Visible) {
-          await ToSignal(GetTree(), "process_frame");
-          await ToSignal(GetTree(), "process_frame");
-          await ToSignal(GetTree(), "process_frame");
-          await ToSignal(GetTree(), "process_frame");
-          await ToSignal(GetTree(), "process_frame");
-          await ToSignal(GetTree(), "process_frame");
-          await ToSignal(GetTree(), "process_frame");
-          await ToSignal(GetTree(), "process_frame");
-          await ToSignal(GetTree(), "process_frame");
-          await ToSignal(GetTree(), "process_frame");
-          await ToSignal(GetTree(), "process_frame");
-          await ToSignal(GetTree(), "process_frame");
-          await UpdateFocusableControls();
-          await HandleMenuInput(@event);
-        }
+        await ToSignal(GetTree(), "process_frame");
+        await HandleMenuInput(@event);
       }
     } finally {
       isProcessingInput = false;
-      canMoveOnVertical = true;
     }
   }
 
@@ -216,6 +194,8 @@ public partial class InputManager : Control {
   private int lastInGameMenuIndex = -1;
 
   public async Task UpdateFocusableControls() {
+
+
     focusableControls.Clear();
     currentFocusedIndex = -1; // Start with no button focused
     currentFocusedMenu = null;
@@ -235,10 +215,10 @@ public partial class InputManager : Control {
           : -1;
       //INGAME MENU -------------------------------
     } else if (currentState == State.InGameMenuDisplayed && currentSubstate == SubState.None) {
-      // GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
+      GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
       currentFocusedMenu = UIManager.Instance.mainMenu;
       GetInteractableUIElements(currentFocusedMenu);
-      currentFocusedIndex = -1;
+      currentFocusedIndex = 1;
       // currentFocusedIndex = (lastInGameMenuIndex >= 0 && lastInGameMenuIndex < focusableControls.Count)
       //     ? lastInGameMenuIndex
       //     : -1;
@@ -259,11 +239,13 @@ public partial class InputManager : Control {
       currentFocusedIndex = -1; // Focus on the first button in the submenu
       //EXIT TO MAIN MENU ---------------------------
     } else if (currentState == State.InGameMenuDisplayed && currentSubstate == SubState.ExitToMainMenuConfirmationPopupDisplayed) {
+      GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
       currentFocusedMenu = UIManager.Instance.mainMenu.ExitToMainMenuPanel;
       GetInteractableUIElements(currentFocusedMenu);
       //LNAGUAGE OPTIONS -------------------------
       currentFocusedIndex = -1; // Focus on the first button in the submenu
     } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && currentSubstate == SubState.LanguageMenuDisplayed) {
+      GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
       currentFocusedMenu = UIManager.Instance.mainMenu.LanguageOptionsContainer;
       GetInteractableUIElements(currentFocusedMenu);
       currentFocusedIndex = -1; // Focus on the first button in the submenu
@@ -281,9 +263,22 @@ public partial class InputManager : Control {
       currentFocusedIndex = -1;
     }
 
+    UpdateCurrentFocusedIndexBasedOnMousePosition();
+
+
     await ClearButtonHighlights();
   }
 
+
+  private void UpdateCurrentFocusedIndexBasedOnMousePosition() {
+    for (int i = 0; i < focusableControls.Count; i++) {
+      if (focusableControls[i] is Control focusable
+          && focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) && focusable.Visible == true) {
+        currentFocusedIndex = i;
+        break;
+      }
+    }
+  }
 
   private void GetInteractableUIElements(Node node) {
     if (node is Control control && control is IInteractableUI && control.Visible == true) {
@@ -339,23 +334,14 @@ public partial class InputManager : Control {
 
 
   private async Task HandleMouseClick() {
-
-    if (currentFocusedIndex != -1 && currentFocusedIndex < focusableControls.Count) {
-      await HandleMenuAccept();
-    } else {
-      // Check if the click is on any button, even if it wasn't the last hovered one
-      for (int i = 0; i < focusableControls.Count; i++) {
-        if (focusableControls[i] is IInteractableUI && focusableControls[i] is Control focusable
-        && focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) && focusable.Visible == true) {
-          currentFocusedIndex = i;
-          await HandleMenuAccept();
-          return;
-        }
+    for (int i = 0; i < focusableControls.Count; i++) {
+      if (focusableControls[i] is IInteractableUI && focusableControls[i] is Control focusable
+          && focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) && focusable.Visible == true) {
+        currentFocusedIndex = i;
+        await HandleMenuAccept();
+        return;
       }
     }
-
-    // If we reach here, the click was outside any menu button
-    // No need to do anything, as Godot will handle clicks on other UI elements
   }
 
   private async Task HandleMenuInput(InputEvent @event) {
@@ -368,7 +354,7 @@ public partial class InputManager : Control {
       return;
     }
 
-    if (isVertical && canMoveOnVertical) {
+    if (isVertical) {
       if (CanProcessInput(currentTime) &&
           (Input.IsActionPressed("ui_up") ||
            (@event is InputEventJoypadMotion joypadMotionUp &&
@@ -479,18 +465,33 @@ public partial class InputManager : Control {
     var visibleControls = GetVisibleFocusableControls();
     if (visibleControls.Count == 0) return;
 
-    int currentVisibleIndex = currentFocusedIndex != -1 ? visibleControls.IndexOf(focusableControls[currentFocusedIndex]) : -1;
+    int newIndex = GetNextValidIndex(isUp);
 
-    if (currentVisibleIndex == -1) {
-      currentVisibleIndex = isUp ? visibleControls.Count - 1 : 0;
-    } else {
-      currentVisibleIndex = (currentVisibleIndex + (isUp ? -1 : 1) + visibleControls.Count) % visibleControls.Count;
-    }
-
-    currentFocusedIndex = focusableControls.IndexOf(visibleControls[currentVisibleIndex]);
+    currentFocusedIndex = focusableControls.IndexOf(visibleControls[newIndex]);
     GD.Print($"newFocusedIndex: {currentFocusedIndex}, control: {focusableControls[currentFocusedIndex].Name}");
     await HighlightMenuButton(currentFocusedIndex);
   }
+
+  private int GetNextValidIndex(bool isUp) {
+    var visibleControls = GetVisibleFocusableControls();
+    bool skipInGameMenu = UIManager.Instance.playerChoicesBoxUI.Visible || UIManager.Instance.inGameMenuButton.Visible;
+    int startIndex = skipInGameMenu ? 1 : 0;
+
+    int currentVisibleIndex = currentFocusedIndex != -1
+        ? visibleControls.IndexOf(focusableControls[currentFocusedIndex])
+        : startIndex;
+
+    if (currentVisibleIndex == -1) {
+      currentVisibleIndex = startIndex;
+    }
+
+    do {
+      currentVisibleIndex = (currentVisibleIndex + (isUp ? -1 : 1) + visibleControls.Count) % visibleControls.Count;
+    } while (skipInGameMenu && currentVisibleIndex == 0);
+
+    return currentVisibleIndex;
+  }
+
 
   private async Task HandleHorizontalNavigation(bool isLeft) {
     var visibleControls = GetVisibleFocusableControls();

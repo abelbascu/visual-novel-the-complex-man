@@ -141,7 +141,7 @@ public partial class MainMenu : Control {
     loadGameButton.Pressed += () => _ = OnLoadGameButtonPressed();
     languageButton.Pressed += () => _ = OnLanguageButtonPressed();
     creditsButton.Pressed += () => _ = OnCreditsButtonPressed();
-    exitToMainMenuButton.Pressed += OnExitToMainMenuButtonPressed;
+    exitToMainMenuButton.Pressed += () => _ = OnExitToMainMenuButtonPressed();
     exitGameButton.Pressed += () => _ = OnExitGameButtonPressed();
 
     //exit to main menu events
@@ -653,7 +653,7 @@ public partial class MainMenu : Control {
   }
 
   //Exit to Main Menu
-  public async void OnExitToMainMenuButtonPressed() {
+  public async Task OnExitToMainMenuButtonPressed() {
     await inputBlocker.BlockNewInput(async () => {
       DisableAllButtons();
       HideIngameMenuIcon();
@@ -665,8 +665,9 @@ public partial class MainMenu : Control {
     await inputBlocker.BlockNewInput(async () => {
       DisableAllButtons();
       SetButtonActiveState(NoExitToMainMenuButton, false);
-      SetContainerButtonsVisibility(MainOptionsContainer, false);
-      await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
+      SetButtonActiveState(YesExitToMainMenuButton, false);
+      //SetContainerButtonsVisibility(MainOptionsContainer, false);
+      await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.5f);
       SetButtonActiveState(YesExitToMainMenuButton, false);
       ExitToMainMenuPanel.Visible = true;
       ExitToMainMenuPanel.TopLevel = true;

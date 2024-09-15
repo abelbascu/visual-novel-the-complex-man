@@ -109,7 +109,7 @@ public partial class InputManager : Control {
     }
 
     //mouse input
-    if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left) {
+    if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left && !inputBlocker.IsBlocked && !isProcessingInput) {
       lastInputWasKeyboardOrGamepad = false;
       isProcessingInput = true;
       await ProcessInputAsync(@event);
@@ -117,7 +117,7 @@ public partial class InputManager : Control {
       AcceptEvent();
 
       //gamepad and keyboard input
-    } else if (isGamePadAndKeyboardInputEnabled) {
+    } else if (isGamePadAndKeyboardInputEnabled && !inputBlocker.IsBlocked && !isProcessingInput) {
       if (@event.IsActionPressed("ui_accept") || @event.IsActionPressed("ui_cancel") || @event.IsActionPressed("ui_left")
       || @event.IsActionPressed("ui_right") || @event.IsActionPressed("ui_up") || @event.IsActionPressed("ui_down")) {
         lastInputWasKeyboardOrGamepad = true;
@@ -523,6 +523,10 @@ public partial class InputManager : Control {
 
 
   private async Task HandleMenuCancel() {
+
+    if (inputBlocker.IsBlocked) {
+      return;
+    }
 
     if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)) {
       await UIManager.Instance.mainMenu.OnExitGameCancelButtonPressed();

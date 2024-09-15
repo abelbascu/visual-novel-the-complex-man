@@ -373,7 +373,7 @@ public partial class MainMenu : Control {
     SetContainerButtonsVisibility(ExitToMainMenuPanel, false);
     SetContainerButtonsVisibility(MainOptionsContainer, true);
 
-  //!if i don't do this, the savegame and continue button appear as visible in the log...
+    //!if i don't do this, the savegame and continue button appear as visible in the log...
     CallDeferred(nameof(SetupMainMenuButtonVisibility));
 
     SetDialogueUIElementsTopLevel(false);
@@ -575,11 +575,11 @@ public partial class MainMenu : Control {
     await ToSignal(GetTree(), "process_frame");
     await ToSignal(GetTree(), "process_frame");
     await ToSignal(GetTree(), "process_frame");
-     await ToSignal(GetTree(), "process_frame");
     await ToSignal(GetTree(), "process_frame");
     await ToSignal(GetTree(), "process_frame");
     await ToSignal(GetTree(), "process_frame");
-     await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
+    await ToSignal(GetTree(), "process_frame");
     await ToSignal(GetTree(), "process_frame");
     await ToSignal(GetTree(), "process_frame");
     await ToSignal(GetTree(), "process_frame");
@@ -594,8 +594,8 @@ public partial class MainMenu : Control {
       await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
       SetContainerButtonsVisibility(MainOptionsContainer, false);
       SetContainerButtonsVisibility(LanguageOptionsContainer, true);
+      await DisplayLanguageMenu();
       GameStateManager.Instance.Fire(Trigger.DISPLAY_LANGUAGE_MENU);
-      EnableAllButtons();
     });
   }
 
@@ -604,6 +604,7 @@ public partial class MainMenu : Control {
       LanguageOptionsContainer.Visible = true;
       LanguageOptionsContainer.TopLevel = true;
       await UIFadeHelper.FadeInControl(LanguageOptionsContainer);
+      EnableAllButtons();
     });
   }
 

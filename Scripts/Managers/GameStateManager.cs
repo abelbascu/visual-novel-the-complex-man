@@ -143,7 +143,7 @@ public partial class GameStateManager : Node {
                 () => {}},
             //in game menu > language menu
             {(State.InGameMenuDisplayed, SubState.None, State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed, Trigger.DISPLAY_LANGUAGE_MENU),
-                () => GameManager.Instance.Display_Language_Menu()},
+                () => {}},
             //language menu > go back to ingame menu
             {(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed, State.InGameMenuDisplayed, SubState.DisplayingIngameMenu, Trigger.DISPLAY_INGAME_MENU),
                 () => GameManager.Instance.Display_Ingame_Menu()},
@@ -204,7 +204,7 @@ public partial class GameStateManager : Node {
                 () =>GameManager.Instance.Enter_Dialogue_Mode()},
             //main menu > language menu
             {(State.MainMenuDisplayed, SubState.None, State.MainMenuDisplayed, SubState.LanguageMenuDisplayed, Trigger.DISPLAY_LANGUAGE_MENU),
-                () => GameManager.Instance.Display_Language_Menu()},
+                () => {}},
             //language menu > go back to main menu
             {(State.MainMenuDisplayed, SubState.LanguageMenuDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
                 () =>  GameManager.Instance.Display_Main_Menu_Container_Only()},

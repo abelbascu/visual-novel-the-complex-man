@@ -39,6 +39,7 @@ public partial class InputManager : Control {
   private bool isInputLocked = false;
   private bool lastInputWasKeyboardOrGamepad = false;
 
+
   //we put another extra measure as the main menu buttons
   //still received input even if they are disabled
   //!this creates copupling
@@ -186,7 +187,21 @@ public partial class InputManager : Control {
     GD.Print("FocusableControlsUpdated");
     foreach (Control focusable in focusableControls)
       GD.Print($"{focusable.Name}");
-    await ClearButtonHighlights();
+
+    // Ensure proper highlighting when returning to main or in-game menu
+    if ((newState == State.MainMenuDisplayed || newState == State.InGameMenuDisplayed) && newSubState == SubState.None) {
+      if (lastInputWasKeyboardOrGamepad) {
+        currentFocusedIndex = newState == State.MainMenuDisplayed ? lastMainMenuIndex : lastInGameMenuIndex;
+      } else {
+        currentFocusedIndex = GetIndexOfControlUnderMouse();
+      }
+
+      if (currentFocusedIndex >= 0 && currentFocusedIndex < focusableControls.Count) {
+        await HighlightMenuButton(currentFocusedIndex);
+      }
+    } else {
+      await ClearButtonHighlights();
+    }
   }
 
 
@@ -211,19 +226,22 @@ public partial class InputManager : Control {
     else if (currentState == State.MainMenuDisplayed && currentSubstate == SubState.None) {
       currentFocusedMenu = UIManager.Instance.mainMenu;
       GetInteractableUIElements(currentFocusedMenu);
-      currentFocusedIndex = (lastMainMenuIndex >= 0 && lastMainMenuIndex < focusableControls.Count)
-          ? lastMainMenuIndex
-          : -1;
+      if (lastInputWasKeyboardOrGamepad && lastMainMenuIndex != -1 && lastMainMenuIndex < focusableControls.Count) {
+        currentFocusedIndex = lastMainMenuIndex;
+      } else {
+        currentFocusedIndex = GetIndexOfControlUnderMouse();
+      }
       //INGAME MENU -------------------------------
     } else if (currentState == State.InGameMenuDisplayed && currentSubstate == SubState.None) {
       GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
       currentFocusedMenu = UIManager.Instance.mainMenu;
       GetInteractableUIElements(currentFocusedMenu);
-      currentFocusedIndex = 1;
-      // currentFocusedIndex = (lastInGameMenuIndex >= 0 && lastInGameMenuIndex < focusableControls.Count)
-      //     ? lastInGameMenuIndex
-      //     : -1;
-      //LOAD GAME ----------------------------------
+
+      if (lastInputWasKeyboardOrGamepad && lastInGameMenuIndex != -1 && lastInGameMenuIndex < focusableControls.Count) {
+        currentFocusedIndex = lastInGameMenuIndex;
+      } else {
+        currentFocusedIndex = GetIndexOfControlUnderMouse();
+      }
     } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && currentSubstate == SubState.LoadScreenDisplayed) {
       currentFocusedMenu = UIManager.Instance.saveGameScreen;
       GetInteractableUIElements(currentFocusedMenu);
@@ -265,21 +283,25 @@ public partial class InputManager : Control {
       currentFocusedIndex = -1;
     }
 
-    UpdateCurrentFocusedIndexBasedOnMousePosition();
+    //UpdateCurrentFocusedIndexBasedOnMousePosition();
 
-
-    await ClearButtonHighlights();
+    if (currentFocusedIndex != -1) {
+      await HighlightMenuButton(currentFocusedIndex);
+    } else {
+      await ClearButtonHighlights();
+    }
   }
 
 
-  private void UpdateCurrentFocusedIndexBasedOnMousePosition() {
+  private int GetIndexOfControlUnderMouse() {
     for (int i = 0; i < focusableControls.Count; i++) {
-      if (focusableControls[i] is Control focusable
-          && focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) && focusable.Visible == true) {
-        currentFocusedIndex = i;
-        break;
+      if (focusableControls[i] is Control focusable &&
+          focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) &&
+          focusable.Visible) {
+        return i;
       }
     }
+    return -1;
   }
 
   private void GetInteractableUIElements(Node node) {
@@ -299,6 +321,8 @@ public partial class InputManager : Control {
     if (GameStateManager.Instance.CurrentState == State.InDialogueMode) {
       return; // Ignore mouse motion in dialogue mode
     }
+
+    lastInputWasKeyboardOrGamepad = false;
 
     int newFocusedIndex = -1;
     for (int i = 0; i < focusableControls.Count; i++) {

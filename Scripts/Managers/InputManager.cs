@@ -577,33 +577,82 @@ public partial class InputManager : Control {
 
   private async Task HandleVerticalNavigation(bool isUp) {
     var visibleControls = GetVisibleFocusableControls();
+
     if (visibleControls.Count == 0) return;
 
     int newIndex = GetNextValidIndex(isUp);
 
-    currentFocusedIndex = focusableControls.IndexOf(visibleControls[newIndex]);
-    GD.Print($"newFocusedIndex: {currentFocusedIndex}, control: {focusableControls[currentFocusedIndex].Name}");
-    await HighlightMenuButton(currentFocusedIndex);
+    if (newIndex != -1 && newIndex != currentFocusedIndex) {
+      currentFocusedIndex = focusableControls.IndexOf(visibleControls[newIndex]);
+      GD.Print($"newFocusedIndex: {currentFocusedIndex}, control: {focusableControls[currentFocusedIndex].Name}");
+      await HighlightMenuButton(currentFocusedIndex);
+    }
   }
 
   private int GetNextValidIndex(bool isUp) {
     var visibleControls = GetVisibleFocusableControls();
-    bool skipInGameMenu = UIManager.Instance.playerChoicesBoxUI.Visible || UIManager.Instance.inGameMenuButton.Visible;
-    int startIndex = skipInGameMenu ? 1 : 0;
+    bool isInGameMenuVisible = UIManager.Instance.inGameMenuButton.Visible;
+    bool isPlayerChoicesVisible = UIManager.Instance.playerChoicesBoxUI.Visible;
 
-    int currentVisibleIndex = currentFocusedIndex != -1
-        ? visibleControls.IndexOf(focusableControls[currentFocusedIndex])
-        : startIndex;
+    // If no controls are visible, return -1
+    if (visibleControls.Count == 0) return -1;
 
-    if (currentVisibleIndex == -1) {
-      currentVisibleIndex = startIndex;
+    int count = visibleControls.Count;
+    int currentIndex;
+
+    if (currentFocusedIndex == -1) {
+      // If no button is currently focused, select the first or last valid button
+      currentIndex = isUp ? count - 1 : 0;
+      // Skip in-game menu button if necessary
+      if (currentIndex == 0 && isInGameMenuVisible && !UIManager.Instance.playerChoicesBoxUI.Visible) {
+        currentIndex = 1;
+      }
+    } 
+      // If a button is focused, start from the current position
+    else {
+      currentIndex = visibleControls.IndexOf(focusableControls[currentFocusedIndex]);
+
+      // Move to next/previous button
+      if (isUp) {
+        currentIndex = (currentIndex - 1 + count) % count;
+      } else {
+        currentIndex = (currentIndex + 1) % count;
+      }
     }
 
+    // Find the next valid button
+    int startIndex = currentIndex;
     do {
-      currentVisibleIndex = (currentVisibleIndex + (isUp ? -1 : 1) + visibleControls.Count) % visibleControls.Count;
-    } while (skipInGameMenu && currentVisibleIndex == 0);
+      // Skip the in-game menu button if it's visible and we're not in player choices
+      if (currentIndex == 0 && isInGameMenuVisible && !UIManager.Instance.playerChoicesBoxUI.Visible) {
+        currentIndex = isUp ? count - 1 : 1;
+      }
+      //It checks if the current button is valid for navigation.
+      //If it's valid, it returns that index immediately.
+      if (IsValidButtonForNavigation(visibleControls[currentIndex])) {
+        return currentIndex;
+      }
 
-    return currentVisibleIndex;
+      //If it's not valid, it moves to the next button in the specified direction.
+      if (isUp) {
+        currentIndex = (currentIndex - 1 + count) % count;
+      } else {
+        currentIndex = (currentIndex + 1) % count;
+      }
+
+      //It keeps doing this until it finds a valid button or has checked all buttons.
+      // If we've looped back to the start index, break to avoid infinite loop
+      if (currentIndex == startIndex) break;
+
+    } while (true);
+
+    // If no valid button found, return -1
+    return -1;
+  }
+
+  private bool IsValidButtonForNavigation(Control control) {
+    // Add any additional conditions here if needed
+    return control.Visible;
   }
 
 

@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 public partial class PlayerChoicesBoxUI : MarginContainer {
     public Action<Vector2> SizeChanged;
@@ -106,6 +107,7 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         }
 
         FinishedDisplayingPlayerChoice?.Invoke();
+    //     await Task.CompletedTask;
     }
 
     public bool ButtonExistsForPlayerChoice(DialogueObject playerChoiceObject) {

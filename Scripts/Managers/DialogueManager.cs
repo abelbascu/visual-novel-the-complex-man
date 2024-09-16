@@ -216,16 +216,16 @@ public partial class DialogueManager : Control {
     IsPlayerChoiceBeingPrinted = false;
     //we are already in dialogue mode, but we trigger this empty signal
     //so focusable UI controls list in InputManager is updated
-    if(GameStateManager.Instance.IsInState(GameStateMachine.State.InDialogueMode, GameStateMachine.SubState.None))
-    GameStateManager.Instance.Fire(GameStateMachine.Trigger.ENTER_DIALOGUE_MODE);
+    if (GameStateManager.Instance.IsInState(GameStateMachine.State.InDialogueMode, GameStateMachine.SubState.None))
+      GameStateManager.Instance.Fire(GameStateMachine.Trigger.ENTER_DIALOGUE_MODE);
   }
 
   public void OnTextBoxFinishedDisplayingDialogueLine() {
     isDialogueBeingPrinted = false;
     //we are already in dialogue mode, but we trigger this empty signal
     //so focusable UI controls list in InputManager is updated
-     if(GameStateManager.Instance.IsInState(GameStateMachine.State.InDialogueMode, GameStateMachine.SubState.None))
-    GameStateManager.Instance.Fire(GameStateMachine.Trigger.ENTER_DIALOGUE_MODE);
+    if (GameStateManager.Instance.IsInState(GameStateMachine.State.InDialogueMode, GameStateMachine.SubState.None))
+      GameStateManager.Instance.Fire(GameStateMachine.Trigger.ENTER_DIALOGUE_MODE);
   }
 
   public void RemoveFromPlayerChoicesList(DialogueObject dialogObj) {
@@ -305,6 +305,10 @@ public partial class DialogueManager : Control {
       AddNoGroupPlayerChoicesToList(currentDialogueObject);
       DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
     }
+
+    if (GameStateManager.Instance.IsInState(GameStateMachine.State.InDialogueMode, GameStateMachine.SubState.None))
+      GameStateManager.Instance.Fire(GameStateMachine.Trigger.ENTER_DIALOGUE_MODE);
+
   }
 
   public void AddGroupPlayerChoicesToList(DialogueObject nextDialogueObject) {
@@ -398,6 +402,9 @@ public partial class DialogueManager : Control {
           DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
         }
       }
+
+      if (GameStateManager.Instance.IsInState(GameStateMachine.State.InDialogueMode, GameStateMachine.SubState.None))
+        GameStateManager.Instance.Fire(GameStateMachine.Trigger.ENTER_DIALOGUE_MODE);
     }
 
     //if the node is a NoGroupParent, meaning that it is not a GROUP node but it has branching childs, 

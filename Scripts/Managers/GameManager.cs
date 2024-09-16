@@ -216,26 +216,26 @@ public partial class GameManager : Control {
       GD.Print("In Initialize_Load_Screen, before triggering DISPLAY_LOAD_SCREEN");
       GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
     } else {
-    GD.Print("In Initialize_Load_Screen, before triggering DISPLAY_SAVE_SCREEN");
+      GD.Print("In Initialize_Load_Screen, before triggering DISPLAY_SAVE_SCREEN");
       GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
   }
 
   public async Task Initialize_Save_Screen() {
 
-     bool isLoadScreen = true;
-    
+    bool isLoadScreen = true;
+
     GD.Print("On InputManager about to call SetUpSaveOrLoadScreen");
     isLoadScreen = await UIManager.saveGameScreen.SetUpSaveOrLoadScreen(UIManager.Instance.mainMenu.SAVE_SCREEN);
-     await ToSignal(GetTree(), "process_frame");
     await ToSignal(GetTree(), "process_frame");
     await ToSignal(GetTree(), "process_frame");
     await ToSignal(GetTree(), "process_frame");
-      if (isLoadScreen) {
+    await ToSignal(GetTree(), "process_frame");
+    if (isLoadScreen) {
       GD.Print("In Initialize_Save_Screen, before triggering DISPLAY_LOAD_SCREEN");
       GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
-    } else {
-    GD.Print("In Initialize_Save_Screen, before triggering DISPLAY_SAVE_SCREEN");
+    } else {  
+      GD.Print("In Initialize_Save_Screen, before triggering DISPLAY_SAVE_SCREEN");
       GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }
   }

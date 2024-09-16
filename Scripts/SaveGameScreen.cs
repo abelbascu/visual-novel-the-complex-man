@@ -179,7 +179,9 @@ public partial class SaveGameScreen : MarginContainer {
     // await Task.Yield();
 
     //give time to disable the slots before we continue
-    // await Task.CompletedTask;
+    //i need to make the go back button visible here before calling
+    //DISPLAY_SAVE_SCREEN triffer, if not, input manager won't see it
+    goBackButton.Visible = true;
 
     InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
 
@@ -193,7 +195,6 @@ public partial class SaveGameScreen : MarginContainer {
 
     GD.Print("Starting DDisplaySaveScreen");
 
-    goBackButton.Visible = false;
     goBackButton.SetProcessInput(false); //avoid hitting the ga back button repeatedly
     goBackButton.MouseFilter = MouseFilterEnum.Ignore;
     goBackButton.ProcessMode = ProcessModeEnum.Disabled;

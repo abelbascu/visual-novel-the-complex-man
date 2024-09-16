@@ -277,7 +277,6 @@ public partial class InputManager : Control {
       else if (UIManager.Instance.playerChoicesBoxUI.Visible)
         currentFocusedMenu = DialogueManager.Instance.playerChoicesBoxUI;
       GetInteractableUIElements(currentFocusedMenu);
-      currentFocusedIndex = 1; // Focus on the first button in the submenu
     } else {
       // For any other state/substate combination, clear focus
       currentFocusedIndex = -1;
@@ -580,7 +579,7 @@ public partial class InputManager : Control {
 
     if (visibleControls.Count == 0) return;
 
-    int newIndex = GetNextValidIndex(isUp);
+    int newIndex = GetNextValidFocusableControlIndex(isUp);
 
     if (newIndex != -1 && newIndex != currentFocusedIndex) {
       currentFocusedIndex = focusableControls.IndexOf(visibleControls[newIndex]);
@@ -589,7 +588,7 @@ public partial class InputManager : Control {
     }
   }
 
-  private int GetNextValidIndex(bool isUp) {
+  private int GetNextValidFocusableControlIndex(bool isUp) {
     var visibleControls = GetVisibleFocusableControls();
     bool isInGameMenuVisible = UIManager.Instance.inGameMenuButton.Visible;
     bool isPlayerChoicesVisible = UIManager.Instance.playerChoicesBoxUI.Visible;
@@ -604,7 +603,7 @@ public partial class InputManager : Control {
       // If no button is currently focused, select the first or last valid button
       currentIndex = isUp ? count - 1 : 0;
       // Skip in-game menu button if necessary
-      if (currentIndex == 0 && isInGameMenuVisible && !UIManager.Instance.playerChoicesBoxUI.Visible) {
+      if (currentIndex == 0 && isInGameMenuVisible) {
         currentIndex = 1;
       }
     } 
@@ -624,7 +623,7 @@ public partial class InputManager : Control {
     int startIndex = currentIndex;
     do {
       // Skip the in-game menu button if it's visible and we're not in player choices
-      if (currentIndex == 0 && isInGameMenuVisible && !UIManager.Instance.playerChoicesBoxUI.Visible) {
+      if (currentIndex == 0 && isInGameMenuVisible) {
         currentIndex = isUp ? count - 1 : 1;
       }
       //It checks if the current button is valid for navigation.

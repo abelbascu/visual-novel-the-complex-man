@@ -680,7 +680,7 @@ public partial class MainMenu : Control {
     });
   }
 
-  private async Task OnExitToMainMenuCancelButtonPressed() {
+  public async Task OnExitToMainMenuCancelButtonPressed() {
     await inputBlocker.BlockNewInput(async () => {
       SetButtonActiveState(NoExitToMainMenuButton, false);
       SetButtonActiveState(YesExitToMainMenuButton, false);

@@ -567,24 +567,42 @@ public partial class InputManager : Control {
       return;
     }
 
-    if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)) {
-      await UIManager.Instance.mainMenu.OnExitGameCancelButtonPressed();
+    // if (GameStateManager.Instance.IsInState(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed)) {
+    //   await UIManager.Instance.mainMenu.OnExitGameCancelButtonPressed();
+    //   return;
+    // }
+
+    //if the ingame menu is displayed, we close it or open it
+    else if ((GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed || GameStateManager.Instance.CurrentState == State.InDialogueMode) && GameStateManager.Instance.CurrentSubstate == SubState.None) {
+      //if (GameStateManager.Instance.CurrentSubstate == SubState.None)
+      await UIManager.Instance.inGameMenuButton.OnPressed();
       return;
     }
 
-    //if the ingame menu is displayed, we close it or open it
-    else if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed || GameStateManager.Instance.CurrentState == State.InDialogueMode)
-      //if (GameStateManager.Instance.CurrentSubstate == SubState.None)
-      await UIManager.Instance.inGameMenuButton.OnPressed();
+    // else if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed || GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed) {
+    //   if (GameStateManager.Instance.CurrentSubstate == SubState.LanguageMenuDisplayed) {
+    //     await UIManager.Instance.mainMenu.OnLanguagesGoBackButtonPressed();
+    //   }
+    else if (GameStateManager.Instance.CurrentSubstate == SubState.LoadScreenDisplayed) {
+      await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
+      return;
+    } else if (GameStateManager.Instance.CurrentSubstate == SubState.SaveScreenDisplayed) {
+      await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
+      return;
 
-    else if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed || GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed) {
-      if (GameStateManager.Instance.CurrentSubstate == SubState.LanguageMenuDisplayed)
-        await UIManager.Instance.mainMenu.OnLanguagesGoBackButtonPressed();
-
-    } else if (GameStateManager.Instance.IsInState(State.InGameMenuDisplayed, SubState.LanguageMenuDisplayed))
+    } else if (GameStateManager.Instance.CurrentSubstate == SubState.LanguageMenuDisplayed) {
       //if (GameStateManager.Instance.CurrentSubstate == SubState.None)
       await UIManager.Instance.mainMenu.OnLanguagesGoBackButtonPressed();
-
+      return;
+    }
+    else if(GameStateManager.Instance.CurrentSubstate == SubState.ExitToMainMenuConfirmationPopupDisplayed) {
+      await UIManager.Instance.mainMenu.OnExitToMainMenuCancelButtonPressed();
+        return;
+    }
+    else if(GameStateManager.Instance.CurrentSubstate == SubState.ExitGameConfirmationPopupDisplayed) {
+      await UIManager.Instance.mainMenu.OnExitGameCancelButtonPressed();
+      return;
+    }
 
     // else if(GameStateManager.Instance.CurrentSubstate == SubState.LoadScreenDisplayed)
     //     await UIManager.Instance.saveGameScreen.OnGoBackButtonPressed();
@@ -604,25 +622,22 @@ public partial class InputManager : Control {
       await HighlightMenuButton(currentFocusedIndex);
 
       // Scroll to the newly focused control if it's an InteractableUIButton within a SaveGameSlot
-        if (focusableControls[currentFocusedIndex] is InteractableUIButton button)
-        {
-            var saveGameSlot = FindSaveGameSlotParent(button);
-            if (saveGameSlot != null)
-            {
-                var saveGameScreen = UIManager.Instance.saveGameScreen;
-                saveGameScreen.ScrollToControl(saveGameSlot);
-            }
+      if (focusableControls[currentFocusedIndex] is InteractableUIButton button) {
+        var saveGameSlot = FindSaveGameSlotParent(button);
+        if (saveGameSlot != null) {
+          var saveGameScreen = UIManager.Instance.saveGameScreen;
+          saveGameScreen.ScrollToControl(saveGameSlot);
         }
+      }
 
     }
   }
 
-  private SaveGameSlot FindSaveGameSlotParent(Node node)
-{
+  private SaveGameSlot FindSaveGameSlotParent(Node node) {
     if (node == null) return null;
     if (node is SaveGameSlot saveGameSlot) return saveGameSlot;
     return FindSaveGameSlotParent(node.GetParent());
-}
+  }
 
 
   private int GetNextValidFocusableControlIndex(bool isUp) {

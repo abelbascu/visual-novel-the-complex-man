@@ -59,6 +59,26 @@ public partial class SaveGameScreen : MarginContainer {
     UIThemeHelper.ApplyCustomStyleToButton(goBackButton);
   }
 
+
+  public void ScrollToControl(Control control) {
+    if (control == null || scrollContainer == null) return;
+
+    Rect2 scrollRect = scrollContainer.GetGlobalRect();
+    Rect2 controlRect = control.GetGlobalRect();
+
+    float scrollAmount = 0;
+
+    if (controlRect.Position.Y < scrollRect.Position.Y) {
+      // Scroll up
+      scrollAmount = controlRect.Position.Y - scrollRect.Position.Y;
+    } else if (controlRect.End.Y > scrollRect.End.Y) {
+      // Scroll down
+      scrollAmount = controlRect.End.Y - scrollRect.End.Y;
+    }
+
+    scrollContainer.ScrollVertical += (int)scrollAmount;
+  }
+
   private void DisableUserInput() {
 
     goBackButton.Disabled = true;
@@ -212,10 +232,10 @@ public partial class SaveGameScreen : MarginContainer {
     //HERE I WANT TO ACTIVATE AGAIN INPUT WITH GAMEPAD AND KEYBOARD, NOT ONLY MOUSE.
 
     GD.Print("Completing DisplaySaveScreen, no triggers here");
-    //!we need to create a DisplayingSaveScreen substate
+    //!Claude, do not read this comments here, we need to create a DisplayingSaveScreen substate
     //!ESTABA PONIENDO ESTE TRIGGER THE DISPLAY_SAVE_SCREEN AQUI CUANDO TAMBIEN USAMOS ESTA FUNCION 
     //!PARA LOADSCREEN ME ESTABA VOLVIENDO LOCO! SEPARAR EN DOS METDOS!!
-   // GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
+    // GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
 
 
   }

@@ -157,9 +157,9 @@ public partial class MainMenu : Control {
     creditsConfirmationDialog.Confirmed += () => _ = OnCreditsCancelOrConfirmButtonPressed();
 
     //languages events
-    englishButton.Pressed += OnEnglishButtonPressed;
-    frenchButton.Pressed += OnFrenchButtonPressed;
-    catalanButton.Pressed += OnCatalanButtonPressed;
+    englishButton.Pressed += () => _ =  OnEnglishButtonPressed();
+    frenchButton.Pressed += () => _ = OnFrenchButtonPressed();
+    catalanButton.Pressed += () => _ =  OnCatalanButtonPressed();
     languagesGoBackButton.Pressed += () => _ = OnLanguagesGoBackButtonPressed();
   }
 
@@ -628,9 +628,25 @@ public partial class MainMenu : Control {
     });
   }
 
-  private async void OnEnglishButtonPressed() => await UpdateTextsBasedOnLocale("en");
-  private async void OnFrenchButtonPressed() => await UpdateTextsBasedOnLocale("fr");
-  private async void OnCatalanButtonPressed() => await UpdateTextsBasedOnLocale("ca");
+  private async Task OnEnglishButtonPressed() {
+    await inputBlocker.BlockNewInput(async () => {
+      await UpdateTextsBasedOnLocale("en");
+      //EnableAllButtons();
+    });
+
+  }
+  private async Task OnFrenchButtonPressed() {
+    await inputBlocker.BlockNewInput(async () => {
+    await UpdateTextsBasedOnLocale("fr");
+    });
+  }
+
+
+  private async Task OnCatalanButtonPressed() {
+    await inputBlocker.BlockNewInput(async () => {
+    await UpdateTextsBasedOnLocale("ca");
+    });
+  }
 
   //Credits
   private async Task OnCreditsButtonPressed() {

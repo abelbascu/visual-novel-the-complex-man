@@ -106,8 +106,8 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
             }
         }
 
+        //!this is useless we can remove it
         FinishedDisplayingPlayerChoice?.Invoke();
-    //     await Task.CompletedTask;
     }
 
     public bool ButtonExistsForPlayerChoice(DialogueObject playerChoiceObject) {

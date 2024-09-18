@@ -57,6 +57,9 @@ public partial class InputNameScreen : Control {
     var vBoxContainer = marginContainer.GetNode<VBoxContainer>("MarginContainer1/VBoxContainer");
 
     nameInput = vBoxContainer.GetNode<InteractableUILineEdit>("HBoxContainer/LineEdit");
+    nameInput.CaretBlink = true;
+    nameInput.CaretForceDisplayed = true;
+
     acceptNameButton = vBoxContainer.GetNode<InteractableUITextureButton>("HBoxContainer/Control/InteractableUITextureButton");
 
     confirmationDialog = marginContainer.GetNode<ConfirmationDialog>("MarginContainer2/ConfirmationDialog");
@@ -266,7 +269,7 @@ public partial class InputNameScreen : Control {
   // }
 
   public Color GetHighlightedButtonColor() {
-     return Colors.Yellow;
+    return Colors.Yellow;
   }
 
   public Color GetNormalButtonColor() {

@@ -747,9 +747,38 @@ public partial class InputManager : Control {
         playerChoiceButton.ApplyStyle(i == index);
       } else if (focusableControls[i] is InteractableUIButton button) {
         await ApplyButtonStyle(button, i == index);
-      }
+        } else if (focusableControls[i] is InteractableUILineEdit lineEdit) {
+            await ApplyLineEditStyle(lineEdit, i == index);
+        } else if (focusableControls[i] is InteractableUITextureButton textureButton) {
+            await ApplyTextureButtonStyle(textureButton, i == index);
+        }
     }
   }
+
+private async Task ApplyLineEditStyle(InteractableUILineEdit lineEdit, bool isHighlighted) {
+    var uiManager = GetNode<UIManager>("/root/Game/GameManager/UIManager");
+    var inputNameScreen = uiManager.GetNode<InputNameScreen>("InputNameScreen");
+    if (inputNameScreen != null) {
+        lineEdit.AddThemeStyleboxOverride("normal", isHighlighted 
+            ? inputNameScreen.GetHighlightedLineEditStyle() 
+            : inputNameScreen.GetNormalLineEditStyle());
+    }
+    await Task.CompletedTask;
+}
+
+private async Task ApplyTextureButtonStyle(InteractableUITextureButton textureButton, bool isHighlighted)
+{
+    var uiManager = GetNode<UIManager>("/root/Game/GameManager/UIManager");
+    var inputNameScreen = uiManager.GetNode<InputNameScreen>("InputNameScreen");
+    if (inputNameScreen != null)
+    {
+        var background = textureButton.GetNode<ColorRect>("../AcceptButtonBackground");
+        background.Color = isHighlighted 
+            ? inputNameScreen.GetHighlightedButtonColor() 
+            : inputNameScreen.GetNormalButtonColor();
+    }
+    await Task.CompletedTask;
+}
 
   private async Task ApplyButtonStyle(InteractableUIButton button, bool isHighlighted) {
 

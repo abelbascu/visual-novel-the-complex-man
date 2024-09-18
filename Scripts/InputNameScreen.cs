@@ -17,6 +17,7 @@ public partial class InputNameScreen : Control {
   private string inputYourNameConfirmNameText_TRANSLATE = "INPUT_YOUR_NAME_CONFIRM_NAME"; //[center]Are you sure that {username} is your final name?[/center]\n[center]You won't be able to change it during this current play![/center]"
   private RichTextLabel richText;
   private InteractableUITextureButton acceptNameButton;
+  private ColorRect acceptButtonBackground;
 
   [Export] public float FadeDuration { get; set; } = 0.5f;
 
@@ -56,7 +57,7 @@ public partial class InputNameScreen : Control {
     var vBoxContainer = marginContainer.GetNode<VBoxContainer>("MarginContainer1/VBoxContainer");
 
     nameInput = vBoxContainer.GetNode<InteractableUILineEdit>("HBoxContainer/LineEdit");
-    acceptNameButton = vBoxContainer.GetNode<InteractableUITextureButton>("HBoxContainer/InteractableUITextureButton");
+    acceptNameButton = vBoxContainer.GetNode<InteractableUITextureButton>("HBoxContainer/Control/InteractableUITextureButton");
 
     confirmationDialog = marginContainer.GetNode<ConfirmationDialog>("MarginContainer2/ConfirmationDialog");
     richText = vBoxContainer.GetNode<RichTextLabel>("RichTextLabel");
@@ -77,6 +78,8 @@ public partial class InputNameScreen : Control {
     // image.Resize(256, 256, Image.Interpolation.Bilinear);
     // var smallerTexture = ImageTexture.CreateFromImage(image);
     // acceptNameButton.TextureNormal = smallerTexture;
+
+    acceptButtonBackground = GetNode<ColorRect>("MarginContainer/MarginContainer1/VBoxContainer/HBoxContainer/Control/AcceptButtonBackground");
 
 
     ListenForNameConfirmation();
@@ -131,7 +134,7 @@ public partial class InputNameScreen : Control {
 
   private void OnNameInputInteract() {
     ShowConfirmationDialog();
-}
+  }
 
   private void OnAcceptButtonPressed() {
     ShowConfirmationDialog();
@@ -156,64 +159,121 @@ public partial class InputNameScreen : Control {
   //   }
   // }
 
-    // public override void _Process(double delta) {
-    //   if (IsVisibleInTree() && !isNameConfirmed) {
-    //     if (!nameInput.HasFocus()) {
-    //       GD.Print("LineEdit lost focus, attempting to regrab");
-    //       nameInput.GrabFocus();
-    //     }
-    //   }
-    // }
+  // public override void _Process(double delta) {
+  //   if (IsVisibleInTree() && !isNameConfirmed) {
+  //     if (!nameInput.HasFocus()) {
+  //       GD.Print("LineEdit lost focus, attempting to regrab");
+  //       nameInput.GrabFocus();
+  //     }
+  //   }
+  // }
 
-    private void OnNameSubmitted(string text) {
-      ShowConfirmationDialog();
-    }
+  private void OnNameSubmitted(string text) {
+    ShowConfirmationDialog();
+  }
 
 
 
-    private void ShowConfirmationDialog() {
-      username = nameInput.Text;
-      if (!string.IsNullOrWhiteSpace(username)) {
-        //confirmationDialog.DialogText = $"Are you sure that '{username}' is your name? It can be a curse or a blessing...";
-        //confirmationDialog.CancelButtonText = $"No, {username} is not my name!.\nLet me change it!";
-        confirmationDialog.CancelButtonText = string.Format(Tr(inputYourNameCancelButtonText_TRANSLATE), username);
-        confirmationDialog.OkButtonText = string.Format(Tr(inputYourNameOKButtonText_TRANSLATE), username);
-        richTextLabel.Text = string.Format(Tr(inputYourNameConfirmNameText_TRANSLATE), username);
-        confirmationDialog.Visible = true; // Make sure the dialog is visible
-                                           //confirmationDialog.PopupCentered();
-      } else {
-        richText.Text = Tr("PLEASE_ENTER_NAME_BEFORE_CONFIRMING");
-        GetTree().CreateTimer(3.0f).Timeout += ClearErrorMessage;
-        // Optionally, provide feedback if the name is empty
-        GD.Print("Please enter a name before confirming.");
-      }
-    }
-
-    private void ClearErrorMessage() {
-      richText.Text = Tr(inputYourNameTitleTRANSLATE);
-    }
-
-    private async Task OnConfirmName() {
-      nameInput.Editable = false;
-      nameInput.FocusMode = Control.FocusModeEnum.None;
-      nameInput.ProcessMode = Node.ProcessModeEnum.Disabled;
-      confirmationDialog.ProcessMode = Node.ProcessModeEnum.Disabled;
-
-      if (isNameConfirmed) return; // Prevent multiple confirmations
-      isNameConfirmed = true;
-      GD.Print($"Name confirmed: {username}");
-      confirmationDialog.ProcessMode = Node.ProcessModeEnum.Disabled;
-      nameInput.ProcessMode = confirmationDialog.ProcessMode = Node.ProcessModeEnum.Disabled;
-      UIInputHelper.DisableParentChildrenInput(this);
-      // Hide the confirmation dialog
-      confirmationDialog.Visible = false;
-      await UIFadeHelper.FadeOutControl(this, 1.3f);
-      GameStateManager.Instance.Fire(Trigger.DISPLAY_NEW_GAME_DIALOGUES);
-      Visible = false;
-    }
-
-    private void OnCancelConfirmation() {
-      confirmationDialog.Visible = false; // Hide the dialog when cancelled
-      nameInput.GrabFocus();
+  private void ShowConfirmationDialog() {
+    username = nameInput.Text;
+    if (!string.IsNullOrWhiteSpace(username)) {
+      //confirmationDialog.DialogText = $"Are you sure that '{username}' is your name? It can be a curse or a blessing...";
+      //confirmationDialog.CancelButtonText = $"No, {username} is not my name!.\nLet me change it!";
+      confirmationDialog.CancelButtonText = string.Format(Tr(inputYourNameCancelButtonText_TRANSLATE), username);
+      confirmationDialog.OkButtonText = string.Format(Tr(inputYourNameOKButtonText_TRANSLATE), username);
+      richTextLabel.Text = string.Format(Tr(inputYourNameConfirmNameText_TRANSLATE), username);
+      confirmationDialog.Visible = true; // Make sure the dialog is visible
+                                         //confirmationDialog.PopupCentered();
+    } else {
+      richText.Text = Tr("PLEASE_ENTER_NAME_BEFORE_CONFIRMING");
+      GetTree().CreateTimer(3.0f).Timeout += ClearErrorMessage;
+      // Optionally, provide feedback if the name is empty
+      GD.Print("Please enter a name before confirming.");
     }
   }
+
+  private void ClearErrorMessage() {
+    richText.Text = Tr(inputYourNameTitleTRANSLATE);
+  }
+
+  private async Task OnConfirmName() {
+    nameInput.Editable = false;
+    nameInput.FocusMode = Control.FocusModeEnum.None;
+    nameInput.ProcessMode = Node.ProcessModeEnum.Disabled;
+    confirmationDialog.ProcessMode = Node.ProcessModeEnum.Disabled;
+
+    if (isNameConfirmed) return; // Prevent multiple confirmations
+    isNameConfirmed = true;
+    GD.Print($"Name confirmed: {username}");
+    confirmationDialog.ProcessMode = Node.ProcessModeEnum.Disabled;
+    nameInput.ProcessMode = confirmationDialog.ProcessMode = Node.ProcessModeEnum.Disabled;
+    UIInputHelper.DisableParentChildrenInput(this);
+    // Hide the confirmation dialog
+    confirmationDialog.Visible = false;
+    await UIFadeHelper.FadeOutControl(this, 1.3f);
+    GameStateManager.Instance.Fire(Trigger.DISPLAY_NEW_GAME_DIALOGUES);
+    Visible = false;
+  }
+
+  private void OnCancelConfirmation() {
+    confirmationDialog.Visible = false; // Hide the dialog when cancelled
+    nameInput.GrabFocus();
+  }
+
+
+  public StyleBoxFlat GetHighlightedLineEditStyle() {
+    return new StyleBoxFlat {
+      BorderColor = new Color(1, 1, 1),
+      BorderWidthBottom = 4,
+      BorderWidthLeft = 4,
+      BorderWidthRight = 4,
+      BorderWidthTop = 4,
+      DrawCenter = false // This ensures only the border is drawn
+    };
+  }
+
+  public StyleBoxFlat GetNormalLineEditStyle() {
+    return new StyleBoxFlat {
+      BorderColor = new Color(0.5f, 0.5f, 0.5f),
+      BorderWidthBottom = 2,
+      BorderWidthLeft = 2,
+      BorderWidthRight = 2,
+      BorderWidthTop = 2,
+      DrawCenter = false
+    };
+  }
+
+  // public StyleBoxFlat GetHighlightedButtonStyle() {
+  //     return new StyleBoxFlat {
+  //         BorderColor = new Color(1, 1, 1),
+  //         BorderWidthBottom = 4,
+  //         BorderWidthLeft = 4,
+  //         BorderWidthRight = 4,
+  //         BorderWidthTop = 4,
+  //         DrawCenter = false
+  //     };
+  // }
+
+  // public StyleBoxFlat GetNormalButtonStyle() {
+  //     return new StyleBoxFlat {
+  //         BorderColor = Colors.Transparent,
+  //         BorderWidthBottom = 0,
+  //         BorderWidthLeft = 0,
+  //         BorderWidthRight = 0,
+  //         BorderWidthTop = 0,
+  //         DrawCenter = false
+  //     };
+  // }
+
+  public Color GetHighlightedButtonColor() {
+     return Colors.Yellow;
+  }
+
+  public Color GetNormalButtonColor() {
+    return new Color(0, 0, 0, 0); // Fully transparent
+  }
+}
+
+
+
+

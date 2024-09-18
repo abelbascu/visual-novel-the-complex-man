@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://bmtre6kqrxwmu"]
+[gd_scene load_steps=6 format=3 uid="uid://bmtre6kqrxwmu"]
 
 [ext_resource type="Script" path="res://Scripts/InputNameScreen.cs" id="1_qomts"]
 [ext_resource type="Script" path="res://Scripts/InteractableUILineEdit.cs" id="2_mjuhh"]
 [ext_resource type="Texture2D" uid="uid://4mhe6t0sdpt8" path="res://Visuals/next button.png" id="3_lb2ww"]
 [ext_resource type="Script" path="res://Scripts/InteractableUITextureButton.cs" id="4_aj8r0"]
+[ext_resource type="Script" path="res://Scripts/InteractableUIButton.cs" id="5_giga8"]
 
 [node name="InputNameScreen" type="Control"]
 layout_mode = 3
@@ -102,3 +103,61 @@ max_size = Vector2i(800, 300)
 ok_button_text = ""
 dialog_close_on_escape = false
 cancel_button_text = ""
+
+[node name="ConfirmNameDialogPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+auto_translate_mode = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -336.0
+offset_top = 60.0
+offset_right = 364.0
+offset_bottom = 414.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ConfirmNameDialogPanel"]
+layout_mode = 1
+offset_right = 700.0
+offset_bottom = 354.0
+
+[node name="MarginContainer" type="MarginContainer" parent="ConfirmNameDialogPanel/VBoxContainer"]
+custom_minimum_size = Vector2(500, 200)
+layout_mode = 2
+
+[node name="AreYouSureTextLabel" type="RichTextLabel" parent="ConfirmNameDialogPanel/VBoxContainer/MarginContainer"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/normal_font_size = 38
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="YesNoAcceptNameButtonsHBoxContainer" type="HBoxContainer" parent="ConfirmNameDialogPanel/VBoxContainer"]
+custom_minimum_size = Vector2(400, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="YesAcceptNameButton" type="Button" parent="ConfirmNameDialogPanel/VBoxContainer/YesNoAcceptNameButtonsHBoxContainer"]
+custom_minimum_size = Vector2(200, 75)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 38
+text = "YES"
+script = ExtResource("5_giga8")
+
+[node name="NoAcceptNameButton" type="Button" parent="ConfirmNameDialogPanel/VBoxContainer/YesNoAcceptNameButtonsHBoxContainer"]
+custom_minimum_size = Vector2(200, 75)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 38
+text = "NO"
+script = ExtResource("5_giga8")

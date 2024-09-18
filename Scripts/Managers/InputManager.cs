@@ -450,7 +450,8 @@ public partial class InputManager : Control {
     private async Task HandleMenuInput(InputEvent @event) {
       float currentTime = (float)Time.GetTicksMsec() / 1000.0f;
       bool isVertical = GameStateManager.Instance.CurrentSubstate != SubState.ExitGameConfirmationPopupDisplayed &&
-                        GameStateManager.Instance.CurrentSubstate != SubState.ExitToMainMenuConfirmationPopupDisplayed;
+                        GameStateManager.Instance.CurrentSubstate != SubState.ExitToMainMenuConfirmationPopupDisplayed &&
+                        GameStateManager.Instance.CurrentState != State.EnterYourNameScreenDisplayed;
 
       if (@event is InputEventMouseButton mouseButton && mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left) {
         await HandleMouseClick();

@@ -152,6 +152,9 @@ public partial class InputManager : Control {
       } else if (GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
         await ToSignal(GetTree(), "process_frame");
         await HandleMenuInput(@event);
+      } else if (GameStateManager.Instance.IsInState(State.EnterYourNameScreenDisplayed, SubState.None)) {
+        await ToSignal(GetTree(), "process_frame");
+        await HandleMenuInput(@event);
       }
     } finally {
       isProcessingInput = false;
@@ -277,214 +280,227 @@ public partial class InputManager : Control {
       else if (UIManager.Instance.playerChoicesBoxUI.Visible)
         currentFocusedMenu = DialogueManager.Instance.playerChoicesBoxUI;
       GetInteractableUIElements(currentFocusedMenu);
-    } else {
-      // For any other state/substate combination, clear focus
-      currentFocusedIndex = -1;
-    }
-
-    //UpdateCurrentFocusedIndexBasedOnMousePosition();
-
-    if (currentFocusedIndex != -1) {
-      await HighlightMenuButton(currentFocusedIndex);
-    } else {
-      await ClearButtonHighlights();
-    }
-  }
-
-
-  private int GetIndexOfControlUnderMouse() {
-    for (int i = 0; i < focusableControls.Count; i++) {
-      if (focusableControls[i] is Control focusable &&
-          focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) &&
-          focusable.Visible) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  private void GetInteractableUIElements(Node node) {
-
-    if (node is Control control) {
-      if (control is PlayerChoiceButton playerChoiceButton) {
-        focusableControls.Add(playerChoiceButton);
-        return; // Stop traversing this branch
-      } else if (control is SaveGameSlot saveGameSlot) {
-        // For SaveGameSlot, we only want to add its actionButton
-        if (saveGameSlot.actionButton != null && saveGameSlot.actionButton.Visible) {
-          focusableControls.Add(saveGameSlot.actionButton);
-        }
-        return; // Stop traversing this branch
-      } else if (control is IInteractableUI && control.Visible) {
-        focusableControls.Add(control);
-        return; // Stop traversing this branch
-      }
-    }
-
-    foreach (var child in node.GetChildren()) {
-      GetInteractableUIElements(child);
-    }
-  }
-
-  private List<Control> GetVisibleFocusableControls() {
-    return focusableControls.FindAll(control => control.Visible);
-  }
-
-  private async void HandleMouseMotion() {
-    if (GameStateManager.Instance.CurrentState == State.InDialogueMode) {
-      return; // Ignore mouse motion in dialogue mode
-    }
-
-    lastInputWasKeyboardOrGamepad = false;
-
-    int newFocusedIndex = -1;
-    for (int i = 0; i < focusableControls.Count; i++) {
-      if (focusableControls[i] is IInteractableUI && focusableControls[i] is Control focusable
-      && focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) && focusable.Visible == true) {
-        newFocusedIndex = i;
-        //currentFocusedIndex = newFocusedIndex;
-        GD.Print($"newFocusedIndex: {newFocusedIndex}, control: {focusableControls[i].Name}");
-        break;
-      }
-    }
-
-    if (newFocusedIndex != currentFocusedIndex) {
-      // Clear previous highlight
-      if (currentFocusedIndex != -1 && currentFocusedIndex < focusableControls.Count) {
-        await ApplyButtonStyle(focusableControls[currentFocusedIndex] as InteractableUIButton, false);
-      }
-
-      // //before the assignation, add this if, otherwise the highlighted button will be dehighlighted
-      // if (newFocusedIndex != -1)
-
-      // Set new highlight
-      // Set new highlight or clear all if mouse is not over any button
-      if (newFocusedIndex != -1 && newFocusedIndex < focusableControls.Count) {
-        currentFocusedIndex = newFocusedIndex;
-        await ApplyButtonStyle(focusableControls[currentFocusedIndex] as InteractableUIButton, true);
-      } else {
+    } else if (currentState == State.EnterYourNameScreenDisplayed) {
+        GetInteractableUIElements(UIManager.Instance.inputNameScreen);
+      } 
+      else {
+        // For any other state/substate combination, clear focus
         currentFocusedIndex = -1;
+      }
+
+      //UpdateCurrentFocusedIndexBasedOnMousePosition();
+
+      if (currentFocusedIndex != -1) {
+        await HighlightMenuButton(currentFocusedIndex);
+      } else {
         await ClearButtonHighlights();
       }
     }
-  }
 
-  private async Task ClearButtonHighlights() {
-    foreach (var control in focusableControls) {
-      if (control is InteractableUIButton button) {
-        await ApplyButtonStyle(button, false);
-        button.ReleaseFocus();
-      } else if (control is PlayerChoiceButton playerChoiceButton) {
-        playerChoiceButton.ApplyStyle(false);
+
+    private int GetIndexOfControlUnderMouse() {
+      for (int i = 0; i < focusableControls.Count; i++) {
+        if (focusableControls[i] is Control focusable &&
+            focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) &&
+            focusable.Visible) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    private void GetInteractableUIElements(Node node) {
+
+      if (node is Control control) {
+        if (control is PlayerChoiceButton playerChoiceButton) {
+          focusableControls.Add(playerChoiceButton);
+          GD.Print($"Focusable control: {control.Name}, Type: {control.GetType().Name}");
+          return; // Stop traversing this branch
+        } else if (control is InteractableUILineEdit lineEdit) {
+          focusableControls.Add(lineEdit);
+          GD.Print($"Focusable control: {control.Name}, Type: {control.GetType().Name}");
+          return;
+        } else if (control is SaveGameSlot saveGameSlot) {
+          // For SaveGameSlot, we only want to add its actionButton
+          if (saveGameSlot.actionButton != null && saveGameSlot.actionButton.Visible) {
+            focusableControls.Add(saveGameSlot.actionButton);
+            GD.Print($"Focusable control: {control.Name}, Type: {control.GetType().Name}");
+          }
+          return; // Stop traversing this branch
+        } else if (control is IInteractableUI && control.Visible) {
+          focusableControls.Add(control);
+          return; // Stop traversing this branch
+        }
+      }
+
+
+      foreach (var child in node.GetChildren()) {
+        GetInteractableUIElements(child);
+      }
+
+
+
+    }
+
+    private List<Control> GetVisibleFocusableControls() {
+      return focusableControls.FindAll(control => control.Visible);
+    }
+
+    private async void HandleMouseMotion() {
+      if (GameStateManager.Instance.CurrentState == State.InDialogueMode) {
+        return; // Ignore mouse motion in dialogue mode
+      }
+
+      lastInputWasKeyboardOrGamepad = false;
+
+      int newFocusedIndex = -1;
+      for (int i = 0; i < focusableControls.Count; i++) {
+        if (focusableControls[i] is IInteractableUI && focusableControls[i] is Control focusable
+        && focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) && focusable.Visible == true) {
+          newFocusedIndex = i;
+          //currentFocusedIndex = newFocusedIndex;
+          GD.Print($"newFocusedIndex: {newFocusedIndex}, control: {focusableControls[i].Name}");
+          break;
+        }
+      }
+
+      if (newFocusedIndex != currentFocusedIndex) {
+        // Clear previous highlight
+        if (currentFocusedIndex != -1 && currentFocusedIndex < focusableControls.Count) {
+          await ApplyButtonStyle(focusableControls[currentFocusedIndex] as InteractableUIButton, false);
+        }
+
+        // //before the assignation, add this if, otherwise the highlighted button will be dehighlighted
+        // if (newFocusedIndex != -1)
+
+        // Set new highlight
+        // Set new highlight or clear all if mouse is not over any button
+        if (newFocusedIndex != -1 && newFocusedIndex < focusableControls.Count) {
+          currentFocusedIndex = newFocusedIndex;
+          await ApplyButtonStyle(focusableControls[currentFocusedIndex] as InteractableUIButton, true);
+        } else {
+          currentFocusedIndex = -1;
+          await ClearButtonHighlights();
+        }
       }
     }
-    await Task.CompletedTask;
-  }
+
+    private async Task ClearButtonHighlights() {
+      foreach (var control in focusableControls) {
+        if (control is InteractableUIButton button) {
+          await ApplyButtonStyle(button, false);
+          button.ReleaseFocus();
+        } else if (control is PlayerChoiceButton playerChoiceButton) {
+          playerChoiceButton.ApplyStyle(false);
+        }
+      }
+      await Task.CompletedTask;
+    }
 
 
-  private async Task HandleMouseClick() {
+    private async Task HandleMouseClick() {
 
 
-    for (int i = 0; i < focusableControls.Count; i++) {
-      if (focusableControls[i] is IInteractableUI && focusableControls[i] is Control focusable
-          && focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) && focusable.Visible == true) {
-        currentFocusedIndex = i;
-        await HandleMenuAccept();
+      for (int i = 0; i < focusableControls.Count; i++) {
+        if (focusableControls[i] is IInteractableUI && focusableControls[i] is Control focusable
+            && focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) && focusable.Visible == true) {
+          currentFocusedIndex = i;
+          await HandleMenuAccept();
+          return;
+        }
+      }
+    }
+
+    public async Task SetCurrentFocusedUIControlIndexAfterClosingMenu() {
+      await UpdateFocusableControls();
+
+      // If player choices are visible, focus on the first choice
+      if (UIManager.Instance.playerChoicesBoxUI.Visible) {
+        for (int i = 0; i < focusableControls.Count; i++) {
+          if (focusableControls[i].GetParent() == UIManager.Instance.playerChoicesBoxUI) {
+            currentFocusedIndex = i;
+            break;
+          }
+        }
+      }
+      // If dialogue box is visible, focus on it
+      else if (UIManager.Instance.dialogueBoxUI.Visible) {
+        for (int i = 0; i < focusableControls.Count; i++) {
+          if (focusableControls[i] == UIManager.Instance.dialogueBoxUI.dialogueLineLabel) {
+            currentFocusedIndex = i;
+            break;
+          }
+        }
+      }
+      // If neither is visible, set focus to the first non-InGameMenuButton control
+      else {
+        for (int i = 0; i < focusableControls.Count; i++) {
+          if (!(focusableControls[i] is InGameMenuButton)) {
+            currentFocusedIndex = i;
+            break;
+          }
+        }
+      }
+
+      if (currentFocusedIndex != -1) {
+        await HighlightMenuButton(currentFocusedIndex);
+      }
+    }
+
+    private async Task HandleMenuInput(InputEvent @event) {
+      float currentTime = (float)Time.GetTicksMsec() / 1000.0f;
+      bool isVertical = GameStateManager.Instance.CurrentSubstate != SubState.ExitGameConfirmationPopupDisplayed &&
+                        GameStateManager.Instance.CurrentSubstate != SubState.ExitToMainMenuConfirmationPopupDisplayed;
+
+      if (@event is InputEventMouseButton mouseButton && mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left) {
+        await HandleMouseClick();
         return;
       }
-    }
-  }
 
-  public async Task SetCurrentFocusedUIControlIndexAfterClosingMenu() {
-    await UpdateFocusableControls();
-
-    // If player choices are visible, focus on the first choice
-    if (UIManager.Instance.playerChoicesBoxUI.Visible) {
-      for (int i = 0; i < focusableControls.Count; i++) {
-        if (focusableControls[i].GetParent() == UIManager.Instance.playerChoicesBoxUI) {
-          currentFocusedIndex = i;
-          break;
+      if (isVertical) {
+        if (CanProcessInput(currentTime) &&
+            (Input.IsActionPressed("ui_up") ||
+             (@event is InputEventJoypadMotion joypadMotionUp &&
+              joypadMotionUp.Axis == JoyAxis.LeftY &&
+              joypadMotionUp.AxisValue < -STICK_THRESHOLD))) {
+          await HandleVerticalNavigation(true);
+          lastInputTime = currentTime;
+        } else if (CanProcessInput(currentTime) &&
+                   (Input.IsActionPressed("ui_down") ||
+                    (@event is InputEventJoypadMotion joypadMotionDown &&
+                     joypadMotionDown.Axis == JoyAxis.LeftY &&
+                     joypadMotionDown.AxisValue > STICK_THRESHOLD))) {
+          await HandleVerticalNavigation(false);
+          lastInputTime = currentTime;
+        }
+      } else {
+        if (CanProcessInput(currentTime) &&
+            (Input.IsActionPressed("ui_left") ||
+             (@event is InputEventJoypadMotion joypadMotionLeft &&
+              joypadMotionLeft.Axis == JoyAxis.LeftX &&
+              joypadMotionLeft.AxisValue < -STICK_THRESHOLD))) {
+          await HandleHorizontalNavigation(true);
+          lastInputTime = currentTime;
+        } else if (CanProcessInput(currentTime) &&
+                   (Input.IsActionPressed("ui_right") ||
+                    (@event is InputEventJoypadMotion joypadMotionRight &&
+                     joypadMotionRight.Axis == JoyAxis.LeftX &&
+                     joypadMotionRight.AxisValue > STICK_THRESHOLD))) {
+          await HandleHorizontalNavigation(false);
+          lastInputTime = currentTime;
         }
       }
-    }
-    // If dialogue box is visible, focus on it
-    else if (UIManager.Instance.dialogueBoxUI.Visible) {
-      for (int i = 0; i < focusableControls.Count; i++) {
-        if (focusableControls[i] == UIManager.Instance.dialogueBoxUI.dialogueLineLabel) {
-          currentFocusedIndex = i;
-          break;
-        }
-      }
-    }
-    // If neither is visible, set focus to the first non-InGameMenuButton control
-    else {
-      for (int i = 0; i < focusableControls.Count; i++) {
-        if (!(focusableControls[i] is InGameMenuButton)) {
-          currentFocusedIndex = i;
-          break;
-        }
+
+      if (Input.IsActionJustPressed("ui_accept")) {
+        await HandleMenuAccept();
+      } else if (Input.IsActionJustPressed("ui_cancel")) {
+        await HandleMenuCancel();
       }
     }
 
-    if (currentFocusedIndex != -1) {
-      await HighlightMenuButton(currentFocusedIndex);
+    private bool CanProcessInput(float currentTime) {
+      return currentTime - lastInputTime >= INPUT_COOLDOWN;
     }
-  }
-
-  private async Task HandleMenuInput(InputEvent @event) {
-    float currentTime = (float)Time.GetTicksMsec() / 1000.0f;
-    bool isVertical = GameStateManager.Instance.CurrentSubstate != SubState.ExitGameConfirmationPopupDisplayed &&
-                      GameStateManager.Instance.CurrentSubstate != SubState.ExitToMainMenuConfirmationPopupDisplayed;
-
-    if (@event is InputEventMouseButton mouseButton && mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left) {
-      await HandleMouseClick();
-      return;
-    }
-
-    if (isVertical) {
-      if (CanProcessInput(currentTime) &&
-          (Input.IsActionPressed("ui_up") ||
-           (@event is InputEventJoypadMotion joypadMotionUp &&
-            joypadMotionUp.Axis == JoyAxis.LeftY &&
-            joypadMotionUp.AxisValue < -STICK_THRESHOLD))) {
-        await HandleVerticalNavigation(true);
-        lastInputTime = currentTime;
-      } else if (CanProcessInput(currentTime) &&
-                 (Input.IsActionPressed("ui_down") ||
-                  (@event is InputEventJoypadMotion joypadMotionDown &&
-                   joypadMotionDown.Axis == JoyAxis.LeftY &&
-                   joypadMotionDown.AxisValue > STICK_THRESHOLD))) {
-        await HandleVerticalNavigation(false);
-        lastInputTime = currentTime;
-      }
-    } else {
-      if (CanProcessInput(currentTime) &&
-          (Input.IsActionPressed("ui_left") ||
-           (@event is InputEventJoypadMotion joypadMotionLeft &&
-            joypadMotionLeft.Axis == JoyAxis.LeftX &&
-            joypadMotionLeft.AxisValue < -STICK_THRESHOLD))) {
-        await HandleHorizontalNavigation(true);
-        lastInputTime = currentTime;
-      } else if (CanProcessInput(currentTime) &&
-                 (Input.IsActionPressed("ui_right") ||
-                  (@event is InputEventJoypadMotion joypadMotionRight &&
-                   joypadMotionRight.Axis == JoyAxis.LeftX &&
-                   joypadMotionRight.AxisValue > STICK_THRESHOLD))) {
-        await HandleHorizontalNavigation(false);
-        lastInputTime = currentTime;
-      }
-    }
-
-    if (Input.IsActionJustPressed("ui_accept")) {
-      await HandleMenuAccept();
-    } else if (Input.IsActionJustPressed("ui_cancel")) {
-      await HandleMenuCancel();
-    }
-  }
-
-  private bool CanProcessInput(float currentTime) {
-    return currentTime - lastInputTime >= INPUT_COOLDOWN;
-  }
 
 
   private DateTime lastAcceptTime = DateTime.MinValue;
@@ -518,7 +534,8 @@ public partial class InputManager : Control {
     }
 
     if (focusedControl != null && focusedControl.Visible) {
-      IInteractableUI interactable = null;
+      // IInteractableUI interactable = null;
+      IInteractableUI interactable = focusedControl as IInteractableUI;
       if (focusedControl is InGameMenuButton inGameMenuButton) {
         interactable = inGameMenuButton.textureButton;
       } else if (focusedControl is IInteractableUI) {
@@ -594,12 +611,10 @@ public partial class InputManager : Control {
       //if (GameStateManager.Instance.CurrentSubstate == SubState.None)
       await UIManager.Instance.mainMenu.OnLanguagesGoBackButtonPressed();
       return;
-    }
-    else if(GameStateManager.Instance.CurrentSubstate == SubState.ExitToMainMenuConfirmationPopupDisplayed) {
+    } else if (GameStateManager.Instance.CurrentSubstate == SubState.ExitToMainMenuConfirmationPopupDisplayed) {
       await UIManager.Instance.mainMenu.OnExitToMainMenuCancelButtonPressed();
-        return;
-    }
-    else if(GameStateManager.Instance.CurrentSubstate == SubState.ExitGameConfirmationPopupDisplayed) {
+      return;
+    } else if (GameStateManager.Instance.CurrentSubstate == SubState.ExitGameConfirmationPopupDisplayed) {
       await UIManager.Instance.mainMenu.OnExitGameCancelButtonPressed();
       return;
     }

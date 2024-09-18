@@ -152,6 +152,7 @@ public partial class GameManager : Control {
   public async Task Display_Enter_Your_Name_Screen() {
     await UIManager.Instance.inputNameScreen.Show();
     UIManager.Instance.splashScreen.Hide();
+    GameStateManager.Instance.Fire(Trigger.DISPLAY_ENTER_YOUR_NAME_SCREEN);
     // UIManager.Instance.inputNameScreen.Show();
   }
 

@@ -23,7 +23,7 @@ public partial class InputNameScreen : Control {
 
   [Export] public float FadeDuration { get; set; } = 0.5f;
 
-  private void SetupConfirmationDialogTheme() {
+  private void SetupConfirmationDialogEvents() {
     YesAcceptNameButton.Pressed += () => _ = OnConfirmName();
     NoAcceptNameButton.Pressed += OnCancelConfirmation;
     ConfirmNameDialogPanel.Visible = false; // Ensure the dialog is initially hidden
@@ -43,7 +43,7 @@ public partial class InputNameScreen : Control {
 
     ConfirmNameDialogPanel = GetNode<Panel>("ConfirmNameDialogPanel");
     YesAcceptNameButton = GetNode<InteractableUIButton>("ConfirmNameDialogPanel/VBoxContainer/YesNoAcceptNameButtonsHBoxContainer/YesAcceptNameButton");
-    NoAcceptNameButton = GetNode<InteractableUIButton>("ConfirmNameDialogPanel/VBoxContainer/YesNoAcceptNameButtonsHBoxContainer/NoAcceptNameButton");;
+    NoAcceptNameButton = GetNode<InteractableUIButton>("ConfirmNameDialogPanel/VBoxContainer/YesNoAcceptNameButtonsHBoxContainer/NoAcceptNameButton"); ;
     AreYouSureTextLabel = GetNode<RichTextLabel>("ConfirmNameDialogPanel/VBoxContainer/MarginContainer/AreYouSureTextLabel");
 
 
@@ -58,7 +58,7 @@ public partial class InputNameScreen : Control {
     acceptButtonBackground = GetNode<ColorRect>("MarginContainer/MarginContainer1/VBoxContainer/HBoxContainer/Control/AcceptButtonBackground");
 
     ListenForNameConfirmation();
-    SetupConfirmationDialogTheme();
+    SetupConfirmationDialogEvents();
 
     this.Visible = false;
     nameInput.SetProcessInput(false);
@@ -66,6 +66,110 @@ public partial class InputNameScreen : Control {
     //seems a godot bug, i needed to put the key in the Godot Editor
     // string titleText =  TranslationServer.Translate(inputYourNameTitleTRANSLATE);
     // richText.Text = titleText; 
+    SetupConfirmNameDialog();
+    ApplyStyleToAcceptNamePanelAndButtons();
+
+  }
+
+   private void AdjustPanelSize()
+    {
+        var vBoxContainer = ConfirmNameDialogPanel.GetNode<VBoxContainer>("VBoxContainer");
+        var marginContainer = vBoxContainer.GetNode<MarginContainer>("MarginContainer");
+        var buttonContainer = vBoxContainer.GetNode<HBoxContainer>("YesNoAcceptNameButtonsHBoxContainer");
+
+        // Calculate the required size
+        //IMPORTANT CALL! GetCombinedMinimumSize helps to determine its size
+        //accounting for its children, in this case the MarginContainer and YesNoAcceptNameButtonsHBoxContainer
+        var contentSize = vBoxContainer.GetCombinedMinimumSize();
+        var requiredSize = contentSize + new Vector2(40, 60); // Add some padding
+
+        // Set the panel size
+        ConfirmNameDialogPanel.CustomMinimumSize = requiredSize;
+        ConfirmNameDialogPanel.Size = requiredSize;
+
+        // Center the panel
+        ConfirmNameDialogPanel.Position = (GetViewportRect().Size - ConfirmNameDialogPanel.Size) / 2;
+
+        GD.Print($"Adjusted panel size: {ConfirmNameDialogPanel.Size}");
+        GD.Print($"VBoxContainer size: {vBoxContainer.Size}");
+        GD.Print($"Button container size: {buttonContainer.Size}");
+    }
+
+
+  private void SetupConfirmNameDialog() {
+    // // Set the panel to size based on content and center it
+    ConfirmNameDialogPanel.AnchorLeft = 0.5f;
+    ConfirmNameDialogPanel.AnchorTop = 0.5f;
+    ConfirmNameDialogPanel.AnchorRight = 0.5f;
+    ConfirmNameDialogPanel.AnchorBottom = 0.5f;
+    ConfirmNameDialogPanel.GrowHorizontal = Control.GrowDirection.Both;
+    ConfirmNameDialogPanel.GrowVertical = Control.GrowDirection.Both;
+    ConfirmNameDialogPanel.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
+    ConfirmNameDialogPanel.SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
+
+    // Ensure the panel uses size flags that allow it to be seen
+    // ConfirmNameDialogPanel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+    // ConfirmNameDialogPanel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+
+    // Set the VBoxContainer to use CenterCenter preset
+    var vBoxContainer = ConfirmNameDialogPanel.GetNode<VBoxContainer>("VBoxContainer");
+    vBoxContainer.AnchorsPreset = (int)Control.LayoutPreset.FullRect;
+    vBoxContainer.AnchorsPreset = (int)Control.LayoutPreset.Center;
+    vBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+    vBoxContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+
+    var marginContainer = vBoxContainer.GetNode<MarginContainer>("MarginContainer");
+    marginContainer.AnchorsPreset = (int)Control.LayoutPreset.FullRect;
+    marginContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+    marginContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+
+    marginContainer.AddThemeConstantOverride("margin_top", 20);
+    marginContainer.AddThemeConstantOverride("margin_bottom", 20);
+    marginContainer.AddThemeConstantOverride("margin_left", 20);
+    marginContainer.AddThemeConstantOverride("margin_right", 20);
+
+    // Connect to MarginContainer's resized signal
+    marginContainer.Connect("resized", new Callable(this, nameof(OnMarginContainerResized)));
+
+
+    // Set up the AreYouSureTextLabel
+    AreYouSureTextLabel.BbcodeEnabled = true;
+    AreYouSureTextLabel.FitContent = true;
+    AreYouSureTextLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+    AreYouSureTextLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+    AreYouSureTextLabel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+
+
+
+    // Ensure buttons expand horizontally
+    var buttonContainer = vBoxContainer.GetNode<HBoxContainer>("YesNoAcceptNameButtonsHBoxContainer");
+    buttonContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+    buttonContainer.SizeFlagsVertical = Control.SizeFlags.ShrinkEnd;
+
+    YesAcceptNameButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+    NoAcceptNameButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+
+    YesAcceptNameButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+    NoAcceptNameButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+
+    // Set a minimum size for the panel
+    // ConfirmNameDialogPanel.CustomMinimumSize = new Vector2(300, 200);
+
+    // Apply the custom style to the panel and buttons
+    ApplyStyleToAcceptNamePanelAndButtons();
+
+    // Initial size adjustment
+    CallDeferred(nameof(AdjustPanelSize));
+    ConfirmNameDialogPanel.Connect("resized", new Callable(this, nameof(AdjustPanelSize)));
+
+    //ConfirmNameDialogPanel.TopLevel = true;
+    //ConfirmNameDialogPanel.Visible = true;
+    ConfirmNameDialogPanel.Modulate = Colors.White;
+
+  }
+
+  private void OnMarginContainerResized() {
+    CallDeferred(nameof(AdjustPanelSize));
   }
 
   public async Task Show() {
@@ -127,8 +231,11 @@ public partial class InputNameScreen : Control {
 
       NoAcceptNameButton.Text = string.Format(Tr(inputYourNameCancelButtonText_TRANSLATE), username);
       YesAcceptNameButton.Text = string.Format(Tr(inputYourNameOKButtonText_TRANSLATE), username);
-      AreYouSureTextLabel.Text = string.Format(Tr(inputYourNameConfirmNameText_TRANSLATE), username);
+      AreYouSureTextLabel.Text = "[center]" + string.Format(Tr(inputYourNameConfirmNameText_TRANSLATE), username) + "[/center]";
+
+
       ConfirmNameDialogPanel.Visible = true;
+      CallDeferred(nameof(AdjustPanelSize));
 
     } else {
       enterNameBeforeConfirmingText.Text = Tr("PLEASE_ENTER_NAME_BEFORE_CONFIRMING");
@@ -193,6 +300,14 @@ public partial class InputNameScreen : Control {
 
   public Color GetNormalButtonColor() {
     return new Color(0, 0, 0, 0); // Fully transparent
+  }
+
+
+  private void ApplyStyleToAcceptNamePanelAndButtons() {
+    UIThemeHelper.ApplyCustomStyleToButton(YesAcceptNameButton);
+    UIThemeHelper.ApplyCustomStyleToButton(NoAcceptNameButton);
+    UIThemeHelper.ApplyCustomStyleToPanel(ConfirmNameDialogPanel);
+
   }
 }
 

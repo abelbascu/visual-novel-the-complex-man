@@ -156,9 +156,9 @@ public partial class DialogueManager : Control {
   }
 
   public void DisplayPlayerChoices(List<DialogueObject> playerChoices, Action<bool> setIsPlayerChoiceBeingPrinted) {
-   
-   
-   
+
+
+
     if (playerChoicesBoxUI == null) {
       //before adding the player choices, we need to create the container VBox
       DisplayPlayerChoicesBoxUI();
@@ -356,6 +356,8 @@ public partial class DialogueManager : Control {
   }
 
   public void OnPlayerChoiceButtonUIPressed(DialogueObject playerChoiceObject) {
+
+
 
     DialogueVisited.Invoke(playerChoiceObject.ID);
 

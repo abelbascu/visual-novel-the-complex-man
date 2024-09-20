@@ -21,10 +21,7 @@ public partial class InputNameScreen : Control {
   private InteractableUIButton YesAcceptNameButton;
   private InteractableUIButton NoAcceptNameButton;
   private RichTextLabel AreYouSureTextLabel;
-
-  // New variables for character limit
   private const int MaxNameLength = 20;
-  //private RichTextLabel characterLimitMessage;
 
   [Export] public float FadeDuration { get; set; } = 0.5f;
 
@@ -37,22 +34,10 @@ public partial class InputNameScreen : Control {
     nameInput.TextChanged += OnNameInputTextChanged;
   }
 
-
   public override void _Ready() {
-
 
     marginContainer = GetNode<MarginContainer>("MarginContainer");
     var vBoxContainer = marginContainer.GetNode<VBoxContainer>("MarginContainer1/VBoxContainer");
-
-    // Add character limit message
-    // characterLimitMessage.BbcodeEnabled = true;
-    // characterLimitMessage.FitContent = true;
-    // characterLimitMessage.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-    // characterLimitMessage.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-    // characterLimitMessage.SizeFlagsVertical = SizeFlags.ShrinkCenter;
-    // characterLimitMessage.Visible = false;
-    // vBoxContainer.AddChild(characterLimitMessage);
-    // vBoxContainer.MoveChild(characterLimitMessage, 1); // Move it just below the question label
 
     nameInput = vBoxContainer.GetNode<InteractableUILineEdit>("HBoxContainer/LineEdit");
     nameInput.CaretBlink = true;
@@ -64,7 +49,6 @@ public partial class InputNameScreen : Control {
     YesAcceptNameButton = GetNode<InteractableUIButton>("ConfirmNameDialogPanel/VBoxContainer/YesNoAcceptNameButtonsHBoxContainer/YesAcceptNameButton");
     NoAcceptNameButton = GetNode<InteractableUIButton>("ConfirmNameDialogPanel/VBoxContainer/YesNoAcceptNameButtonsHBoxContainer/NoAcceptNameButton"); ;
     AreYouSureTextLabel = GetNode<RichTextLabel>("ConfirmNameDialogPanel/VBoxContainer/MarginContainer/AreYouSureTextLabel");
-
 
     warningsTextLabel = vBoxContainer.GetNode<RichTextLabel>("RichTextLabel");
 
@@ -87,7 +71,6 @@ public partial class InputNameScreen : Control {
     // richText.Text = titleText; 
     SetupConfirmNameDialog();
     ApplyStyleToAcceptNamePanelAndButtons();
-
   }
 
   private void ListenForNameConfirmation() {
@@ -143,25 +126,18 @@ public partial class InputNameScreen : Control {
     }
   }
 
-
   private void OnNameInputSetCaret() {
     Vector2 clickPosition = nameInput.GetLocalMousePosition();
-
     // Get the total width of the visible text
     float totalWidth = nameInput.Size.X - nameInput.GetScrollOffset();
-
     // Calculate the relative x position of the click
     float relativeX = (clickPosition.X + nameInput.GetScrollOffset()) / totalWidth;
-
     // Calculate the approximate character position
     int approximatePosition = Mathf.FloorToInt(relativeX * nameInput.Text.Length);
-
     // Clamp the position to ensure it's within the text bounds
     int clampedPosition = Mathf.Clamp(approximatePosition, 0, nameInput.Text.Length);
-
     // Set the caret (cursor) position
     nameInput.CaretColumn = clampedPosition;
-
     // Ensure the LineEdit has focus
     nameInput.GrabFocus();
   }
@@ -199,7 +175,6 @@ public partial class InputNameScreen : Control {
     }
   }
 
-
   private void SetupConfirmNameDialog() {
     // // Set the panel to size based on content and center it
     ConfirmNameDialogPanel.AnchorLeft = 0.5f;
@@ -210,10 +185,6 @@ public partial class InputNameScreen : Control {
     ConfirmNameDialogPanel.GrowVertical = Control.GrowDirection.Both;
     ConfirmNameDialogPanel.SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter;
     ConfirmNameDialogPanel.SizeFlagsVertical = Control.SizeFlags.ShrinkCenter;
-
-    // Ensure the panel uses size flags that allow it to be seen
-    // ConfirmNameDialogPanel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
-    // ConfirmNameDialogPanel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 
     // Set the VBoxContainer to use CenterCenter preset
     var vBoxContainer = ConfirmNameDialogPanel.GetNode<VBoxContainer>("VBoxContainer");
@@ -294,34 +265,6 @@ public partial class InputNameScreen : Control {
     nameInput.GrabFocus();
   }
 
-
-  // private void OnNameInputGuiInput(InputEvent @event) {
-  //   if (@event is InputEventMouseButton mouseEvent &&
-  //       mouseEvent.ButtonIndex == MouseButton.Left &&
-  //       mouseEvent.Pressed) {
-  //     // Get the clicked position within the LineEdit
-  //     Vector2 clickPosition = GetLocalMousePosition();
-
-  //     // Estimate the clicked column based on average character width
-  //     float textWidth = nameInput.GetThemeFont("font").GetStringSize(nameInput.Text, fontSize: nameInput.GetThemeFontSize("font_size")).X;
-  //     float avgCharWidth = nameInput.Text.Length > 0 ? textWidth / nameInput.Text.Length : 10; // Default to 10 if text is empty
-
-  //     // Account for potential left padding
-  //     float leftPadding = nameInput.GetThemeConstant("minimum_spaces") * avgCharWidth;
-
-  //     int estimatedColumn = Mathf.FloorToInt((clickPosition.X - leftPadding) / avgCharWidth);
-
-  //     // Clamp the estimated column to valid range
-  //     int clampedColumn = Mathf.Clamp(estimatedColumn, 0, nameInput.Text.Length);
-
-  //     // Set the caret (cursor) position
-  //     nameInput.CaretColumn = clampedColumn;
-
-  //     // Ensure the LineEdit has focus
-  //     nameInput.GrabFocus();
-  //   }
-  // }
-
   private void OnNameInputInteract() {
     ShowConfirmationDialog();
   }
@@ -330,24 +273,18 @@ public partial class InputNameScreen : Control {
     ShowConfirmationDialog();
   }
 
-
   private void OnNameSubmitted(string text) {
     ShowConfirmationDialog();
   }
 
-
   private void ShowConfirmationDialog() {
     username = nameInput.Text;
     if (!string.IsNullOrWhiteSpace(username)) {
-
       NoAcceptNameButton.Text = string.Format(Tr(inputYourNameCancelButtonText_TRANSLATE), username);
       YesAcceptNameButton.Text = string.Format(Tr(inputYourNameOKButtonText_TRANSLATE), username);
       AreYouSureTextLabel.Text = "[center]" + string.Format(Tr(inputYourNameConfirmNameText_TRANSLATE), username) + "[/center]";
-
-
       ConfirmNameDialogPanel.Visible = true;
       CallDeferred(nameof(AdjustPanelSize));
-
     } else {
       warningsTextLabel.Text = Tr("PLEASE_ENTER_NAME_BEFORE_CONFIRMING");
       GetTree().CreateTimer(3.0f).Timeout += ClearErrorMessage;
@@ -381,7 +318,6 @@ public partial class InputNameScreen : Control {
     ConfirmNameDialogPanel.Visible = false; // Hide the dialog when cancelled
     nameInput.GrabFocus();
   }
-
 
   public StyleBoxFlat GetHighlightedLineEditStyle() {
     return new StyleBoxFlat {
@@ -421,6 +357,47 @@ public partial class InputNameScreen : Control {
 
   }
 }
+
+
+//DO NOT DELETE THIS. This code was in InputManager but was creating some issues.
+//As we are not implementing InputNameScreen now i'll keep it here for now.
+
+// } else if (focusableUIControls[i] is InteractableUILineEdit lineEdit) {
+//   await ApplyLineEditStyle(lineEdit, i == index && isHighlighted);
+// } else if (focusableUIControls[i] is InteractableUITextureButton textureButton) {
+//THIS METHOD WHEN CALLED FROM INPUTMANAGER CAN CREATE CONFLIC WITH OTHER TEXTURE BUTTONS LIKE INGAME MENU BUTTONS.
+//   await ApplyTextureButtonStyle(textureButton, i == index && isHighlighted);
+// }
+//   }
+//  }
+// }
+
+
+//Though this call should be here not coupled in InputManager.
+
+// private async Task ApplyLineEditStyle(InteractableUILineEdit lineEdit, bool isHighlighted) {
+//   var uiManager = GetNode<UIManager>("/root/Game/GameManager/UIManager");
+//   var inputNameScreen = uiManager.GetNode<InputNameScreen>("InputNameScreen");
+//   if (inputNameScreen != null) {
+//     lineEdit.AddThemeStyleboxOverride("normal", isHighlighted
+//         ? inputNameScreen.GetHighlightedLineEditStyle()
+//         : inputNameScreen.GetNormalLineEditStyle());
+//   }
+//   await Task.CompletedTask;
+// }
+
+
+// private async Task ApplyTextureButtonStyle(InteractableUITextureButton textureButton, bool isHighlighted) {
+//   var uiManager = GetNode<UIManager>("/root/Game/GameManager/UIManager");
+//   var inputNameScreen = uiManager.GetNode<InputNameScreen>("InputNameScreen");
+//   if (inputNameScreen != null) {
+//     var background = textureButton.GetNode<ColorRect>("../AcceptButtonBackground");
+//     background.Color = isHighlighted
+//         ? inputNameScreen.GetHighlightedButtonColor()
+//         : inputNameScreen.GetNormalButtonColor();
+//   }
+//   await Task.CompletedTask;
+// }
 
 
 

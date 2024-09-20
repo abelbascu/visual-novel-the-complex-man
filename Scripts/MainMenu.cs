@@ -600,8 +600,8 @@ public partial class MainMenu : Control {
       LanguageOptionsContainer.Visible = true;
       LanguageOptionsContainer.TopLevel = true;
       await UIFadeHelper.FadeInControl(LanguageOptionsContainer);
-      EnableAllButtons();
     });
+    EnableAllButtons();
   }
 
   public async Task OnLanguagesGoBackButtonPressed() {

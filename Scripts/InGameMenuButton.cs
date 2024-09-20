@@ -16,37 +16,39 @@ public partial class InGameMenuButton : MarginContainer {
 
   public async Task OnPressed() {
 
-    DisableIngameMenuButton();
-    InputManager.Instance.SetGamePadAndKeyboardInputEnabled(false);
+    await InputBlocker.BlockNewInput(async () => {
 
-    if (UIManager.Instance.mainMenu.MainOptionsContainer.Visible == false &&
-            GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
-      //we pause timer here and not withing display menu method because when we show some submenus
-      //we hide the ingame menu and then show it again when closing the submenus.
-      //we just want to pause it every time that we are not in dialogue mode for now.
-      LoadSaveManager.Instance.PauseGameTimer();
-      //await UIManager.Instance.mainMenu.DisplayInGameMenu();
-      GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
-      DisableIngameMenuButton();
-      await UIFadeHelper.FadeInControl(textureButton, 0.3f);
-    } else {
-      //LoadSaveManager.Instance.ResumeGameTimer();
-      // await UIManager.Instance.mainMenu.CloseInGameMenu();
-      await UIManager.Instance.mainMenu.CloseInGameMenu();
-      // UIManager.Instance.mainMenu.Visible = false;
-      GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
       DisableIngameMenuButton();
 
-    }
+      if (UIManager.Instance.mainMenu.MainOptionsContainer.Visible == false &&
+              GameStateManager.Instance.IsInState(State.InDialogueMode, SubState.None)) {
+        //we pause timer here and not withing display menu method because when we show some submenus
+        //we hide the ingame menu and then show it again when closing the submenus.
+        //we just want to pause it every time that we are not in dialogue mode for now.
+        LoadSaveManager.Instance.PauseGameTimer();
+        //await UIManager.Instance.mainMenu.DisplayInGameMenu();
+        GameStateManager.Instance.Fire(Trigger.DISPLAY_INGAME_MENU);
+        DisableIngameMenuButton();
+        await UIFadeHelper.FadeInControl(textureButton, 0.3f);
+      } else {
+        //LoadSaveManager.Instance.ResumeGameTimer();
+        // await UIManager.Instance.mainMenu.CloseInGameMenu();
+        await UIManager.Instance.mainMenu.CloseInGameMenu();
+        // UIManager.Instance.mainMenu.Visible = false;
+        GameStateManager.Instance.Fire(Trigger.ENTER_DIALOGUE_MODE);
+        DisableIngameMenuButton();
+        //if user closes ingame menu, put focus again on dialoguebox
+        //or the first playerchoice, even if the mouse stays over ingame menu
+        //we don't want users to use the action key to open ingame menu
+        await InputManager.Instance.SetCurrentFocusedUIControlIndexAfterClosingMenu();
 
-    InputManager.Instance.SetGamePadAndKeyboardInputEnabled(true);
+      }
+    });
+
     EnableIngameMenuButton();
-    //if user closes ingame menu, put focus again on dialoguebox
-    //or the first playerchoice, even if the mouse stays over ingame menu
-    //we don't want users to use the action key to open ingame menu
-    await InputManager.Instance.SetCurrentFocusedUIControlIndexAfterClosingMenu();
 
     UIManager.Instance.UpdateUILayout();
+
   }
 
 

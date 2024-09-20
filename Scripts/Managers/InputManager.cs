@@ -33,13 +33,9 @@ public partial class InputManager : Control {
   //we use this to disable button presses just after UI element is pressed
   //to prevent multiple button press that would break the game state transitions.
   private bool isGamePadAndKeyboardInputEnabled = true;
-  public void SetGamePadAndKeyboardInputEnabled(bool enabled) {
-    isGamePadAndKeyboardInputEnabled = enabled;
-  }
-  //moree conditiions to block further input
+  //more conditiions to block further input
   //until we finish processing
   public bool isProcessingInput = false;
-  private bool isInputLocked = false;
   private bool lastInputWasKeyboardOrGamepad = false;
 
   public override void _EnterTree() {
@@ -63,20 +59,20 @@ public partial class InputManager : Control {
     };
   }
 
-  //try to prevent reading fast input that would break the game state transitions
+  //try to prevent repeated fast input that would break the game state transitions
   private bool CanProcessInput(float currentTime) {
     return currentTime - lastInputTime >= INPUT_COOLDOWN;
   }
 
 
   public override async void _Input(InputEvent @event) {
-    //if main menu is processing any input after a click or press, do not accept more input
+    //if there is any pending input to process, do not accept more input
     if (InputBlocker.IsInputBlocked) {
       GetViewport().SetInputAsHandled();
       return;
       //even if the user clicked the same button very faszt before the button was hidden
     }
-    if (!isGamePadAndKeyboardInputEnabled || isProcessingInput || isInputLocked) {
+    if (isProcessingInput) {
       GetViewport().SetInputAsHandled();
       return;
     }
@@ -137,7 +133,10 @@ public partial class InputManager : Control {
   }
 
   private async Task HandleSplashScreenInput(InputEvent @event) {
-    await UIManager.Instance.splashScreen.TransitionToMainMenu();
+    await InputBlocker.BlockNewInput(async () => {
+      await UIManager.Instance.splashScreen.TransitionToMainMenu();
+    });
+
     isProcessingInput = false;
   }
   //every time that state changes, refresh the UI focusableUIControls list 
@@ -225,7 +224,7 @@ public partial class InputManager : Control {
       //LNAGUAGE OPTIONS -------------------------
       currentFocusedIndex = -1; // Focus on the first button in the submenu
     } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && currentSubstate == SubState.LanguageMenuDisplayed) {
-      GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
+      //GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
       currentFocusedScene = UIManager.Instance.mainMenu.LanguageOptionsContainer;
       GetInteractableUIElements(currentFocusedScene);
       currentFocusedIndex = -1; // Focus on the first button in the submenu
@@ -377,7 +376,7 @@ public partial class InputManager : Control {
         }
       }
     }
-    // If neither is visible, set focus to the first non-InGameMenuButton control
+    // If neither is visible, set focus on the first non-InGameMenuButton control
     else {
       for (int i = 0; i < focusableUIControls.Count; i++) {
         if (!(focusableUIControls[i] is InGameMenuButton)) {

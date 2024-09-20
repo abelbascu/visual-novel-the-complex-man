@@ -125,9 +125,11 @@ public partial class GameManager : Control {
   }
 
   public async Task Display_Ingame_Menu() {
-
-    await UIManager.Instance.mainMenu.DisplayInGameMenu();
+    await InputBlocker.BlockNewInput(async () => {
+      await UIManager.Instance.mainMenu.DisplayInGameMenu();
+    });
   }
+
 
   public async Task Close_Ingame_Menu() {
     await UIManager.Instance.mainMenu.CloseInGameMenu();
@@ -242,17 +244,22 @@ public partial class GameManager : Control {
   }
 
   public async Task Display_Save_Screen() {
-    await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
+
+    await InputBlocker.BlockNewInput(async () => {
+      await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
+    });
   }
 
 
   public async Task Display_Load_Screen() {
-    if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
-      await UIManager.Instance.mainMenu.CloseMainMenu();
-    else
-      await UIManager.Instance.mainMenu.CloseInGameMenu();
-    GD.Print("In Display_Load_Screen, before triggering DisplaySaveScreen, no triggers here");
-    await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
+    await InputBlocker.BlockNewInput(async () => {
+      if (GameStateManager.Instance.CurrentState == State.MainMenuDisplayed)
+        await UIManager.Instance.mainMenu.CloseMainMenu();
+      else
+        await UIManager.Instance.mainMenu.CloseInGameMenu();
+      GD.Print("In Display_Load_Screen, before triggering DisplaySaveScreen, no triggers here");
+      await UIManager.Instance.saveGameScreen.DisplaySaveScreen();
+    });
 
   }
 

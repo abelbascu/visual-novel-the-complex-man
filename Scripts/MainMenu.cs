@@ -58,14 +58,10 @@ public partial class MainMenu : Control {
   private RichTextLabel WantToQuitGameLabel;
   private RichTextLabel WantToQuitToMainMenuLabel;
 
-  public InputBlocker inputBlocker { get; private set; }
-
 
 
 
   public override void _Ready() {
-
-    inputBlocker = new InputBlocker();
 
     GetUINodes();
     SetupButtonEvents();
@@ -157,9 +153,9 @@ public partial class MainMenu : Control {
     creditsConfirmationDialog.Confirmed += () => _ = OnCreditsCancelOrConfirmButtonPressed();
 
     //languages events
-    englishButton.Pressed += () => _ =  OnEnglishButtonPressed();
+    englishButton.Pressed += () => _ = OnEnglishButtonPressed();
     frenchButton.Pressed += () => _ = OnFrenchButtonPressed();
-    catalanButton.Pressed += () => _ =  OnCatalanButtonPressed();
+    catalanButton.Pressed += () => _ = OnCatalanButtonPressed();
     languagesGoBackButton.Pressed += () => _ = OnLanguagesGoBackButtonPressed();
   }
 
@@ -341,7 +337,7 @@ public partial class MainMenu : Control {
 
 
   public async Task DisplayMainMenuContainerOnly() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       DisableAllButtons();
       //this calls to pause the game timer, more sense on ingame menu
       //but can be used to autosave game while user exits current game
@@ -454,7 +450,7 @@ public partial class MainMenu : Control {
 
   public async Task DisplayInGameMenu() {
 
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
 
       SetContainerButtonsVisibility(LanguageOptionsContainer, false);
       SetContainerButtonsVisibility(ExitGameConfirmationPanel, false);
@@ -518,7 +514,7 @@ public partial class MainMenu : Control {
 
 
   public async Task CloseInGameMenu() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       DisableAllButtons();
       MainOptionsContainer.SetProcessInput(false);
       UIManager.Instance.menuOverlay.Visible = false;
@@ -531,7 +527,7 @@ public partial class MainMenu : Control {
 
   //Start new game
   private async Task OnStartNewGameButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       DisableAllButtons();
       HideIngameMenuIcon();
       await FadeOutMainMenu();
@@ -542,7 +538,7 @@ public partial class MainMenu : Control {
 
   //Continue game
   private async Task OnContinueButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       DisableAllButtons();
       ShowIngameMenuIcon();
       await CloseInGameMenu();
@@ -553,7 +549,7 @@ public partial class MainMenu : Control {
 
   //Save game
   private async Task OnSaveGameButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       DisableAllButtons();
       HideIngameMenuIcon();
       await CloseInGameMenu();
@@ -565,7 +561,7 @@ public partial class MainMenu : Control {
 
   //Load Game
   private async Task OnLoadGameButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       HideIngameMenuIcon();
       DisableAllButtons();
       GD.Print("In OnLoadGameButtonPressed triggering INITIALIZE_LOAD_SCREEN ");
@@ -588,7 +584,7 @@ public partial class MainMenu : Control {
 
   //Language options
   private async Task OnLanguageButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       HideIngameMenuIcon();
       DisableAllButtons();
       await UIFadeHelper.FadeOutControl(MainOptionsContainer, 0.6f);
@@ -600,7 +596,7 @@ public partial class MainMenu : Control {
   }
 
   public async Task DisplayLanguageMenu() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       LanguageOptionsContainer.Visible = true;
       LanguageOptionsContainer.TopLevel = true;
       await UIFadeHelper.FadeInControl(LanguageOptionsContainer);
@@ -609,7 +605,7 @@ public partial class MainMenu : Control {
   }
 
   public async Task OnLanguagesGoBackButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       if (GameStateManager.Instance.CurrentState == State.InGameMenuDisplayed)
         ShowIngameMenuIcon();
 
@@ -629,28 +625,28 @@ public partial class MainMenu : Control {
   }
 
   private async Task OnEnglishButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       await UpdateTextsBasedOnLocale("en");
       //EnableAllButtons();
     });
 
   }
   private async Task OnFrenchButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
-    await UpdateTextsBasedOnLocale("fr");
+    await InputBlocker.BlockNewInput(async () => {
+      await UpdateTextsBasedOnLocale("fr");
     });
   }
 
 
   private async Task OnCatalanButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
-    await UpdateTextsBasedOnLocale("ca");
+    await InputBlocker.BlockNewInput(async () => {
+      await UpdateTextsBasedOnLocale("ca");
     });
   }
 
   //Credits
   private async Task OnCreditsButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       HideIngameMenuIcon();
       DisableAllButtons();
       await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
@@ -661,7 +657,7 @@ public partial class MainMenu : Control {
   }
 
   private async Task OnCreditsCancelOrConfirmButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       DisableAllButtons();
       await UIFadeHelper.FadeOutWindow(creditsConfirmationDialog, 0.2f);
       //EnableAllButtons();
@@ -671,7 +667,7 @@ public partial class MainMenu : Control {
 
   //Exit to Main Menu
   public async Task OnExitToMainMenuButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       DisableAllButtons();
       HideIngameMenuIcon();
       await ShowExitToMainMenuConfirmationPopup();
@@ -679,7 +675,7 @@ public partial class MainMenu : Control {
   }
 
   public async Task ShowExitToMainMenuConfirmationPopup() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       DisableAllButtons();
       SetButtonActiveState(NoExitToMainMenuButton, false);
       SetButtonActiveState(YesExitToMainMenuButton, false);
@@ -697,7 +693,7 @@ public partial class MainMenu : Control {
   }
 
   public async Task OnExitToMainMenuCancelButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       SetButtonActiveState(NoExitToMainMenuButton, false);
       SetButtonActiveState(YesExitToMainMenuButton, false);
       await UIFadeHelper.FadeOutControl(ExitToMainMenuPanel, 0.6f);
@@ -710,7 +706,7 @@ public partial class MainMenu : Control {
   }
 
   private async Task OnExitToMainMenuConfirmButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       SetButtonActiveState(NoExitToMainMenuButton, false);
       SetButtonActiveState(YesExitToMainMenuButton, false);
       HideIngameMenuIcon();
@@ -728,7 +724,7 @@ public partial class MainMenu : Control {
   }
 
   private async Task HandleExitFromDialogueMode() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       UIManager.Instance.fadeOverlay.TopLevel = true;
       await UIManager.Instance.FadeInScreenOverlay(1.5f);
       UIManager.Instance.dialogueBoxUI.Hide();
@@ -740,7 +736,7 @@ public partial class MainMenu : Control {
 
   //Exit game
   public async Task OnExitGameButtonPressed() {
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       SetButtonActiveState(exitGameButton, false);
       DisableAllButtons();
       HideIngameMenuIcon();
@@ -756,7 +752,7 @@ public partial class MainMenu : Control {
 
   public async Task ShowExitGameConfirmationPopup() {
 
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       DisableAllButtons();
       await UIFadeHelper.FadeOutControl(MainOptionsContainer, 1.0f);
       SetContainerButtonsVisibility(MainOptionsContainer, false);
@@ -774,7 +770,7 @@ public partial class MainMenu : Control {
 
   private async Task OnExitGameConfirmButtonPressed() {
 
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       SetButtonActiveState(NoExitGameButton, false);
       SetButtonActiveState(YesExitGameButton, false);
       HideIngameMenuIcon();
@@ -788,7 +784,7 @@ public partial class MainMenu : Control {
 
   public async Task OnExitGameCancelButtonPressed() {
 
-    await inputBlocker.BlockNewInput(async () => {
+    await InputBlocker.BlockNewInput(async () => {
       SetButtonActiveState(NoExitGameButton, false);
       SetButtonActiveState(YesExitGameButton, false);
       DisableAllButtons();

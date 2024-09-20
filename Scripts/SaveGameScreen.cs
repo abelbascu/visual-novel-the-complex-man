@@ -22,16 +22,8 @@ public partial class SaveGameScreen : MarginContainer {
   private UITextTweenFadeOut fadeOut;
   public bool IsInteractable => Visible;
 
-  private InputBlocker inputBlocker;
-  private void InitializeInputBlocker() {
-    var mainMenu = GetNode<MainMenu>("../../UIManager/MainMenu");
-    inputBlocker = mainMenu.inputBlocker;
-  }
-
 
   public override void _Ready() {
-
-    CallDeferred(nameof(InitializeInputBlocker));
 
     saveGameSlotScene = GD.Load<PackedScene>("res://Scenes/SaveGameSlot.tscn");
     scrollContainer = GetNode<ScrollContainer>("MarginContainer/ScrollContainer");

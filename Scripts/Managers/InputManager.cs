@@ -6,47 +6,41 @@ using State = GameStateMachine.State;
 using SubState = GameStateMachine.SubState;
 using System.Threading.Tasks;
 
-
 public partial class InputManager : Control {
   public static InputManager Instance { get; private set; }
-  //from here we grab all the IInteractableUI controls
+  //where we grab all the IInteractableUI controls
   private Control currentFocusedScene;
-  //stroe the controls here
+  //we need to know the game state to assign a currentFocusedScene
+  private State currentState;
+  private SubState currentSubstate;
+  //store focusable UI controls here
   private List<Control> focusableUIControls = new List<Control>();
   //index of the control that has been clicked, pressed or selected
   private int currentFocusedIndex;
-  private State currentState;
-  private SubState currentSubstate;
-  //here we get the new control or scene where we extract the new UI focusable objects from
+  //store the last index of the menu button that was focused so when we come back
+  //from a submenu we can focus on the same button before we entered the submenu
   private int lastMainMenuIndex = -1;
   private int lastInGameMenuIndex = -1;
   //add cooldown to avoid duplicated key or button press
+  //both vars are used together in CanAcceptInput
   private float lastInputTime = 0f;
+  private const float INPUT_COOLDOWN = 0.1f; // 200ms cooldown
+  //both vars are for debounce for accept button
   private DateTime lastAcceptTime = DateTime.MinValue;
   private const int DEBOUNCE_MILLISECONDS = 200; // Adjust this value as needed
-
-  private const float INPUT_COOLDOWN = 0.1f; // 200ms cooldown
   //if gamepad stick moves this distance, register as movement
   private const float STICK_THRESHOLD = 0.4f;
-
   //we use this to disable button presses just after UI element is pressed
   //to prevent multiple button press that would break the game state transitions.
   private bool isGamePadAndKeyboardInputEnabled = true;
   public void SetGamePadAndKeyboardInputEnabled(bool enabled) {
     isGamePadAndKeyboardInputEnabled = enabled;
   }
-  //when we process input let's block further input
+  //moree conditiions to block further input
   //until we finish processing
   public bool isProcessingInput = false;
   private bool isInputLocked = false;
   private bool lastInputWasKeyboardOrGamepad = false;
-  //we put another extra measure as the main menu buttons
-  //still received input even if they are disabled
-  private InputBlocker inputBlocker;
-  private void InitializeInputBlocker() {
-    var mainMenu = GetNode<MainMenu>("../UIManager/MainMenu");
-    inputBlocker = mainMenu.inputBlocker;
-  }
 
   public override void _EnterTree() {
     if (Instance == null) {
@@ -63,17 +57,21 @@ public partial class InputManager : Control {
   }
 
   public override void _Ready() {
-    CallDeferred(nameof(InitializeInputBlocker));
     //subcribe when game changes state, so we can refresh the UI focusableUIControls list
     GameStateManager.Instance.StateChanged += (prevState, prevSubState, newState, newSubState, args) => {
       _ = OnGameStateChanged(prevState, prevSubState, newState, newSubState, args);
     };
   }
 
+  //try to prevent reading fast input that would break the game state transitions
+  private bool CanProcessInput(float currentTime) {
+    return currentTime - lastInputTime >= INPUT_COOLDOWN;
+  }
+
+
   public override async void _Input(InputEvent @event) {
-    //-------------------- DO NOT PROCESS MORE INPUT IS WE ARE ALREADY PROCESSING IT -----------------------------
     //if main menu is processing any input after a click or press, do not accept more input
-    if (inputBlocker == null || inputBlocker.IsBlocked) {
+    if (InputBlocker.IsInputBlocked) {
       GetViewport().SetInputAsHandled();
       return;
       //even if the user clicked the same button very faszt before the button was hidden
@@ -91,14 +89,14 @@ public partial class InputManager : Control {
       return;
     }
     //mouse input
-    if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left && !inputBlocker.IsBlocked && !isProcessingInput) {
+    if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left && !InputBlocker.IsInputBlocked && !isProcessingInput) {
       lastInputWasKeyboardOrGamepad = false;
       isProcessingInput = true;
       await ProcessInputAsync(@event);
       //stop propagating event
       AcceptEvent();
       //gamepad and keyboard input
-    } else if (isGamePadAndKeyboardInputEnabled && !inputBlocker.IsBlocked && !isProcessingInput) {
+    } else if (isGamePadAndKeyboardInputEnabled && !InputBlocker.IsInputBlocked && !isProcessingInput) {
       if (@event.IsActionPressed("ui_accept") || @event.IsActionPressed("ui_cancel") || @event.IsActionPressed("ui_left")
       || @event.IsActionPressed("ui_right") || @event.IsActionPressed("ui_up") || @event.IsActionPressed("ui_down")) {
         lastInputWasKeyboardOrGamepad = true;
@@ -442,10 +440,6 @@ public partial class InputManager : Control {
     }
   }
 
-  private bool CanProcessInput(float currentTime) {
-    return currentTime - lastInputTime >= INPUT_COOLDOWN;
-  }
-
   //!-------------- HANDLE ACCEPT ---------------
   private async Task HandleMenuAccept() {
     DateTime now = DateTime.Now;
@@ -512,7 +506,7 @@ public partial class InputManager : Control {
   }
 
   private async Task HandleMenuCancel() {
-    if (inputBlocker.IsBlocked) {
+    if (InputBlocker.IsInputBlocked) {
       return;
     }
     //if the ingame menu is displayed, we close it or open it

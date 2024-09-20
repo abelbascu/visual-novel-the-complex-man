@@ -146,7 +146,7 @@ public partial class GameManager : Control {
 
   public async Task Starting_New_Game() {
     //TO DO: pass a player profile object with bools of his previous choices to test advanced parts faster
-    GameStateManager.Instance.Fire(Trigger.DISPLAY_ENTER_YOUR_NAME_SCREEN);
+    GameStateManager.Instance.Fire(Trigger.DISPLAY_NEW_GAME_DIALOGUES);
   }
 
   public async Task Display_Enter_Your_Name_Screen() {
@@ -235,7 +235,7 @@ public partial class GameManager : Control {
     if (isLoadScreen) {
       GD.Print("In Initialize_Save_Screen, before triggering DISPLAY_LOAD_SCREEN");
       GameStateManager.Instance.Fire(Trigger.DISPLAY_LOAD_SCREEN);
-    } else {  
+    } else {
       GD.Print("In Initialize_Save_Screen, before triggering DISPLAY_SAVE_SCREEN");
       GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
     }

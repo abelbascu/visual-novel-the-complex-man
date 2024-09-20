@@ -13,7 +13,8 @@ public partial class InputNameScreen : Control {
   private string inputYourNameCancelButtonText_TRANSLATE = "INPUT_YOUR_NAME_CANCEL_BUTTON_TEXT"; //"No, {0} is not my name!\nLet me change it!"
   private string inputYourNameOKButtonText_TRANSLATE = "INPUT_YOUR_NAME_OK_BUTTON_TEXT"; //Yes, {0} is my name!.\nLet me enter the tavern!"
   private string inputYourNameConfirmNameText_TRANSLATE = "INPUT_YOUR_NAME_CONFIRM_NAME"; //[center]Are you sure that {username} is your final name?[/center]\n[center]You won't be able to change it during this current play![/center]"
-  private RichTextLabel enterNameBeforeConfirmingText;
+  private string characterLimitMessageTRANSLATE = "CHARACTER_LIMIT_REACHED";
+  private RichTextLabel warningsTextLabel;
   private InteractableUITextureButton acceptNameButton;
   private ColorRect acceptButtonBackground;
   private Panel ConfirmNameDialogPanel;
@@ -21,19 +22,37 @@ public partial class InputNameScreen : Control {
   private InteractableUIButton NoAcceptNameButton;
   private RichTextLabel AreYouSureTextLabel;
 
+  // New variables for character limit
+  private const int MaxNameLength = 20;
+  //private RichTextLabel characterLimitMessage;
+
   [Export] public float FadeDuration { get; set; } = 0.5f;
 
   private void SetupConfirmationDialogEvents() {
     YesAcceptNameButton.Pressed += () => _ = OnConfirmName();
     NoAcceptNameButton.Pressed += OnCancelConfirmation;
     ConfirmNameDialogPanel.Visible = false; // Ensure the dialog is initially hidden
+                                            // Set up character limit
+    nameInput.MaxLength = MaxNameLength;
+    nameInput.TextChanged += OnNameInputTextChanged;
   }
 
 
   public override void _Ready() {
 
+
     marginContainer = GetNode<MarginContainer>("MarginContainer");
     var vBoxContainer = marginContainer.GetNode<VBoxContainer>("MarginContainer1/VBoxContainer");
+
+    // Add character limit message
+    // characterLimitMessage.BbcodeEnabled = true;
+    // characterLimitMessage.FitContent = true;
+    // characterLimitMessage.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+    // characterLimitMessage.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+    // characterLimitMessage.SizeFlagsVertical = SizeFlags.ShrinkCenter;
+    // characterLimitMessage.Visible = false;
+    // vBoxContainer.AddChild(characterLimitMessage);
+    // vBoxContainer.MoveChild(characterLimitMessage, 1); // Move it just below the question label
 
     nameInput = vBoxContainer.GetNode<InteractableUILineEdit>("HBoxContainer/LineEdit");
     nameInput.CaretBlink = true;
@@ -47,7 +66,7 @@ public partial class InputNameScreen : Control {
     AreYouSureTextLabel = GetNode<RichTextLabel>("ConfirmNameDialogPanel/VBoxContainer/MarginContainer/AreYouSureTextLabel");
 
 
-    enterNameBeforeConfirmingText = vBoxContainer.GetNode<RichTextLabel>("RichTextLabel");
+    warningsTextLabel = vBoxContainer.GetNode<RichTextLabel>("RichTextLabel");
 
     acceptNameButton.CustomMinimumSize = new Vector2(100, 100);
     acceptNameButton.SizeFlagsHorizontal = SizeFlags.ShrinkEnd;
@@ -71,29 +90,114 @@ public partial class InputNameScreen : Control {
 
   }
 
-   private void AdjustPanelSize()
-    {
-        var vBoxContainer = ConfirmNameDialogPanel.GetNode<VBoxContainer>("VBoxContainer");
-        var marginContainer = vBoxContainer.GetNode<MarginContainer>("MarginContainer");
-        var buttonContainer = vBoxContainer.GetNode<HBoxContainer>("YesNoAcceptNameButtonsHBoxContainer");
+  private void ListenForNameConfirmation() {
+    // nameInput.PlaceholderText = "Enter your name";
+    //player confirms by hitting the OK button on the LineEdit textobx or hitting the Enter key
+    nameInput.TextSubmitted += OnNameSubmitted;
+    acceptNameButton.Pressed += OnAcceptButtonPressed;
+    nameInput.FocusEntered += () => GD.Print("LineEdit focus entered");
+    nameInput.FocusExited += () => GD.Print("LineEdit focus exited");
+    nameInput.InteractRequested += () => OnNameInputSetCaret();
+    //nameInput.GuiInput += OnNameInputGuiInput;
+  }
 
-        // Calculate the required size
-        //IMPORTANT CALL! GetCombinedMinimumSize helps to determine its size
-        //accounting for its children, in this case the MarginContainer and YesNoAcceptNameButtonsHBoxContainer
-        var contentSize = vBoxContainer.GetCombinedMinimumSize();
-        var requiredSize = contentSize + new Vector2(40, 60); // Add some padding
+  public override void _UnhandledInput(InputEvent @event) {
+    if (GameStateManager.Instance.IsInState(State.EnterYourNameScreenDisplayed, SubState.None)) {
+      if (@event.IsAction("ui_left")) {
+        MoveCaret(-1);
+        GetViewport().SetInputAsHandled();
+      } else if (@event.IsAction("ui_right")) {
+        MoveCaret(1);
+        GetViewport().SetInputAsHandled();
+      } else if (@event.IsAction("ui_accept")) {
+        OnAcceptButtonPressed();
+        GetViewport().SetInputAsHandled();
+      } else if (@event.IsAction("ui_cancel")) {
+        HandleBackspace();
+        GetViewport().SetInputAsHandled();
+      }
 
-        // Set the panel size
-        ConfirmNameDialogPanel.CustomMinimumSize = requiredSize;
-        ConfirmNameDialogPanel.Size = requiredSize;
-
-        // Center the panel
-        ConfirmNameDialogPanel.Position = (GetViewportRect().Size - ConfirmNameDialogPanel.Size) / 2;
-
-        GD.Print($"Adjusted panel size: {ConfirmNameDialogPanel.Size}");
-        GD.Print($"VBoxContainer size: {vBoxContainer.Size}");
-        GD.Print($"Button container size: {buttonContainer.Size}");
+      // Debug information
+      GD.Print($"Input Event: {@event.GetType()}, Action: {GetActionName(@event)}, Pressed: {@event.IsPressed()}");
     }
+  }
+
+
+  private string GetActionName(InputEvent @event) {
+    if (@event.IsAction("ui_left")) return "ui_left";
+    if (@event.IsAction("ui_right")) return "ui_right";
+    if (@event.IsAction("ui_accept")) return "ui_accept";
+    if (@event.IsAction("ui_cancel")) return "ui_cancel";
+    return "unknown";
+  }
+
+  private void MoveCaret(int direction) {
+    int newPosition = nameInput.CaretColumn + direction;
+    nameInput.CaretColumn = Mathf.Clamp(newPosition, 0, nameInput.Text.Length);
+  }
+
+  private void HandleBackspace() {
+    if (nameInput.CaretColumn > 0) {
+      nameInput.Text = nameInput.Text.Remove(nameInput.CaretColumn - 1, 1);
+      nameInput.CaretColumn--;
+    }
+  }
+
+
+  private void OnNameInputSetCaret() {
+    Vector2 clickPosition = nameInput.GetLocalMousePosition();
+
+    // Get the total width of the visible text
+    float totalWidth = nameInput.Size.X - nameInput.GetScrollOffset();
+
+    // Calculate the relative x position of the click
+    float relativeX = (clickPosition.X + nameInput.GetScrollOffset()) / totalWidth;
+
+    // Calculate the approximate character position
+    int approximatePosition = Mathf.FloorToInt(relativeX * nameInput.Text.Length);
+
+    // Clamp the position to ensure it's within the text bounds
+    int clampedPosition = Mathf.Clamp(approximatePosition, 0, nameInput.Text.Length);
+
+    // Set the caret (cursor) position
+    nameInput.CaretColumn = clampedPosition;
+
+    // Ensure the LineEdit has focus
+    nameInput.GrabFocus();
+  }
+
+  private void AdjustPanelSize() {
+    var vBoxContainer = ConfirmNameDialogPanel.GetNode<VBoxContainer>("VBoxContainer");
+    var marginContainer = vBoxContainer.GetNode<MarginContainer>("MarginContainer");
+    var buttonContainer = vBoxContainer.GetNode<HBoxContainer>("YesNoAcceptNameButtonsHBoxContainer");
+
+    // Calculate the required size
+    //IMPORTANT CALL! GetCombinedMinimumSize helps to determine its size
+    //accounting for its children, in this case the MarginContainer and YesNoAcceptNameButtonsHBoxContainer
+    var contentSize = vBoxContainer.GetCombinedMinimumSize();
+    var requiredSize = contentSize + new Vector2(40, 60); // Add some padding
+
+    // Set the panel size
+    ConfirmNameDialogPanel.CustomMinimumSize = requiredSize;
+    ConfirmNameDialogPanel.Size = requiredSize;
+
+    // Center the panel
+    ConfirmNameDialogPanel.Position = (GetViewportRect().Size - ConfirmNameDialogPanel.Size) / 2;
+
+    GD.Print($"Adjusted panel size: {ConfirmNameDialogPanel.Size}");
+    GD.Print($"VBoxContainer size: {vBoxContainer.Size}");
+    GD.Print($"Button container size: {buttonContainer.Size}");
+  }
+
+  private void OnNameInputTextChanged(string newText) {
+    if (newText.Length >= MaxNameLength) {
+      warningsTextLabel.Text = Tr(characterLimitMessageTRANSLATE);
+      //characterLimitMessage.Visible = true;
+    } else {
+      // characterLimitMessage.Visible = false;
+      ClearErrorMessage();
+    }
+  }
 
 
   private void SetupConfirmNameDialog() {
@@ -131,15 +235,12 @@ public partial class InputNameScreen : Control {
     // Connect to MarginContainer's resized signal
     marginContainer.Connect("resized", new Callable(this, nameof(OnMarginContainerResized)));
 
-
     // Set up the AreYouSureTextLabel
     AreYouSureTextLabel.BbcodeEnabled = true;
     AreYouSureTextLabel.FitContent = true;
     AreYouSureTextLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
     AreYouSureTextLabel.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
     AreYouSureTextLabel.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
-
-
 
     // Ensure buttons expand horizontally
     var buttonContainer = vBoxContainer.GetNode<HBoxContainer>("YesNoAcceptNameButtonsHBoxContainer");
@@ -152,20 +253,13 @@ public partial class InputNameScreen : Control {
     YesAcceptNameButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
     NoAcceptNameButton.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 
-    // Set a minimum size for the panel
-    // ConfirmNameDialogPanel.CustomMinimumSize = new Vector2(300, 200);
-
     // Apply the custom style to the panel and buttons
     ApplyStyleToAcceptNamePanelAndButtons();
 
     // Initial size adjustment
     CallDeferred(nameof(AdjustPanelSize));
     ConfirmNameDialogPanel.Connect("resized", new Callable(this, nameof(AdjustPanelSize)));
-
-    //ConfirmNameDialogPanel.TopLevel = true;
-    //ConfirmNameDialogPanel.Visible = true;
-    ConfirmNameDialogPanel.Modulate = Colors.White;
-
+    //ConfirmNameDialogPanel.Modulate = Colors.White;
   }
 
   private void OnMarginContainerResized() {
@@ -200,16 +294,33 @@ public partial class InputNameScreen : Control {
     nameInput.GrabFocus();
   }
 
-  private void ListenForNameConfirmation() {
-    // nameInput.PlaceholderText = "Enter your name";
-    //player confirms by hitting the OK button on the LineEdit textobx or hitting the Enter key
-    nameInput.TextSubmitted += OnNameSubmitted;
-    acceptNameButton.Pressed += OnAcceptButtonPressed;
-    nameInput.FocusEntered += () => GD.Print("LineEdit focus entered");
-    nameInput.FocusExited += () => GD.Print("LineEdit focus exited");
-    nameInput.InteractRequested += () => OnNameInputInteract();
-    //nameInput.GuiInput += OnNameInputGuiInput;
-  }
+
+  // private void OnNameInputGuiInput(InputEvent @event) {
+  //   if (@event is InputEventMouseButton mouseEvent &&
+  //       mouseEvent.ButtonIndex == MouseButton.Left &&
+  //       mouseEvent.Pressed) {
+  //     // Get the clicked position within the LineEdit
+  //     Vector2 clickPosition = GetLocalMousePosition();
+
+  //     // Estimate the clicked column based on average character width
+  //     float textWidth = nameInput.GetThemeFont("font").GetStringSize(nameInput.Text, fontSize: nameInput.GetThemeFontSize("font_size")).X;
+  //     float avgCharWidth = nameInput.Text.Length > 0 ? textWidth / nameInput.Text.Length : 10; // Default to 10 if text is empty
+
+  //     // Account for potential left padding
+  //     float leftPadding = nameInput.GetThemeConstant("minimum_spaces") * avgCharWidth;
+
+  //     int estimatedColumn = Mathf.FloorToInt((clickPosition.X - leftPadding) / avgCharWidth);
+
+  //     // Clamp the estimated column to valid range
+  //     int clampedColumn = Mathf.Clamp(estimatedColumn, 0, nameInput.Text.Length);
+
+  //     // Set the caret (cursor) position
+  //     nameInput.CaretColumn = clampedColumn;
+
+  //     // Ensure the LineEdit has focus
+  //     nameInput.GrabFocus();
+  //   }
+  // }
 
   private void OnNameInputInteract() {
     ShowConfirmationDialog();
@@ -238,13 +349,13 @@ public partial class InputNameScreen : Control {
       CallDeferred(nameof(AdjustPanelSize));
 
     } else {
-      enterNameBeforeConfirmingText.Text = Tr("PLEASE_ENTER_NAME_BEFORE_CONFIRMING");
+      warningsTextLabel.Text = Tr("PLEASE_ENTER_NAME_BEFORE_CONFIRMING");
       GetTree().CreateTimer(3.0f).Timeout += ClearErrorMessage;
     }
   }
 
   private void ClearErrorMessage() {
-    enterNameBeforeConfirmingText.Text = Tr(inputYourNameTitleTRANSLATE);
+    warningsTextLabel.Text = Tr(inputYourNameTitleTRANSLATE);
   }
 
   private async Task OnConfirmName() {

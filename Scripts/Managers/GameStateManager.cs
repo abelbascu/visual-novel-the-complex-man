@@ -78,6 +78,9 @@ public partial class GameStateManager : Node {
             //main Menu > start new game
             {(State.MainMenuDisplayed, SubState.None, State.StartingNewGame, SubState.None, Trigger.START_NEW_GAME),
                 () => GameManager.Instance.Starting_New_Game()},
+            //start New Game > set up new game dialogues
+            {(State.StartingNewGame, SubState.None, State.SettingUpNewGameDialogues, SubState.None, Trigger.DISPLAY_NEW_GAME_DIALOGUES),
+                () => GameManager.Instance.Display_New_Game_Dialogues()},
             //start New Game > enter your name screen
             {(State.StartingNewGame, SubState.None, State.EnterYourNameScreenDisplayed, SubState.None, Trigger.DISPLAY_ENTER_YOUR_NAME_SCREEN),
                 () => GameManager.Instance.Display_Enter_Your_Name_Screen()},

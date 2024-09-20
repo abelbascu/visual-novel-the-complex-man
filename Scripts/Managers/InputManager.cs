@@ -30,12 +30,8 @@ public partial class InputManager : Control {
   private const int DEBOUNCE_MILLISECONDS = 200; // Adjust this value as needed
   //if gamepad stick moves this distance, register as movement
   private const float STICK_THRESHOLD = 0.4f;
-  //we use this to disable button presses just after UI element is pressed
-  //to prevent multiple button press that would break the game state transitions.
-  private bool isGamePadAndKeyboardInputEnabled = true;
-  //more conditiions to block further input
-  //until we finish processing
-  public bool isProcessingInput = false;
+  //NECESSARY onditiions to block further input
+  public bool isProcessingInput = false; //DO NOT REMOVE
   private bool lastInputWasKeyboardOrGamepad = false;
 
   public override void _EnterTree() {
@@ -92,7 +88,7 @@ public partial class InputManager : Control {
       //stop propagating event
       AcceptEvent();
       //gamepad and keyboard input
-    } else if (isGamePadAndKeyboardInputEnabled && !InputBlocker.IsInputBlocked && !isProcessingInput) {
+    } else if (!InputBlocker.IsInputBlocked && !isProcessingInput) {
       if (@event.IsActionPressed("ui_accept") || @event.IsActionPressed("ui_cancel") || @event.IsActionPressed("ui_left")
       || @event.IsActionPressed("ui_right") || @event.IsActionPressed("ui_up") || @event.IsActionPressed("ui_down")) {
         lastInputWasKeyboardOrGamepad = true;

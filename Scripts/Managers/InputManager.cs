@@ -309,7 +309,7 @@ public partial class InputManager : Control {
   //when we open the ingame menu, 
   public async Task SetCurrentFocusedUIControlIndexAfterClosingInGameMenu() {
     await UpdateFocusableControls();
-    // If player choices are visible, focus on the first choice
+    // If player choices are visible, focus on last saved player choice if it exists.
     if (UIManager.Instance.playerChoicesBoxUI.Visible) {
       if (lastPlayerChoiceIndex != -1) {
         currentFocusedIndex = lastPlayerChoiceIndex;
@@ -324,16 +324,6 @@ public partial class InputManager : Control {
         }
       }
     }
-    // // If neither is visible, set focus on the first non-InGameMenuButton control
-    // else {
-    //   for (int i = 0; i < focusableUIControls.Count; i++) {
-    //     if (!(focusableUIControls[i] is InGameMenuButton)) {
-    //       currentFocusedIndex = i;
-    //       break;
-    //     }
-    //   }
-    // }
-
     if (currentFocusedIndex != -1) {
       await HighlightFocusableControl(currentFocusedIndex, true);
     } else {

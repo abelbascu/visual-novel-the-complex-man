@@ -1,3 +1,5 @@
+#if TOOLS
+
 using Godot;
 using System;
 using System.Collections.Generic;
@@ -7,7 +9,6 @@ using System.Text.Json;
 //using Scripts;
 //using Scripts.Helpers;
 
-#if TOOLS
 [Tool]
 public partial class visual_association_plugin : EditorPlugin {
   private Control dock;

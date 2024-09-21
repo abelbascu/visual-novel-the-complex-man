@@ -227,7 +227,7 @@ public partial class InputManager : Control {
     if (currentFocusedIndex != -1) {
       await HighlightFocusableControl(currentFocusedIndex, true);
     } else {
-      await ClearAllFocusableControlsHighlighting();
+      await ClearAllFocusableControlsHighlights();
     }
   }
 
@@ -285,9 +285,11 @@ public partial class InputManager : Control {
       //dehighlight last focused control first
       if (currentFocusedIndex != -1 && currentFocusedIndex < focusableUIControls.Count) {
         await HighlightFocusableControl(currentFocusedIndex, false);
-        // Set new highlight
-        await HighlightFocusableControl(currentFocusedIndex, true);
+      }
+      // Set new highlight
+      if (newFocusedIndex != -1 && newFocusedIndex < focusableUIControls.Count) {
         currentFocusedIndex = newFocusedIndex;
+        await HighlightFocusableControl(currentFocusedIndex, true);
       }
     }
   }
@@ -336,7 +338,7 @@ public partial class InputManager : Control {
       await HighlightFocusableControl(currentFocusedIndex, true);
     } else {
       //or clear all if mouse is not over any IInteractableUI control
-      await ClearAllFocusableControlsHighlighting();
+      await ClearAllFocusableControlsHighlights();
     }
   }
 
@@ -591,7 +593,7 @@ public partial class InputManager : Control {
     }
   }
 
-  private async Task ClearAllFocusableControlsHighlighting() {
+  private async Task ClearAllFocusableControlsHighlights() {
     foreach (var control in focusableUIControls) {
       if (control is InteractableUIButton button) {
         await ApplyButtonStyle(button, false);

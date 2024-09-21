@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 public partial class DialogueManager : Control {
 
-  public const int STARTING_CONVO_ID = 2;
+  public const int STARTING_CONVO_ID = 1;
   public const int STARTING_DIALOGUE_ID = 1;
   //-------------------------------------------------------------------config variables---------------------------------------------------------------------------------
   [Export] public int currentConversationID = STARTING_CONVO_ID; //set here the conversation you want to load. Conversations in Chatmapper are what we could call chapters.

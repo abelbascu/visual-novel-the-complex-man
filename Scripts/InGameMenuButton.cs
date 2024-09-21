@@ -40,7 +40,7 @@ public partial class InGameMenuButton : MarginContainer {
         //if user closes ingame menu, put focus again on dialoguebox
         //or the first playerchoice, even if the mouse stays over ingame menu
         //we don't want users to use the action key to open ingame menu
-        await InputManager.Instance.SetCurrentFocusedUIControlIndexAfterClosingMenu();
+        await InputManager.Instance.SetCurrentFocusedUIControlIndexAfterClosingInGameMenu();
 
       }
     });

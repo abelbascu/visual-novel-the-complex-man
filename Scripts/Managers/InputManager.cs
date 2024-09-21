@@ -162,57 +162,57 @@ public partial class InputManager : Control {
       //Mainn menu
     } else if (currentState == State.MainMenuDisplayed && currentSubstate == SubState.None) {
       currentFocusedScene = UIManager.Instance.mainMenu;
-      GetInteractableUIElements(currentFocusedScene);
+      SetFocusableControls(currentFocusedScene);
       if (lastInputWasKeyboardOrGamepad && lastMainMenuIndex != -1 && lastMainMenuIndex < focusableUIControls.Count) {
         currentFocusedIndex = lastMainMenuIndex;
       } else { currentFocusedIndex = GetIndexOfControlUnderMouse(); }
       //Ingame menu
     } else if (currentState == State.InGameMenuDisplayed && currentSubstate == SubState.None) {
-      GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
+      SetFocusableControls(UIManager.Instance.inGameMenuButton);
       currentFocusedScene = UIManager.Instance.mainMenu;
-      GetInteractableUIElements(currentFocusedScene);
+      SetFocusableControls(currentFocusedScene);
       if (lastInputWasKeyboardOrGamepad && lastInGameMenuIndex != -1 && lastInGameMenuIndex < focusableUIControls.Count) {
         currentFocusedIndex = lastInGameMenuIndex;
       } else { currentFocusedIndex = GetIndexOfControlUnderMouse(); }
       //Load game screen
     } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && currentSubstate == SubState.LoadScreenDisplayed) {
       currentFocusedScene = UIManager.Instance.saveGameScreen;
-      GetInteractableUIElements(currentFocusedScene);
+      SetFocusableControls(currentFocusedScene);
       currentFocusedIndex = -1;
       //Save game screen
     } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && currentSubstate == SubState.SaveScreenDisplayed) {
       currentFocusedScene = UIManager.Instance.saveGameScreen;
-      GetInteractableUIElements(currentFocusedScene);
+      SetFocusableControls(currentFocusedScene);
       currentFocusedIndex = -1;
       //Exit game popup
     } else if (currentState == State.MainMenuDisplayed && currentSubstate == SubState.ExitGameConfirmationPopupDisplayed) {
       currentFocusedScene = UIManager.Instance.mainMenu.ExitGameConfirmationPanel;
-      GetInteractableUIElements(currentFocusedScene);
+      SetFocusableControls(currentFocusedScene);
       currentFocusedIndex = -1; // Focus on the first button in the submenu
       //Exit to main menu popup
     } else if (currentState == State.InGameMenuDisplayed && currentSubstate == SubState.ExitToMainMenuConfirmationPopupDisplayed) {
       currentFocusedScene = UIManager.Instance.mainMenu.ExitToMainMenuPanel;
-      GetInteractableUIElements(currentFocusedScene);
+      SetFocusableControls(currentFocusedScene);
       currentFocusedIndex = -1;
       //Language menu
       currentFocusedIndex = -1; // Focus on the first button in the submenu
     } else if ((currentState == State.MainMenuDisplayed || currentState == State.InGameMenuDisplayed) && currentSubstate == SubState.LanguageMenuDisplayed) {
       currentFocusedScene = UIManager.Instance.mainMenu.LanguageOptionsContainer;
-      GetInteractableUIElements(currentFocusedScene);
+      SetFocusableControls(currentFocusedScene);
       currentFocusedIndex = -1; // Focus on the first button in the submenu
       //Dialogue Mode
     } else if (currentState == State.InDialogueMode && currentSubstate == SubState.None) {
-      GetInteractableUIElements(UIManager.Instance.inGameMenuButton);
+      SetFocusableControls(UIManager.Instance.inGameMenuButton);
       //get dialogue box
       if (UIManager.Instance.dialogueBoxUI.Visible)
         currentFocusedScene = DialogueManager.Instance.dialogueBoxUI;
       //get player choices box
       else if (UIManager.Instance.playerChoicesBoxUI.Visible)
         currentFocusedScene = DialogueManager.Instance.playerChoicesBoxUI;
-      GetInteractableUIElements(currentFocusedScene);
+      SetFocusableControls(currentFocusedScene);
       //enter your name screen (we won't use it for now)
     } else if (currentState == State.EnterYourNameScreenDisplayed) {
-      GetInteractableUIElements(UIManager.Instance.inputNameScreen);
+      SetFocusableControls(UIManager.Instance.inputNameScreen);
     } else {
       // For any other state/substate combination, clear focus
       currentFocusedIndex = -1;
@@ -225,6 +225,27 @@ public partial class InputManager : Control {
     }
   }
 
+  private List<Control> GetFocusableControls() {
+    return focusableUIControls.FindAll(control => control.Visible);
+  }
+
+  private void SetFocusableControls(Node node) {
+    //we pass the screen and get the focusable UI controls
+    if (node is Control control) {
+
+      if (control is IInteractableUI && control.Visible) {
+        focusableUIControls.Add(control);
+        GD.Print($"Focusable control: {control.Name}, Type: {control.GetType().Name}");
+        return; // Stop traversing this control tree
+      }
+    }
+    //we keep traversing the tree until we find a IInteractableUI or any control type specified above
+    foreach (var child in node.GetChildren()) {
+      SetFocusableControls(child);
+    }
+  }
+
+
   private int GetIndexOfControlUnderMouse() {
     for (int i = 0; i < focusableUIControls.Count; i++) {
       if (focusableUIControls[i] is Control focusable &&
@@ -236,58 +257,11 @@ public partial class InputManager : Control {
     return -1;
   }
 
-
-  private void GetInteractableUIElements(Node node) {
-    //we pass the screen and get the focusable UI controls
-    if (node is Control control) {
-      //get the player choice buttons if we are in Dialogue Mode
-      if (control is PlayerChoiceButton playerChoiceButton) {
-        focusableUIControls.Add(playerChoiceButton);
-        GD.Print($"Focusable control: {control.Name}, Type: {control.GetType().Name}");
-        return; // Stop traversing this branch beccause there is a IInteractableUI richtextlabel
-        //inside the playerchoice that we don't want to add, or we would have conflicts
-        //when clicking over it. We do this becasue the playerChoiceButton parent is needed
-        //for the highlighting, and the richtextlabel for the pressed signal to advance the dialogue
-      }
-       //get the lineEdit used in InputNameScreen (we won't use it for now)
-       else if (control is InteractableUILineEdit lineEdit) {
-        focusableUIControls.Add(lineEdit);
-        GD.Print($"Focusable control: {control.Name}, Type: {control.GetType().Name}");
-        return;
-      }
-      //get the save/load game slots from Save/Load screen /we use 'SaveGameSlot' for 
-      //both save and load screens
-      else if (control is SaveGameSlot saveGameSlot) {
-        // For SaveGameSlot, we only want to add its actionButton
-        if (saveGameSlot.actionButton != null && saveGameSlot.actionButton.Visible) {
-          focusableUIControls.Add(saveGameSlot.actionButton);
-          GD.Print($"Focusable control: {control.Name}, Type: {control.GetType().Name}");
-        }
-        return; // Stop traversing this control tree
-      }
-      //get the rest of the UI elements from the UI (menu buttons)
-      else if (control is IInteractableUI && control.Visible) {
-        focusableUIControls.Add(control);
-        return; // Stop traversing this control tree
-      }
-    }
-
-    //we keep traversing the tree until we find a IInteractableUI or any control type specified above
-    foreach (var child in node.GetChildren()) {
-      GetInteractableUIElements(child);
-    }
-    //! i don't like that we have interactableUITextureButton contrls like ingame menu icon or
-    //! the acceptPlayername in input name screen, because there is copuling in some places
-    //! and we need to differentiate them, when we should just trigger Interact() and forget
-  }
-
-  private List<Control> GetVisibleFocusableControls() {
-    return focusableUIControls.FindAll(control => control.Visible);
-  }
-
   private async void HandleMouseMotion() {
+    //Ignore mouse motion in dialogue mode, we don´t want to change focus index by hovering
+    //over the ingame menu icon. If we ui_accepted then we would not advance the dialogue
     if (GameStateManager.Instance.CurrentState == State.InDialogueMode) {
-      return; // Ignore mouse motion in dialogue mode
+      return;
     }
     lastInputWasKeyboardOrGamepad = false;
     int newFocusedIndex = -1;
@@ -319,19 +293,6 @@ public partial class InputManager : Control {
       }
     }
   }
-
-  private async Task ClearButtonHighlights() {
-    foreach (var control in focusableUIControls) {
-      if (control is InteractableUIButton button) {
-        await ApplyButtonStyle(button, false);
-        button.ReleaseFocus();
-      } else if (control is PlayerChoiceButton playerChoiceButton) {
-        playerChoiceButton.ApplyStyle(false);
-      }
-    }
-    await Task.CompletedTask;
-  }
-
 
   private async Task HandleMouseClick() {
     for (int i = 0; i < focusableUIControls.Count; i++) {
@@ -523,7 +484,7 @@ public partial class InputManager : Control {
   }
 
   private async Task HandleVerticalNavigation(bool isUp) {
-    var visibleControls = GetVisibleFocusableControls();
+    var visibleControls = GetFocusableControls();
     if (visibleControls.Count == 0) return;
     int newIndex = GetNextValidFocusableControlIndex(isUp);
     if (newIndex != -1 && newIndex != currentFocusedIndex) {
@@ -547,8 +508,13 @@ public partial class InputManager : Control {
     return FindSaveGameSlotParent(node.GetParent());
   }
 
+  private bool IsValidButtonForNavigation(Control control) {
+    // Add any additional conditions here if needed
+    return control.Visible;
+  }
+
   private int GetNextValidFocusableControlIndex(bool isUp) {
-    var visibleControls = GetVisibleFocusableControls();
+    var visibleControls = GetFocusableControls();
     bool isInGameMenuVisible = UIManager.Instance.inGameMenuButton.Visible;
     bool isPlayerChoicesVisible = UIManager.Instance.playerChoicesBoxUI.Visible;
     // If no controls are visible, return -1
@@ -586,7 +552,6 @@ public partial class InputManager : Control {
       if (IsValidButtonForNavigation(visibleControls[currentIndex])) {
         return currentIndex;
       }
-
       //If it's not valid, it moves to the next button in the specified direction.
       if (isUp) {
         currentIndex = (currentIndex - 1 + count) % count;
@@ -601,13 +566,9 @@ public partial class InputManager : Control {
     return -1;
   }
 
-  private bool IsValidButtonForNavigation(Control control) {
-    // Add any additional conditions here if needed
-    return control.Visible;
-  }
 
   private async Task HandleHorizontalNavigation(bool isLeft) {
-    var visibleControls = GetVisibleFocusableControls();
+    var visibleControls = GetFocusableControls();
     if (visibleControls.Count == 0) return;
     int currentVisibleIndex = currentFocusedIndex != -1 ? visibleControls.IndexOf(focusableUIControls[currentFocusedIndex]) : -1;
     if (currentVisibleIndex == -1) {
@@ -630,9 +591,20 @@ public partial class InputManager : Control {
     }
   }
 
+  private async Task ClearButtonHighlights() {
+    foreach (var control in focusableUIControls) {
+      if (control is InteractableUIButton button) {
+        await ApplyButtonStyle(button, false);
+        button.ReleaseFocus();
+      } else if (control is PlayerChoiceButton playerChoiceButton) {
+        playerChoiceButton.ApplyStyle(false);
+      }
+    }
+    await Task.CompletedTask;
+  }
+
   private async Task ApplyButtonStyle(InteractableUIButton button, bool isHighlighted) {
     if (button == null) return;
-
     if (isHighlighted) {
       var hoverStyle = UIThemeHelper.GetHoverStyleBox();
       button.AddThemeStyleboxOverride("normal", hoverStyle);

@@ -28,7 +28,7 @@ window/stretch/mode="viewport"
 [dotnet]
 
 project/assembly_name="VisualNovelTheComplexMan"
-project/solution_directory="Solution"
+project/solution_directory="."
 
 [editor_plugins]
 

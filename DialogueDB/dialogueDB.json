@@ -137,7 +137,7 @@
 			  "fr-FR": "",
 			  "cat-CAT": "",
 			  "IsNoTurningBackPath": "False",
-			  "VisualPath": "",
+			  "VisualPath": "res://Visuals/DialogueOrPlayerChoice/open the door.png",
 			  "VisualType": 0
 			},
 			"ID": 3
@@ -162,7 +162,7 @@
 			  "Actor": "3",
 			  "Conversant": "3",
 			  "Menu Text": "",
-			  "Dialogue Text": "I asked my father...",
+			  "Dialogue Text": "I ask my father...",
 			  "Parenthetical": "",
 			  "Audio Files": "[]",
 			  "Video File": "",

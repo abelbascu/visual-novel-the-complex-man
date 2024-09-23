@@ -18,6 +18,11 @@ public partial class visual_association_plugin : EditorPlugin {
   private Dictionary<int, List<DialogueObject>> conversationObjectsDB;
   private const string JSON_PATH = "res://DialogueDB/dialogueDB.json";
 
+  private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions {
+    WriteIndented = true,
+    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+  };
+
   public override void _EnterTree() {
     GD.Print("VisualAssociationPlugin _EnterTree called");
 
@@ -54,7 +59,21 @@ public partial class visual_association_plugin : EditorPlugin {
       dialogueList.SelectMode = ItemList.SelectModeEnum.Multi;
     }
 
+    VisualPathMappings.Load(); // Load existing mappings from json to dictionary
     CallDeferred(nameof(DeferredSetup));
+  }
+
+  private void InjectSavedVisualPaths() {
+    foreach (var conversation in conversationObjectsDB) {
+      foreach (var dialogue in conversation.Value) {
+        if (VisualPathMappings.Mappings.TryGetValue(dialogue.ID, out string visualPath)) {
+          dialogue.VisualPath = visualPath;
+          dialogue.VisualType = 0; // Default to Image, or you could store this in the mappings as well
+        }
+      }
+    }
+    SaveDialoguesToJson();
+    GD.Print("[InjectSavedVisualPaths] Finished injecting saved visual paths to dialoguesDB.json");
   }
 
   private void DeferredSetup() {
@@ -67,7 +86,6 @@ public partial class visual_association_plugin : EditorPlugin {
     };
   }
 
-
   public override void _Ready() {
     base._Ready();
     // This ensures we have access to the EditorInterface
@@ -77,8 +95,6 @@ public partial class visual_association_plugin : EditorPlugin {
       GD.PrintErr("EditorInterface is not available");
     }
   }
-
-
 
   public override void _ExitTree() {
     GD.Print("VisualAssociationPlugin _ExitTree called");
@@ -112,6 +128,10 @@ public partial class visual_association_plugin : EditorPlugin {
       GD.PrintErr($"Error in LoadDialogues: {e.Message}");
       GD.PrintErr(e.StackTrace);
     }
+
+    InjectSavedVisualPaths();
+
+
   }
 
   private Dictionary<int, List<DialogueObject>> LoadDialoguesFromJson() {
@@ -185,20 +205,43 @@ public partial class visual_association_plugin : EditorPlugin {
   }
 
   private void UpdateDialogue(int index, string visualPath, int visualType) {
+    GD.Print($"[UpdateDialogue] Start - index: {index}, visualPath: {visualPath}, visualType: {visualType}");
+
+    if (conversationObjectsDB == null) {
+      GD.PrintErr("[UpdateDialogue] conversationObjectsDB is null. Cannot update dialogue.");
+      return;
+    }
+
     int dialogueIndex = 0;
 
     foreach (var conversation in conversationObjectsDB) {
+      if (conversation.Value == null) continue;
+
       foreach (var dialogue in conversation.Value) {
+        if (dialogue == null) continue;
+
         if (dialogueIndex == index) {
           dialogue.VisualPath = visualPath;
           dialogue.VisualType = visualType;
-          GD.Print($"Updated dialogue {dialogue.ID} with VisualPath: {visualPath}, VisualType: {visualType}");
+
+          // Simplified defensive check
+          if (VisualPathMappings.Mappings == null) {
+            GD.PrintErr("[UpdateDialogue] VisualPathMappings.Mappings is null. Initializing new dictionary.");
+            VisualPathMappings.Mappings = new Dictionary<int, string>();
+          }
+
+          VisualPathMappings.Mappings[dialogue.ID] = visualPath; // Save mapping
+          GD.Print($"[UpdateDialogue] Updated dialogue {dialogue.ID} with VisualPath: {visualPath}, VisualType: {visualType}");
+          VisualPathMappings.Save(); // Save the updated mappings to file
           return;
         }
         dialogueIndex++;
       }
     }
+
+    GD.PrintErr($"[UpdateDialogue] Dialogue at index {index} not found.");
   }
+
 
   private void SaveDialoguesToJson() {
     string projectRoot = ProjectSettings.GlobalizePath("res://");
@@ -272,21 +315,69 @@ public partial class visual_association_plugin : EditorPlugin {
         Assets = updatedAssets
       };
 
-      var options = new JsonSerializerOptions {
-        WriteIndented = true,
-        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-      };
-      string updatedJsonString = JsonSerializer.Serialize(updatedRoot, options);
+      string updatedJsonString = JsonSerializer.Serialize(updatedRoot, JsonOptions);
       File.WriteAllText(fullPath, updatedJsonString);
       GD.Print("JSON file updated successfully.");
+
+      VisualPathMappings.Save(); // Save mappings to a separate file
     } catch (Exception e) {
       GD.PrintErr($"Error updating JSON file: {e.Message}");
       GD.PrintErr(e.StackTrace);
     }
   }
-  // private Dictionary<int, List<DialogueObject>> LoadDialoguesFromJson() {
-  //     string jsonString = File.ReadAllText(JSON_PATH);
-  //     return JSON2DialogueObjectParser.ExtractDialogueObjects(jsonString);
-  // }
+
+  private void InjectVisualPaths(string jsonPath) {
+    try {
+      string jsonString = File.ReadAllText(jsonPath);
+      using var jsonDocument = JsonDocument.Parse(jsonString);
+      var root = jsonDocument.RootElement;
+
+      var conversationsArray = root.GetProperty("Assets").GetProperty("Conversations");
+      var updatedConversations = new List<object>();
+
+      foreach (var conversation in conversationsArray.EnumerateArray()) {
+        var dialogNodes = conversation.GetProperty("DialogNodes");
+        var updatedDialogNodes = new List<object>();
+
+        foreach (var node in dialogNodes.EnumerateArray()) {
+          var id = node.GetProperty("ID").GetInt32();
+          var fields = node.GetProperty("Fields");
+          var updatedFields = JsonSerializer.Deserialize<Dictionary<string, object>>(fields.GetRawText());
+
+          if (VisualPathMappings.Mappings.TryGetValue(id, out string visualPath)) {
+            updatedFields["VisualPath"] = visualPath;
+            updatedFields["VisualType"] = visualTypeOption.Selected;
+            GD.Print($"Injected VisualPath for dialogue ID {id}: {visualPath}");
+          }
+
+          var updatedNode = JsonSerializer.Deserialize<Dictionary<string, object>>(node.GetRawText());
+          updatedNode["Fields"] = updatedFields;
+          updatedDialogNodes.Add(updatedNode);
+        }
+
+        var updatedConversation = JsonSerializer.Deserialize<Dictionary<string, object>>(conversation.GetRawText());
+        updatedConversation["DialogNodes"] = updatedDialogNodes;
+        updatedConversations.Add(updatedConversation);
+      }
+
+      var updatedRoot = new Dictionary<string, object> {
+        ["Assets"] = new Dictionary<string, object> {
+          ["Conversations"] = updatedConversations
+        }
+      };
+
+      string updatedJsonString = JsonSerializer.Serialize(updatedRoot, JsonOptions);
+      File.WriteAllText(jsonPath, updatedJsonString);
+      GD.Print("Visual paths injected successfully.");
+    } catch (Exception e) {
+      GD.PrintErr($"Error injecting visual paths: {e.Message}");
+    }
+  }
+
+  // Add a method to handle reloading the JSON file
+  public void ReloadJSON() {
+    LoadDialogues();
+    InjectVisualPaths(JSON_PATH);
+  }
 }
 #endif

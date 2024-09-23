@@ -23,8 +23,11 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+language = null
 
 [node name="DialogueManager" parent="GameManager" instance=ExtResource("2_8t2uu")]
+currentConversationID = null
+currentDialogueID = null
 
 [node name="GameStateManager" parent="GameManager" instance=ExtResource("3_dyufh")]
 layout_mode = 1

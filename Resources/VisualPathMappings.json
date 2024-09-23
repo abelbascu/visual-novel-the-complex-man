@@ -1,1 +1,6 @@
-null
+{
+  "1": "res://Visuals/DialogueOrPlayerChoice/PlayerDirtyRoom.jpg",
+  "2": "res://Visuals/DialogueOrPlayerChoice/cosmos ether.png",
+  "3": "res://Visuals/DialogueOrPlayerChoice/open the door.png",
+  "4": "res://Visuals/DialogueOrPlayerChoice/jump over the flowers.png"
+}

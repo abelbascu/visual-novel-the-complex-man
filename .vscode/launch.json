@@ -34,7 +34,7 @@
             ]
         },
         {
-            "name": "Launch Editor",
+            "name": "Launch Godot Editor",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
@@ -46,12 +46,15 @@
                 "--path",
                 "${workspaceRoot}",
                 "--editor"
-            ]
+            ],
+            "justMyCode": false
         },
         {
-            "name": "Attach to Process",
+            "name": "Attach to Godot Process",
             "type": "coreclr",
-            "request": "attach"
+            "request": "attach",
+            "processId": "${command:pickProcess}",
+            "justMyCode": false
         }
     ]
 }

@@ -10,6 +10,7 @@ offset_right = 1200.0
 offset_bottom = 200.0
 size_flags_horizontal = 3
 script = ExtResource("1_d8hvf")
+ThumbnailSize = null
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 custom_minimum_size = Vector2(850, 200)

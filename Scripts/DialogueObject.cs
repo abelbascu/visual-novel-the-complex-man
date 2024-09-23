@@ -20,6 +20,14 @@ public class DialogueObject {
   //and the player can only follow the current path, until a sure dead, change of conversation, etc.
   public bool IsNoTurningBackPath = false;
   public string VisualPath { get; set; }
+  public float VisualPreDelay { get; set; }
+  public float VisualPostDelay { get; set; }
+  public string MusicPath { get; set; }
+  public float MusicPreDelay { get; set; }
+  public float MusicPostDelay { get; set; }
+  public string SoundPath { get; set; }
+  public float SoundPreDelay { get; set; }
+  public float SoundPostDelay { get; set; }
 }
 
 

@@ -1,12 +1,15 @@
 using Godot;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 public partial class VisualManager : Control {
   public static VisualManager Instance { get; private set; }
 
   public TextureRect fullScreenImage;
   public string VisualPath;
+  public float visualPreDelay = 0;
+  public float visualPostDelay = 0;
   // private VideoStreamPlayer videoPlayer;
 
   public override void _EnterTree() {
@@ -37,7 +40,7 @@ public partial class VisualManager : Control {
 
 
 
-  public void DisplayVisual(string visualPath) {
+  public async Task DisplayVisual(string visualPath, float visualPreDelay, float visualPostDelay) {
     HideAllVisuals();
     this.VisualPath = visualPath;
 
@@ -46,7 +49,9 @@ public partial class VisualManager : Control {
       case ".png":
       case ".jpg":
       case ".jpeg":
+        await Task.Delay((int)(visualPreDelay * 1000));
         DisplayImage(visualPath);
+        await Task.Delay((int)(visualPostDelay * 1000));
         break;
       case ".tscn":
         //PlayCutscene(visualPath);

@@ -31,6 +31,7 @@ public partial class DialogueManager : Control {
   //public const string NARRATOR = "3";
 
   public Action<int> DialogueVisited;
+  public event Action<DialogueObject> DialogueStarted;
 
   public enum Actors {
     Player = 1,
@@ -103,13 +104,15 @@ public partial class DialogueManager : Control {
     return null;
   }
 
-  public void DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) {
+  public async Task DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) {
     // Narrator or NPC won't ever have multiple choices, so we can display the dialogue now.     
 
+    DialogueStarted?.Invoke(dialogObj);
+
     if (!string.IsNullOrEmpty(dialogObj.VisualPath)) {
-      VisualManager.Instance.DisplayVisual(dialogObj.VisualPath);
+      VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, dialogObj.VisualPreDelay, dialogObj.VisualPostDelay);
     } else {
-      VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath);
+      VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath, VisualManager.Instance.visualPreDelay, VisualManager.Instance.visualPostDelay);
     }
 
     if (dialogObj.Actor != "1") {
@@ -156,8 +159,6 @@ public partial class DialogueManager : Control {
   }
 
   public void DisplayPlayerChoices(List<DialogueObject> playerChoices, Action<bool> setIsPlayerChoiceBeingPrinted) {
-
-
 
     if (playerChoicesBoxUI == null) {
       //before adding the player choices, we need to create the container VBox

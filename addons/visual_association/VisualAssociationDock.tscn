@@ -33,3 +33,11 @@ layout_mode = 2
 [node name="AssociateButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Associate Visual"
+
+[node name="AssociateMusicButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Associate Music"
+
+[node name="AssociateSoundButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Associate Sound"

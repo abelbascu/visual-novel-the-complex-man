@@ -48,8 +48,8 @@ public partial class GameManager : Control {
 
     SetupInitialLanguage();
     LoadTranslations();
+    DialogueManager.Instance.DialogueStarted += OnDialogueStarted;
   }
-
 
   private void SetupInitialLanguage() {
     //***** SET LANGUAGE HERE *****
@@ -62,6 +62,19 @@ public partial class GameManager : Control {
     language = "en";
     TranslationServer.SetLocale(language);
   }
+
+  private async void OnDialogueStarted(DialogueObject dialogObj) {
+    if (!string.IsNullOrEmpty(dialogObj.VisualPath)) {
+      _ = VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, dialogObj.VisualPreDelay, dialogObj.VisualPostDelay);
+    }
+    if (!string.IsNullOrEmpty(dialogObj.MusicPath)) {
+      _ = AudioManager.Instance.PlayMusic(dialogObj.MusicPath, dialogObj.MusicPreDelay, dialogObj.MusicPostDelay);
+    }
+    if (!string.IsNullOrEmpty(dialogObj.SoundPath)) {
+      _ = AudioManager.Instance.PlaySound(dialogObj.SoundPath, dialogObj.SoundPreDelay, dialogObj.SoundPostDelay);
+    }
+  }
+
 
   private void LoadTranslations() {
     // Get the directory path
@@ -299,9 +312,9 @@ public partial class GameManager : Control {
       //until the player selects a new player choice. Notice that most times, after an NPC or actor dialogue, a group of player choices may be displayed, but it may also happen that after a 
       //player choice is displayed, more new player chocies are displayed. We are solving this rare case here. 
       DialogueManager.Instance.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, DialogueManager.Instance.SetIsPlayerChoiceBeingPrinted);
-      VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath);
+      await VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath, VisualManager.Instance.visualPreDelay, VisualManager.Instance.visualPostDelay);
     } else
-      DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
+      await DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
 
     await UIManager.Instance.FadeOutScreenOverlay(1.5f);
     UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();

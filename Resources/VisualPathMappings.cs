@@ -4,13 +4,25 @@ using System.IO;
 using System.Text.Json;
 using Godot;
 
+public class MediaInfo {
+  public string VisualPath { get; set; }
+  public float VisualPreDelay { get; set; }
+  public float VisualPostDelay { get; set; }
+  public string MusicPath { get; set; }
+  public float MusicPreDelay { get; set; }
+  public float MusicPostDelay { get; set; }
+  public string SoundPath { get; set; }
+  public float SoundPreDelay { get; set; }
+  public float SoundPostDelay { get; set; }
+}
+
 public static class VisualPathMappings {
-  private static Dictionary<int, string> _mappings = new Dictionary<int, string>();
-  public static Dictionary<int, string> Mappings {
+  private static Dictionary<int, MediaInfo> _mappings = new Dictionary<int, MediaInfo>();
+  public static Dictionary<int, MediaInfo> Mappings {
     get {
       if (_mappings == null) {
-        _mappings = new Dictionary<int, string>();
-        Load(); // Try to load existing mappings when first accessed
+        _mappings = new Dictionary<int, MediaInfo>();
+        Load();
       }
       return _mappings;
     }
@@ -20,7 +32,7 @@ public static class VisualPathMappings {
   private const string JSON_PATH = "res://Resources/VisualPathMappings.json";
 
   static VisualPathMappings() {
-    Load(); // Try to load existing mappings when the class is first used
+    Load();
   }
 
   public static void Load() {
@@ -30,21 +42,21 @@ public static class VisualPathMappings {
 
       if (File.Exists(fullPath)) {
         string jsonString = File.ReadAllText(fullPath);
-        var loadedMappings = JsonSerializer.Deserialize<Dictionary<int, string>>(jsonString);
+        var loadedMappings = JsonSerializer.Deserialize<Dictionary<int, MediaInfo>>(jsonString);
         if (loadedMappings != null) {
           Mappings = loadedMappings;
           GD.Print($"[VisualPathMappings] Successfully loaded {Mappings.Count} mappings");
         } else {
           GD.PrintErr("[VisualPathMappings] Loaded mappings were null, initializing empty dictionary");
-          Mappings = new Dictionary<int, string>();
+          Mappings = new Dictionary<int, MediaInfo>();
         }
       } else {
         GD.Print("[VisualPathMappings] Mappings file does not exist, initializing empty dictionary");
-        Mappings = new Dictionary<int, string>();
+        Mappings = new Dictionary<int, MediaInfo>();
       }
     } catch (Exception e) {
       GD.PrintErr($"[VisualPathMappings] Error loading mappings: {e.Message}");
-      Mappings = new Dictionary<int, string>();
+      Mappings = new Dictionary<int, MediaInfo>();
     }
   }
 
@@ -52,6 +64,8 @@ public static class VisualPathMappings {
     try {
       string fullPath = ProjectSettings.GlobalizePath(JSON_PATH);
       GD.Print($"[VisualPathMappings] Attempting to save mappings to: {fullPath}");
+
+      Directory.CreateDirectory(Path.GetDirectoryName(fullPath));
 
       string jsonString = JsonSerializer.Serialize(Mappings, new JsonSerializerOptions { WriteIndented = true });
       File.WriteAllText(fullPath, jsonString);

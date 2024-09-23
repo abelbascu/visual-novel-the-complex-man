@@ -39,7 +39,14 @@ public static class JSON2DialogueObjectParser {
                 bool isGroup = false;
                 bool isNoTurningBackPath = false;
                 string visualPath = "";
-                int visualType = 0;
+                float visualPredelay = 0;
+                float visualPostDelay = 0;
+                string musicPath = "";
+                float musicPreDelay = 0;
+                float musicPostDelay = 0;
+                string soundPath = "";
+                float soundPreDelay = 0;
+                float soundPostDelay = 0;
 
                 if (dialogNode.TryGetProperty("IsGroup", out JsonElement isGroupElement)) {
                   if (isGroupElement.ValueKind == JsonValueKind.False) {
@@ -61,7 +68,34 @@ public static class JSON2DialogueObjectParser {
                     actor = actorElement.GetString();
                   if (fieldsElement.TryGetProperty("VisualPath", out JsonElement visualPathElement))
                     visualPath = visualPathElement.GetString();
-
+                  if (fieldsElement.TryGetProperty("VisualPreDelay", out JsonElement visualPreDelayElement))
+                    visualPostDelay = visualPreDelayElement.ValueKind == JsonValueKind.String ?
+                        float.TryParse(visualPreDelayElement.GetString(), out float result) ? result : 0 :
+                        visualPreDelayElement.GetSingle();
+                  if (fieldsElement.TryGetProperty("VisualPostDelay", out JsonElement visualPostDelayElement))
+                    visualPostDelay = visualPostDelayElement.ValueKind == JsonValueKind.String ?
+                        float.TryParse(visualPostDelayElement.GetString(), out float result) ? result : 0 :
+                        visualPostDelayElement.GetSingle();
+                  if (fieldsElement.TryGetProperty("MusicPath", out JsonElement musicPathElement))
+                    musicPath = musicPathElement.GetString();
+                  if (fieldsElement.TryGetProperty("MusicPreDelay", out JsonElement musicPreDelayElement))
+                    musicPreDelay = musicPreDelayElement.ValueKind == JsonValueKind.String ?
+                        float.TryParse(musicPreDelayElement.GetString(), out float result) ? result : 0 :
+                        musicPreDelayElement.GetSingle();
+                  if (fieldsElement.TryGetProperty("MusicPostDelay", out JsonElement musicPostDelayElement))
+                    musicPostDelay = musicPostDelayElement.ValueKind == JsonValueKind.String ?
+                        float.TryParse(musicPostDelayElement.GetString(), out float result) ? result : 0 :
+                        musicPostDelayElement.GetSingle();
+                  if (fieldsElement.TryGetProperty("SoundPath", out JsonElement soundPathElement))
+                    soundPath = soundPathElement.GetString();
+                  if (fieldsElement.TryGetProperty("SoundPreDelay", out JsonElement soundPreDelayElement))
+                    soundPreDelay = soundPreDelayElement.ValueKind == JsonValueKind.String ?
+                        float.TryParse(soundPreDelayElement.GetString(), out float result) ? result : 0 :
+                        soundPreDelayElement.GetSingle();
+                  if (fieldsElement.TryGetProperty("SoundPostDelay", out JsonElement soundPostDelayElement))
+                    soundPostDelay = soundPostDelayElement.ValueKind == JsonValueKind.String ?
+                        float.TryParse(soundPostDelayElement.GetString(), out float result) ? result : 0 :
+                        soundPostDelayElement.GetSingle();
                   if (fieldsElement.TryGetProperty("IsNoTurningBackPath", out JsonElement isNoTurningBackPathElement)) {
                     if (isNoTurningBackPathElement.ValueKind == JsonValueKind.String) {
                       string value = isNoTurningBackPathElement.GetString();
@@ -72,7 +106,6 @@ public static class JSON2DialogueObjectParser {
                       isNoTurningBackPath = false;
                     }
                   }
-
                 }
 
                 if (dialogNode.TryGetProperty("OutgoingLinks", out JsonElement outgoingLinksElement)) {
@@ -115,6 +148,13 @@ public static class JSON2DialogueObjectParser {
                     Actor = actor,
                     IsNoTurningBackPath = isNoTurningBackPath,
                     VisualPath = visualPath,
+                    MusicPath = musicPath,
+                    MusicPreDelay = musicPreDelay,
+                    MusicPostDelay = musicPostDelay,
+                    SoundPath = soundPath,
+                    SoundPreDelay = soundPreDelay,
+                    SoundPostDelay = soundPostDelay
+
                   });
 
                 }

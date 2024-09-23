@@ -107,9 +107,9 @@ public partial class DialogueManager : Control {
     // Narrator or NPC won't ever have multiple choices, so we can display the dialogue now.     
 
     if (!string.IsNullOrEmpty(dialogObj.VisualPath)) {
-      VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, (VisualManager.VisualType)dialogObj.VisualType);
+      VisualManager.Instance.DisplayVisual(dialogObj.VisualPath);
     } else {
-      VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath, VisualManager.Instance.visualType);
+      VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath);
     }
 
     if (dialogObj.Actor != "1") {

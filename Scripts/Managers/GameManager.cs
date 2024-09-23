@@ -299,7 +299,7 @@ public partial class GameManager : Control {
       //until the player selects a new player choice. Notice that most times, after an NPC or actor dialogue, a group of player choices may be displayed, but it may also happen that after a 
       //player choice is displayed, more new player chocies are displayed. We are solving this rare case here. 
       DialogueManager.Instance.DisplayPlayerChoices(DialogueManager.Instance.playerChoicesList, DialogueManager.Instance.SetIsPlayerChoiceBeingPrinted);
-      VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath, VisualManager.Instance.visualType);
+      VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath);
     } else
       DialogueManager.Instance.DisplayDialogueOrPlayerChoice(DialogueManager.Instance.currentDialogueObject);
 

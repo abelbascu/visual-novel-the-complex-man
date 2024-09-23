@@ -40,11 +40,9 @@ public partial class visual_association_plugin : EditorPlugin {
 
     dialogueList = dock.GetNodeOrNull<ItemList>("VBoxContainer/ScrollContainer/DialogueList");
     associateButton = dock.GetNodeOrNull<Button>("VBoxContainer/AssociateButton");
-    visualTypeOption = dock.GetNodeOrNull<OptionButton>("VBoxContainer/VisualTypeOption");
 
     if (dialogueList == null) GD.PrintErr("DialogueList not found");
     if (associateButton == null) GD.PrintErr("AssociateButton not found");
-    if (visualTypeOption == null) GD.PrintErr("VisualTypeOption not found");
 
     if (associateButton != null) {
       associateButton.Pressed += OnAssociateButtonPressed;
@@ -68,7 +66,6 @@ public partial class visual_association_plugin : EditorPlugin {
       foreach (var dialogue in conversation.Value) {
         if (VisualPathMappings.Mappings.TryGetValue(dialogue.ID, out string visualPath)) {
           dialogue.VisualPath = visualPath;
-          dialogue.VisualType = 0; // Default to Image, or you could store this in the mappings as well
         }
       }
     }
@@ -222,7 +219,6 @@ public partial class visual_association_plugin : EditorPlugin {
 
         if (dialogueIndex == index) {
           dialogue.VisualPath = visualPath;
-          dialogue.VisualType = visualType;
 
           // Simplified defensive check
           if (VisualPathMappings.Mappings == null) {
@@ -231,7 +227,7 @@ public partial class visual_association_plugin : EditorPlugin {
           }
 
           VisualPathMappings.Mappings[dialogue.ID] = visualPath; // Save mapping
-          GD.Print($"[UpdateDialogue] Updated dialogue {dialogue.ID} with VisualPath: {visualPath}, VisualType: {visualType}");
+          GD.Print($"[UpdateDialogue] Updated dialogue {dialogue.ID} with VisualPath: {visualPath}");
           VisualPathMappings.Save(); // Save the updated mappings to file
           return;
         }
@@ -277,9 +273,8 @@ public partial class visual_association_plugin : EditorPlugin {
                 updatedFields[field.Name] = JsonSerializer.Deserialize<object>(field.Value.GetRawText());
               }
 
-              // Update VisualPath and VisualType
+              // Update VisualPath
               updatedFields["VisualPath"] = dialogue.VisualPath ?? "";
-              updatedFields["VisualType"] = dialogue.VisualType;
 
               var updatedDialogNode = new {
                 OutgoingLinks = JsonSerializer.Deserialize<object>(dialogNode.GetProperty("OutgoingLinks").GetRawText()),
@@ -346,7 +341,6 @@ public partial class visual_association_plugin : EditorPlugin {
 
           if (VisualPathMappings.Mappings.TryGetValue(id, out string visualPath)) {
             updatedFields["VisualPath"] = visualPath;
-            updatedFields["VisualType"] = visualTypeOption.Selected;
             GD.Print($"Injected VisualPath for dialogue ID {id}: {visualPath}");
           }
 

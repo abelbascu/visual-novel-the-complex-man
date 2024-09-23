@@ -62,19 +62,6 @@ public static class JSON2DialogueObjectParser {
                   if (fieldsElement.TryGetProperty("VisualPath", out JsonElement visualPathElement))
                     visualPath = visualPathElement.GetString();
 
-                  if (fieldsElement.TryGetProperty("VisualType", out JsonElement visualTypeElement)) {
-                    if (visualTypeElement.ValueKind == JsonValueKind.Number) {
-                      visualType = visualTypeElement.GetInt32();
-                    } else if (visualTypeElement.ValueKind == JsonValueKind.String) {
-                      if (int.TryParse(visualTypeElement.GetString(), out int result)) {
-                        visualType = result;
-                      } else {
-                        // Handle the case where the string is not a valid integer
-                        GD.PrintErr($"Invalid VisualType for DialogID {dialogID}: {visualTypeElement}");
-                      }
-                    }
-                  }
-
                   if (fieldsElement.TryGetProperty("IsNoTurningBackPath", out JsonElement isNoTurningBackPathElement)) {
                     if (isNoTurningBackPathElement.ValueKind == JsonValueKind.String) {
                       string value = isNoTurningBackPathElement.GetString();
@@ -128,7 +115,6 @@ public static class JSON2DialogueObjectParser {
                     Actor = actor,
                     IsNoTurningBackPath = isNoTurningBackPath,
                     VisualPath = visualPath,
-                    VisualType = visualType
                   });
 
                 }

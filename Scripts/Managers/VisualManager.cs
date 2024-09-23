@@ -1,12 +1,12 @@
 using Godot;
 using System;
+using System.IO;
 
 public partial class VisualManager : Control {
   public static VisualManager Instance { get; private set; }
 
   public TextureRect fullScreenImage;
   public string VisualPath;
-  public VisualType visualType;
   // private VideoStreamPlayer videoPlayer;
 
   public override void _EnterTree() {
@@ -37,17 +37,24 @@ public partial class VisualManager : Control {
 
 
 
-  public void DisplayVisual(string visualPath, VisualType type) {
+  public void DisplayVisual(string visualPath) {
     HideAllVisuals();
     this.VisualPath = visualPath;
-    this.visualType = type;
-    switch (type) {
-      case VisualType.Image:
+
+    string extension = Path.GetExtension(visualPath).ToLower();
+    switch (extension) {
+      case ".png":
+      case ".jpg":
+      case ".jpeg":
         DisplayImage(visualPath);
         break;
-        // case VisualType.Cutscene:
-        //     PlayCutscene(visualPath);
-        //     break;
+      case ".tscn":
+        //PlayCutscene(visualPath);
+        break;
+      default:
+        GD.PrintErr($"Unsupported file type: {extension}");
+        break;
+
     }
   }
 
@@ -75,10 +82,5 @@ public partial class VisualManager : Control {
     fullScreenImage.Hide();
     // videoPlayer.Hide();
     // videoPlayer.Stop();
-  }
-
-  public enum VisualType {
-    Image,
-    Cutscene
   }
 }

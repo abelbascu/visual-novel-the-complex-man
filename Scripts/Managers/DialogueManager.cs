@@ -107,18 +107,15 @@ public partial class DialogueManager : Control {
   public async Task DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) {
     // Narrator or NPC won't ever have multiple choices, so we can display the dialogue now.     
 
-    DialogueStarted?.Invoke(dialogObj);
+    await GameManager.Instance.HandlePreDelays(dialogObj);
 
-    if (!string.IsNullOrEmpty(dialogObj.VisualPath)) {
-      VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, dialogObj.VisualPreDelay, dialogObj.VisualPostDelay);
-    } else {
-      VisualManager.Instance.DisplayVisual(VisualManager.Instance.VisualPath, VisualManager.Instance.visualPreDelay, VisualManager.Instance.visualPostDelay);
-    }
+    DialogueStarted?.Invoke(dialogObj);
 
     if (dialogObj.Actor != "1") {
       DisplayDialogue(dialogObj);
       currentDialogueObject = dialogObj;
-      //if it's the player, we need to add first the choice to the list and VBox   
+
+      GameManager.Instance.HandlePostDelays(dialogObj);
     } else {
       AddPlayerChoicesToList(dialogObj.ID, dialogObj);
       DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
@@ -143,10 +140,6 @@ public partial class DialogueManager : Control {
       string speakerName = GetSpeakerName(actor);
       dialogueBoxUI.DisplaySpeakerName(speakerName);
     }
-
-    //we are already in dialogue mode, but we trigger this empty signal
-    //so focusable UI controls list in InputManager is updated
-    // GameStateManager.Instance.Fire(GameStateMachine.Trigger.ENTER_DIALOGUE_MODE);
   }
 
 

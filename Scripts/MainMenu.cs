@@ -406,7 +406,7 @@ public partial class MainMenu : Control {
     //if we come back from a current play, remove the dialogue mode image
     VisualManager.Instance.RemoveImage();
     //then load the main menu own image
-    mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/your darkness splash screen.png");
+    mainMenuBackgroundImage.Texture = GD.Load<Texture2D>("res://Visuals/DialogueOrPlayerChoice/splahs screen your darkness.png");
     mainMenuBackgroundImage.Modulate = new Color(1, 1, 1, 1);  // This sets it to ffffff (fully opaque)
     mainMenuBackgroundImage.SetAnchorsPreset(LayoutPreset.FullRect);
     mainMenuBackgroundImage.Visible = true;

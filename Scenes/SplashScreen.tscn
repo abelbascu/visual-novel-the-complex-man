@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://11fx20rqcq14"]
 
 [ext_resource type="Script" path="res://Scripts/SplashScreen.cs" id="1_3i34r"]
-[ext_resource type="Texture2D" uid="uid://b4yo5epficoj5" path="res://Visuals/your darkness splash screen.png" id="2_vsv1b"]
+[ext_resource type="Texture2D" uid="uid://b6u3et2ov3vp5" path="res://Visuals/DialogueOrPlayerChoice/splahs screen your darkness.png" id="2_kg58c"]
 
 [node name="SplashScreen" type="MarginContainer"]
 anchors_preset = 15
@@ -15,7 +15,7 @@ script = ExtResource("1_3i34r")
 
 [node name="TextureRect" type="TextureRect" parent="."]
 layout_mode = 2
-texture = ExtResource("2_vsv1b")
+texture = ExtResource("2_kg58c")
 expand_mode = 1
 
 [node name="MarginContainer" type="MarginContainer" parent="."]

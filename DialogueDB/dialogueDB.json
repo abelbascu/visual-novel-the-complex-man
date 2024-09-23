@@ -66,15 +66,15 @@
 			  "fr-FR": "",
 			  "cat-CAT": "",
 			  "IsNoTurningBackPath": "False",
-			  "VisualPath": "res://Visuals/your darkness splash screen.png",
+			  "VisualPath": "res://Visuals/splash screen the dragon riddle.png",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
 			  "MusicPath": "res://Music/DEEP GUITAR.mp3",
 			  "MusicPreDelay": 0,
-			  "MusicPostDelay": 4,
+			  "MusicPostDelay": 10,
 			  "SoundPath": "res://Music/FX/digital watch alarm.mp3",
 			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 10
+			  "SoundPostDelay": 25
 			},
 			"ID": 1
 		  },

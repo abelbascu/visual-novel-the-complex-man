@@ -3,6 +3,7 @@ using System;
 using System.Security.Cryptography.X509Certificates;
 using static GameStateMachine;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 
 public partial class GameManager : Control {
@@ -63,16 +64,75 @@ public partial class GameManager : Control {
     TranslationServer.SetLocale(language);
   }
 
-  private async void OnDialogueStarted(DialogueObject dialogObj) {
+  private void OnDialogueStarted(DialogueObject dialogObj) {
     if (!string.IsNullOrEmpty(dialogObj.VisualPath)) {
       _ = VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, dialogObj.VisualPreDelay, dialogObj.VisualPostDelay);
     }
+
     if (!string.IsNullOrEmpty(dialogObj.MusicPath)) {
       _ = AudioManager.Instance.PlayMusic(dialogObj.MusicPath, dialogObj.MusicPreDelay, dialogObj.MusicPostDelay);
     }
+
     if (!string.IsNullOrEmpty(dialogObj.SoundPath)) {
       _ = AudioManager.Instance.PlaySound(dialogObj.SoundPath, dialogObj.SoundPreDelay, dialogObj.SoundPostDelay);
     }
+  }
+
+  public async Task HandlePreDelays(DialogueObject dialogObj) {
+    var tasks = new List<Task>();
+
+    if (!string.IsNullOrEmpty(dialogObj.MusicPath) && dialogObj.MusicPreDelay > 0) {
+      tasks.Add(Task.Delay((int)(dialogObj.MusicPreDelay * 1000))
+          .ContinueWith(_ => AudioManager.Instance.PlayMusic(dialogObj.MusicPath, dialogObj.MusicPreDelay, dialogObj.MusicPostDelay)));
+    }
+
+    if (!string.IsNullOrEmpty(dialogObj.VisualPath) && dialogObj.VisualPreDelay > 0) {
+      tasks.Add(Task.Delay((int)(dialogObj.VisualPreDelay * 1000))
+          .ContinueWith(_ => VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, dialogObj.VisualPreDelay, dialogObj.VisualPostDelay)));
+    }
+
+    if (!string.IsNullOrEmpty(dialogObj.SoundPath) && dialogObj.SoundPreDelay > 0) {
+      tasks.Add(Task.Delay((int)(dialogObj.SoundPreDelay * 1000))
+          .ContinueWith(_ => AudioManager.Instance.PlaySound(dialogObj.SoundPath, dialogObj.SoundPreDelay, dialogObj.SoundPostDelay)));
+    }
+
+    await Task.WhenAll(tasks);
+  }
+
+  public void HandlePostDelays(DialogueObject dialogObj) {
+    bool dialogueFinished = false;
+    UIManager.Instance.dialogueBoxUI.FinishedDisplayingDialogueLine += () => dialogueFinished = true;
+
+    if (dialogObj.MusicPostDelay > 0) {
+      StartPostDelayTimer(dialogObj.MusicPostDelay, () => {
+        if (dialogueFinished) UIManager.Instance.dialogueBoxUI.ShowWaitingIndicator();
+        AudioManager.Instance.PlayMusic(dialogObj.MusicPath, dialogObj.MusicPreDelay, dialogObj.MusicPostDelay);
+      });
+    }
+
+    if (dialogObj.VisualPostDelay > 0) {
+      StartPostDelayTimer(dialogObj.VisualPostDelay, () => {
+        if (dialogueFinished) UIManager.Instance.dialogueBoxUI.ShowWaitingIndicator();
+        VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, dialogObj.VisualPreDelay, dialogObj.VisualPostDelay);
+      });
+    }
+
+    if (dialogObj.SoundPostDelay > 0) {
+      StartPostDelayTimer(dialogObj.SoundPostDelay, () => {
+        if (dialogueFinished) UIManager.Instance.dialogueBoxUI.ShowWaitingIndicator();
+        AudioManager.Instance.PlaySound(dialogObj.SoundPath, dialogObj.SoundPreDelay, dialogObj.SoundPostDelay);
+      });
+    }
+  }
+
+  private void StartPostDelayTimer(float delay, Action action) {
+    var timer = GetTree().CreateTimer(delay);
+    timer.Timeout += () => OnPostDelayTimerTimeout(action);
+  }
+
+  private void OnPostDelayTimerTimeout(Action action) {
+    action.Invoke();
+    UIManager.Instance.dialogueBoxUI.HideWaitingIndicator();
   }
 
 

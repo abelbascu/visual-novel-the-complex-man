@@ -6,7 +6,7 @@
     "MusicPath": "res://Audio/Music/Cosmology_SynthChrds.wav",
     "MusicPreDelay": 2,
     "MusicPostDelay": 0,
-    "SoundPath": "res://Music/FX/digital watch alarm.mp3",
+    "SoundPath": "res://Audio/FX/digital watch alarm.mp3",
     "SoundPreDelay": 0,
     "SoundPostDelay": 20
   },

@@ -35,9 +35,8 @@ public partial class AudioManager : Control {
   }
 
   private void AddLimiterToMasterBus() {
-    var limiter = new AudioEffectLimiter();
-    limiter.ThresholdDb = -3.0f;
-    limiter.CeilingDb = 0.0f;
+    var limiter = new AudioEffectHardLimiter();
+    limiter.CeilingDb = -0.3f;
     AudioServer.AddBusEffect(0, limiter);
   }
 
@@ -104,7 +103,6 @@ public partial class AudioManager : Control {
         }
       }
     }
-
     return Mathf.LinearToDb(peak);
   }
 

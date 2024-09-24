@@ -14,11 +14,8 @@ public partial class GameManager : Control {
   public UIManager UIManager { get; private set; }
   public GameStateManager GameStateManager { get; private set; }
   public InputManager InputManager { get; private set; }
-  //public PlayerStateManager PlayerStateManager { get; private set; }
-  // public MediaManager MediaManager { get; private set; }
   // public MinigameManager MinigameManager { get; private set; }
   // public AchievementsManager AchievementsManager { get; private set; }
-  //private GameStateMachine stateMachine;
   private PackedScene mainMenuPackedScene;
   private Control mainMenuScene;
   private MainMenu mainMenu;
@@ -32,8 +29,6 @@ public partial class GameManager : Control {
   }
 
   public override void _Ready() {
-
-
     // Make GameManager fill its parent
     AnchorRight = 1;
     AnchorBottom = 1;
@@ -49,7 +44,7 @@ public partial class GameManager : Control {
 
     SetupInitialLanguage();
     LoadTranslations();
-    DialogueManager.Instance.DialogueStarted += OnDialogueStarted;
+    // DialogueManager.Instance.DialogueStarted += OnDialogueStarted;
   }
 
   private void SetupInitialLanguage() {
@@ -62,77 +57,6 @@ public partial class GameManager : Control {
     //for testing purposes, will change the language directly here so we do not have to tinker witn Windows locale settings each time
     language = "en";
     TranslationServer.SetLocale(language);
-  }
-
-  private void OnDialogueStarted(DialogueObject dialogObj) {
-    if (!string.IsNullOrEmpty(dialogObj.VisualPath)) {
-      _ = VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, dialogObj.VisualPreDelay, dialogObj.VisualPostDelay);
-    }
-
-    if (!string.IsNullOrEmpty(dialogObj.MusicPath)) {
-      _ = AudioManager.Instance.PlayMusic(dialogObj.MusicPath, dialogObj.MusicPreDelay, dialogObj.MusicPostDelay);
-    }
-
-    if (!string.IsNullOrEmpty(dialogObj.SoundPath)) {
-      _ = AudioManager.Instance.PlaySound(dialogObj.SoundPath, dialogObj.SoundPreDelay, dialogObj.SoundPostDelay);
-    }
-  }
-
-  public async Task HandlePreDelays(DialogueObject dialogObj) {
-    var tasks = new List<Task>();
-
-    if (!string.IsNullOrEmpty(dialogObj.MusicPath) && dialogObj.MusicPreDelay > 0) {
-      tasks.Add(Task.Delay((int)(dialogObj.MusicPreDelay * 1000))
-          .ContinueWith(_ => AudioManager.Instance.PlayMusic(dialogObj.MusicPath, dialogObj.MusicPreDelay, dialogObj.MusicPostDelay)));
-    }
-
-    if (!string.IsNullOrEmpty(dialogObj.VisualPath) && dialogObj.VisualPreDelay > 0) {
-      tasks.Add(Task.Delay((int)(dialogObj.VisualPreDelay * 1000))
-          .ContinueWith(_ => VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, dialogObj.VisualPreDelay, dialogObj.VisualPostDelay)));
-    }
-
-    if (!string.IsNullOrEmpty(dialogObj.SoundPath) && dialogObj.SoundPreDelay > 0) {
-      tasks.Add(Task.Delay((int)(dialogObj.SoundPreDelay * 1000))
-          .ContinueWith(_ => AudioManager.Instance.PlaySound(dialogObj.SoundPath, dialogObj.SoundPreDelay, dialogObj.SoundPostDelay)));
-    }
-
-    await Task.WhenAll(tasks);
-  }
-
-  public void HandlePostDelays(DialogueObject dialogObj) {
-    bool dialogueFinished = false;
-    UIManager.Instance.dialogueBoxUI.FinishedDisplayingDialogueLine += () => dialogueFinished = true;
-
-    if (dialogObj.MusicPostDelay > 0) {
-      StartPostDelayTimer(dialogObj.MusicPostDelay, () => {
-        if (dialogueFinished) UIManager.Instance.dialogueBoxUI.ShowWaitingIndicator();
-        AudioManager.Instance.PlayMusic(dialogObj.MusicPath, dialogObj.MusicPreDelay, dialogObj.MusicPostDelay);
-      });
-    }
-
-    if (dialogObj.VisualPostDelay > 0) {
-      StartPostDelayTimer(dialogObj.VisualPostDelay, () => {
-        if (dialogueFinished) UIManager.Instance.dialogueBoxUI.ShowWaitingIndicator();
-        VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, dialogObj.VisualPreDelay, dialogObj.VisualPostDelay);
-      });
-    }
-
-    if (dialogObj.SoundPostDelay > 0) {
-      StartPostDelayTimer(dialogObj.SoundPostDelay, () => {
-        if (dialogueFinished) UIManager.Instance.dialogueBoxUI.ShowWaitingIndicator();
-        AudioManager.Instance.PlaySound(dialogObj.SoundPath, dialogObj.SoundPreDelay, dialogObj.SoundPostDelay);
-      });
-    }
-  }
-
-  private void StartPostDelayTimer(float delay, Action action) {
-    var timer = GetTree().CreateTimer(delay);
-    timer.Timeout += () => OnPostDelayTimerTimeout(action);
-  }
-
-  private void OnPostDelayTimerTimeout(Action action) {
-    action.Invoke();
-    UIManager.Instance.dialogueBoxUI.HideWaitingIndicator();
   }
 
 
@@ -207,7 +131,6 @@ public partial class GameManager : Control {
   public async Task Close_Ingame_Menu() {
     await UIManager.Instance.mainMenu.CloseInGameMenu();
   }
-
 
   public async Task Go_Back_To_Menu() {
     GetTree().CallGroup("popups", "close_all");
@@ -380,8 +303,6 @@ public partial class GameManager : Control {
     UIManager.Instance.inGameMenuButton.EnableIngameMenuButton();
   }
 
-
-
   public async Task Display_Language_Menu() {
     await UIManager.Instance.mainMenu.DisplayLanguageMenu();
   }
@@ -406,6 +327,47 @@ public partial class GameManager : Control {
 
   public void Exit_Game() {
     GetTree().Quit();
+  }
+
+  public async Task HandleMediaPreDelays(DialogueObject dialogObj) {
+    var preDelayTasks = new List<Task>();
+    float maxPreDelay = Math.Max(dialogObj.MusicPreDelay, Math.Max(dialogObj.VisualPreDelay, dialogObj.SoundPreDelay));
+    if (!string.IsNullOrEmpty(dialogObj.MusicPath))
+      preDelayTasks.Add(ExecuteMediaWithDelay(dialogObj.MusicPreDelay, dialogObj.MusicPostDelay, maxPreDelay,
+        () => AudioManager.Instance.PlayMusic(dialogObj.MusicPath, 0, dialogObj.MusicPostDelay)));
+    if (!string.IsNullOrEmpty(dialogObj.VisualPath))
+      preDelayTasks.Add(ExecuteMediaWithDelay(dialogObj.VisualPreDelay, dialogObj.VisualPostDelay, maxPreDelay,
+        () => VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, 0, dialogObj.VisualPostDelay)));
+    if (!string.IsNullOrEmpty(dialogObj.SoundPath))
+      preDelayTasks.Add(ExecuteMediaWithDelay(dialogObj.SoundPreDelay, dialogObj.SoundPostDelay, maxPreDelay,
+        () => AudioManager.Instance.PlaySound(dialogObj.SoundPath, 0, dialogObj.SoundPostDelay)));
+
+    await Task.WhenAll(preDelayTasks);
+  }
+
+  private async Task ExecuteMediaWithDelay(float preDelay, float postDelay, float maxDelay, Action action) {
+    if (preDelay > 0) {
+      await Task.Delay((int)((maxDelay - preDelay) * 1000));
+      action();
+    } else if (preDelay == 0 && postDelay == 0) {
+      await Task.Delay((int)(maxDelay * 1000));
+      action();
+    }
+  }
+
+  public void SchedulePostDelayMediaActions(DialogueObject dialogObj) {
+    if (!string.IsNullOrEmpty(dialogObj.SoundPath) && dialogObj.SoundPostDelay > 0) {
+      _ = Task.Delay((int)(dialogObj.SoundPostDelay * 1000))
+          .ContinueWith(_ => AudioManager.Instance.PlaySound(dialogObj.SoundPath, 0, 0));
+    }
+    if (!string.IsNullOrEmpty(dialogObj.MusicPath) && dialogObj.MusicPostDelay > 0) {
+      _ = Task.Delay((int)(dialogObj.MusicPostDelay * 1000))
+          .ContinueWith(_ => AudioManager.Instance.PlayMusic(dialogObj.MusicPath, 0, 0));
+    }
+    if (!string.IsNullOrEmpty(dialogObj.VisualPath) && dialogObj.VisualPostDelay > 0) {
+      _ = Task.Delay((int)(dialogObj.VisualPostDelay * 1000))
+          .ContinueWith(_ => VisualManager.Instance.DisplayVisual(dialogObj.VisualPath, 0, 0));
+    }
   }
 
 

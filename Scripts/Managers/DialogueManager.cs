@@ -107,15 +107,14 @@ public partial class DialogueManager : Control {
   public async Task DisplayDialogueOrPlayerChoice(DialogueObject dialogObj) {
     // Narrator or NPC won't ever have multiple choices, so we can display the dialogue now.     
 
-    await GameManager.Instance.HandlePreDelays(dialogObj);
+    await GameManager.Instance.HandleMediaPreDelays(dialogObj);
 
     DialogueStarted?.Invoke(dialogObj);
 
     if (dialogObj.Actor != "1") {
       DisplayDialogue(dialogObj);
       currentDialogueObject = dialogObj;
-
-      GameManager.Instance.HandlePostDelays(dialogObj);
+      GameManager.Instance.SchedulePostDelayMediaActions(dialogObj);
     } else {
       AddPlayerChoicesToList(dialogObj.ID, dialogObj);
       DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);

@@ -33,9 +33,9 @@
 			  "MusicPath": "",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
-			  "SoundPath": "res://Music/FX/digital watch alarm.mp3",
+			  "SoundPath": "",
 			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 15
+			  "SoundPostDelay": 0
 			},
 			"ID": 0
 		  },
@@ -70,12 +70,11 @@
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
 			  "MusicPath": "res://Music/DEEP GUITAR.mp3",
-			  "MusicPreDelay": 4,
+			  "MusicPreDelay": 8,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "res://Music/FX/digital watch alarm.mp3",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 20,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 20
 			},
 			"ID": 1
 		  },
@@ -113,9 +112,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 2
 		  },
@@ -153,9 +151,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 3
 		  },
@@ -193,9 +190,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 4
 		  },
@@ -233,9 +229,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 5
 		  },
@@ -273,9 +268,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 13
 		  },
@@ -313,9 +307,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 17
 		  },
@@ -353,9 +346,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "[]",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 18
 		  },
@@ -393,9 +385,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "[]",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 19
 		  },
@@ -433,9 +424,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "[]",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 20
 		  },
@@ -473,9 +463,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "[]",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 21
 		  },
@@ -513,9 +502,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "[]",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 22
 		  },
@@ -553,9 +541,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "[]",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 23
 		  },
@@ -593,9 +580,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "[]",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 24
 		  },
@@ -633,9 +619,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "[]",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 25
 		  },
@@ -665,9 +650,8 @@
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "[]",
-			  "soundPreDelay": "0",
-			  "SoundPostDelay": 0,
-			  "SoundPreDelay": 0
+			  "SoundPreDelay": 0,
+			  "SoundPostDelay": 0
 			},
 			"ID": 26
 		  }

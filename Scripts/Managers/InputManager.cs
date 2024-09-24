@@ -247,8 +247,10 @@ public partial class InputManager : Control {
       }
     }
     //we keep traversing the tree until we find a IInteractableUI or any control type specified above
-    foreach (var child in node.GetChildren()) {
-      SetFocusableControls(child);
+    if (node != null) {
+      foreach (var child in node.GetChildren()) {
+        SetFocusableControls(child);
+      }
     }
   }
 

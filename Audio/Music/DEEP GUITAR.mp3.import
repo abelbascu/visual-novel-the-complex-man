@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cqgs3xnm2a76c"
+path="res://.godot/imported/DEEP GUITAR.mp3-4e43ff891a481f394bb0e12d849d6486.mp3str"
+
+[deps]
+
+source_file="res://Audio/Music/DEEP GUITAR.mp3"
+dest_files=["res://.godot/imported/DEEP GUITAR.mp3-4e43ff891a481f394bb0e12d849d6486.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

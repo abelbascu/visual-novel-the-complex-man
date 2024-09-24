@@ -38,6 +38,8 @@ public partial class SplashScreen : Control {
 
     // Use CallDeferred with a lambda to call the async method
     _ = FadeInScreen();
+
+    AudioManager.Instance.PlayMusic("res://Audio/Music/splash screen.wav");
   }
 
   public async Task FadeInScreen() {

@@ -1,13 +1,90 @@
 {
   "1": {
-	"VisualPath": "res://Visuals/splash screen the dragon riddle.png",
-	"VisualPreDelay": 5,
-	"VisualPostDelay": 0,
-	"MusicPath": "res://Music/DEEP GUITAR.mp3",
-	"MusicPreDelay": 0,
-	"MusicPostDelay": 10,
-	"SoundPath": "res://Music/FX/digital watch alarm.mp3",
-	"SoundPreDelay": 0,
-	"SoundPostDelay": 25
+    "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+    "VisualPreDelay": 0,
+    "VisualPostDelay": 0,
+    "MusicPath": "res://Music/DEEP GUITAR.mp3",
+    "MusicPreDelay": 4,
+    "MusicPostDelay": 0,
+    "SoundPath": "res://Music/FX/digital watch alarm.mp3",
+    "SoundPreDelay": 0,
+    "SoundPostDelay": 20
+  },
+  "2": {
+    "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+    "VisualPreDelay": 0,
+    "VisualPostDelay": 0,
+    "MusicPath": null,
+    "MusicPreDelay": 0,
+    "MusicPostDelay": 0,
+    "SoundPath": null,
+    "SoundPreDelay": 0,
+    "SoundPostDelay": 0
+  },
+  "3": {
+    "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+    "VisualPreDelay": 0,
+    "VisualPostDelay": 0,
+    "MusicPath": null,
+    "MusicPreDelay": 0,
+    "MusicPostDelay": 0,
+    "SoundPath": null,
+    "SoundPreDelay": 0,
+    "SoundPostDelay": 0
+  },
+  "4": {
+    "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+    "VisualPreDelay": 0,
+    "VisualPostDelay": 0,
+    "MusicPath": null,
+    "MusicPreDelay": 0,
+    "MusicPostDelay": 0,
+    "SoundPath": null,
+    "SoundPreDelay": 0,
+    "SoundPostDelay": 0
+  },
+  "5": {
+    "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+    "VisualPreDelay": 0,
+    "VisualPostDelay": 0,
+    "MusicPath": null,
+    "MusicPreDelay": 0,
+    "MusicPostDelay": 0,
+    "SoundPath": null,
+    "SoundPreDelay": 0,
+    "SoundPostDelay": 0
+  },
+  "13": {
+    "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+    "VisualPreDelay": 0,
+    "VisualPostDelay": 0,
+    "MusicPath": null,
+    "MusicPreDelay": 0,
+    "MusicPostDelay": 0,
+    "SoundPath": null,
+    "SoundPreDelay": 0,
+    "SoundPostDelay": 0
+  },
+  "17": {
+    "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+    "VisualPreDelay": 0,
+    "VisualPostDelay": 0,
+    "MusicPath": null,
+    "MusicPreDelay": 0,
+    "MusicPostDelay": 0,
+    "SoundPath": null,
+    "SoundPreDelay": 0,
+    "SoundPostDelay": 0
+  },
+  "0": {
+    "VisualPath": null,
+    "VisualPreDelay": 0,
+    "VisualPostDelay": 0,
+    "MusicPath": null,
+    "MusicPreDelay": 0,
+    "MusicPostDelay": 0,
+    "SoundPath": "res://Music/FX/digital watch alarm.mp3",
+    "SoundPreDelay": 0,
+    "SoundPostDelay": 15
   }
 }

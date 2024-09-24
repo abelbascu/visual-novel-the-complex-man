@@ -33,9 +33,9 @@
 			  "MusicPath": "",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
-			  "SoundPath": "",
+			  "SoundPath": "res://Music/FX/digital watch alarm.mp3",
 			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "SoundPostDelay": 15
 			},
 			"ID": 0
 		  },
@@ -66,15 +66,16 @@
 			  "fr-FR": "",
 			  "cat-CAT": "",
 			  "IsNoTurningBackPath": "False",
-			  "VisualPath": "res://Visuals/splash screen the dragon riddle.png",
+			  "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
 			  "MusicPath": "res://Music/DEEP GUITAR.mp3",
-			  "MusicPreDelay": 0,
-			  "MusicPostDelay": 10,
+			  "MusicPreDelay": 4,
+			  "MusicPostDelay": 0,
 			  "SoundPath": "res://Music/FX/digital watch alarm.mp3",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 25
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 20,
+			  "SoundPreDelay": 0
 			},
 			"ID": 1
 		  },
@@ -105,15 +106,16 @@
 			  "fr-FR": "",
 			  "cat-CAT": "",
 			  "IsNoTurningBackPath": "False",
-			  "VisualPath": "res://Visuals/DialogueOrPlayerChoice/PlayerDirtyRoom.jpg",
+			  "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
 			  "MusicPath": "",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 2
 		  },
@@ -144,15 +146,16 @@
 			  "fr-FR": "",
 			  "cat-CAT": "",
 			  "IsNoTurningBackPath": "False",
-			  "VisualPath": "res://Visuals/DialogueOrPlayerChoice/open the door.png",
+			  "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
 			  "MusicPath": "",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 3
 		  },
@@ -183,15 +186,16 @@
 			  "fr-FR": "",
 			  "cat-CAT": "",
 			  "IsNoTurningBackPath": "False",
-			  "VisualPath": "res://Visuals/DialogueOrPlayerChoice/jump over the flowers.png",
+			  "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
 			  "MusicPath": "",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 4
 		  },
@@ -222,15 +226,16 @@
 			  "fr-FR": "",
 			  "cat-CAT": "",
 			  "IsNoTurningBackPath": "False",
-			  "VisualPath": "[]",
+			  "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
 			  "MusicPath": "",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 5
 		  },
@@ -261,15 +266,16 @@
 			  "fr-FR": "",
 			  "cat-CAT": "",
 			  "IsNoTurningBackPath": "False",
-			  "VisualPath": "[]",
+			  "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
 			  "MusicPath": "",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 13
 		  },
@@ -300,15 +306,16 @@
 			  "fr-FR": "",
 			  "cat-CAT": "",
 			  "IsNoTurningBackPath": "False",
-			  "VisualPath": "[]",
+			  "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
 			  "MusicPath": "",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
 			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 17
 		  },
@@ -342,12 +349,13 @@
 			  "VisualPath": "[]",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
-			  "MusicPath": "",
+			  "MusicPath": "[]",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
-			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "SoundPath": "[]",
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 18
 		  },
@@ -381,12 +389,13 @@
 			  "VisualPath": "[]",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
-			  "MusicPath": "",
+			  "MusicPath": "[]",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
-			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "SoundPath": "[]",
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 19
 		  },
@@ -420,12 +429,13 @@
 			  "VisualPath": "[]",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
-			  "MusicPath": "",
+			  "MusicPath": "[]",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
-			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "SoundPath": "[]",
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 20
 		  },
@@ -459,12 +469,13 @@
 			  "VisualPath": "[]",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
-			  "MusicPath": "",
+			  "MusicPath": "[]",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
-			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "SoundPath": "[]",
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 21
 		  },
@@ -498,12 +509,13 @@
 			  "VisualPath": "[]",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
-			  "MusicPath": "",
+			  "MusicPath": "[]",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
-			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "SoundPath": "[]",
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 22
 		  },
@@ -537,12 +549,13 @@
 			  "VisualPath": "[]",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
-			  "MusicPath": "",
+			  "MusicPath": "[]",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
-			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "SoundPath": "[]",
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 23
 		  },
@@ -576,12 +589,13 @@
 			  "VisualPath": "[]",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
-			  "MusicPath": "",
+			  "MusicPath": "[]",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
-			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "SoundPath": "[]",
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 24
 		  },
@@ -615,12 +629,13 @@
 			  "VisualPath": "[]",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
-			  "MusicPath": "",
+			  "MusicPath": "[]",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
-			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "SoundPath": "[]",
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 25
 		  },
@@ -646,12 +661,13 @@
 			  "VisualPath": "[]",
 			  "VisualPreDelay": "0",
 			  "VisualPostDelay": "0",
-			  "MusicPath": "",
+			  "MusicPath": "[]",
 			  "MusicPreDelay": 0,
 			  "MusicPostDelay": 0,
-			  "SoundPath": "",
-			  "SoundPreDelay": 0,
-			  "SoundPostDelay": 0
+			  "SoundPath": "[]",
+			  "soundPreDelay": "0",
+			  "SoundPostDelay": 0,
+			  "SoundPreDelay": 0
 			},
 			"ID": 26
 		  }

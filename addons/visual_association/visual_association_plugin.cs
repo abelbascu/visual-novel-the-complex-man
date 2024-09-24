@@ -5,16 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-//using Godot.Editor;
-//using Scripts;
-//using Scripts.Helpers;
+using System.Linq;
+
 
 [Tool]
 public partial class visual_association_plugin : EditorPlugin {
   private Control dock;
-  private ItemList dialogueList;
+  private ItemList dialogueListInPluginView;
   private Button associateButton;
-  //private OptionButton visualTypeOption;
   private Dictionary<int, List<DialogueObject>> conversationObjectsDB;
   private const string JSON_PATH = "res://DialogueDB/dialogueDB.json";
   private Button associateMusicButton;
@@ -27,7 +25,6 @@ public partial class visual_association_plugin : EditorPlugin {
 
   public override void _EnterTree() {
     GD.Print("VisualAssociationPlugin _EnterTree called");
-
     var scene = ResourceLoader.Load<PackedScene>("res://addons/visual_association/VisualAssociationDock.tscn");
     if (scene == null) {
       GD.PrintErr("Failed to load VisualAssociationDock scene");
@@ -40,7 +37,7 @@ public partial class visual_association_plugin : EditorPlugin {
       return;
     }
 
-    dialogueList = dock.GetNodeOrNull<ItemList>("VBoxContainer/ScrollContainer/DialogueList");
+    dialogueListInPluginView = dock.GetNodeOrNull<ItemList>("VBoxContainer/ScrollContainer/DialogueList");
     associateButton = dock.GetNodeOrNull<Button>("VBoxContainer/AssociateButton");
 
     associateMusicButton = dock.GetNodeOrNull<Button>("VBoxContainer/AssociateMusicButton");
@@ -53,25 +50,21 @@ public partial class visual_association_plugin : EditorPlugin {
       associateSoundButton.Pressed += OnAssociateSoundButtonPressed;
     }
 
-    if (dialogueList == null) GD.PrintErr("DialogueList not found");
+    if (dialogueListInPluginView == null) GD.PrintErr("DialogueList not found");
     if (associateButton == null) GD.PrintErr("AssociateButton not found");
 
     if (associateButton != null) {
       associateButton.Pressed += OnAssociateButtonPressed;
     }
 
-    // if (visualTypeOption != null) {
-    //   visualTypeOption.AddItem("Image", 0);
-    //   visualTypeOption.AddItem("Cutscene", 1);
-    // }
-
-    if (dialogueList != null) {
-      dialogueList.SelectMode = ItemList.SelectModeEnum.Multi;
+    if (dialogueListInPluginView != null) {
+      dialogueListInPluginView.SelectMode = ItemList.SelectModeEnum.Multi;
     }
 
     VisualPathMappings.Load(); // Load existing mappings from json to dictionary
     CallDeferred(nameof(DeferredSetup));
   }
+
 
   private void InjectSavedVisualPaths() {
     foreach (var conversation in conversationObjectsDB) {
@@ -81,13 +74,9 @@ public partial class visual_association_plugin : EditorPlugin {
           dialogue.VisualPath = mediaInfo.VisualPath;
           dialogue.VisualPreDelay = mediaInfo.VisualPreDelay;
           dialogue.VisualPostDelay = mediaInfo.VisualPostDelay;
-        }
-        if (VisualPathMappings.Mappings.TryGetValue(dialogue.ID, out mediaInfo)) {
           dialogue.MusicPath = mediaInfo.MusicPath;
           dialogue.MusicPreDelay = mediaInfo.MusicPreDelay;
           dialogue.MusicPostDelay = mediaInfo.MusicPostDelay;
-        }
-        if (VisualPathMappings.Mappings.TryGetValue(dialogue.ID, out mediaInfo)) {
           dialogue.SoundPath = mediaInfo.SoundPath;
           dialogue.SoundPreDelay = mediaInfo.SoundPreDelay;
           dialogue.SoundPostDelay = mediaInfo.SoundPostDelay;
@@ -119,6 +108,10 @@ public partial class visual_association_plugin : EditorPlugin {
   }
 
   public override void _ExitTree() {
+
+    if (associateButton != null) {
+      associateButton.Pressed += OnAssociateButtonPressed;
+    }
     GD.Print("VisualAssociationPlugin _ExitTree called");
     if (dock != null) {
       RemoveControlFromBottomPanel(dock);
@@ -128,7 +121,7 @@ public partial class visual_association_plugin : EditorPlugin {
 
   private void LoadDialogues() {
     GD.Print("LoadDialogues method called");
-    if (dialogueList == null) {
+    if (dialogueListInPluginView == null) {
       GD.PrintErr("DialogueList is null, cannot load dialogues");
       return;
     }
@@ -137,38 +130,34 @@ public partial class visual_association_plugin : EditorPlugin {
       conversationObjectsDB = LoadDialoguesFromJson();
       GD.Print($"Loaded {conversationObjectsDB.Count} conversations");
 
-      dialogueList.Clear();
+      dialogueListInPluginView.Clear();
       foreach (var conversation in conversationObjectsDB) {
         foreach (var dialogue in conversation.Value) {
           string itemText = $"Conv {conversation.Key} - Dialogue {dialogue.ID}: {dialogue.DialogueTextDefault.Substring(0, Math.Min(dialogue.DialogueTextDefault.Length, 120))}...";
           GD.Print($"Adding item: {itemText}");
-          dialogueList.AddItem(itemText);
+          int dialogueRowIndexInPluginView = dialogueListInPluginView.AddItem(itemText);
+          dialogueListInPluginView.SetItemMetadata(dialogueRowIndexInPluginView, dialogue.ID);
         }
       }
-      GD.Print($"Total items added to dialogueList: {dialogueList.ItemCount}");
+      GD.Print($"Total items added to dialogueListInPluginView: {dialogueListInPluginView.ItemCount}");
     } catch (Exception e) {
       GD.PrintErr($"Error in LoadDialogues: {e.Message}");
       GD.PrintErr(e.StackTrace);
     }
 
     InjectSavedVisualPaths();
-
-
   }
 
   private Dictionary<int, List<DialogueObject>> LoadDialoguesFromJson() {
-    GD.Print($"Attempting to load JSON from {JSON_PATH}");
+    string fullJsonPath = ProjectSettings.GlobalizePath(JSON_PATH);
+    GD.Print($"Attempting to load JSON from {fullJsonPath}");
     try {
-      string projectRoot = ProjectSettings.GlobalizePath("res://");
-      string fullPath = Path.Combine(projectRoot, JSON_PATH.TrimStart("res://".ToCharArray()));
-      GD.Print($"Full path: {fullPath}");
-
-      if (!File.Exists(fullPath)) {
-        GD.PrintErr($"File not found: {fullPath}");
+      if (!File.Exists(fullJsonPath)) {
+        GD.PrintErr($"File not found: {fullJsonPath}");
         return new Dictionary<int, List<DialogueObject>>();
       }
 
-      string jsonString = File.ReadAllText(fullPath);
+      string jsonString = File.ReadAllText(fullJsonPath);
       GD.Print($"JSON content length: {jsonString.Length}");
       var result = JSON2DialogueObjectParser.ExtractDialogueObjects(jsonString);
       GD.Print($"Extracted {result.Count} conversations");
@@ -180,13 +169,15 @@ public partial class visual_association_plugin : EditorPlugin {
     }
   }
 
-  private EditorFileDialog fileDialog;
+  public EditorFileDialog fileDialog;
 
-  private async void OnAssociateButtonPressed() {
+  public async void OnAssociateButtonPressed() {
     var fileDialog = new FileDialog();
     fileDialog.FileMode = FileDialog.FileModeEnum.OpenFile;
     fileDialog.AddFilter("*.png, *.jpg, *.jpeg ; Supported Images");
-    AddChild(fileDialog);
+    fileDialog.MinSize = new Vector2I(800, 600); // Set minimum size
+
+    GetTree().Root.AddChild(fileDialog);
     fileDialog.PopupCentered();
 
     var result = await ToSignal(fileDialog, "file_selected");
@@ -207,14 +198,21 @@ public partial class visual_association_plugin : EditorPlugin {
     float preDelay = float.TryParse(preDelayInput.Text, out float pd) ? pd : 0;
     float postDelay = float.TryParse(postDelayInput.Text, out float psd) ? psd : 0;
 
-    UpdateDialogue(dialogueList.GetSelectedItems()[0], path, preDelay, postDelay);
+    var selectedIndices = dialogueListInPluginView.GetSelectedItems();
+    var selectedIDs = new List<int>();
+    foreach (int index in selectedIndices) {
+      selectedIDs.Add((int)dialogueListInPluginView.GetItemMetadata(index));
+    }
+    UpdateDialogue(selectedIDs, path, preDelay, postDelay, null, null, null, null, null, null);
   }
 
   private async void OnAssociateMusicButtonPressed() {
     var fileDialog = new FileDialog();
     fileDialog.FileMode = FileDialog.FileModeEnum.OpenFile;
     fileDialog.AddFilter("*.mp3, *.wav ; Supported Audio");
-    AddChild(fileDialog);
+    fileDialog.MinSize = new Vector2I(800, 600); // Set minimum size
+
+    GetTree().Root.AddChild(fileDialog);
     fileDialog.PopupCentered();
 
     var result = await ToSignal(fileDialog, "file_selected");
@@ -235,14 +233,21 @@ public partial class visual_association_plugin : EditorPlugin {
     float preDelay = float.TryParse(preDelayInput.Text, out float pd) ? pd : 0;
     float postDelay = float.TryParse(postDelayInput.Text, out float psd) ? psd : 0;
 
-    UpdateDialogue(dialogueList.GetSelectedItems()[0], null, null, null, path, preDelay, postDelay, null, null);
+    var selectedIndices = dialogueListInPluginView.GetSelectedItems();
+    var selectedIDs = new List<int>();
+    foreach (int index in selectedIndices) {
+      selectedIDs.Add((int)dialogueListInPluginView.GetItemMetadata(index));
+    }
+    UpdateDialogue(selectedIDs, null, null, null, path, preDelay, postDelay, null, null);
   }
 
   private async void OnAssociateSoundButtonPressed() {
     var fileDialog = new FileDialog();
     fileDialog.FileMode = FileDialog.FileModeEnum.OpenFile;
     fileDialog.AddFilter("*.mp3, *.wav ; Supported Audio");
-    AddChild(fileDialog);
+    fileDialog.MinSize = new Vector2I(800, 600); // Set minimum size
+
+    GetTree().Root.AddChild(fileDialog);
     fileDialog.PopupCentered();
 
     var result = await ToSignal(fileDialog, "file_selected");
@@ -263,65 +268,46 @@ public partial class visual_association_plugin : EditorPlugin {
     float preDelay = float.TryParse(preDelayInput.Text, out float pd) ? pd : 0;
     float postDelay = float.TryParse(postDelayInput.Text, out float psd) ? psd : 0;
 
-    UpdateDialogue(dialogueList.GetSelectedItems()[0], null, null, null, null, null, null, path, preDelay, postDelay);
-  }
-
-
-
-  private void OnFileSelected(string path) {
-    GD.Print($"File selected: {path}");
-    var selectedItems = dialogueList.GetSelectedItems();
-    foreach (int index in selectedItems) {
-      UpdateDialogue(index, path);
+    var selectedIndices = dialogueListInPluginView.GetSelectedItems();
+    var selectedIDs = new List<int>();
+    foreach (int index in selectedIndices) {
+      selectedIDs.Add((int)dialogueListInPluginView.GetItemMetadata(index));
     }
-    SaveDialoguesToJson();
-    VisualPathMappings.Save();
-    RefreshDialogueList();
-    RemoveFileDialog();
+    UpdateDialogue(selectedIDs, null, null, null, null, null, null, path, preDelay, postDelay);
   }
 
   private void RefreshDialogueList() {
-    dialogueList.Clear();
+    dialogueListInPluginView.Clear();
     foreach (var conversation in conversationObjectsDB) {
       foreach (var dialogue in conversation.Value) {
         string itemText = $"Conv {conversation.Key} - Dialogue {dialogue.ID}: {dialogue.DialogueTextDefault.Substring(0, Math.Min(dialogue.DialogueTextDefault.Length, 120))}...";
-        dialogueList.AddItem(itemText);
+        dialogueListInPluginView.AddItem(itemText);
       }
     }
   }
 
-
-  private void OnFileDialogCanceled() {
-    GD.Print("File selection canceled");
-    RemoveFileDialog();
-  }
-
-  private void RemoveFileDialog() {
-    if (fileDialog != null) {
-      fileDialog.QueueFree();
-      fileDialog = null;
-    }
-  }
-
-  private void UpdateDialogue(int index, string visualPath = null, float? visualPreDelay = null, float? visualPostDelay = null,
+  private void UpdateDialogue(List<int> dialogueIDs, string visualPath = null, float? visualPreDelay = null, float? visualPostDelay = null,
                               string musicPath = null, float? musicPreDelay = null, float? musicPostDelay = null,
                               string soundPath = null, float? soundPreDelay = null, float? soundPostDelay = null) {
-    GD.Print($"[UpdateDialogue] Start - index: {index}, visualPath: {visualPath}, musicPath: {musicPath}, soundPath: {soundPath}");
 
     if (conversationObjectsDB == null) {
       GD.PrintErr("[UpdateDialogue] conversationObjectsDB is null. Cannot update dialogue.");
       return;
     }
 
-    int dialogueIndex = 0;
+    bool foundAny = false;
 
-    foreach (var conversation in conversationObjectsDB) {
-      if (conversation.Value == null) continue;
+    foreach (int dialogueID in dialogueIDs) {
+      bool found = false;
 
-      foreach (var dialogue in conversation.Value) {
-        if (dialogue == null) continue;
+      foreach (var conversation in conversationObjectsDB) {
+        if (conversation.Value == null) continue;
 
-        if (dialogueIndex == index) {
+        var dialogue = conversation.Value.FirstOrDefault(d => d.ID == dialogueID);
+        if (dialogue != null) {
+          found = true;
+          foundAny = true;
+
           // Update dialogue object
           if (visualPath != null) {
             dialogue.VisualPath = visualPath;
@@ -367,25 +353,38 @@ public partial class visual_association_plugin : EditorPlugin {
           }
 
           GD.Print($"[UpdateDialogue] Updated dialogue {dialogue.ID} with new media information");
-          VisualPathMappings.Save(); // Save the updated mappings to file
-          return;
+          GD.Print($"Dialogue ID {dialogue.ID} updated in VisualPathMappings:");
+          GD.Print($"  VisualPath: {mediaInfo.VisualPath}, PreDelay: {mediaInfo.VisualPreDelay}, PostDelay: {mediaInfo.VisualPostDelay}");
+          GD.Print($"  MusicPath: {mediaInfo.MusicPath}, PreDelay: {mediaInfo.MusicPreDelay}, PostDelay: {mediaInfo.MusicPostDelay}");
+          GD.Print($"  SoundPath: {mediaInfo.SoundPath}, PreDelay: {mediaInfo.SoundPreDelay}, PostDelay: {mediaInfo.SoundPostDelay}");
+          break;
+          //return;
         }
-        dialogueIndex++;
+      }
+      if (!found) {
+        GD.PrintErr($"[UpdateDialogue] Dialogue at index {dialogueID} not found.");
       }
     }
+    if (!foundAny) {
+      GD.PrintErr("[UpdateDialogue] No dialogue found for the given indices.");
+    }
+    SaveDialoguesToJson();
+    VisualPathMappings.Save();
+    RefreshDialogueList();
 
-    GD.PrintErr($"[UpdateDialogue] Dialogue at index {index} not found.");
+    //GD.PrintErr($"[UpdateDialogue] Dialogue at index {index} not found.");
   }
 
 
 
   private void SaveDialoguesToJson() {
-    string projectRoot = ProjectSettings.GlobalizePath("res://");
-    string fullPath = Path.Combine(projectRoot, JSON_PATH.TrimStart("res://".ToCharArray()));
-    GD.Print($"Attempting to save JSON to: {fullPath}");
+    string fullJsonPath = ProjectSettings.GlobalizePath(JSON_PATH);
+    string backupPath = fullJsonPath + ".backup";
+    GD.Print($"Attempting to save JSON to: {fullJsonPath}");
 
+    File.Copy(fullJsonPath, backupPath, true);
     try {
-      string jsonString = File.ReadAllText(fullPath);
+      string jsonString = File.ReadAllText(fullJsonPath);
       using var jsonDocument = JsonDocument.Parse(jsonString);
       var root = jsonDocument.RootElement;
 
@@ -457,13 +456,23 @@ public partial class visual_association_plugin : EditorPlugin {
       };
 
       string updatedJsonString = JsonSerializer.Serialize(updatedRoot, JsonOptions);
-      File.WriteAllText(fullPath, updatedJsonString);
-      GD.Print("JSON file updated successfully.");
+      File.WriteAllText(fullJsonPath, updatedJsonString);
+
+
+      if (new FileInfo(fullJsonPath).Length == 0) {
+        throw new Exception("Save resulted in empty file");
+      } else {
+        GD.Print("JSON file updated successfully.");
+      }
 
       VisualPathMappings.Save(); // Save mappings to a separate file
     } catch (Exception e) {
       GD.PrintErr($"Error updating JSON file: {e.Message}");
       GD.PrintErr(e.StackTrace);
+      GD.PrintErr("Reverting to backup dialogueDB.json...");
+
+      File.Copy(backupPath, fullJsonPath, true);
+
     }
   }
 
@@ -528,7 +537,8 @@ public partial class visual_association_plugin : EditorPlugin {
   // Add a method to handle reloading the JSON file
   public void ReloadJSON() {
     LoadDialogues();
-    InjectVisualPaths(JSON_PATH);
+    string fullJsonPath = ProjectSettings.GlobalizePath(JSON_PATH);
+    InjectVisualPaths(fullJsonPath);
   }
 }
 #endif

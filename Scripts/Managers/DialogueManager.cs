@@ -97,9 +97,9 @@ public partial class DialogueManager : Control {
 
   public DialogueObject GetDialogueObject(int currentConversationID, int currentDialogueObjectID) {
     // Check if the conversationID exists in the dictionary
-    if (conversationDialogues.TryGetValue(currentConversationID, out List<DialogueObject> dialogueList)) {
+    if (conversationDialogues.TryGetValue(currentConversationID, out List<DialogueObject> dialogueListInPluginView)) {
       // find the first DialogueObject with the specified ID, IDs are unique
-      return dialogueList.FirstOrDefault(dialogueObject => dialogueObject.ID == currentDialogueObjectID);
+      return dialogueListInPluginView.FirstOrDefault(dialogueObject => dialogueObject.ID == currentDialogueObjectID);
     }
     return null;
   }

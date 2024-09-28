@@ -26,7 +26,7 @@ public partial class DialogueLineLabel : RichTextLabel, IInteractableUI {
     SizeFlagsVertical = SizeFlags.ExpandFill;
 
     AddThemeConstantOverride("line_separation", LINE_SEPARATION);
-    AddThemeFontSizeOverride("normal_font_size", 28);
+    AddThemeFontSizeOverride("normal_font_size", 55);
   }
 
   public Task Interact() {
@@ -35,19 +35,19 @@ public partial class DialogueLineLabel : RichTextLabel, IInteractableUI {
   }
 
 
-//   public override void _GuiInput(InputEvent @event) {
-//     if (@event is InputEventMouseButton mouseEvent &&
-//         (mouseEvent.ButtonIndex == MouseButton.Left ||
-//         mouseEvent.ButtonIndex == MouseButton.Right) &&
-//         mouseEvent.Pressed) {
-//       // Check if the click is within the bounds of the Label
-//       // if (this.GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
-//       Pressed.Invoke();
-//       GD.Print("Label area clicked!");
-//       GetViewport().SetInputAsHandled(); // Prevent the click from propagating
-//                                          //}
-//     }
-//   }
+  //   public override void _GuiInput(InputEvent @event) {
+  //     if (@event is InputEventMouseButton mouseEvent &&
+  //         (mouseEvent.ButtonIndex == MouseButton.Left ||
+  //         mouseEvent.ButtonIndex == MouseButton.Right) &&
+  //         mouseEvent.Pressed) {
+  //       // Check if the click is within the bounds of the Label
+  //       // if (this.GetGlobalRect().HasPoint(GetGlobalMousePosition())) {
+  //       Pressed.Invoke();
+  //       GD.Print("Label area clicked!");
+  //       GetViewport().SetInputAsHandled(); // Prevent the click from propagating
+  //                                          //}
+  //     }
+  //   }
 
   public void OnPressed() {
     DialogueManager.Instance.OnDialogueBoxUIPressed();

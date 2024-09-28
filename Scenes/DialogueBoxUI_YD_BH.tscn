@@ -1,7 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://8ytymk06gtxw"]
+[gd_scene load_steps=4 format=3 uid="uid://cmvuvg1obc03u"]
 
-[ext_resource type="Texture2D" uid="uid://dvmxcg1hidawy" path="res://Visuals/UI/dialogue box UI bckg transparent resized.png" id="2_tw5bf"]
-[ext_resource type="Script" path="res://Scripts/DialogueLineLabel.cs" id="3_gs1qn"]
+[ext_resource type="Texture2D" uid="uid://dvmxcg1hidawy" path="res://Visuals/UI/dialogue box UI bckg transparent resized.png" id="1_x8rlm"]
+[ext_resource type="Script" path="res://Scripts/DialogueLineLabel.cs" id="2_ebq6n"]
 
 [sub_resource type="SystemFont" id="SystemFont_6a7m0"]
 fallbacks = Array[Font]([null])
@@ -26,7 +26,7 @@ size_flags_vertical = 8
 [node name="NinePatchRect" type="NinePatchRect" parent="."]
 clip_contents = true
 layout_mode = 2
-texture = ExtResource("2_tw5bf")
+texture = ExtResource("1_x8rlm")
 region_rect = Rect2(-0.63406, 0.429291, 201.34, 100.044)
 patch_margin_left = 137
 patch_margin_top = 65
@@ -43,7 +43,7 @@ size_flags_vertical = 0
 theme_override_fonts/normal_font = SubResource("SystemFont_6a7m0")
 theme_override_font_sizes/normal_font_size = 1
 bbcode_enabled = true
-script = ExtResource("3_gs1qn")
+script = ExtResource("2_ebq6n")
 
 [node name="LetterDisplayTimer" type="Timer" parent="."]
 one_shot = true

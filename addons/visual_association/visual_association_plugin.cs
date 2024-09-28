@@ -169,7 +169,7 @@ public partial class visual_association_plugin : EditorPlugin {
     }
   }
 
-  public EditorFileDialog fileDialog;
+  //public EditorFileDialog fileDialog;
 
   public async void OnAssociateButtonPressed() {
     var fileDialog = new FileDialog();
@@ -476,69 +476,69 @@ public partial class visual_association_plugin : EditorPlugin {
     }
   }
 
-  private void InjectVisualPaths(string jsonPath) {
-    try {
-      string jsonString = File.ReadAllText(jsonPath);
-      using var jsonDocument = JsonDocument.Parse(jsonString);
-      var root = jsonDocument.RootElement;
+  // private void InjectVisualPaths(string jsonPath) {
+  //   try {
+  //     string jsonString = File.ReadAllText(jsonPath);
+  //     using var jsonDocument = JsonDocument.Parse(jsonString);
+  //     var root = jsonDocument.RootElement;
 
-      var conversationsArray = root.GetProperty("Assets").GetProperty("Conversations");
-      var updatedConversations = new List<object>();
+  //     var conversationsArray = root.GetProperty("Assets").GetProperty("Conversations");
+  //     var updatedConversations = new List<object>();
 
-      foreach (var conversation in conversationsArray.EnumerateArray()) {
-        var dialogNodes = conversation.GetProperty("DialogNodes");
-        var updatedDialogNodes = new List<object>();
+  //     foreach (var conversation in conversationsArray.EnumerateArray()) {
+  //       var dialogNodes = conversation.GetProperty("DialogNodes");
+  //       var updatedDialogNodes = new List<object>();
 
-        foreach (var node in dialogNodes.EnumerateArray()) {
-          var id = node.GetProperty("ID").GetInt32();
-          var fields = node.GetProperty("Fields");
-          var updatedFields = JsonSerializer.Deserialize<Dictionary<string, object>>(fields.GetRawText());
+  //       foreach (var node in dialogNodes.EnumerateArray()) {
+  //         var id = node.GetProperty("ID").GetInt32();
+  //         var fields = node.GetProperty("Fields");
+  //         var updatedFields = JsonSerializer.Deserialize<Dictionary<string, object>>(fields.GetRawText());
 
-          if (VisualPathMappings.Mappings.TryGetValue(id, out MediaInfo mediaInfo)) {
-            updatedFields["VisualPath"] = mediaInfo.VisualPath;
-            updatedFields["VisualPreDelay"] = mediaInfo.VisualPreDelay;
-            updatedFields["VisualPostDelay"] = mediaInfo.VisualPostDelay;
-            updatedFields["MusicPath"] = mediaInfo.MusicPath;
-            updatedFields["MusicPreDelay"] = mediaInfo.MusicPreDelay;
-            updatedFields["MusicPostDelay"] = mediaInfo.MusicPostDelay;
-            updatedFields["SoundPath"] = mediaInfo.SoundPath;
-            updatedFields["SoundPreDelay"] = mediaInfo.SoundPreDelay;
-            updatedFields["SoundPostDelay"] = mediaInfo.SoundPostDelay;
+  //         if (VisualPathMappings.Mappings.TryGetValue(id, out MediaInfo mediaInfo)) {
+  //           updatedFields["VisualPath"] = mediaInfo.VisualPath;
+  //           updatedFields["VisualPreDelay"] = mediaInfo.VisualPreDelay;
+  //           updatedFields["VisualPostDelay"] = mediaInfo.VisualPostDelay;
+  //           updatedFields["MusicPath"] = mediaInfo.MusicPath;
+  //           updatedFields["MusicPreDelay"] = mediaInfo.MusicPreDelay;
+  //           updatedFields["MusicPostDelay"] = mediaInfo.MusicPostDelay;
+  //           updatedFields["SoundPath"] = mediaInfo.SoundPath;
+  //           updatedFields["SoundPreDelay"] = mediaInfo.SoundPreDelay;
+  //           updatedFields["SoundPostDelay"] = mediaInfo.SoundPostDelay;
 
-            GD.Print($"Injected VisualPath for dialogue ID {id}: {mediaInfo.VisualPath}");
-            GD.Print($"Injected VisualPreDelay for dialogue ID {id}: {mediaInfo.VisualPreDelay}");
+  //           GD.Print($"Injected VisualPath for dialogue ID {id}: {mediaInfo.VisualPath}");
+  //           GD.Print($"Injected VisualPreDelay for dialogue ID {id}: {mediaInfo.VisualPreDelay}");
 
-            var updatedNode = JsonSerializer.Deserialize<Dictionary<string, object>>(node.GetRawText());
-            updatedNode["Fields"] = updatedFields;
-            updatedDialogNodes.Add(updatedNode);
-          }
+  //           var updatedNode = JsonSerializer.Deserialize<Dictionary<string, object>>(node.GetRawText());
+  //           updatedNode["Fields"] = updatedFields;
+  //           updatedDialogNodes.Add(updatedNode);
+  //         }
 
-          var updatedConversation = JsonSerializer.Deserialize<Dictionary<string, object>>(conversation.GetRawText());
-          updatedConversation["DialogNodes"] = updatedDialogNodes;
-          updatedConversations.Add(updatedConversation);
-        }
+  //         var updatedConversation = JsonSerializer.Deserialize<Dictionary<string, object>>(conversation.GetRawText());
+  //         updatedConversation["DialogNodes"] = updatedDialogNodes;
+  //         updatedConversations.Add(updatedConversation);
+  //       }
 
-        var updatedRoot = new Dictionary<string, object> {
-          ["Assets"] = new Dictionary<string, object> {
-            ["Conversations"] = updatedConversations
-          }
-        };
+  //       var updatedRoot = new Dictionary<string, object> {
+  //         ["Assets"] = new Dictionary<string, object> {
+  //           ["Conversations"] = updatedConversations
+  //         }
+  //       };
 
-        string updatedJsonString = JsonSerializer.Serialize(updatedRoot, JsonOptions);
-        File.WriteAllText(jsonPath, updatedJsonString);
-        GD.Print("Visual paths injected successfully.");
-      }
+  //       string updatedJsonString = JsonSerializer.Serialize(updatedRoot, JsonOptions);
+  //       File.WriteAllText(jsonPath, updatedJsonString);
+  //       GD.Print("Visual paths injected successfully.");
+  //     }
 
-    } catch (Exception e) {
-      GD.PrintErr($"Error injecting visual paths: {e.Message}");
-    }
-  }
+  //   } catch (Exception e) {
+  //     GD.PrintErr($"Error injecting visual paths: {e.Message}");
+  //   }
+  // }
 
-  // Add a method to handle reloading the JSON file
-  public void ReloadJSON() {
-    LoadDialogues();
-    string fullJsonPath = ProjectSettings.GlobalizePath(JSON_PATH);
-    InjectVisualPaths(fullJsonPath);
-  }
+  // // Add a method to handle reloading the JSON file
+  // public void ReloadJSON() {
+  //   LoadDialogues();
+  //   string fullJsonPath = ProjectSettings.GlobalizePath(JSON_PATH);
+  //   InjectVisualPaths(fullJsonPath);
+  // }
 }
 #endif

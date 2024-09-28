@@ -23,3 +23,10 @@ cloc-1.64.exe
 *.mp3
 *.png
 *.wav
+text fonts/lanapixel_everything/controllerbuttons.html
+text fonts/lanapixel_everything/LanaPixel.md
+text fonts/lanapixel_everything/LanaPixel.ttf
+text fonts/lanapixel_everything/LanaPixel.ttf.import
+text fonts/lanapixel_everything/LanaPixel_CC-BYLicense.txt
+text fonts/lanapixel_everything/LanaPixel_OpenFontLicense.txt
+Text/LanaPixel.ttf

@@ -14,16 +14,19 @@ config/name="Visual Novel The Complex Man"
 run/main_scene="res://Scenes/Game.tscn"
 config/features=PackedStringArray("4.3", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
+config/windows_native_icon="res://Visuals/yourdarkness.ico"
 
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
+window/size/mode=2
 window/size/initial_position_type=3
 window/size/transparent=true
 window/size/window_width_override=960
 window/size/window_height_override=540
 window/stretch/mode="viewport"
+window/stretch/aspect="expand"
 
 [dotnet]
 
@@ -33,6 +36,10 @@ project/solution_directory="."
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/visual_association/plugin.cfg")
+
+[gui]
+
+theme/custom_font="res://Text/LanaPixel.ttf"
 
 [input]
 

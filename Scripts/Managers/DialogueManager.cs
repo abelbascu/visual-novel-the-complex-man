@@ -25,7 +25,7 @@ public partial class DialogueManager : Control {
   //------------------------------------------------------------------event handlers-----------------------------------------------------------------------------------
   //---------------------------------------------------------------------singleton--------------------------------------------------------------------------------------
   public static DialogueManager Instance { get; private set; }
-  public DialogueBoxAndSpeakerTag dialogueBoxUI;
+  public DialogueBoxWithTag_YD_BH dialogueBoxUI;
   public PlayerChoicesBoxUI playerChoicesBoxUI;
 
   //public const string NARRATOR = "3";

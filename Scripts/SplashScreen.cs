@@ -20,13 +20,34 @@ public partial class SplashScreen : Control {
   }
 
   public override void _Ready() {
+
+    GetTree().Root.SetContentScaleSize(new Vector2I(1920, 1080));
+    GetTree().Root.SetContentScaleFactor(1.0f);
+
     CallDeferred("DisableInput");
     CallDeferred("SetInputHandled");
     backgroundTexture = GetNode<TextureRect>("TextureRect");
     backgroundTexture.Modulate = new Color(1, 1, 1, 0); // Start fully transparent
+    backgroundTexture.Texture = GD.Load<Texture2D>("res://Visuals/splash screen.png");
+    backgroundTexture.SetAnchorsPreset(LayoutPreset.FullRect);
+    backgroundTexture.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
+    backgroundTexture.StretchMode = TextureRect.StretchModeEnum.Scale;
+    backgroundTexture.Visible = true;
     pressAnyKeyLabel = GetNode<RichTextLabel>("MarginContainer/RichTextLabel");
 
-    // Load and set up the shader
+    CallDeferred("SetupShader");
+    //CallDeferred with a lambda to call the async method
+    _ = FadeInScreen();
+    AudioManager.Instance.PlayMusic("res://Audio/Music/splash screen.wav");
+  }
+
+  public async Task FadeInScreen() {
+    backgroundTexture.Show();
+    await UIFadeHelper.FadeInControl(backgroundTexture, 1.5f);
+    SetProcessInput(true);
+  }
+
+  private void SetupShader() {
     Shader shader = GD.Load<Shader>("res://Shaders/background_sinwavefx.gdshader");
     shaderMaterial = new ShaderMaterial { Shader = shader };
     backgroundTexture.Material = shaderMaterial;
@@ -35,17 +56,6 @@ public partial class SplashScreen : Control {
     shaderMaterial.SetShaderParameter("speed", 0.5f);
     shaderMaterial.SetShaderParameter("amplitude", 3.0f);
     shaderMaterial.SetShaderParameter("wave_width", 0.5f);
-
-    // Use CallDeferred with a lambda to call the async method
-    _ = FadeInScreen();
-
-    AudioManager.Instance.PlayMusic("res://Audio/Music/splash screen.wav");
-  }
-
-  public async Task FadeInScreen() {
-    backgroundTexture.Show();
-    await UIFadeHelper.FadeInControl(backgroundTexture, 1.5f);
-    SetProcessInput(true);
   }
 
   public async Task FadeOutScreen() {

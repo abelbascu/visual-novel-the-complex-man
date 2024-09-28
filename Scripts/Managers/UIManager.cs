@@ -7,7 +7,7 @@ public partial class UIManager : Control {
 
   public static UIManager Instance { get; private set; }
   public PackedScene dialogueBoxUIScene;
-  public DialogueBoxAndSpeakerTag dialogueBoxUI; //the graphical rectangle container to display the text over
+  public DialogueBoxWithTag_YD_BH dialogueBoxUI; //the graphical rectangle container to display the text over
   private VBoxContainer dialogueChoicesMarginContainer;
   private const int UI_BOTTOM_POSITION = 200; //starting at the bottom of the screen, we subtract this value to position the Y screen position of the dilaogue box  
   public PackedScene playerChoicesBoxUIScene;
@@ -94,8 +94,8 @@ public partial class UIManager : Control {
     saveGameScreen = GetNode<SaveGameScreen>("SaveGameScreen");
     saveGameScreen.Hide();
 
-    inputNameScreen = GetNode<InputNameScreen>("InputNameScreen");
-    inputNameScreen.Hide();
+    // inputNameScreen = GetNode<InputNameScreen>("InputNameScreen");
+    // inputNameScreen.Hide();
 
     //Set up PlayerChoicesBoxUI
     playerChoicesBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
@@ -114,8 +114,8 @@ public partial class UIManager : Control {
     playerChoicesBoxUI.OffsetBottom = OFFSET_BOTTOM;
 
     //Set up DialogueBoxUI
-    dialogueBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxAndSpeakerTag.tscn");
-    dialogueBoxUI = dialogueBoxUIScene.Instantiate<DialogueBoxAndSpeakerTag>();
+    dialogueBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxWithTag_YD_BH.tscn");
+    dialogueBoxUI = dialogueBoxUIScene.Instantiate<DialogueBoxWithTag_YD_BH>();
     AddChild(dialogueBoxUI);
     dialogueBoxUI.Hide();
     // Set anchors to stretch horizontally
@@ -230,7 +230,7 @@ public partial class UIManager : Control {
     }
   }
 
-  public DialogueBoxAndSpeakerTag GetDialogueBoxUI() {
+  public DialogueBoxWithTag_YD_BH GetDialogueBoxUI() {
     return dialogueBoxUI;
   }
 

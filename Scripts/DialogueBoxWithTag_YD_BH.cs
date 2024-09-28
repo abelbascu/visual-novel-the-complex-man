@@ -45,7 +45,7 @@ public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
     backgroundRect = GetNode<NinePatchRect>("DialogueBoxUI_YD_BH/NinePatchRect"); // Adjust the path if needed
     if (backgroundRect != null) {
       // Set the alpha to 0.5 (adjust this value to change transparency)
-      backgroundRect.Modulate = new Color(backgroundRect.Modulate, 0.9f);
+      //backgroundRect.Modulate = new Color(backgroundRect.Modulate, 0.9f);
     }
 
     dialogueLineLabel = GetNode<DialogueLineLabel>("DialogueBoxUI_YD_BH/MarginContainer/DialogueLineLabel");

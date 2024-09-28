@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bveusi6hqjjfm"]
+
+[ext_resource type="Script" path="res://Scripts/Helpers/DynamicCursorScaler.cs" id="1_8c3xu"]
+
+[node name="DynamicCursorScaler" type="Node"]
+script = ExtResource("1_8c3xu")

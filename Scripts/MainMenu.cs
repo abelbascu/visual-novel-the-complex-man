@@ -164,7 +164,7 @@ public partial class MainMenu : Control {
     SetFullRect();
     EnableRichTextLabels();
     StyleHBoxContainers();
-    ApplyCustomStyleToAllButtons();
+    //ApplyCustomStyleToAllButtons();
     StylePanelsAndDialogs();
   }
 
@@ -195,25 +195,25 @@ public partial class MainMenu : Control {
 
   private void ApplyCustomStyleToAllButtons() {
     //apply a default blue style with white rounded edges for panels and buttons
-    ApplyCustomStyleToButtonsInContainer(MainOptionsContainer);
-    ApplyCustomStyleToButtonsInContainer(LanguageOptionsContainer);
-    ApplyCustomStyleToButtonsInContainer(ExitToMainMenuPanel);
-    ApplyCustomStyleToButtonsInContainer(ExitGameConfirmationPanel);
+    ApplyCustomStyleToButtonBlueRoundedsInContainer(MainOptionsContainer);
+    ApplyCustomStyleToButtonBlueRoundedsInContainer(LanguageOptionsContainer);
+    ApplyCustomStyleToButtonBlueRoundedsInContainer(ExitToMainMenuPanel);
+    ApplyCustomStyleToButtonBlueRoundedsInContainer(ExitGameConfirmationPanel);
   }
 
   private void StylePanelsAndDialogs() {
-    UIThemeHelper.ApplyCustomStyleToPanel(ExitToMainMenuPanel);
-    UIThemeHelper.ApplyCustomStyleToPanel(ExitGameConfirmationPanel);
+    UIThemeHelper.ApplyCustomStyleToPanelBlueRounded(ExitToMainMenuPanel);
+    UIThemeHelper.ApplyCustomStyleToPanelBlueRounded(ExitGameConfirmationPanel);
     UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
   }
 
-  private void ApplyCustomStyleToButtonsInContainer(Control container) {
+  private void ApplyCustomStyleToButtonBlueRoundedsInContainer(Control container) {
     foreach (var child in container.GetChildren()) {
       if (child is InteractableUIButton button) {
-        UIThemeHelper.ApplyCustomStyleToButton(button);
+        UIThemeHelper.ApplyCustomStyleToButtonBlueRounded(button);
       } else if (child is Control) {
         // Recursively apply style to children of this control
-        ApplyCustomStyleToButtonsInContainer(child as Control);
+        ApplyCustomStyleToButtonBlueRoundedsInContainer(child as Control);
       }
     }
   }

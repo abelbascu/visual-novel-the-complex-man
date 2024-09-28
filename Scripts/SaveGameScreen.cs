@@ -48,7 +48,7 @@ public partial class SaveGameScreen : MarginContainer {
     goBackButton.SetAnchorsPreset(Control.LayoutPreset.TopRight);
     //goBackButton.Position = new Vector2(-10, 10); 
 
-    UIThemeHelper.ApplyCustomStyleToButton(goBackButton);
+    UIThemeHelper.ApplyCustomStyleToButtonBlueRounded(goBackButton);
   }
 
 

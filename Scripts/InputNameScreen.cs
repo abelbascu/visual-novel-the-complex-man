@@ -351,9 +351,9 @@ public partial class InputNameScreen : Control {
 
 
   private void ApplyStyleToAcceptNamePanelAndButtons() {
-    UIThemeHelper.ApplyCustomStyleToButton(YesAcceptNameButton);
-    UIThemeHelper.ApplyCustomStyleToButton(NoAcceptNameButton);
-    UIThemeHelper.ApplyCustomStyleToPanel(ConfirmNameDialogPanel);
+    UIThemeHelper.ApplyCustomStyleToButtonBlueRounded(YesAcceptNameButton);
+    UIThemeHelper.ApplyCustomStyleToButtonBlueRounded(NoAcceptNameButton);
+    UIThemeHelper.ApplyCustomStyleToPanelBlueRounded(ConfirmNameDialogPanel);
 
   }
 }

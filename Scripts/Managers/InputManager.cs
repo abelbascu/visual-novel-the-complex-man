@@ -600,12 +600,12 @@ public partial class InputManager : Control {
   private async Task ApplyButtonStyle(InteractableUIButton button, bool isHighlighted) {
     if (button == null) return;
     if (isHighlighted) {
-      var hoverStyle = UIThemeHelper.GetHoverStyleBox();
+      var hoverStyle = UIThemeHelper.GetPixelArtHoverStyleBox();
       button.AddThemeStyleboxOverride("normal", hoverStyle);
       button.AddThemeStyleboxOverride("hover", hoverStyle);
       button.AddThemeStyleboxOverride("focus", hoverStyle);
     } else {
-      var normalStyle = UIThemeHelper.GetNormalStyleBox();
+      var normalStyle = UIThemeHelper.GetPixelArtNormalStyleBox();
       button.AddThemeStyleboxOverride("normal", normalStyle);
       button.AddThemeStyleboxOverride("hover", normalStyle);
       button.AddThemeStyleboxOverride("focus", normalStyle);

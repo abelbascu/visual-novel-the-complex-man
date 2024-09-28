@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://cmvuvg1obc03u"]
 
-[ext_resource type="Texture2D" uid="uid://dvmxcg1hidawy" path="res://Visuals/UI/dialogue box UI bckg transparent resized.png" id="1_x8rlm"]
+[ext_resource type="Texture2D" uid="uid://yhr1vbvx7saj" path="res://Visuals/UI/dialgoueboxpixel.png" id="1_bc6ls"]
 [ext_resource type="Script" path="res://Scripts/DialogueLineLabel.cs" id="2_ebq6n"]
 
 [sub_resource type="SystemFont" id="SystemFont_6a7m0"]
@@ -10,28 +10,29 @@ subpixel_positioning = 0
 msdf_size = 28
 
 [node name="DialogueBoxUI" type="MarginContainer"]
+custom_minimum_size = Vector2(1200, 220)
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -856.0
+offset_left = -600.0
 offset_top = -220.0
-offset_right = 856.0
+offset_right = 600.0
 grow_horizontal = 2
 grow_vertical = 0
-size_flags_horizontal = 8
-size_flags_vertical = 8
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
 [node name="NinePatchRect" type="NinePatchRect" parent="."]
 clip_contents = true
 layout_mode = 2
-texture = ExtResource("1_x8rlm")
-region_rect = Rect2(-0.63406, 0.429291, 201.34, 100.044)
-patch_margin_left = 137
-patch_margin_top = 65
-patch_margin_right = 126
-patch_margin_bottom = 67
+texture = ExtResource("1_bc6ls")
+region_rect = Rect2(-0.0185084, 0.429291, 119.704, 89.5915)
+patch_margin_left = 96
+patch_margin_top = 64
+patch_margin_right = 96
+patch_margin_bottom = 69
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2

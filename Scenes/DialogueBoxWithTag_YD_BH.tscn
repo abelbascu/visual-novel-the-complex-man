@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://d0ciperl8pgbv"]
 
 [ext_resource type="Script" path="res://Scripts/DialogueBoxWithTag_YD_BH.cs" id="1_sun85"]
-[ext_resource type="Texture2D" uid="uid://dvmxcg1hidawy" path="res://Visuals/UI/dialogue box UI bckg transparent resized.png" id="2_o38ci"]
+[ext_resource type="Texture2D" uid="uid://yhr1vbvx7saj" path="res://Visuals/UI/dialgoueboxpixel.png" id="2_svn7a"]
 [ext_resource type="PackedScene" uid="uid://cmvuvg1obc03u" path="res://Scenes/DialogueBoxUI_YD_BH.tscn" id="4_37agv"]
 
 [node name="DialogueBoxWithTag_YD_BH" type="VBoxContainer"]
@@ -17,10 +17,10 @@ grow_horizontal = 2
 grow_vertical = 0
 size_flags_horizontal = 8
 size_flags_vertical = 8
-alignment = 2
 script = ExtResource("1_sun85")
 
 [node name="SpeakerTagMarginContainer" type="MarginContainer" parent="."]
+visible = false
 custom_minimum_size = Vector2(200, 40)
 layout_mode = 2
 size_flags_horizontal = 0
@@ -28,14 +28,12 @@ size_flags_vertical = 0
 
 [node name="NinePatchRect" type="NinePatchRect" parent="SpeakerTagMarginContainer"]
 layout_mode = 2
-texture = ExtResource("2_o38ci")
-region_rect = Rect2(76.0804, 27.7216, 50.9809, 37.2784)
+texture = ExtResource("2_svn7a")
+region_rect = Rect2(24, 24, 72, 41)
 
 [node name="SpeakerTagRichTextLabel" type="RichTextLabel" parent="SpeakerTagMarginContainer"]
 layout_mode = 2
 bbcode_enabled = true
 
 [node name="DialogueBoxUI_YD_BH" parent="." instance=ExtResource("4_37agv")]
-custom_minimum_size = Vector2(1200, 220)
 layout_mode = 2
-size_flags_horizontal = 4

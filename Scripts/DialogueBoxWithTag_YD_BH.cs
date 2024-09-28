@@ -24,7 +24,19 @@ public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
 
   // Called when the node enters the scene tree for the first time.
   public override void _Ready() {
+    // Set layout mode to Anchor (layout_mode = 1)
+    LayoutMode = 1;
 
+    // Set anchors to bottom center
+    AnchorBottom = 1;
+    AnchorLeft = 0.5f;
+    AnchorRight = 0.5f;
+
+    // Center horizontally and align to bottom
+    AnchorLeft = 0.5f;
+    AnchorRight = 0.5f;
+    AnchorTop = 1;
+    AnchorBottom = 1;
     MouseFilter = MouseFilterEnum.Ignore;
 
     speakerTag = GetNode<RichTextLabel>("SpeakerTagMarginContainer/SpeakerTagRichTextLabel");

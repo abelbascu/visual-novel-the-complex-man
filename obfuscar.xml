@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+<Obfuscator>
+  <Var name="InPath" value="." />
+  <Var name="OutPath" value=".\Obfuscated" />
+  <Var name="KeepPublicApi" value="false" />
+  <Var name="HidePrivateApi" value="true" />
+  <Var name="UseKoreanNames" value="true" />
+  <Var name="ReuseNames" value="true" />
+  <Var name="RenameProperties" value="true" />
+  <Var name="RegenerateDebugInfo" value="true" />
+  <Module file="$(InPath)\VisualNovelTheComplexMan.dll" />
+</Obfuscator>

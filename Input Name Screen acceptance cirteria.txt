@@ -1,0 +1,25 @@
+inputnamescreen flow 
+
+this approach seems fine, thoaght looking at the acceptance criteria i didn't specified interactions quite well. After checking deeper, this is what should happen:
+
+ private InteractableUILineEdit nameInput; is found at the left of the screen.
+
+the  private InteractableUITextureButton acceptNameButton; is at the right.
+
+when we enter the InputNameScreen, nameInput is already highlighted, so the user can immediately type any chars on it.  If the user hovers over the acceptNameButton, it will be highlighted, but if he moves the mouses out of it it will be dehigighted. At the same time that nameInput has been dehighlighted, it hasn't lost focus though. If the user types any char on the keyboard, it will be autohighlitghted again., so the user knows where the focus is.
+
+So even if the acceptNameButton gets highlighted because the mouse is over it, nameInput always has focus so the user can still type on it. so when the mouse is only hovering , the focus is still on the inputName unless the user clicks on the acceptNameButton, in which case we show the ConfirmNameDialogPanel (it the characters entered are less then the max value) and nameInput loses focus.
+
+If user clicks with the mouse on acceptNameButton but no chars were input in nameInput, the message will be displayed warningsTextLabel.Text = Tr("PLEASE_ENTER_NAME_BEFORE_CONFIRMING");
+
+an automatically acceptNameButton will be dehighlighted and nameInput will be hihglighted to grab focus, indicating the user that he needs to type a name.
+
+Now if the user is on inputName and cicks Tab or Esc, the inputName will be dehihglighted and the user can move right/left with the key or pad to select the acceptNameButton or the nameInput again. Once he is again on it, he can type anything again.
+
+ if the user presses space while having focus on nammeInput, a blank space char sholdd  be added
+
+the issue is that the spaceBar is mapped with ui_accept, i don't know if it's because of this that the nameInput doesn't accept the blank space... I don't know if we can temporarily disable the spacebar as mapped with ui_aacept while focus in on the inputName...
+
+Name when the user presses enter or ui_accept button on the gamepad, then the ConfirmNameDialogPanel is dispplayed. By pressing ui_cancel when this panel is displayed, it is hidden so we just go back to hte inputNameScreen where we can edit the name yet.
+
+I know that htere is the possiblity to show a virtual keyaboard on the case that we are using the gamepad, that would be cool too.

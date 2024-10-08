@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Linq;
-
+using System.Threading.Tasks;
 
 [Tool]
 public partial class visual_association_plugin : EditorPlugin {
@@ -24,95 +24,41 @@ public partial class visual_association_plugin : EditorPlugin {
   };
 
   public override void _EnterTree() {
-    GD.Print("VisualAssociationPlugin _EnterTree called");
-    var scene = ResourceLoader.Load<PackedScene>("res://addons/visual_association/VisualAssociationDock.tscn");
-    if (scene == null) {
-      GD.PrintErr("Failed to load VisualAssociationDock scene");
-      return;
-    }
+    InitializeDock();
+    VisualPathMappings.Load();
+    CallDeferred(nameof(DeferredSetup));
+  }
 
-    dock = scene.Instantiate<Control>();
+  private void InitializeDock() {
+    var scene = ResourceLoader.Load<PackedScene>("res://addons/visual_association/VisualAssociationDock.tscn");
+    dock = scene?.Instantiate<Control>();
     if (dock == null) {
-      GD.PrintErr("Failed to instantiate VisualAssociationDock scene");
+      GD.PrintErr("Failed to load or instantiate VisualAssociationDock scene");
       return;
     }
 
     dialogueListInPluginView = dock.GetNodeOrNull<ItemList>("VBoxContainer/ScrollContainer/DialogueList");
     associateButton = dock.GetNodeOrNull<Button>("VBoxContainer/AssociateButton");
-
     associateMusicButton = dock.GetNodeOrNull<Button>("VBoxContainer/AssociateMusicButton");
     associateSoundButton = dock.GetNodeOrNull<Button>("VBoxContainer/AssociateSoundButton");
 
-    if (associateMusicButton != null) {
-      associateMusicButton.Pressed += OnAssociateMusicButtonPressed;
-    }
-    if (associateSoundButton != null) {
-      associateSoundButton.Pressed += OnAssociateSoundButtonPressed;
-    }
-
-    if (dialogueListInPluginView == null) GD.PrintErr("DialogueList not found");
-    if (associateButton == null) GD.PrintErr("AssociateButton not found");
-
-    if (associateButton != null) {
-      associateButton.Pressed += OnAssociateButtonPressed;
-    }
-
-    if (dialogueListInPluginView != null) {
-      dialogueListInPluginView.SelectMode = ItemList.SelectModeEnum.Multi;
-    }
-
-    VisualPathMappings.Load(); // Load existing mappings from json to dictionary
-    CallDeferred(nameof(DeferredSetup));
+    SetupButtons();
   }
 
-
-  private void InjectSavedVisualPaths() {
-    foreach (var conversation in conversationObjectsDB) {
-      foreach (var dialogue in conversation.Value) {
-
-        if (VisualPathMappings.Mappings.TryGetValue(dialogue.ID, out MediaInfo mediaInfo)) {
-          dialogue.VisualPath = mediaInfo.VisualPath;
-          dialogue.VisualPreDelay = mediaInfo.VisualPreDelay;
-          dialogue.VisualPostDelay = mediaInfo.VisualPostDelay;
-          dialogue.MusicPath = mediaInfo.MusicPath;
-          dialogue.MusicPreDelay = mediaInfo.MusicPreDelay;
-          dialogue.MusicPostDelay = mediaInfo.MusicPostDelay;
-          dialogue.SoundPath = mediaInfo.SoundPath;
-          dialogue.SoundPreDelay = mediaInfo.SoundPreDelay;
-          dialogue.SoundPostDelay = mediaInfo.SoundPostDelay;
-        }
-      }
-    }
-    SaveDialoguesToJson();
-    GD.Print("[InjectSavedVisualPaths] Finished injecting saved visual paths to dialoguesDB.json");
+  private void SetupButtons() {
+    if (associateButton != null) associateButton.Pressed += OnAssociateButtonPressed;
+    if (associateMusicButton != null) associateMusicButton.Pressed += OnAssociateMusicButtonPressed;
+    if (associateSoundButton != null) associateSoundButton.Pressed += OnAssociateSoundButtonPressed;
+    if (dialogueListInPluginView != null) dialogueListInPluginView.SelectMode = ItemList.SelectModeEnum.Multi;
   }
 
   private void DeferredSetup() {
     AddControlToBottomPanel(dock, "Visual Association");
     LoadDialogues();
-
-    // Ensure the plugin is ready to handle file dialogs
-    GetTree().CreateTimer(1.0).Timeout += () => {
-      GD.Print("Plugin is ready for file dialogs");
-    };
-  }
-
-  public override void _Ready() {
-    base._Ready();
-    // This ensures we have access to the EditorInterface
-    if (EditorInterface.Singleton != null) {
-      GD.Print("EditorInterface is available");
-    } else {
-      GD.PrintErr("EditorInterface is not available");
-    }
   }
 
   public override void _ExitTree() {
-
-    if (associateButton != null) {
-      associateButton.Pressed += OnAssociateButtonPressed;
-    }
-    GD.Print("VisualAssociationPlugin _ExitTree called");
+    if (associateButton != null) associateButton.Pressed -= OnAssociateButtonPressed;
     if (dock != null) {
       RemoveControlFromBottomPanel(dock);
       dock.QueueFree();
@@ -120,7 +66,6 @@ public partial class visual_association_plugin : EditorPlugin {
   }
 
   private void LoadDialogues() {
-    GD.Print("LoadDialogues method called");
     if (dialogueListInPluginView == null) {
       GD.PrintErr("DialogueList is null, cannot load dialogues");
       return;
@@ -128,417 +73,322 @@ public partial class visual_association_plugin : EditorPlugin {
 
     try {
       conversationObjectsDB = LoadDialoguesFromJson();
-      GD.Print($"Loaded {conversationObjectsDB.Count} conversations");
-
-      dialogueListInPluginView.Clear();
-      foreach (var conversation in conversationObjectsDB) {
-        foreach (var dialogue in conversation.Value) {
-          string itemText = $"Conv {conversation.Key} - Dialogue {dialogue.ID}: {dialogue.DialogueTextDefault.Substring(0, Math.Min(dialogue.DialogueTextDefault.Length, 120))}...";
-          GD.Print($"Adding item: {itemText}");
-          int dialogueRowIndexInPluginView = dialogueListInPluginView.AddItem(itemText);
-          dialogueListInPluginView.SetItemMetadata(dialogueRowIndexInPluginView, dialogue.ID);
-        }
-      }
-      GD.Print($"Total items added to dialogueListInPluginView: {dialogueListInPluginView.ItemCount}");
+      PopulateDialogueList();
+      InjectSavedVisualPaths();
     } catch (Exception e) {
       GD.PrintErr($"Error in LoadDialogues: {e.Message}");
       GD.PrintErr(e.StackTrace);
     }
-
-    InjectSavedVisualPaths();
   }
 
-  private Dictionary<int, List<DialogueObject>> LoadDialoguesFromJson() {
-    string fullJsonPath = ProjectSettings.GlobalizePath(JSON_PATH);
-    GD.Print($"Attempting to load JSON from {fullJsonPath}");
-    try {
-      if (!File.Exists(fullJsonPath)) {
-        GD.PrintErr($"File not found: {fullJsonPath}");
-        return new Dictionary<int, List<DialogueObject>>();
-      }
-
-      string jsonString = File.ReadAllText(fullJsonPath);
-      GD.Print($"JSON content length: {jsonString.Length}");
-      var result = JSON2DialogueObjectParser.ExtractDialogueObjects(jsonString);
-      GD.Print($"Extracted {result.Count} conversations");
-      return result;
-    } catch (Exception e) {
-      GD.PrintErr($"Error loading dialogues from JSON: {e.Message}");
-      GD.PrintErr(e.StackTrace);
-      return new Dictionary<int, List<DialogueObject>>();
-    }
-  }
-
-  //public EditorFileDialog fileDialog;
-
-  public async void OnAssociateButtonPressed() {
-    var fileDialog = new FileDialog();
-    fileDialog.FileMode = FileDialog.FileModeEnum.OpenFile;
-    fileDialog.AddFilter("*.png, *.jpg, *.jpeg ; Supported Images");
-    fileDialog.MinSize = new Vector2I(800, 600); // Set minimum size
-
-    GetTree().Root.AddChild(fileDialog);
-    fileDialog.PopupCentered();
-
-    var result = await ToSignal(fileDialog, "file_selected");
-    string path = (string)result[0];
-
-    var popup = new AcceptDialog();
-    var vbox = new VBoxContainer();
-    var preDelayInput = new LineEdit { PlaceholderText = "Pre-dialogue delay (seconds)" };
-    var postDelayInput = new LineEdit { PlaceholderText = "Post-dialogue delay (seconds)" };
-    vbox.AddChild(preDelayInput);
-    vbox.AddChild(postDelayInput);
-    popup.AddChild(vbox);
-    AddChild(popup);
-    popup.PopupCentered();
-
-    await ToSignal(popup, "confirmed");
-
-    float preDelay = float.TryParse(preDelayInput.Text, out float pd) ? pd : 0;
-    float postDelay = float.TryParse(postDelayInput.Text, out float psd) ? psd : 0;
-
-    var selectedIndices = dialogueListInPluginView.GetSelectedItems();
-    var selectedIDs = new List<int>();
-    foreach (int index in selectedIndices) {
-      selectedIDs.Add((int)dialogueListInPluginView.GetItemMetadata(index));
-    }
-    UpdateDialogue(selectedIDs, path, preDelay, postDelay, null, null, null, null, null, null);
-  }
-
-  private async void OnAssociateMusicButtonPressed() {
-    var fileDialog = new FileDialog();
-    fileDialog.FileMode = FileDialog.FileModeEnum.OpenFile;
-    fileDialog.AddFilter("*.mp3, *.wav ; Supported Audio");
-    fileDialog.MinSize = new Vector2I(800, 600); // Set minimum size
-
-    GetTree().Root.AddChild(fileDialog);
-    fileDialog.PopupCentered();
-
-    var result = await ToSignal(fileDialog, "file_selected");
-    string path = (string)result[0];
-
-    var popup = new AcceptDialog();
-    var vbox = new VBoxContainer();
-    var preDelayInput = new LineEdit { PlaceholderText = "Pre-dialogue delay (seconds)" };
-    var postDelayInput = new LineEdit { PlaceholderText = "Post-dialogue delay (seconds)" };
-    vbox.AddChild(preDelayInput);
-    vbox.AddChild(postDelayInput);
-    popup.AddChild(vbox);
-    AddChild(popup);
-    popup.PopupCentered();
-
-    await ToSignal(popup, "confirmed");
-
-    float preDelay = float.TryParse(preDelayInput.Text, out float pd) ? pd : 0;
-    float postDelay = float.TryParse(postDelayInput.Text, out float psd) ? psd : 0;
-
-    var selectedIndices = dialogueListInPluginView.GetSelectedItems();
-    var selectedIDs = new List<int>();
-    foreach (int index in selectedIndices) {
-      selectedIDs.Add((int)dialogueListInPluginView.GetItemMetadata(index));
-    }
-    UpdateDialogue(selectedIDs, null, null, null, path, preDelay, postDelay, null, null);
-  }
-
-  private async void OnAssociateSoundButtonPressed() {
-    var fileDialog = new FileDialog();
-    fileDialog.FileMode = FileDialog.FileModeEnum.OpenFile;
-    fileDialog.AddFilter("*.mp3, *.wav ; Supported Audio");
-    fileDialog.MinSize = new Vector2I(800, 600); // Set minimum size
-
-    GetTree().Root.AddChild(fileDialog);
-    fileDialog.PopupCentered();
-
-    var result = await ToSignal(fileDialog, "file_selected");
-    string path = (string)result[0];
-
-    var popup = new AcceptDialog();
-    var vbox = new VBoxContainer();
-    var preDelayInput = new LineEdit { PlaceholderText = "Pre-dialogue delay (seconds)" };
-    var postDelayInput = new LineEdit { PlaceholderText = "Post-dialogue delay (seconds)" };
-    vbox.AddChild(preDelayInput);
-    vbox.AddChild(postDelayInput);
-    popup.AddChild(vbox);
-    AddChild(popup);
-    popup.PopupCentered();
-
-    await ToSignal(popup, "confirmed");
-
-    float preDelay = float.TryParse(preDelayInput.Text, out float pd) ? pd : 0;
-    float postDelay = float.TryParse(postDelayInput.Text, out float psd) ? psd : 0;
-
-    var selectedIndices = dialogueListInPluginView.GetSelectedItems();
-    var selectedIDs = new List<int>();
-    foreach (int index in selectedIndices) {
-      selectedIDs.Add((int)dialogueListInPluginView.GetItemMetadata(index));
-    }
-    UpdateDialogue(selectedIDs, null, null, null, null, null, null, path, preDelay, postDelay);
-  }
-
-  private void RefreshDialogueList() {
+  private void PopulateDialogueList() {
     dialogueListInPluginView.Clear();
     foreach (var conversation in conversationObjectsDB) {
       foreach (var dialogue in conversation.Value) {
         string itemText = $"Conv {conversation.Key} - Dialogue {dialogue.ID}: {dialogue.DialogueTextDefault.Substring(0, Math.Min(dialogue.DialogueTextDefault.Length, 120))}...";
-        dialogueListInPluginView.AddItem(itemText);
+        int dialogueRowIndexInPluginView = dialogueListInPluginView.AddItem(itemText);
+        dialogueListInPluginView.SetItemMetadata(dialogueRowIndexInPluginView, dialogue.ID);
       }
     }
   }
 
-  private void UpdateDialogue(List<int> dialogueIDs, string visualPath = null, float? visualPreDelay = null, float? visualPostDelay = null,
-                              string musicPath = null, float? musicPreDelay = null, float? musicPostDelay = null,
-                              string soundPath = null, float? soundPreDelay = null, float? soundPostDelay = null) {
+  private Dictionary<int, List<DialogueObject>> LoadDialoguesFromJson() {
+    string fullJsonPath = ProjectSettings.GlobalizePath(JSON_PATH);
+    if (!File.Exists(fullJsonPath)) {
+      GD.PrintErr($"File not found: {fullJsonPath}");
+      return new Dictionary<int, List<DialogueObject>>();
+    }
 
-    if (conversationObjectsDB == null) {
-      GD.PrintErr("[UpdateDialogue] conversationObjectsDB is null. Cannot update dialogue.");
+    string jsonString = File.ReadAllText(fullJsonPath);
+    return JSON2DialogueObjectParser.ExtractDialogueObjects(jsonString);
+  }
+
+  private async void OnAssociateButtonPressed() {
+    var selectedDialogueIDs = GetSelectedDialogueIDs();
+    if (selectedDialogueIDs.Count == 0) {
+      GD.Print("No dialogues selected.");
       return;
     }
 
-    bool foundAny = false;
+    var fileDialog = new FileDialog {
+      FileMode = FileDialog.FileModeEnum.OpenFile,
+      MinSize = new Vector2I(800, 600)
+    };
+    fileDialog.AddFilter("*.png, *.jpg, *.jpeg ; Supported Images");
 
-    foreach (int dialogueID in dialogueIDs) {
-      bool found = false;
+    GetTree().Root.AddChild(fileDialog);
+    fileDialog.PopupCentered();
 
-      foreach (var conversation in conversationObjectsDB) {
-        if (conversation.Value == null) continue;
+    var result = await ToSignal(fileDialog, "file_selected");
+    string path = (string)result[0];
 
-        var dialogue = conversation.Value.FirstOrDefault(d => d.ID == dialogueID);
-        if (dialogue != null) {
-          found = true;
-          foundAny = true;
+    var (preDelay, postDelay) = await ShowDelayInputDialog();
 
-          // Update dialogue object
-          if (visualPath != null) {
-            dialogue.VisualPath = visualPath;
-            dialogue.VisualPreDelay = visualPreDelay ?? dialogue.VisualPreDelay;
-            dialogue.VisualPostDelay = visualPostDelay ?? dialogue.VisualPostDelay;
-          }
-          if (musicPath != null) {
-            dialogue.MusicPath = musicPath;
-            dialogue.MusicPreDelay = musicPreDelay ?? dialogue.MusicPreDelay;
-            dialogue.MusicPostDelay = musicPostDelay ?? dialogue.MusicPostDelay;
-          }
-          if (soundPath != null) {
-            dialogue.SoundPath = soundPath;
-            dialogue.SoundPreDelay = soundPreDelay ?? dialogue.SoundPreDelay;
-            dialogue.SoundPostDelay = soundPostDelay ?? dialogue.SoundPostDelay;
-          }
+    UpdateDialogues(selectedDialogueIDs, new MediaInfo {
+      VisualPath = path,
+      VisualPreDelay = preDelay,
+      VisualPostDelay = postDelay
+    });
+  }
 
-          // Update VisualPathMappings
-          if (VisualPathMappings.Mappings == null) {
-            GD.PrintErr("[UpdateDialogue] VisualPathMappings.Mappings is null. Initializing new dictionary.");
-            VisualPathMappings.Mappings = new Dictionary<int, MediaInfo>();
-          }
+  private List<int> GetSelectedDialogueIDs() {
+    return dialogueListInPluginView.GetSelectedItems()
+        .Select(index => (int)dialogueListInPluginView.GetItemMetadata(index))
+        .ToList();
+  }
 
-          if (!VisualPathMappings.Mappings.TryGetValue(dialogue.ID, out var mediaInfo)) {
-            mediaInfo = new MediaInfo();
-            VisualPathMappings.Mappings[dialogue.ID] = mediaInfo;
-          }
+  private async Task<(float preDelay, float postDelay)> ShowDelayInputDialog() {
+    var popup = new AcceptDialog();
+    var vbox = new VBoxContainer();
+    var preDelayInput = new LineEdit { PlaceholderText = "Pre-dialogue delay (seconds)" };
+    var postDelayInput = new LineEdit { PlaceholderText = "Post-dialogue delay (seconds)" };
+    vbox.AddChild(preDelayInput);
+    vbox.AddChild(postDelayInput);
+    popup.AddChild(vbox);
+    AddChild(popup);
+    popup.PopupCentered();
 
-          if (visualPath != null) {
-            mediaInfo.VisualPath = visualPath;
-            mediaInfo.VisualPreDelay = visualPreDelay ?? mediaInfo.VisualPreDelay;
-            mediaInfo.VisualPostDelay = visualPostDelay ?? mediaInfo.VisualPostDelay;
-          }
-          if (musicPath != null) {
-            mediaInfo.MusicPath = musicPath;
-            mediaInfo.MusicPreDelay = musicPreDelay ?? mediaInfo.MusicPreDelay;
-            mediaInfo.MusicPostDelay = musicPostDelay ?? mediaInfo.MusicPostDelay;
-          }
-          if (soundPath != null) {
-            mediaInfo.SoundPath = soundPath;
-            mediaInfo.SoundPreDelay = soundPreDelay ?? mediaInfo.SoundPreDelay;
-            mediaInfo.SoundPostDelay = soundPostDelay ?? mediaInfo.SoundPostDelay;
-          }
+    await ToSignal(popup, "confirmed");
 
-          GD.Print($"[UpdateDialogue] Updated dialogue {dialogue.ID} with new media information");
-          GD.Print($"Dialogue ID {dialogue.ID} updated in VisualPathMappings:");
-          GD.Print($"  VisualPath: {mediaInfo.VisualPath}, PreDelay: {mediaInfo.VisualPreDelay}, PostDelay: {mediaInfo.VisualPostDelay}");
-          GD.Print($"  MusicPath: {mediaInfo.MusicPath}, PreDelay: {mediaInfo.MusicPreDelay}, PostDelay: {mediaInfo.MusicPostDelay}");
-          GD.Print($"  SoundPath: {mediaInfo.SoundPath}, PreDelay: {mediaInfo.SoundPreDelay}, PostDelay: {mediaInfo.SoundPostDelay}");
-          break;
-          //return;
-        }
-      }
-      if (!found) {
-        GD.PrintErr($"[UpdateDialogue] Dialogue at index {dialogueID} not found.");
-      }
-    }
-    if (!foundAny) {
-      GD.PrintErr("[UpdateDialogue] No dialogue found for the given indices.");
+    float.TryParse(preDelayInput.Text, out float preDelay);
+    float.TryParse(postDelayInput.Text, out float postDelay);
+
+    return (preDelay, postDelay);
+  }
+
+  private void UpdateDialogues(List<int> dialogueIDs, MediaInfo mediaInfo) {
+    foreach (var dialogueID in dialogueIDs) {
+      UpdateSingleDialogue(dialogueID, mediaInfo);
     }
     SaveDialoguesToJson();
     VisualPathMappings.Save();
     RefreshDialogueList();
-
-    //GD.PrintErr($"[UpdateDialogue] Dialogue at index {index} not found.");
   }
 
+  private void UpdateSingleDialogue(int dialogueID, MediaInfo mediaInfo) {
+    var dialogue = FindDialogueById(dialogueID);
+    if (dialogue == null) {
+      GD.PrintErr($"Dialogue with ID {dialogueID} not found.");
+      return;
+    }
 
+    UpdateDialogueFields(dialogue, mediaInfo);
+    UpdateVisualPathMappings(dialogueID, mediaInfo);
+  }
 
+  private DialogueObject FindDialogueById(int dialogueID) {
+    return conversationObjectsDB.Values
+        .SelectMany(dialogues => dialogues)
+        .FirstOrDefault(d => d.ID == dialogueID);
+  }
+
+  private void UpdateDialogueFields(DialogueObject dialogue, MediaInfo mediaInfo) {
+    if (!string.IsNullOrEmpty(mediaInfo.VisualPath))
+      dialogue.VisualPath = mediaInfo.VisualPath;
+    if (mediaInfo.VisualPreDelay != 0)
+      dialogue.VisualPreDelay = mediaInfo.VisualPreDelay;
+    if (mediaInfo.VisualPostDelay != 0)
+      dialogue.VisualPostDelay = mediaInfo.VisualPostDelay;
+
+    // Only update music and sound fields if they were modified in the plugin
+    if (!string.IsNullOrEmpty(mediaInfo.MusicPath))
+      dialogue.MusicPath = mediaInfo.MusicPath;
+    if (mediaInfo.MusicPreDelay != 0)
+      dialogue.MusicPreDelay = mediaInfo.MusicPreDelay;
+    if (mediaInfo.MusicPostDelay != 0)
+      dialogue.MusicPostDelay = mediaInfo.MusicPostDelay;
+
+    if (!string.IsNullOrEmpty(mediaInfo.SoundPath))
+      dialogue.SoundPath = mediaInfo.SoundPath;
+    if (mediaInfo.SoundPreDelay != 0)
+      dialogue.SoundPreDelay = mediaInfo.SoundPreDelay;
+    if (mediaInfo.SoundPostDelay != 0)
+      dialogue.SoundPostDelay = mediaInfo.SoundPostDelay;
+  }
+
+  private void UpdateVisualPathMappings(int dialogueID, MediaInfo mediaInfo) {
+    if (!VisualPathMappings.Mappings.TryGetValue(dialogueID, out var existingMediaInfo)) {
+      existingMediaInfo = new MediaInfo();
+      VisualPathMappings.Mappings[dialogueID] = existingMediaInfo;
+    }
+
+    if (!string.IsNullOrEmpty(mediaInfo.VisualPath))
+      existingMediaInfo.VisualPath = mediaInfo.VisualPath;
+    if (mediaInfo.VisualPreDelay != 0)
+      existingMediaInfo.VisualPreDelay = mediaInfo.VisualPreDelay;
+    if (mediaInfo.VisualPostDelay != 0)
+      existingMediaInfo.VisualPostDelay = mediaInfo.VisualPostDelay;
+
+    if (!string.IsNullOrEmpty(mediaInfo.MusicPath))
+      existingMediaInfo.MusicPath = mediaInfo.MusicPath;
+    if (mediaInfo.MusicPreDelay != 0)
+      existingMediaInfo.MusicPreDelay = mediaInfo.MusicPreDelay;
+    if (mediaInfo.MusicPostDelay != 0)
+      existingMediaInfo.MusicPostDelay = mediaInfo.MusicPostDelay;
+
+    if (!string.IsNullOrEmpty(mediaInfo.SoundPath))
+      existingMediaInfo.SoundPath = mediaInfo.SoundPath;
+    if (mediaInfo.SoundPreDelay != 0)
+      existingMediaInfo.SoundPreDelay = mediaInfo.SoundPreDelay;
+    if (mediaInfo.SoundPostDelay != 0)
+      existingMediaInfo.SoundPostDelay = mediaInfo.SoundPostDelay;
+  }
   private void SaveDialoguesToJson() {
     string fullJsonPath = ProjectSettings.GlobalizePath(JSON_PATH);
     string backupPath = fullJsonPath + ".backup";
-    GD.Print($"Attempting to save JSON to: {fullJsonPath}");
-
     File.Copy(fullJsonPath, backupPath, true);
+
     try {
       string jsonString = File.ReadAllText(fullJsonPath);
-      using var jsonDocument = JsonDocument.Parse(jsonString);
-      var root = jsonDocument.RootElement;
-
-      var conversationsArray = root.GetProperty("Assets").GetProperty("Conversations");
-      var updatedConversations = new List<object>();
-
-      for (int i = 0; i < conversationsArray.GetArrayLength(); i++) {
-        var conversation = conversationsArray[i];
-        int conversationId = conversation.GetProperty("ID").GetInt32();
-
-        if (conversationObjectsDB.TryGetValue(conversationId, out var dialogues)) {
-          var dialogNodesArray = conversation.GetProperty("DialogNodes");
-          var updatedDialogNodes = new List<object>();
-
-          for (int j = 0; j < dialogNodesArray.GetArrayLength(); j++) {
-            var dialogNode = dialogNodesArray[j];
-            int dialogId = dialogNode.GetProperty("ID").GetInt32();
-
-            var dialogue = dialogues.Find(d => d.ID == dialogId);
-            if (dialogue != null) {
-              var fields = dialogNode.GetProperty("Fields");
-              var updatedFields = new Dictionary<string, object>();
-              foreach (var field in fields.EnumerateObject()) {
-                // Deserialize the field value to remove extra quotes
-                updatedFields[field.Name] = JsonSerializer.Deserialize<object>(field.Value.GetRawText());
-              }
-
-              // Update fields
-              updatedFields["VisualPath"] = dialogue.VisualPath ?? "";
-              updatedFields["MusicPath"] = dialogue.MusicPath ?? "";
-              updatedFields["MusicPreDelay"] = dialogue.MusicPreDelay;
-              updatedFields["MusicPostDelay"] = dialogue.MusicPostDelay;
-              updatedFields["SoundPath"] = dialogue.SoundPath ?? "";
-              updatedFields["SoundPreDelay"] = dialogue.SoundPreDelay;
-              updatedFields["SoundPostDelay"] = dialogue.SoundPostDelay;
-
-              var updatedDialogNode = new {
-                OutgoingLinks = JsonSerializer.Deserialize<object>(dialogNode.GetProperty("OutgoingLinks").GetRawText()),
-                ConversationID = conversationId,
-                IsRoot = dialogNode.TryGetProperty("IsRoot", out var isRoot) ? isRoot.GetBoolean() : false,
-                IsGroup = dialogue.IsGroup,
-                Fields = updatedFields,
-                ID = dialogId
-              };
-
-              updatedDialogNodes.Add(updatedDialogNode);
-            } else {
-              updatedDialogNodes.Add(JsonSerializer.Deserialize<object>(dialogNode.GetRawText()));
-            }
-          }
-
-          var updatedConversation = new {
-            ID = conversationId,
-            DialogNodes = updatedDialogNodes
-          };
-
-          updatedConversations.Add(updatedConversation);
-        } else {
-          updatedConversations.Add(JsonSerializer.Deserialize<object>(conversation.GetRawText()));
-        }
-      }
-
-      var updatedAssets = new {
-        Conversations = updatedConversations
-      };
-
-      var updatedRoot = new {
-        Assets = updatedAssets
-      };
-
-      string updatedJsonString = JsonSerializer.Serialize(updatedRoot, JsonOptions);
-      File.WriteAllText(fullJsonPath, updatedJsonString);
-
-
-      if (new FileInfo(fullJsonPath).Length == 0) {
-        throw new Exception("Save resulted in empty file");
-      } else {
-        GD.Print("JSON file updated successfully.");
-      }
-
-      VisualPathMappings.Save(); // Save mappings to a separate file
+      var updatedJson = UpdateJsonWithDialogues(jsonString);
+      File.WriteAllText(fullJsonPath, updatedJson);
+      GD.Print("JSON file updated successfully.");
     } catch (Exception e) {
       GD.PrintErr($"Error updating JSON file: {e.Message}");
-      GD.PrintErr(e.StackTrace);
-      GD.PrintErr("Reverting to backup dialogueDB.json...");
-
       File.Copy(backupPath, fullJsonPath, true);
-
     }
   }
 
-  // private void InjectVisualPaths(string jsonPath) {
-  //   try {
-  //     string jsonString = File.ReadAllText(jsonPath);
-  //     using var jsonDocument = JsonDocument.Parse(jsonString);
-  //     var root = jsonDocument.RootElement;
+  private string UpdateJsonWithDialogues(string jsonString) {
+    using var jsonDocument = JsonDocument.Parse(jsonString);
+    var root = jsonDocument.RootElement;
 
-  //     var conversationsArray = root.GetProperty("Assets").GetProperty("Conversations");
-  //     var updatedConversations = new List<object>();
+    var conversationsArray = root.GetProperty("Assets").GetProperty("Conversations");
+    var updatedConversations = new List<object>();
 
-  //     foreach (var conversation in conversationsArray.EnumerateArray()) {
-  //       var dialogNodes = conversation.GetProperty("DialogNodes");
-  //       var updatedDialogNodes = new List<object>();
+    foreach (var conversation in conversationsArray.EnumerateArray()) {
+      var updatedConversation = UpdateConversation(conversation);
+      updatedConversations.Add(updatedConversation);
+    }
 
-  //       foreach (var node in dialogNodes.EnumerateArray()) {
-  //         var id = node.GetProperty("ID").GetInt32();
-  //         var fields = node.GetProperty("Fields");
-  //         var updatedFields = JsonSerializer.Deserialize<Dictionary<string, object>>(fields.GetRawText());
+    var updatedRoot = new Dictionary<string, object> {
+      ["Assets"] = new Dictionary<string, object> {
+        ["Conversations"] = updatedConversations
+      }
+    };
 
-  //         if (VisualPathMappings.Mappings.TryGetValue(id, out MediaInfo mediaInfo)) {
-  //           updatedFields["VisualPath"] = mediaInfo.VisualPath;
-  //           updatedFields["VisualPreDelay"] = mediaInfo.VisualPreDelay;
-  //           updatedFields["VisualPostDelay"] = mediaInfo.VisualPostDelay;
-  //           updatedFields["MusicPath"] = mediaInfo.MusicPath;
-  //           updatedFields["MusicPreDelay"] = mediaInfo.MusicPreDelay;
-  //           updatedFields["MusicPostDelay"] = mediaInfo.MusicPostDelay;
-  //           updatedFields["SoundPath"] = mediaInfo.SoundPath;
-  //           updatedFields["SoundPreDelay"] = mediaInfo.SoundPreDelay;
-  //           updatedFields["SoundPostDelay"] = mediaInfo.SoundPostDelay;
+    return JsonSerializer.Serialize(updatedRoot, JsonOptions);
+  }
 
-  //           GD.Print($"Injected VisualPath for dialogue ID {id}: {mediaInfo.VisualPath}");
-  //           GD.Print($"Injected VisualPreDelay for dialogue ID {id}: {mediaInfo.VisualPreDelay}");
+  private object UpdateConversation(JsonElement conversation) {
+    int conversationId = conversation.GetProperty("ID").GetInt32();
+    var dialogNodesArray = conversation.GetProperty("DialogNodes");
+    var updatedDialogNodes = new List<object>();
 
-  //           var updatedNode = JsonSerializer.Deserialize<Dictionary<string, object>>(node.GetRawText());
-  //           updatedNode["Fields"] = updatedFields;
-  //           updatedDialogNodes.Add(updatedNode);
-  //         }
+    foreach (var dialogNode in dialogNodesArray.EnumerateArray()) {
+      var updatedNode = UpdateDialogNode(dialogNode, conversationId);
+      updatedDialogNodes.Add(updatedNode);
+    }
 
-  //         var updatedConversation = JsonSerializer.Deserialize<Dictionary<string, object>>(conversation.GetRawText());
-  //         updatedConversation["DialogNodes"] = updatedDialogNodes;
-  //         updatedConversations.Add(updatedConversation);
-  //       }
+    return new {
+      ID = conversationId,
+      DialogNodes = updatedDialogNodes
+    };
+  }
 
-  //       var updatedRoot = new Dictionary<string, object> {
-  //         ["Assets"] = new Dictionary<string, object> {
-  //           ["Conversations"] = updatedConversations
-  //         }
-  //       };
+  private object UpdateDialogNode(JsonElement dialogNode, int conversationId) {
+    int dialogId = dialogNode.GetProperty("ID").GetInt32();
+    var fields = dialogNode.GetProperty("Fields");
+    var updatedFields = JsonSerializer.Deserialize<Dictionary<string, object>>(fields.GetRawText());
 
-  //       string updatedJsonString = JsonSerializer.Serialize(updatedRoot, JsonOptions);
-  //       File.WriteAllText(jsonPath, updatedJsonString);
-  //       GD.Print("Visual paths injected successfully.");
-  //     }
+    var dialogue = FindDialogueById(dialogId);
+    if (dialogue != null) {
+      UpdateFieldsFromDialogue(updatedFields, dialogue);
+    }
 
-  //   } catch (Exception e) {
-  //     GD.PrintErr($"Error injecting visual paths: {e.Message}");
-  //   }
-  // }
+    return new {
+      OutgoingLinks = JsonSerializer.Deserialize<object>(dialogNode.GetProperty("OutgoingLinks").GetRawText()),
+      ConversationID = conversationId,
+      IsRoot = dialogNode.TryGetProperty("IsRoot", out var isRoot) ? isRoot.GetBoolean() : false,
+      IsGroup = dialogue?.IsGroup ?? false,
+      Fields = updatedFields,
+      ID = dialogId
+    };
+  }
 
-  // // Add a method to handle reloading the JSON file
-  // public void ReloadJSON() {
-  //   LoadDialogues();
-  //   string fullJsonPath = ProjectSettings.GlobalizePath(JSON_PATH);
-  //   InjectVisualPaths(fullJsonPath);
-  // }
+  private void UpdateFieldsFromDialogue(Dictionary<string, object> fields, DialogueObject dialogue) {
+    fields["VisualPath"] = dialogue.VisualPath ?? "";
+    fields["VisualPreDelay"] = dialogue.VisualPreDelay;
+    fields["VisualPostDelay"] = dialogue.VisualPostDelay;
+    fields["MusicPath"] = dialogue.MusicPath ?? "";
+    fields["MusicPreDelay"] = dialogue.MusicPreDelay;
+    fields["MusicPostDelay"] = dialogue.MusicPostDelay;
+    fields["SoundPath"] = dialogue.SoundPath ?? "";
+    fields["SoundPreDelay"] = dialogue.SoundPreDelay;
+    fields["SoundPostDelay"] = dialogue.SoundPostDelay;
+  }
+
+  private void RefreshDialogueList() {
+    PopulateDialogueList();
+  }
+
+  private void InjectSavedVisualPaths() {
+    foreach (var conversation in conversationObjectsDB.Values) {
+      foreach (var dialogue in conversation) {
+        if (VisualPathMappings.Mappings.TryGetValue(dialogue.ID, out MediaInfo mediaInfo)) {
+          UpdateDialogueFields(dialogue, mediaInfo);
+        }
+      }
+    }
+    SaveDialoguesToJson();
+    GD.Print("[InjectSavedVisualPaths] Finished injecting saved visual paths to dialoguesDB.json");
+  }
+
+  private async void OnAssociateMusicButtonPressed() {
+    var selectedDialogueIDs = GetSelectedDialogueIDs();
+    if (selectedDialogueIDs.Count == 0) {
+      GD.Print("No dialogues selected.");
+      return;
+    }
+
+    var fileDialog = new FileDialog {
+      FileMode = FileDialog.FileModeEnum.OpenFile,
+      MinSize = new Vector2I(800, 600)
+    };
+    fileDialog.AddFilter("*.mp3, *.wav ; Supported Audio");
+
+    GetTree().Root.AddChild(fileDialog);
+    fileDialog.PopupCentered();
+
+    var result = await ToSignal(fileDialog, "file_selected");
+    string path = (string)result[0];
+
+    var (preDelay, postDelay) = await ShowDelayInputDialog();
+
+    UpdateDialogues(selectedDialogueIDs, new MediaInfo {
+      MusicPath = path,
+      MusicPreDelay = preDelay,
+      MusicPostDelay = postDelay
+    });
+  }
+
+  private async void OnAssociateSoundButtonPressed() {
+    var selectedDialogueIDs = GetSelectedDialogueIDs();
+    if (selectedDialogueIDs.Count == 0) {
+      GD.Print("No dialogues selected.");
+      return;
+    }
+
+    var fileDialog = new FileDialog {
+      FileMode = FileDialog.FileModeEnum.OpenFile,
+      MinSize = new Vector2I(800, 600)
+    };
+    fileDialog.AddFilter("*.mp3, *.wav ; Supported Audio");
+
+    GetTree().Root.AddChild(fileDialog);
+    fileDialog.PopupCentered();
+
+    var result = await ToSignal(fileDialog, "file_selected");
+    string path = (string)result[0];
+
+    var (preDelay, postDelay) = await ShowDelayInputDialog();
+
+    UpdateDialogues(selectedDialogueIDs, new MediaInfo {
+      SoundPath = path,
+      SoundPreDelay = preDelay,
+      SoundPostDelay = postDelay
+    });
+  }
 }
 #endif
+

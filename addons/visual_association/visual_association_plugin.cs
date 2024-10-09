@@ -10,58 +10,100 @@ using System.Threading.Tasks;
 
 [Tool]
 public partial class visual_association_plugin : EditorPlugin {
-  private Control dock;
+  private Control mainDockInEditor;
   private ItemList dialogueListInPluginView;
-  private Button associateButton;
   private Dictionary<int, List<DialogueObject>> conversationObjectsDB;
   private const string JSON_PATH = "res://DialogueDB/dialogueDB.json";
-  private Button associateMusicButton;
-  private Button associateSoundButton;
+  private Button setImageButton;
+  private Button setMusicButton;
+  private Button setSoundButton;
 
   private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions {
     WriteIndented = true,
     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
   };
 
+  // public override void _Ready() {
+  //   GetTree().Root.Connect("focus_entered", new Callable(this, nameof(OnEditorFocusEntered)));
+  // }
+
+  // private void OnEditorFocusEntered() {
+  //   if (!Engine.IsEditorHint()) {
+  //     return;
+  //   }
+  //   ReinitializePlugin();
+  // }
+
+  // private void ReinitializePlugin() {
+  //   CleanupPlugin();
+  //   InitializeMainDockInEditor();
+  //   VisualPathMappings.Load();
+  //   AddMainDockInEditorToBottom();
+  //   LoadDialogues();
+  //   InjectSavedVisualPaths();
+  // }
+
   public override void _EnterTree() {
-    InitializeDock();
-    VisualPathMappings.Load();
-    CallDeferred(nameof(DeferredSetup));
+    CleanupPlugin();
+    InitializeMainDockInEditor();
+    // EditorSettings settings = EditorInterface.Singleton.GetEditorSettings();
+    // settings.SetSetting("debugger/auto_switch_to_remote_scene_tree", false);
+    CallDeferred(nameof(AddMainDockInEditorToBottom));
+    CallDeferred(nameof(LoadDialogues));
+    CallDeferred(nameof(InjectSavedVisualPaths));
   }
 
-  private void InitializeDock() {
+  public override void _ExitTree() {
+    CleanupPlugin();
+  }
+
+
+  private void CleanupPlugin() {
+    if (setImageButton != null) {
+      setImageButton.Pressed -= OnAssociateButtonPressed;
+      setImageButton = null;
+    }
+    if (setMusicButton != null) {
+      setMusicButton.Pressed -= OnAssociateMusicButtonPressed;
+      setMusicButton = null;
+    }
+    if (setSoundButton != null) {
+      setSoundButton.Pressed -= OnAssociateSoundButtonPressed;
+      setSoundButton = null;
+    }
+    if (mainDockInEditor != null) {
+      RemoveControlFromBottomPanel(mainDockInEditor);
+      mainDockInEditor.QueueFree();
+      mainDockInEditor = null;
+    }
+  }
+
+  private void InitializeMainDockInEditor() {
     var scene = ResourceLoader.Load<PackedScene>("res://addons/visual_association/VisualAssociationDock.tscn");
-    dock = scene?.Instantiate<Control>();
-    if (dock == null) {
+    mainDockInEditor = scene?.Instantiate<Control>();
+    if (mainDockInEditor == null) {
       GD.PrintErr("Failed to load or instantiate VisualAssociationDock scene");
       return;
     }
 
-    dialogueListInPluginView = dock.GetNodeOrNull<ItemList>("VBoxContainer/ScrollContainer/DialogueList");
-    associateButton = dock.GetNodeOrNull<Button>("VBoxContainer/AssociateButton");
-    associateMusicButton = dock.GetNodeOrNull<Button>("VBoxContainer/AssociateMusicButton");
-    associateSoundButton = dock.GetNodeOrNull<Button>("VBoxContainer/AssociateSoundButton");
+    dialogueListInPluginView = mainDockInEditor.GetNodeOrNull<ItemList>("VBoxContainer/ScrollContainer/DialogueList");
+    setImageButton = mainDockInEditor.GetNodeOrNull<Button>("VBoxContainer/AssociateButton");
+    setMusicButton = mainDockInEditor.GetNodeOrNull<Button>("VBoxContainer/AssociateMusicButton");
+    setSoundButton = mainDockInEditor.GetNodeOrNull<Button>("VBoxContainer/AssociateSoundButton");
 
     SetupButtons();
   }
 
   private void SetupButtons() {
-    if (associateButton != null) associateButton.Pressed += OnAssociateButtonPressed;
-    if (associateMusicButton != null) associateMusicButton.Pressed += OnAssociateMusicButtonPressed;
-    if (associateSoundButton != null) associateSoundButton.Pressed += OnAssociateSoundButtonPressed;
+    if (setImageButton != null) setImageButton.Pressed += OnAssociateButtonPressed;
+    if (setMusicButton != null) setMusicButton.Pressed += OnAssociateMusicButtonPressed;
+    if (setSoundButton != null) setSoundButton.Pressed += OnAssociateSoundButtonPressed;
     if (dialogueListInPluginView != null) dialogueListInPluginView.SelectMode = ItemList.SelectModeEnum.Multi;
   }
 
-  private void DeferredSetup() {
-    AddControlToBottomPanel(dock, "Visual Association");
-    LoadDialogues();
-  }
-
-  public override void _ExitTree() {
-    if (associateButton != null) associateButton.Pressed -= OnAssociateButtonPressed;
-    if (dock != null) {
-      RemoveControlFromBottomPanel(dock);
-      dock.QueueFree();
+  private void AddMainDockInEditorToBottom() {
+    if (mainDockInEditor != null) {
+      AddControlToBottomPanel(mainDockInEditor, "Visual Association");
     }
   }
 
@@ -70,15 +112,30 @@ public partial class visual_association_plugin : EditorPlugin {
       GD.PrintErr("DialogueList is null, cannot load dialogues");
       return;
     }
-
     try {
       conversationObjectsDB = LoadDialoguesFromJson();
       PopulateDialogueList();
-      InjectSavedVisualPaths();
     } catch (Exception e) {
       GD.PrintErr($"Error in LoadDialogues: {e.Message}");
       GD.PrintErr(e.StackTrace);
     }
+  }
+
+  private void InjectSavedVisualPaths() {
+    try {
+      foreach (var conversation in conversationObjectsDB.Values) {
+        foreach (var dialogue in conversation) {
+          if (VisualPathMappings.Mappings.TryGetValue(dialogue.ID, out DialogueObjectMediaInfo mediaInfo)) {
+            UpdateDialogueFields(dialogue, mediaInfo);
+          }
+        }
+      }
+    } catch (Exception e) {
+      GD.PrintErr($"Error in InjectSavedVisualPaths {e.Message}");
+      GD.PrintErr(e.StackTrace);
+    }
+    SaveDialoguesToJson();
+    GD.Print("[InjectSavedVisualPaths] Finished injecting saved visual paths to dialoguesDB.json");
   }
 
   private void PopulateDialogueList() {
@@ -124,7 +181,7 @@ public partial class visual_association_plugin : EditorPlugin {
 
     var (preDelay, postDelay) = await ShowDelayInputDialog();
 
-    UpdateDialogues(selectedDialogueIDs, new MediaInfo {
+    UpdateDialogues(selectedDialogueIDs, new DialogueObjectMediaInfo {
       VisualPath = path,
       VisualPreDelay = preDelay,
       VisualPostDelay = postDelay
@@ -156,7 +213,7 @@ public partial class visual_association_plugin : EditorPlugin {
     return (preDelay, postDelay);
   }
 
-  private void UpdateDialogues(List<int> dialogueIDs, MediaInfo mediaInfo) {
+  private void UpdateDialogues(List<int> dialogueIDs, DialogueObjectMediaInfo mediaInfo) {
     foreach (var dialogueID in dialogueIDs) {
       UpdateSingleDialogue(dialogueID, mediaInfo);
     }
@@ -165,7 +222,7 @@ public partial class visual_association_plugin : EditorPlugin {
     RefreshDialogueList();
   }
 
-  private void UpdateSingleDialogue(int dialogueID, MediaInfo mediaInfo) {
+  private void UpdateSingleDialogue(int dialogueID, DialogueObjectMediaInfo mediaInfo) {
     var dialogue = FindDialogueById(dialogueID);
     if (dialogue == null) {
       GD.PrintErr($"Dialogue with ID {dialogueID} not found.");
@@ -182,7 +239,7 @@ public partial class visual_association_plugin : EditorPlugin {
         .FirstOrDefault(d => d.ID == dialogueID);
   }
 
-  private void UpdateDialogueFields(DialogueObject dialogue, MediaInfo mediaInfo) {
+  private void UpdateDialogueFields(DialogueObject dialogue, DialogueObjectMediaInfo mediaInfo) {
     if (!string.IsNullOrEmpty(mediaInfo.VisualPath))
       dialogue.VisualPath = mediaInfo.VisualPath;
     if (mediaInfo.VisualPreDelay != 0)
@@ -206,32 +263,32 @@ public partial class visual_association_plugin : EditorPlugin {
       dialogue.SoundPostDelay = mediaInfo.SoundPostDelay;
   }
 
-  private void UpdateVisualPathMappings(int dialogueID, MediaInfo mediaInfo) {
-    if (!VisualPathMappings.Mappings.TryGetValue(dialogueID, out var existingMediaInfo)) {
-      existingMediaInfo = new MediaInfo();
-      VisualPathMappings.Mappings[dialogueID] = existingMediaInfo;
+  private void UpdateVisualPathMappings(int dialogueID, DialogueObjectMediaInfo mediaInfo) {
+    if (!VisualPathMappings.Mappings.TryGetValue(dialogueID, out var existingDialogueObjectMediaInfo)) {
+      existingDialogueObjectMediaInfo = new DialogueObjectMediaInfo();
+      VisualPathMappings.Mappings[dialogueID] = existingDialogueObjectMediaInfo;
     }
 
     if (!string.IsNullOrEmpty(mediaInfo.VisualPath))
-      existingMediaInfo.VisualPath = mediaInfo.VisualPath;
+      existingDialogueObjectMediaInfo.VisualPath = mediaInfo.VisualPath;
     if (mediaInfo.VisualPreDelay != 0)
-      existingMediaInfo.VisualPreDelay = mediaInfo.VisualPreDelay;
+      existingDialogueObjectMediaInfo.VisualPreDelay = mediaInfo.VisualPreDelay;
     if (mediaInfo.VisualPostDelay != 0)
-      existingMediaInfo.VisualPostDelay = mediaInfo.VisualPostDelay;
+      existingDialogueObjectMediaInfo.VisualPostDelay = mediaInfo.VisualPostDelay;
 
     if (!string.IsNullOrEmpty(mediaInfo.MusicPath))
-      existingMediaInfo.MusicPath = mediaInfo.MusicPath;
+      existingDialogueObjectMediaInfo.MusicPath = mediaInfo.MusicPath;
     if (mediaInfo.MusicPreDelay != 0)
-      existingMediaInfo.MusicPreDelay = mediaInfo.MusicPreDelay;
+      existingDialogueObjectMediaInfo.MusicPreDelay = mediaInfo.MusicPreDelay;
     if (mediaInfo.MusicPostDelay != 0)
-      existingMediaInfo.MusicPostDelay = mediaInfo.MusicPostDelay;
+      existingDialogueObjectMediaInfo.MusicPostDelay = mediaInfo.MusicPostDelay;
 
     if (!string.IsNullOrEmpty(mediaInfo.SoundPath))
-      existingMediaInfo.SoundPath = mediaInfo.SoundPath;
+      existingDialogueObjectMediaInfo.SoundPath = mediaInfo.SoundPath;
     if (mediaInfo.SoundPreDelay != 0)
-      existingMediaInfo.SoundPreDelay = mediaInfo.SoundPreDelay;
+      existingDialogueObjectMediaInfo.SoundPreDelay = mediaInfo.SoundPreDelay;
     if (mediaInfo.SoundPostDelay != 0)
-      existingMediaInfo.SoundPostDelay = mediaInfo.SoundPostDelay;
+      existingDialogueObjectMediaInfo.SoundPostDelay = mediaInfo.SoundPostDelay;
   }
   private void SaveDialoguesToJson() {
     string fullJsonPath = ProjectSettings.GlobalizePath(JSON_PATH);
@@ -244,7 +301,7 @@ public partial class visual_association_plugin : EditorPlugin {
       File.WriteAllText(fullJsonPath, updatedJson);
       GD.Print("JSON file updated successfully.");
     } catch (Exception e) {
-      GD.PrintErr($"Error updating JSON file: {e.Message}");
+      GD.PrintErr($"Error updating JSON file in SaveDialoguesToJson: {e.Message}");
       File.Copy(backupPath, fullJsonPath, true);
     }
   }
@@ -322,18 +379,6 @@ public partial class visual_association_plugin : EditorPlugin {
     PopulateDialogueList();
   }
 
-  private void InjectSavedVisualPaths() {
-    foreach (var conversation in conversationObjectsDB.Values) {
-      foreach (var dialogue in conversation) {
-        if (VisualPathMappings.Mappings.TryGetValue(dialogue.ID, out MediaInfo mediaInfo)) {
-          UpdateDialogueFields(dialogue, mediaInfo);
-        }
-      }
-    }
-    SaveDialoguesToJson();
-    GD.Print("[InjectSavedVisualPaths] Finished injecting saved visual paths to dialoguesDB.json");
-  }
-
   private async void OnAssociateMusicButtonPressed() {
     var selectedDialogueIDs = GetSelectedDialogueIDs();
     if (selectedDialogueIDs.Count == 0) {
@@ -355,7 +400,7 @@ public partial class visual_association_plugin : EditorPlugin {
 
     var (preDelay, postDelay) = await ShowDelayInputDialog();
 
-    UpdateDialogues(selectedDialogueIDs, new MediaInfo {
+    UpdateDialogues(selectedDialogueIDs, new DialogueObjectMediaInfo {
       MusicPath = path,
       MusicPreDelay = preDelay,
       MusicPostDelay = postDelay
@@ -383,7 +428,7 @@ public partial class visual_association_plugin : EditorPlugin {
 
     var (preDelay, postDelay) = await ShowDelayInputDialog();
 
-    UpdateDialogues(selectedDialogueIDs, new MediaInfo {
+    UpdateDialogues(selectedDialogueIDs, new DialogueObjectMediaInfo {
       SoundPath = path,
       SoundPreDelay = preDelay,
       SoundPostDelay = postDelay

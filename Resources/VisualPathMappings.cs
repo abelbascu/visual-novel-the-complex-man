@@ -4,7 +4,7 @@ using System.IO;
 using System.Text.Json;
 using Godot;
 
-public class MediaInfo {
+public class DialogueObjectMediaInfo {
   public string VisualPath { get; set; }
   public float VisualPreDelay { get; set; }
   public float VisualPostDelay { get; set; }
@@ -17,11 +17,11 @@ public class MediaInfo {
 }
 
 public static class VisualPathMappings {
-  private static Dictionary<int, MediaInfo> _mappings = new Dictionary<int, MediaInfo>();
-  public static Dictionary<int, MediaInfo> Mappings {
+  private static Dictionary<int, DialogueObjectMediaInfo> _mappings = new Dictionary<int, DialogueObjectMediaInfo>();
+  public static Dictionary<int, DialogueObjectMediaInfo> Mappings {
     get {
       if (_mappings == null) {
-        _mappings = new Dictionary<int, MediaInfo>();
+        _mappings = new Dictionary<int, DialogueObjectMediaInfo>();
         Load();
       }
       return _mappings;
@@ -42,21 +42,21 @@ public static class VisualPathMappings {
 
       if (File.Exists(fullPath)) {
         string jsonString = File.ReadAllText(fullPath);
-        var loadedMappings = JsonSerializer.Deserialize<Dictionary<int, MediaInfo>>(jsonString);
+        var loadedMappings = JsonSerializer.Deserialize<Dictionary<int, DialogueObjectMediaInfo>>(jsonString);
         if (loadedMappings != null) {
           Mappings = loadedMappings;
           GD.Print($"[VisualPathMappings] Successfully loaded {Mappings.Count} mappings");
         } else {
           GD.PrintErr("[VisualPathMappings] Loaded mappings were null, initializing empty dictionary");
-          Mappings = new Dictionary<int, MediaInfo>();
+          Mappings = new Dictionary<int, DialogueObjectMediaInfo>();
         }
       } else {
         GD.Print("[VisualPathMappings] Mappings file does not exist, initializing empty dictionary");
-        Mappings = new Dictionary<int, MediaInfo>();
+        Mappings = new Dictionary<int, DialogueObjectMediaInfo>();
       }
     } catch (Exception e) {
       GD.PrintErr($"[VisualPathMappings] Error loading mappings: {e.Message}");
-      Mappings = new Dictionary<int, MediaInfo>();
+      Mappings = new Dictionary<int, DialogueObjectMediaInfo>();
     }
   }
 

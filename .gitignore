@@ -31,3 +31,6 @@ text fonts/lanapixel_everything/LanaPixel_CC-BYLicense.txt
 text fonts/lanapixel_everything/LanaPixel_OpenFontLicense.txt
 Text/LanaPixel.ttf
 export1/
+*.suo
+.vs/VisualNovelTheComplexMan/v17/DocumentLayout.json
+.vs/

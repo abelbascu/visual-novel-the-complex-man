@@ -28,16 +28,35 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 
 [node name="VisualTypeOption" type="OptionButton" parent="VBoxContainer"]
+visible = false
 layout_mode = 2
 
-[node name="AssociateButton" type="Button" parent="VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="AssociateVisualButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "Associate Visual"
 
-[node name="AssociateMusicButton" type="Button" parent="VBoxContainer"]
+[node name="AssociateMusicButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "Associate Music"
 
-[node name="AssociateSoundButton" type="Button" parent="VBoxContainer"]
+[node name="AssociateSoundButton" type="Button" parent="VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "Associate Sound"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="ResetVisualButton" type="Button" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Reset Visual"
+
+[node name="ResetMusicButton" type="Button" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Reset Music"
+
+[node name="ResetSoundButton" type="Button" parent="VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Reset Sound"

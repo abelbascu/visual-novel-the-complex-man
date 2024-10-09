@@ -9,7 +9,7 @@ public static class JSON2DialogueObjectParser {
   public static Dictionary<int, List<DialogueObject>> ExtractDialogueObjects(string jsonText) {
 
     // Initialize a dictionary to store dialogue rows by conversation ID
-    var conversationObjectsDB = new Dictionary<int, List<DialogueObject>>();
+    var conversationsAndDialoguesDict = new Dictionary<int, List<DialogueObject>>();
 
     try {
       // Deserialize JSON data into a JsonElement
@@ -158,10 +158,10 @@ public static class JSON2DialogueObjectParser {
                   });
 
                 }
-                //THIS IS AN UNNECESSARY OPERATION AS IT IS OVERWRITTING conversationObjectsDB[conversationID] FOR EACH NEW dialogueObjects.  
+                //THIS IS AN UNNECESSARY OPERATION AS IT IS OVERWRITTING conversationsAndDialoguesDict[conversationID] FOR EACH NEW dialogueObjects.  
                 //NEEDS TO BE PUT IN AN OUTER CLOSE TO DO THE OPERATION ONLY ONCE!!!!!!
                 // Add the list of dialogue rows to the dictionary
-                conversationObjectsDB[conversationID] = dialogueObjects;
+                conversationsAndDialoguesDict[conversationID] = dialogueObjects;
 
               }
             }
@@ -173,7 +173,7 @@ public static class JSON2DialogueObjectParser {
       GD.PrintErr("Error parsing JSON data: " + e.Message);
     }
 
-    return conversationObjectsDB;
+    return conversationsAndDialoguesDict;
   }
 };
 

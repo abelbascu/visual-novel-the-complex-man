@@ -31,6 +31,8 @@ public static class DialoguesMediaHandler {
 
   private const string JSON_PATH = "res://DialogueDB/dialogueMediaDB.json";
 
+  //becasue it's a static class, as soon as the godot editor is opened
+  //it loads the mappings from the dialogueMediaDB.json file
   static DialoguesMediaHandler() {
     Load();
   }

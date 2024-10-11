@@ -287,11 +287,14 @@ public partial class InputManager : Control {
       //dehighlight last focused control first
       if (currentFocusedIndex != -1 && currentFocusedIndex < focusableUIControls.Count) {
         await HighlightFocusableControl(currentFocusedIndex, false);
+
       }
       // Set new highlight
       if (newFocusedIndex != -1 && newFocusedIndex < focusableUIControls.Count) {
         currentFocusedIndex = newFocusedIndex;
         await HighlightFocusableControl(currentFocusedIndex, true);
+      } else {
+        currentFocusedIndex = -1;
       }
     }
   }

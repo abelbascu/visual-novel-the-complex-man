@@ -68,8 +68,8 @@ public partial class MainMenu : Control {
     ApplyCustomStyles();
 
     //assign the loc keys so each time the language changes the text property is updated
-    WantToQuitGameLabel.Text = wantToQuitGameTRANSLATE;
-    WantToQuitToMainMenuLabel.Text = wantToQuitToMainMenuTRANSLATE;
+    WantToQuitGameLabel.Text = $"[center]{Tr(wantToQuitGameTRANSLATE)}[/center]";
+    WantToQuitToMainMenuLabel.Text = $"[center]{Tr(wantToQuitToMainMenuTRANSLATE)}[/center]";
 
     // GameStateManager.Instance.StateChanged += OnGameStateChanged;
   }

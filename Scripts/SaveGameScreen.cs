@@ -212,8 +212,8 @@ public partial class SaveGameScreen : MarginContainer {
     goBackButton.ProcessMode = ProcessModeEnum.Disabled;
 
     // Ensure the save game screen is fully transparent before showing
-    Modulate = new Color(1, 1, 1, 0);
 
+    Modulate = new Color(1, 1, 1, 0);
     Show();
     await UIFadeHelper.FadeInControl(this, 1.0f);
 
@@ -227,9 +227,6 @@ public partial class SaveGameScreen : MarginContainer {
     //!ESTABA PONIENDO ESTE TRIGGER THE DISPLAY_SAVE_SCREEN AQUI CUANDO TAMBIEN USAMOS ESTA FUNCION 
     //!PARA LOADSCREEN ME ESTABA VOLVIENDO LOCO! SEPARAR EN DOS METDOS!!
     // GameStateManager.Instance.Fire(Trigger.DISPLAY_SAVE_SCREEN);
-
-
-
   }
 
   public void EnableInputAfterSavingComplete() {

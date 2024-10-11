@@ -51,8 +51,8 @@ public partial class LoadSaveManager : Node {
     public DateTime SaveTime { get; set; }
     public TimeSpan TimePlayed { get; set; }
     public float DialoguesVisitedForAllGamesPercentage { get; set; }
-    public string VisualPath { get; set; }
     public bool IsAutosave { get; set; }
+    public string VisualPath { get; set; }
   }
 
   public class PersistentData {

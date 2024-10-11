@@ -46,6 +46,7 @@ public partial class SaveGameScreen : MarginContainer {
     goBackButton.AnchorBottom = 0;
     goBackButton.AnchorLeft = 1;
     goBackButton.SetAnchorsPreset(Control.LayoutPreset.TopRight);
+    goBackButton.SizeFlagsVertical = Control.SizeFlags.Expand | Control.SizeFlags.ShrinkCenter;
     //goBackButton.Position = new Vector2(-10, 10); 
 
     UIThemeHelper.ApplyCustomStyleToButtonPixelArtDark(goBackButton);
@@ -113,20 +114,20 @@ public partial class SaveGameScreen : MarginContainer {
     await Task.CompletedTask;
   }
 
-  private void SaveStatusLabelTheme() {
-    var normalStyle = new StyleBoxFlat {
-      BgColor = Colors.NavyBlue,
-      CornerRadiusTopLeft = 10,
-      CornerRadiusTopRight = 10,
-      CornerRadiusBottomLeft = 10,
-      CornerRadiusBottomRight = 10,
-      BorderColor = Colors.White,
-      BorderWidthBottom = 2,
-      BorderWidthTop = 2,
-      BorderWidthLeft = 2,
-      BorderWidthRight = 2
-    };
-  }
+  // private void SaveStatusLabelTheme() {
+  //   var normalStyle = new StyleBoxFlat {
+  //     BgColor = Colors.NavyBlue,
+  //     CornerRadiusTopLeft = 10,
+  //     CornerRadiusTopRight = 10,
+  //     CornerRadiusBottomLeft = 10,
+  //     CornerRadiusBottomRight = 10,
+  //     BorderColor = Colors.White,
+  //     BorderWidthBottom = 2,
+  //     BorderWidthTop = 2,
+  //     BorderWidthLeft = 2,
+  //     BorderWidthRight = 2
+  //   };
+  // }
 
   private void CreateNoSavesAvailableLabel() {
 

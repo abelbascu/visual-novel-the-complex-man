@@ -1,4 +1,5 @@
 using Godot;
+using Microsoft.VisualBasic;
 using System;
 using System.IO;
 
@@ -15,10 +16,13 @@ public partial class SaveGameSlot : HBoxContainer {
   private RichTextLabel dateLabel;
   private RichTextLabel timePlayedLabel;
   private RichTextLabel gameCompletedPercentageLabel;
+  private MarginContainer MarginContainerGameSave;
+
 
   public InteractableUIButton actionButton;
   private MarginContainer marginContainer;
   private MarginContainer buttonContainer;
+  private HBoxContainer hBoxContainer;
   private int slotNumber;
   private string saveFilePath;
   private bool isMouseOver = false;
@@ -89,18 +93,54 @@ public partial class SaveGameSlot : HBoxContainer {
     171f / 255f   // Blue component
 );
 
+
+  void SetupRichTextLabel(RichTextLabel label) {
+    label.BbcodeEnabled = true;
+    label.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+    label.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+    label.ScrollActive = false;
+    label.FitContent = true;  // This replaces FitContentHeight
+    label.CustomMinimumSize = new Vector2(0, 0);  // This can help with sizing
+  }
+
   public override void _Ready() {
 
+    var vboxContainer = GetNode<VBoxContainer>("MarginContainer/HBoxContainer/VBoxContainer");
+    vboxContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+    vboxContainer.Alignment = BoxContainer.AlignmentMode.Center;
+
     MouseFilter = MouseFilterEnum.Stop;
+    marginContainer = GetNode<MarginContainer>("MarginContainer");
+
+    hBoxContainer = GetNode<HBoxContainer>("MarginContainer/HBoxContainer");
+    hBoxContainer.Alignment = BoxContainer.AlignmentMode.Center;
+    hBoxContainer.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+    hBoxContainer.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
 
     titleLabel = GetNode<RichTextLabel>("MarginContainer/HBoxContainer/VBoxContainer/MarginContainer/GameSaveTitle");
+
     dateLabel = GetNode<RichTextLabel>("MarginContainer/HBoxContainer/VBoxContainer2/MarginContainer/GameSaveDate");
     timePlayedLabel = GetNode<RichTextLabel>("MarginContainer/HBoxContainer/VBoxContainer/MarginContainer2/TimePlayed");
     gameCompletedPercentageLabel = GetNode<RichTextLabel>("MarginContainer/HBoxContainer/VBoxContainer2/MarginContainer2/GameCompletedPercent");
     thumbnailTextureRect = GetNode<TextureRect>("MarginContainer2/HBoxContainer/TextureRect");
     buttonContainer = GetNode<MarginContainer>("MarginContainer2");
     actionButton = GetNode<InteractableUIButton>("MarginContainer2/HBoxContainer/Button");
-    marginContainer = GetNode<MarginContainer>("MarginContainer");
+
+
+    MarginContainerGameSave = GetNode<MarginContainer>("MarginContainer/HBoxContainer/VBoxContainer/MarginContainer");
+    MarginContainerGameSave.SizeFlagsVertical = Control.SizeFlags.Expand | Control.SizeFlags.ShrinkCenter;
+    MarginContainerGameSave.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+    //MarginContainerGameSave.Alignment = BoxContainer.AlignmentMode.Center;
+
+
+
+
+    // Apply this to all your labels
+    SetupRichTextLabel(titleLabel);
+    SetupRichTextLabel(dateLabel);
+    SetupRichTextLabel(timePlayedLabel);
+    SetupRichTextLabel(gameCompletedPercentageLabel);
+
 
     actionButton.Pressed += OnActionButtonPressed;
     actionButton.AddThemeStyleboxOverride("normal", normalStyle);
@@ -140,10 +180,11 @@ public partial class SaveGameSlot : HBoxContainer {
     saveFilePath = Path.GetFullPath(saveFilePath);
 
     string autosaveLabel = gameState.IsAutosave ? $"{Tr(autosavedPrefixLabelTRANSLATE)}" : "";
-    titleLabel.Text = $"Game Save {slotNumber}{autosaveLabel}";
-    dateLabel.Text = gameState.SaveTime.ToString("MMM d, yyyy - h:mm:ss tt");
-    timePlayedLabel.Text = $"{Tr(timePlayedLabelTRANSLATE)}: {FormatTimeSpan(gameState.TimePlayed)}";
-    gameCompletedPercentageLabel.Text = $"{Tr(dialoguesVisitedLabelTRANSLATE)}: {gameState.DialoguesVisitedForAllGamesPercentage:F1}%";
+    titleLabel.Text = $"[center]Game Save {slotNumber}{autosaveLabel}[/center]";
+    titleLabel.FitContent = true;
+    dateLabel.Text = $"[center]{gameState.SaveTime.ToString("MMM d, yyyy - h:mm:ss tt")}[/center]";
+    timePlayedLabel.Text = $"[center]{Tr(timePlayedLabelTRANSLATE)}: {FormatTimeSpan(gameState.TimePlayed)}[/center]";
+    gameCompletedPercentageLabel.Text = $"[center]{Tr(dialoguesVisitedLabelTRANSLATE)}: {gameState.DialoguesVisitedForAllGamesPercentage:F1}%[/center]";
 
     if (gameState.VisualPath != null) {
       Texture2D texture = GD.Load<Texture2D>(gameState.VisualPath);

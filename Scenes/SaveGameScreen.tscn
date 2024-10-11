@@ -57,6 +57,7 @@ theme_override_constants/margin_right = 150
 theme_override_constants/margin_bottom = 75
 
 [node name="GoBackButton" type="Button" parent="MarginContainer2"]
+custom_minimum_size = Vector2(200, 85)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 0

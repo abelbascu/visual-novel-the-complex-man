@@ -193,17 +193,18 @@ public partial class MainMenu : Control {
     container.AddThemeConstantOverride("separation", 20);
   }
 
-  private void ApplyCustomStyleToAllButtons() {
-    //apply a default blue style with white rounded edges for panels and buttons
-    ApplyCustomStyleToButtonBlueRoundedsInContainer(MainOptionsContainer);
-    ApplyCustomStyleToButtonBlueRoundedsInContainer(LanguageOptionsContainer);
-    ApplyCustomStyleToButtonBlueRoundedsInContainer(ExitToMainMenuPanel);
-    ApplyCustomStyleToButtonBlueRoundedsInContainer(ExitGameConfirmationPanel);
-  }
+  // private void ApplyCustomStyleToAllButtons() {
+  //   //apply a default blue style with white rounded edges for panels and buttons
+  //   ApplyCustomStyleToButtonBlueRoundedsInContainer(MainOptionsContainer);
+  //   ApplyCustomStyleToButtonBlueRoundedsInContainer(LanguageOptionsContainer);
+  //   ApplyCustomStyleToButtonBlueRoundedsInContainer(ExitToMainMenuPanel);
+  //   ApplyCustomStyleToButtonBlueRoundedsInContainer(ExitGameConfirmationPanel);
+  // }
 
   private void StylePanelsAndDialogs() {
-    UIThemeHelper.ApplyCustomStyleToPanelBlueRounded(ExitToMainMenuPanel);
-    UIThemeHelper.ApplyCustomStyleToPanelBlueRounded(ExitGameConfirmationPanel);
+    UIThemeHelper.ApplyCustomStyleToPanelPixelArtDark(ExitToMainMenuPanel);
+    UIThemeHelper.ApplyCustomStyleToPanelPixelArtDark(ExitGameConfirmationPanel);
+    //!change confirmation dialog to panel
     UIThemeHelper.ApplyCustomStyleToWindowDialog(creditsConfirmationDialog);
   }
 

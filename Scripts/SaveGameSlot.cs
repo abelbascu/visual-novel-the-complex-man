@@ -43,7 +43,7 @@ public partial class SaveGameSlot : HBoxContainer {
   };
 
   private StyleBoxFlat normalStyle = new StyleBoxFlat {
-    BgColor = Colors.NavyBlue,
+    BgColor = Colors.Black,
     CornerRadiusTopLeft = 10,
     CornerRadiusTopRight = 10,
     CornerRadiusBottomLeft = 10,
@@ -57,7 +57,7 @@ public partial class SaveGameSlot : HBoxContainer {
 
   // Hover state
   private StyleBoxFlat hoverStyle = new StyleBoxFlat {
-    BgColor = customBlue,
+    BgColor = Colors.DarkRed,
     CornerRadiusTopLeft = 10,
     CornerRadiusTopRight = 10,
     CornerRadiusBottomLeft = 10,
@@ -71,7 +71,7 @@ public partial class SaveGameSlot : HBoxContainer {
 
   // Pressed state
   private StyleBoxFlat pressedStyle = new StyleBoxFlat {
-    BgColor = Colors.DarkBlue,
+    BgColor = Colors.DarkRed,
     CornerRadiusTopLeft = 10,
     CornerRadiusTopRight = 10,
     CornerRadiusBottomLeft = 10,

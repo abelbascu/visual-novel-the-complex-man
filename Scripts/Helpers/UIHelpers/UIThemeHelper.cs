@@ -14,53 +14,53 @@ public static class UIThemeHelper {
 
 
 
-  public static void ApplyPixelArtStyleToButton(Button button) {
-    var normalStyle = new StyleBoxFlat {
-      BgColor = Colors.Black,
-      CornerRadiusTopLeft = 0,
-      CornerRadiusTopRight = 0,
-      CornerRadiusBottomLeft = 0,
-      CornerRadiusBottomRight = 0,
-      BorderColor = Colors.White,
-      BorderWidthBottom = 2,
-      BorderWidthTop = 2,
-      BorderWidthLeft = 2,
-      BorderWidthRight = 2
-    };
-    button.AddThemeStyleboxOverride("normal", normalStyle);
+  // public static void ApplyPixelArtStyleToButton(Button button) {
+  //   var normalStyle = new StyleBoxFlat {
+  //     BgColor = Colors.Black,
+  //     CornerRadiusTopLeft = 0,
+  //     CornerRadiusTopRight = 0,
+  //     CornerRadiusBottomLeft = 0,
+  //     CornerRadiusBottomRight = 0,
+  //     BorderColor = Colors.White,
+  //     BorderWidthBottom = 2,
+  //     BorderWidthTop = 2,
+  //     BorderWidthLeft = 2,
+  //     BorderWidthRight = 2
+  //   };
+  //   button.AddThemeStyleboxOverride("normal", normalStyle);
 
-    var hoverStyle = new StyleBoxFlat {
-      BgColor = Colors.DarkGray,
-      CornerRadiusTopLeft = 0,
-      CornerRadiusTopRight = 0,
-      CornerRadiusBottomLeft = 0,
-      CornerRadiusBottomRight = 0,
-      BorderColor = Colors.White,
-      BorderWidthBottom = 2,
-      BorderWidthTop = 2,
-      BorderWidthLeft = 2,
-      BorderWidthRight = 2
-    };
-    button.AddThemeStyleboxOverride("hover", hoverStyle);
+  //   var hoverStyle = new StyleBoxFlat {
+  //     BgColor = Colors.DarkGray,
+  //     CornerRadiusTopLeft = 0,
+  //     CornerRadiusTopRight = 0,
+  //     CornerRadiusBottomLeft = 0,
+  //     CornerRadiusBottomRight = 0,
+  //     BorderColor = Colors.White,
+  //     BorderWidthBottom = 2,
+  //     BorderWidthTop = 2,
+  //     BorderWidthLeft = 2,
+  //     BorderWidthRight = 2
+  //   };
+  //   button.AddThemeStyleboxOverride("hover", hoverStyle);
 
-    var pressedStyle = new StyleBoxFlat {
-      BgColor = Colors.Gray,
-      CornerRadiusTopLeft = 0,
-      CornerRadiusTopRight = 0,
-      CornerRadiusBottomLeft = 0,
-      CornerRadiusBottomRight = 0,
-      BorderColor = Colors.White,
-      BorderWidthBottom = 2,
-      BorderWidthTop = 2,
-      BorderWidthLeft = 2,
-      BorderWidthRight = 2
-    };
-    button.AddThemeStyleboxOverride("pressed", pressedStyle);
+  //   var pressedStyle = new StyleBoxFlat {
+  //     BgColor = Colors.Gray,
+  //     CornerRadiusTopLeft = 0,
+  //     CornerRadiusTopRight = 0,
+  //     CornerRadiusBottomLeft = 0,
+  //     CornerRadiusBottomRight = 0,
+  //     BorderColor = Colors.White,
+  //     BorderWidthBottom = 2,
+  //     BorderWidthTop = 2,
+  //     BorderWidthLeft = 2,
+  //     BorderWidthRight = 2
+  //   };
+  //   button.AddThemeStyleboxOverride("pressed", pressedStyle);
 
-    button.AddThemeFontSizeOverride("font_size", 40);
-    button.AddThemeColorOverride("font_color", Colors.White);
-    button.AddThemeColorOverride("font_hover_color", Colors.Yellow);
-  }
+  //   button.AddThemeFontSizeOverride("font_size", 40);
+  //   button.AddThemeColorOverride("font_color", Colors.White);
+  //   button.AddThemeColorOverride("font_hover_color", Colors.Yellow);
+  // }
 
   public static StyleBoxFlat GetPixelArtNormalStyleBox() {
     return new StyleBoxFlat {
@@ -84,12 +84,45 @@ public static class UIThemeHelper {
       CornerRadiusTopRight = 0,
       CornerRadiusBottomLeft = 0,
       CornerRadiusBottomRight = 0,
+      //BorderColor = Colors.White,
+      BorderWidthBottom = 2,
+      BorderWidthTop = 2,
+      BorderWidthLeft = 2,
+      BorderWidthRight = 2
+    };
+  }
+
+  public static void ApplyCustomStyleToButtonPixelArtDark(Button button) {
+    var normalStyle = new StyleBoxFlat {
+      BgColor = Colors.Black,
+      CornerRadiusTopLeft = 0,
+      CornerRadiusTopRight = 0,
+      CornerRadiusBottomLeft = 0,
+      CornerRadiusBottomRight = 0,
       BorderColor = Colors.White,
       BorderWidthBottom = 2,
       BorderWidthTop = 2,
       BorderWidthLeft = 2,
       BorderWidthRight = 2
     };
+    button.AddThemeStyleboxOverride("normal", normalStyle);
+  }
+
+
+  public static void ApplyCustomStyleToPanelPixelArtDark(Panel panel) {
+    var normalStyle = new StyleBoxFlat {
+      BgColor = Colors.Black,
+      CornerRadiusTopLeft = 0,
+      CornerRadiusTopRight = 0,
+      CornerRadiusBottomLeft = 0,
+      CornerRadiusBottomRight = 0,
+      //BorderColor = Colors.White,
+      BorderWidthBottom = 2,
+      BorderWidthTop = 2,
+      BorderWidthLeft = 2,
+      BorderWidthRight = 2
+    };
+    panel.AddThemeStyleboxOverride("panel", normalStyle);
   }
 
 
@@ -232,46 +265,6 @@ public static class UIThemeHelper {
 
     // Set font size
     button.AddThemeFontSizeOverride("font_size", 40);
-
-    // // // // Button States:
-    // // // // "normal"
-    // // // // "hover"
-    // // // // "pressed"
-    // // // // "focus"
-    // // // // "disabled"
-    // // // // "hover_pressed"
-    // // // // "disabled_pressed"
-    // // // // "disabled_hover"
-
-    // // // // Color Properties:
-    // // // // "font_color"
-    // // // // "font_pressed_color"
-    // // // // "font_hover_color"
-    // // // // "font_focus_color"
-    // // // // "font_disabled_color"
-    // // // // "icon_color_normal"
-    // // // // "icon_color_pressed"
-    // // // // "icon_color_hover"
-    // // // // "icon_color_disabled"
-
-    // // // // Font Size Properties:
-    // // // // "font_size"
-    // // // // "outline_size"
-
-    // // // // Stylebox Properties (for use with AddThemeStyleboxOverride):
-    // // // // "normal"
-    // // // // "hover"
-    // // // // "pressed"
-    // // // // "disabled"
-    // // // // "focus"
-
-    // // // // Constant Properties:
-    // // // // "h_separation"
-    // // // // "outline_size"
-    // // // // "icon_max_width"
-
-    // // // // Icon Properties:
-    // // // // "icon"
   }
 
   public static void PrintThemeProperties() {

@@ -15,7 +15,7 @@ script = ExtResource("1_vav5h")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 layout_mode = 2
-color = Color(0.128923, 0.202889, 0.23781, 0.854902)
+color = Color(0, 0, 0, 0.854902)
 
 [node name="MarginContainer3" type="MarginContainer" parent="."]
 custom_minimum_size = Vector2(1000, 175)

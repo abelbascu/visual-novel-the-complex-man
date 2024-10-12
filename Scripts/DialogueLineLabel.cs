@@ -27,6 +27,9 @@ public partial class DialogueLineLabel : RichTextLabel, IInteractableUI {
 
     AddThemeConstantOverride("line_separation", LINE_SEPARATION);
     AddThemeFontSizeOverride("normal_font_size", 55);
+
+    var emptyStyleBox = new StyleBoxEmpty();
+    AddThemeStyleboxOverride("focus", emptyStyleBox);
   }
 
   public Task Interact() {

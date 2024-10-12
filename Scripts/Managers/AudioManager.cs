@@ -40,14 +40,75 @@ public partial class AudioManager : Control {
     AudioServer.AddBusEffect(0, limiter);
   }
 
-  public async Task PlayMusic(string path, float preDelay = 0, float postDelay = 0) {
-    var stream = ResourceLoader.Load<AudioStream>(path);
-    musicPlayer.Stream = stream;
+  private async Task FadeAudio(AudioStreamPlayer2D player, float startVolume, float endVolume, float duration) {
+
+
+    var timer = new System.Diagnostics.Stopwatch();
+    timer.Start();
+
+    while (timer.Elapsed.TotalSeconds < duration) {
+      float t = (float)(timer.Elapsed.TotalSeconds / duration);
+      float easedT = EaseInOutQuad(t);
+      float currentVolume = Mathf.Lerp(startVolume, endVolume, easedT);
+      float volumeDb = Mathf.LinearToDb(Mathf.Clamp(currentVolume, 0.0001f, 1));
+      player.VolumeDb = volumeDb;
+
+      GD.Print($"Time: {timer.Elapsed.TotalSeconds:F2}s, Volume = {currentVolume}, VolumeDb = {volumeDb}, Playing: {player.Playing}");
+      await ToSignal(GetTree(), "process_frame");
+    }
+
+    player.VolumeDb = Mathf.LinearToDb(endVolume);
+    GD.Print($"Fade completed. Duration: {timer.Elapsed.TotalSeconds:F2}s, Final VolumeDb: {player.VolumeDb}, Playing: {player.Playing}");
+  }
+
+  private float EaseInOutQuad(float t) {
+    return t < 0.5f ? 2f * t * t : 1f - (float)Math.Pow(-2f * t + 2f, 2) / 2f;
+  }
+
+  public async Task PlayMusic(string path, float preDelay = 0, float postDelay = 0, float fadeDuration = 1.5f, bool loop = true) {
+    var newStream = ResourceLoader.Load<AudioStream>(path);
+
+    // Fade out current music if playing
+    if (musicPlayer.Playing) {
+      await FadeAudio(musicPlayer, Mathf.DbToLinear(musicPlayer.VolumeDb), 0, fadeDuration);
+      musicPlayer.Stop();
+    }
+
+    musicPlayer.Stream = newStream;
     musicPlayer.Bus = "Music";
-    ApplyCompressorIfNeeded(musicPlayer);
+
+    // Remove any existing finished signal connections
+    musicPlayer.Finished -= OnMusicFinished;
+
+    if (loop) {
+      // Connect the finished signal to restart playback
+      musicPlayer.Finished += OnMusicFinished;
+    }
+
     await Task.Delay((int)(preDelay * 1000));
+
+    // Set initial volume to 0 and start playing
+    musicPlayer.VolumeDb = Mathf.LinearToDb(0);
     musicPlayer.Play();
+
+    // if (newStream is AudioStreamWav wavStream) {
+    //   wavStream.LoopMode = loop ? AudioStreamWav.LoopModeEnum.Forward : AudioStreamWav.LoopModeEnum.Disabled;
+    // } else if (newStream is AudioStreamOggVorbis oggStream) {
+    //   oggStream.Loop = loop;
+    // }
+    // ApplyCompressorIfNeeded(musicPlayer);
+
+    GD.Print($"musicPlayer.Playing: {musicPlayer.Playing}");
+    // Fade in new music
+    await FadeAudio(musicPlayer, 0, 1, fadeDuration);
+    GD.Print($"musicPlayer.Playing: {musicPlayer.Playing}");
+
     await Task.Delay((int)(postDelay * 1000));
+  }
+
+
+  private void OnMusicFinished() {
+    musicPlayer.Play();
   }
 
   public async Task PlaySound(string path, float preDelay = 0, float postDelay = 0, bool applyReverb = false, Vector2 position = default) {

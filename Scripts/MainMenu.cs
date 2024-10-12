@@ -355,6 +355,7 @@ public partial class MainMenu : Control {
     DisableAllButtons();
     SetupMainMenuBackground();
     SetupForMainMenu();
+    _ = AudioManager.Instance.PlayMusic("res://Audio/Music/splash screen.wav", 0, 0, 1.5f, true);
     await FadeInMainMenu();
     //EnableAllButtons(); WE WERE ENABLING SOME HIDDEN BUTTONS AND THIS AFFECTED THE INPUT MANAGER READING HOW MANY BUTTONS WERE AVAILABLE!
     //this calls to pause the game timer, more sense on ingame menu

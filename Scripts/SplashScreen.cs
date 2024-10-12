@@ -19,7 +19,7 @@ public partial class SplashScreen : Control {
     GetViewport().SetInputAsHandled();
   }
 
-  public override void _Ready() {
+  public override async void _Ready() {
 
     GetTree().Root.SetContentScaleSize(new Vector2I(1920, 1080));
     GetTree().Root.SetContentScaleFactor(1.0f);
@@ -38,7 +38,7 @@ public partial class SplashScreen : Control {
     CallDeferred("SetupShader");
     //CallDeferred with a lambda to call the async method
     _ = FadeInScreen();
-    AudioManager.Instance.PlayMusic("res://Audio/Music/splash screen.wav");
+    _ = AudioManager.Instance.PlayMusic("res://Audio/Music/splash screen.wav", 0, 0, 5f, true);
   }
 
   public async Task FadeInScreen() {

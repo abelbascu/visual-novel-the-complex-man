@@ -1,0 +1,29 @@
+[gd_scene load_steps=3 format=3 uid="uid://cd4uykx4lx2mk"]
+
+[ext_resource type="Script" path="res://Scripts/PlayerChoicesBoxUI.cs" id="1_07t7d"]
+[ext_resource type="Texture2D" uid="uid://yhr1vbvx7saj" path="res://Visuals/UI/dialgoueboxpixel.png" id="2_fbdhc"]
+
+[node name="PlayerChoicesBoxU_YD_BottomHorizontal" type="MarginContainer"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -856.0
+offset_top = -220.0
+offset_right = 856.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_07t7d")
+
+[node name="NinePatchRect" type="NinePatchRect" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("2_fbdhc")
+region_rect = Rect2(0.00372052, -0.00479817, 119.999, 89.9936)
+patch_margin_left = 83
+patch_margin_top = 63
+patch_margin_right = 84
+patch_margin_bottom = 67

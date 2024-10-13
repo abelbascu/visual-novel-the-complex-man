@@ -80,7 +80,7 @@ public partial class InputManager : Control {
       GD.Print($"currentFocusIndex: {currentFocusedIndex}");
       return;
     }
-    if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left && !InputBlocker.IsInputBlocked && !isProcessingInput) {
+    if (@event is InputEventMouseButton mouseEvent && !mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left && !InputBlocker.IsInputBlocked && !isProcessingInput) {
       lastInputWasKeyboardOrGamepad = false;
       isProcessingInput = true;
       await ProcessInputAsync(@event);

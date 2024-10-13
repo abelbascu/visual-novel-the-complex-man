@@ -30,14 +30,14 @@
               "Video File": "",
               "Animation Files": "[]",
               "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
               "MusicPath": "",
               "MusicPreDelay": 0,
               "MusicPostDelay": 0,
               "SoundPath": "",
               "SoundPreDelay": 0,
-              "SoundPostDelay": 0,
-              "VisualPreDelay": 0,
-              "VisualPostDelay": 0
+              "SoundPostDelay": 0
             },
             "ID": 0
           },
@@ -87,7 +87,7 @@
                 "OriginConvoID": 1,
                 "DestinationConvoID": 1,
                 "OriginDialogID": 2,
-                "DestinationDialogID": 3
+                "DestinationDialogID": 7
               }
             ],
             "ConversationID": 1,
@@ -126,7 +126,7 @@
                 "OriginConvoID": 1,
                 "DestinationConvoID": 1,
                 "OriginDialogID": 3,
-                "DestinationDialogID": 4
+                "DestinationDialogID": 11
               }
             ],
             "ConversationID": 1,
@@ -164,6 +164,761 @@
                 "Filename": null,
                 "OriginConvoID": 1,
                 "DestinationConvoID": 1,
+                "OriginDialogID": 7,
+                "DestinationDialogID": 8
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "We went on a trip by car to the mountains with my family, dad, mum and my two sisters.",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 7
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 8,
+                "DestinationDialogID": 9
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "1",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "Who drove the car?",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 8
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 9,
+                "DestinationDialogID": 10
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "1",
+              "Menu Text": "",
+              "Dialogue Text": "My father did",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 9
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 10,
+                "DestinationDialogID": 3
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "We arrived and set up the tents, then my father took me on a walk while my mum and sisters stayed at the tent...",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 10
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 11,
+                "DestinationDialogID": 22
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "I had such a strong feeling that everything around was pulsing and alive...",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 11
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 22,
+                "DestinationDialogID": 24
+              },
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 22,
+                "DestinationDialogID": 25
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "There was a beautiful array of flowers of many different colors around...",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 22
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 24,
+                "DestinationDialogID": 26
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "1",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "Did there were roses?",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 24
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 25,
+                "DestinationDialogID": 34
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "1",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "Did there were tulips?",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 25
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 26,
+                "DestinationDialogID": 27
+              },
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 26,
+                "DestinationDialogID": 28
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "There were three roses, but they stayed at the tent...",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 26
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 27,
+                "DestinationDialogID": 29
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "1",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "That's so nice of you.",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 27
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 28,
+                "DestinationDialogID": 30
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "1",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "This is a fluffy answer...",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 28
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 29,
+                "DestinationDialogID": 4
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "My mum and my two sisters. The most radiant flowers in my life. Let's continue with the story...",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 29
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 30,
+                "DestinationDialogID": 31
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "That's your appreciation. I'm wondering what you consider your mother to be. A stone maybe?",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 30
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 31,
+                "DestinationDialogID": 32
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "1",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "You are starting an argument here.",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 31
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 32,
+                "DestinationDialogID": 33
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "1",
+              "Menu Text": "",
+              "Dialogue Text": "I don't want to discuss. Now let me continue with the story... why I'm here otherwise?",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 32
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 33,
+                "DestinationDialogID": 4
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "1",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "Please go ahead.",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 33
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 34,
+                "DestinationDialogID": 35
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "Yes, it was full of tulips!",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 34
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 35,
+                "DestinationDialogID": 36
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "1",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "It surely was worthy of taking a picture.",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 35
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 36,
+                "DestinationDialogID": 4
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "1",
+              "Menu Text": "",
+              "Dialogue Text": "We did, but at that time we only had a Polaroid. Let's continue with the story...",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 36
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
                 "OriginDialogID": 4,
                 "DestinationDialogID": 5
               }
@@ -178,7 +933,7 @@
               "Actor": "3",
               "Conversant": "3",
               "Menu Text": "",
-              "Dialogue Text": "I ask my father...",
+              "Dialogue Text": "I asked my father...",
               "Parenthetical": "",
               "Audio Files": "[]",
               "Video File": "",
@@ -204,7 +959,7 @@
                 "OriginConvoID": 1,
                 "DestinationConvoID": 1,
                 "OriginDialogID": 5,
-                "DestinationDialogID": 13
+                "DestinationDialogID": 6
               }
             ],
             "ConversationID": 1,
@@ -242,8 +997,8 @@
                 "Filename": null,
                 "OriginConvoID": 1,
                 "DestinationConvoID": 1,
-                "OriginDialogID": 13,
-                "DestinationDialogID": 17
+                "OriginDialogID": 6,
+                "DestinationDialogID": 12
               }
             ],
             "ConversationID": 1,
@@ -269,11 +1024,206 @@
               "MusicPath": "",
               "MusicPreDelay": 0,
               "MusicPostDelay": 0,
+              "SoundPath": "res://Audio/FX/digital watch alarm.mp3",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 2
+            },
+            "ID": 6
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 12,
+                "DestinationDialogID": 13
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "... and kill them.",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 12
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 13,
+                "DestinationDialogID": 14
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "My father looked at me...",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
               "SoundPath": "",
               "SoundPreDelay": 0,
               "SoundPostDelay": 0
             },
             "ID": 13
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 14,
+                "DestinationDialogID": 15
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "and told me...",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 14
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 15,
+                "DestinationDialogID": 16
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "Jump.",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 15
+          },
+          {
+            "OutgoingLinks": [
+              {
+                "Filename": null,
+                "OriginConvoID": 1,
+                "DestinationConvoID": 1,
+                "OriginDialogID": 16,
+                "DestinationDialogID": 17
+              }
+            ],
+            "ConversationID": 1,
+            "IsRoot": false,
+            "IsGroup": false,
+            "Fields": {
+              "Title": "New Dialogue",
+              "Pictures": "[]",
+              "Description": "",
+              "Actor": "3",
+              "Conversant": "3",
+              "Menu Text": "",
+              "Dialogue Text": "You just need to jump over them.",
+              "Parenthetical": "",
+              "Audio Files": "[]",
+              "Video File": "",
+              "fr-FR": "",
+              "cat-CAT": "",
+              "IsNoTurningBackPath": "False",
+              "VisualPath": "",
+              "VisualPreDelay": 0,
+              "VisualPostDelay": 0,
+              "MusicPath": "",
+              "MusicPreDelay": 0,
+              "MusicPostDelay": 0,
+              "SoundPath": "",
+              "SoundPreDelay": 0,
+              "SoundPostDelay": 0
+            },
+            "ID": 16
           },
           {
             "OutgoingLinks": [
@@ -295,7 +1245,7 @@
               "Actor": "3",
               "Conversant": "3",
               "Menu Text": "",
-              "Dialogue Text": "... and kill them.",
+              "Dialogue Text": "This way, you won't kill the flowers...",
               "Parenthetical": "",
               "Audio Files": "[]",
               "Video File": "",
@@ -334,7 +1284,7 @@
               "Actor": "3",
               "Conversant": "3",
               "Menu Text": "",
-              "Dialogue Text": "I had such a strong feeling that everything around was pulsing and alive...",
+              "Dialogue Text": "A feeling of happiness and relief overcame me...",
               "Parenthetical": "",
               "Audio Files": "[]",
               "Video File": "",
@@ -373,7 +1323,7 @@
               "Actor": "3",
               "Conversant": "3",
               "Menu Text": "",
-              "Dialogue Text": "My father looked at me...",
+              "Dialogue Text": "So as we moved down the valley...",
               "Parenthetical": "",
               "Audio Files": "[]",
               "Video File": "",
@@ -412,240 +1362,6 @@
               "Actor": "3",
               "Conversant": "3",
               "Menu Text": "",
-              "Dialogue Text": "and told me...",
-              "Parenthetical": "",
-              "Audio Files": "[]",
-              "Video File": "",
-              "fr-FR": "",
-              "cat-CAT": "",
-              "IsNoTurningBackPath": "False",
-              "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
-              "VisualPreDelay": 0,
-              "VisualPostDelay": 0,
-              "MusicPath": "",
-              "MusicPreDelay": 0,
-              "MusicPostDelay": 0,
-              "SoundPath": "",
-              "SoundPreDelay": 0,
-              "SoundPostDelay": 0
-            },
-            "ID": 20
-          },
-          {
-            "OutgoingLinks": [
-              {
-                "Filename": null,
-                "OriginConvoID": 1,
-                "DestinationConvoID": 1,
-                "OriginDialogID": 21,
-                "DestinationDialogID": 22
-              }
-            ],
-            "ConversationID": 1,
-            "IsRoot": false,
-            "IsGroup": false,
-            "Fields": {
-              "Title": "New Dialogue",
-              "Pictures": "[]",
-              "Description": "",
-              "Actor": "3",
-              "Conversant": "3",
-              "Menu Text": "",
-              "Dialogue Text": "Jump.",
-              "Parenthetical": "",
-              "Audio Files": "[]",
-              "Video File": "",
-              "fr-FR": "",
-              "cat-CAT": "",
-              "IsNoTurningBackPath": "False",
-              "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
-              "VisualPreDelay": 0,
-              "VisualPostDelay": 0,
-              "MusicPath": "",
-              "MusicPreDelay": 0,
-              "MusicPostDelay": 0,
-              "SoundPath": "",
-              "SoundPreDelay": 0,
-              "SoundPostDelay": 0
-            },
-            "ID": 21
-          },
-          {
-            "OutgoingLinks": [
-              {
-                "Filename": null,
-                "OriginConvoID": 1,
-                "DestinationConvoID": 1,
-                "OriginDialogID": 22,
-                "DestinationDialogID": 23
-              }
-            ],
-            "ConversationID": 1,
-            "IsRoot": false,
-            "IsGroup": false,
-            "Fields": {
-              "Title": "New Dialogue",
-              "Pictures": "[]",
-              "Description": "",
-              "Actor": "3",
-              "Conversant": "3",
-              "Menu Text": "",
-              "Dialogue Text": "You just need to jump over them.",
-              "Parenthetical": "",
-              "Audio Files": "[]",
-              "Video File": "",
-              "fr-FR": "",
-              "cat-CAT": "",
-              "IsNoTurningBackPath": "False",
-              "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
-              "VisualPreDelay": 0,
-              "VisualPostDelay": 0,
-              "MusicPath": "",
-              "MusicPreDelay": 0,
-              "MusicPostDelay": 0,
-              "SoundPath": "",
-              "SoundPreDelay": 0,
-              "SoundPostDelay": 0
-            },
-            "ID": 22
-          },
-          {
-            "OutgoingLinks": [
-              {
-                "Filename": null,
-                "OriginConvoID": 1,
-                "DestinationConvoID": 1,
-                "OriginDialogID": 23,
-                "DestinationDialogID": 24
-              }
-            ],
-            "ConversationID": 1,
-            "IsRoot": false,
-            "IsGroup": false,
-            "Fields": {
-              "Title": "New Dialogue",
-              "Pictures": "[]",
-              "Description": "",
-              "Actor": "3",
-              "Conversant": "3",
-              "Menu Text": "",
-              "Dialogue Text": "This way, you won't kill the flowers...",
-              "Parenthetical": "",
-              "Audio Files": "[]",
-              "Video File": "",
-              "fr-FR": "",
-              "cat-CAT": "",
-              "IsNoTurningBackPath": "False",
-              "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
-              "VisualPreDelay": 0,
-              "VisualPostDelay": 0,
-              "MusicPath": "",
-              "MusicPreDelay": 0,
-              "MusicPostDelay": 0,
-              "SoundPath": "",
-              "SoundPreDelay": 0,
-              "SoundPostDelay": 0
-            },
-            "ID": 23
-          },
-          {
-            "OutgoingLinks": [
-              {
-                "Filename": null,
-                "OriginConvoID": 1,
-                "DestinationConvoID": 1,
-                "OriginDialogID": 24,
-                "DestinationDialogID": 25
-              }
-            ],
-            "ConversationID": 1,
-            "IsRoot": false,
-            "IsGroup": false,
-            "Fields": {
-              "Title": "New Dialogue",
-              "Pictures": "[]",
-              "Description": "",
-              "Actor": "3",
-              "Conversant": "3",
-              "Menu Text": "",
-              "Dialogue Text": "A feeling of happiness and relief overcame me...",
-              "Parenthetical": "",
-              "Audio Files": "[]",
-              "Video File": "",
-              "fr-FR": "",
-              "cat-CAT": "",
-              "IsNoTurningBackPath": "False",
-              "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
-              "VisualPreDelay": 0,
-              "VisualPostDelay": 0,
-              "MusicPath": "",
-              "MusicPreDelay": 0,
-              "MusicPostDelay": 0,
-              "SoundPath": "",
-              "SoundPreDelay": 0,
-              "SoundPostDelay": 0
-            },
-            "ID": 24
-          },
-          {
-            "OutgoingLinks": [
-              {
-                "Filename": null,
-                "OriginConvoID": 1,
-                "DestinationConvoID": 1,
-                "OriginDialogID": 25,
-                "DestinationDialogID": 26
-              }
-            ],
-            "ConversationID": 1,
-            "IsRoot": false,
-            "IsGroup": false,
-            "Fields": {
-              "Title": "New Dialogue",
-              "Pictures": "[]",
-              "Description": "",
-              "Actor": "3",
-              "Conversant": "3",
-              "Menu Text": "",
-              "Dialogue Text": "So as we moved down the valley...",
-              "Parenthetical": "",
-              "Audio Files": "[]",
-              "Video File": "",
-              "fr-FR": "",
-              "cat-CAT": "",
-              "IsNoTurningBackPath": "False",
-              "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
-              "VisualPreDelay": 0,
-              "VisualPostDelay": 0,
-              "MusicPath": "",
-              "MusicPreDelay": 0,
-              "MusicPostDelay": 0,
-              "SoundPath": "",
-              "SoundPreDelay": 0,
-              "SoundPostDelay": 0
-            },
-            "ID": 25
-          },
-          {
-            "OutgoingLinks": [
-              {
-                "Filename": null,
-                "OriginConvoID": 1,
-                "DestinationConvoID": 1,
-                "OriginDialogID": 26,
-                "DestinationDialogID": 6
-              }
-            ],
-            "ConversationID": 1,
-            "IsRoot": false,
-            "IsGroup": false,
-            "Fields": {
-              "Title": "New Dialogue",
-              "Pictures": "[]",
-              "Description": "",
-              "Actor": "3",
-              "Conversant": "3",
-              "Menu Text": "",
               "Dialogue Text": "I run like crazy, smiling and jumping over as many flowers as I could...",
               "Parenthetical": "",
               "Audio Files": "[]",
@@ -663,7 +1379,7 @@
               "SoundPreDelay": 0,
               "SoundPostDelay": 0
             },
-            "ID": 26
+            "ID": 20
           },
           {
             "OutgoingLinks": [],
@@ -690,11 +1406,11 @@
               "MusicPath": "",
               "MusicPreDelay": 0,
               "MusicPostDelay": 0,
-              "SoundPath": "res://Audio/FX/digital watch alarm.mp3",
+              "SoundPath": "",
               "SoundPreDelay": 0,
-              "SoundPostDelay": 2
+              "SoundPostDelay": 0
             },
-            "ID": 6
+            "ID": 21
           }
         ]
       }

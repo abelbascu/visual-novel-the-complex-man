@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cd4uykx4lx2mk"]
 
-[ext_resource type="Script" path="res://Scripts/PlayerChoicesBoxUI.cs" id="1_07t7d"]
+[ext_resource type="Script" path="res://Scripts/PlayerChoicesBoxU_YD_BottomHorizontal.cs" id="1_vehx7"]
 [ext_resource type="Texture2D" uid="uid://yhr1vbvx7saj" path="res://Visuals/UI/dialgoueboxpixel.png" id="2_fbdhc"]
 
 [node name="PlayerChoicesBoxU_YD_BottomHorizontal" type="MarginContainer"]
@@ -16,7 +16,7 @@ grow_horizontal = 2
 grow_vertical = 0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = ExtResource("1_07t7d")
+script = ExtResource("1_vehx7")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="."]
 layout_mode = 2

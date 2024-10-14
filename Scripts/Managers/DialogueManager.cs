@@ -26,7 +26,7 @@ public partial class DialogueManager : Control {
   //---------------------------------------------------------------------singleton--------------------------------------------------------------------------------------
   public static DialogueManager Instance { get; private set; }
   public DialogueBoxWithTag_YD_BH dialogueBoxUI;
-  public PlayerChoicesBoxUI playerChoicesBoxUI;
+  public PlayerChoicesBoxU_YD_BottomHorizontal playerChoicesBoxUI;
 
   //public const string NARRATOR = "3";
 
@@ -179,11 +179,11 @@ public partial class DialogueManager : Control {
 
   //!why should we need to create the playerChoicesBoxUI here when we do it in the UIManager?
   public void DisplayPlayerChoicesBoxUI() {
-    PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
+    PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxU_YD_BottomHorizontal.tscn");
     Node instance = scene.Instantiate();
     AddChild(instance);
     //VBoxContainer playerChoìces = instance as VBoxContainer;
-    playerChoicesBoxUI = instance as PlayerChoicesBoxUI;
+    playerChoicesBoxUI = instance as PlayerChoicesBoxU_YD_BottomHorizontal;
     playerChoicesBoxUI.Show();
     playerChoicesBoxUI.TopLevel = true;
     //once all chars of the dialogue text are displayed in the container, we can show the next line.

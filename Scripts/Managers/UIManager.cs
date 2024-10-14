@@ -11,7 +11,7 @@ public partial class UIManager : Control {
   private VBoxContainer dialogueChoicesMarginContainer;
   private const int UI_BOTTOM_POSITION = 200; //starting at the bottom of the screen, we subtract this value to position the Y screen position of the dilaogue box  
   public PackedScene playerChoicesBoxUIScene;
-  public PlayerChoicesBoxUI playerChoicesBoxUI;
+  public PlayerChoicesBoxU_YD_BottomHorizontal playerChoicesBoxUI;
   private const float ANCHOR_LEFT_PERCENTAGE = 0.08f;
   private const float ANCHOR_RIGHT_PERCENTAGE = 0.925f;
   private const float ANCHOR_TOP_PERCENTAGE = 1f;
@@ -98,8 +98,8 @@ public partial class UIManager : Control {
     // inputNameScreen.Hide();
 
     //Set up PlayerChoicesBoxUI
-    playerChoicesBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
-    playerChoicesBoxUI = playerChoicesBoxUIScene.Instantiate<PlayerChoicesBoxUI>();
+    playerChoicesBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxU_YD_BottomHorizontal.tscn");
+    playerChoicesBoxUI = playerChoicesBoxUIScene.Instantiate<PlayerChoicesBoxU_YD_BottomHorizontal>();
     AddChild(playerChoicesBoxUI);
     playerChoicesBoxUI.Hide();
     // Set anchors to stretch horizontally
@@ -234,7 +234,7 @@ public partial class UIManager : Control {
     return dialogueBoxUI;
   }
 
-  public PlayerChoicesBoxUI GetPlayerChoicesBoxUI() {
+  public PlayerChoicesBoxU_YD_BottomHorizontal GetPlayerChoicesBoxUI() {
     return playerChoicesBoxUI;
   }
 }

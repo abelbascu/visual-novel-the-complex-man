@@ -17,9 +17,9 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
   public InteractableUIButton Button => button;
 
 
-// i think that if we select a player choices and hit ui_accept on keyboard or gamepad
-//Interact() is triggered, BUT if it's clicked with the mouse, it directly calls the
-//todo "pressed" signal, i need to do a test
+  // i think that if we select a player choices and hit ui_accept on keyboard or gamepad
+  //Interact() is triggered, BUT if it's clicked with the mouse, it directly calls the
+  //todo "pressed" signal, i need to do a test
 
   public async Task Interact() {
     OnButtonPressed();
@@ -84,7 +84,8 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
     font.FontNames = new string[] { fontName };
     font.Oversampling = 1.0f;
     textLabel.AddThemeFontOverride("normal_font", font);
-    textLabel.AddThemeFontSizeOverride("normal_font_size", fontSize);
+    // textLabel.AddThemeFontSizeOverride("normal_font_size", fontSize);
+    textLabel.AddThemeFontSizeOverride("normal_font_size", 55);
     // Set initial text color
     textLabel.AddThemeColorOverride("default_color", normalColor);
     textLabel.AddThemeConstantOverride("line_separation", LINE_SEPARATION);

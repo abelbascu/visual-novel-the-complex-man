@@ -3,13 +3,8 @@
 [ext_resource type="Script" path="res://Scripts/PlayerChoiceButton.cs" id="1_6pmkl"]
 
 [node name="PlayerChoiceButton" type="MarginContainer"]
-custom_minimum_size = Vector2(200, 10)
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 5.0
-offset_top = 11.0
-offset_right = 5.0
-offset_bottom = 46.0
-grow_horizontal = 2
+custom_minimum_size = Vector2(1200, 10)
+offset_right = 1200.0
+offset_bottom = 40.0
 size_flags_vertical = 4
 script = ExtResource("1_6pmkl")

@@ -70,7 +70,7 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
     textLabel = new RichTextLabel {
       FitContent = true,
       AutowrapMode = TextServer.AutowrapMode.WordSmart,
-      SizeFlagsHorizontal = SizeFlags.Fill,
+      SizeFlagsHorizontal = SizeFlags.ShrinkBegin,
       SizeFlagsVertical = SizeFlags.ShrinkCenter,
       MouseFilter = MouseFilterEnum.Ignore, // Allow events to pass through
       CustomMinimumSize = new Vector2(BUTTON_WIDTH, 0)

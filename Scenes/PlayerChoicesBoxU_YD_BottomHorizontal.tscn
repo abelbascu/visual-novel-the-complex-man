@@ -4,17 +4,18 @@
 [ext_resource type="Texture2D" uid="uid://yhr1vbvx7saj" path="res://Visuals/UI/dialgoueboxpixel.png" id="2_fbdhc"]
 
 [node name="PlayerChoicesBoxU_YD_BottomHorizontal" type="MarginContainer"]
+custom_minimum_size = Vector2(1200, 40)
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -856.0
-offset_top = -220.0
-offset_right = 856.0
+offset_left = -600.0
+offset_top = -130.0
+offset_right = 600.0
 grow_horizontal = 2
 grow_vertical = 0
-size_flags_horizontal = 3
+size_flags_horizontal = 0
 size_flags_vertical = 3
 script = ExtResource("1_vehx7")
 

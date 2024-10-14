@@ -39,9 +39,16 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
     // OffsetTop = -200;  // Adjust this value to set the initial height
     // OffsetBottom = 0;
 
+    CustomMinimumSize = new Vector2(1200, 40);
+
     SetAnchorsAndOffsetsPreset(LayoutPreset.CenterBottom);
     SizeFlagsVertical = SizeFlags.ShrinkEnd;
     GrowVertical = GrowDirection.Begin;
+    AnchorLeft = 0.5f;
+    AnchorRight = 0.5f;
+    // Prevent horizontal growth
+    // SizeFlagsHorizontal = SizeFlags.Fill;
+
 
     // Add margins to the PlayerChoicesBoxUI
     AddThemeConstantOverride("margin_left", 40);
@@ -64,7 +71,7 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
     // Set GlobalMarginContainer to fill the entire PlayerChoicesBoxUI
     globalMarginContainer.AnchorRight = 1;
     globalMarginContainer.AnchorBottom = 1;
-    globalMarginContainer.SizeFlagsHorizontal = SizeFlags.Fill;
+    // globalMarginContainer.SizeFlagsHorizontal = SizeFlags.Fill;
     globalMarginContainer.SizeFlagsVertical = SizeFlags.Fill;
     globalMarginContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
 
@@ -77,7 +84,7 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
 
     // Ensure buttons are aligned to the top
     playerChoicesContainer.Alignment = BoxContainer.AlignmentMode.Begin;
-    playerChoicesContainer.SizeFlagsHorizontal = SizeFlags.Fill;
+    // playerChoicesContainer.SizeFlagsHorizontal = SizeFlags.Fill;
     playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkEnd;
 
     //The space between the BoxContainer's elements, in pixels.

@@ -102,16 +102,6 @@ public partial class UIManager : Control {
     playerChoicesBoxUI = playerChoicesBoxUIScene.Instantiate<PlayerChoicesBoxU_YD_BottomHorizontal>();
     AddChild(playerChoicesBoxUI);
     playerChoicesBoxUI.Hide();
-    // Set anchors to stretch horizontally
-    playerChoicesBoxUI.AnchorLeft = ANCHOR_LEFT_PERCENTAGE;
-    playerChoicesBoxUI.AnchorRight = ANCHOR_RIGHT_PERCENTAGE;
-    playerChoicesBoxUI.AnchorTop = ANCHOR_TOP_PERCENTAGE;
-    playerChoicesBoxUI.AnchorBottom = ANCHOR_BOTTOM_PERCENTAGE;
-    // Reset offsets
-    playerChoicesBoxUI.OffsetLeft = OFFSET_LEFT;
-    playerChoicesBoxUI.OffsetRight = OFFSET_RIGHT;
-    playerChoicesBoxUI.OffsetTop = OFFSET_TOP;  // Adjust this value to set the initial height
-    playerChoicesBoxUI.OffsetBottom = OFFSET_BOTTOM;
 
     //Set up DialogueBoxUI
     dialogueBoxUIScene = ResourceLoader.Load<PackedScene>("res://Scenes/DialogueBoxWithTag_YD_BH.tscn");

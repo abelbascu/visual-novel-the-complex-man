@@ -12,6 +12,11 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
   private PackedScene playerChoiceButtonScene;
   private NinePatchRect backgroundRect;
 
+  private Dictionary<ulong, TaskCompletionSource<bool>> buttonReadyTasks = new Dictionary<ulong, TaskCompletionSource<bool>>();
+  private Dictionary<ulong, Action> buttonReadyActions = new Dictionary<ulong, Action>();
+
+
+
 
 
   public override void _Ready() {
@@ -38,6 +43,7 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
     // OffsetRight = 0;
     // OffsetTop = -200;  // Adjust this value to set the initial height
     // OffsetBottom = 0;
+
 
     CustomMinimumSize = new Vector2(1200, 40);
 
@@ -93,28 +99,54 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
     Resized += () => OnResized();
   }
 
+
   public void OnResized() {
     SizeChanged?.Invoke(Size);
   }
 
-  public void DisplayPlayerChoices(List<DialogueObject> playerChoices, string languageCode) {
-
+  public async Task DisplayPlayerChoices(List<DialogueObject> playerChoices, string languageCode) {
     RemoveAllPlayerChoiceButtons();
+    var tasks = new List<Task>();
 
     foreach (var playerChoiceObject in playerChoices) {
       if (!ButtonExistsForPlayerChoice(playerChoiceObject)) {
-        string playerChoiceToDisplay = GetLocalePlayerChoice(playerChoiceObject, languageCode);
-        PlayerChoiceButton playerChoiceButton = playerChoiceButtonScene.Instantiate<PlayerChoiceButton>();
-        playerChoiceButton.SetDialogueObject(playerChoiceObject);
-        playerChoicesContainer.AddChild(playerChoiceButton);
-        playerChoiceButton.SetText(playerChoiceToDisplay);
-
-        SizeChanged += playerChoiceButton.OnParentSizeChanged;
+        var tcs = new TaskCompletionSource<bool>();
+        tasks.Add(tcs.Task);
+        CreateAndAddPlayerChoiceButton(playerChoiceObject, languageCode, tcs);
       }
     }
-    //!this is useless we can remove it
-    FinishedDisplayingPlayerChoice?.Invoke();
+
+    await Task.WhenAll(tasks);
+
+    CallDeferred(nameof(Show));
+    GD.Print("All player choice buttons are ready");
+    GD.Print("DisplayPlayerChoices completed");
   }
+
+  private void CreateAndAddPlayerChoiceButton(DialogueObject playerChoiceObject, string languageCode, TaskCompletionSource<bool> tcs) {
+    string playerChoiceToDisplay = GetLocalePlayerChoice(playerChoiceObject, languageCode);
+    PlayerChoiceButton playerChoiceButton = playerChoiceButtonScene.Instantiate<PlayerChoiceButton>();
+
+    buttonReadyTasks[playerChoiceButton.GetInstanceId()] = tcs;
+    var connectionResult = playerChoiceButton.Connect("ready", Callable.From(() => OnPlayerChoiceButtonReady(playerChoiceButton)));
+    GD.Print($"Connection result: {connectionResult}");
+
+    playerChoiceButton.SetDialogueObject(playerChoiceObject);
+    playerChoicesContainer.AddChild(playerChoiceButton);
+    SizeChanged += playerChoiceButton.OnParentSizeChanged;
+    playerChoiceButton.SetText(playerChoiceToDisplay);
+  }
+
+  private void OnPlayerChoiceButtonReady(PlayerChoiceButton button) {
+    if (buttonReadyTasks.TryGetValue(button.GetInstanceId(), out var tcs)) {
+      tcs.SetResult(true);
+      buttonReadyTasks.Remove(button.GetInstanceId());
+    }
+  }
+
+  //!this is useless we can remove it
+  // FinishedDisplayingPlayerChoice?.Invoke();
+
 
   public bool ButtonExistsForPlayerChoice(DialogueObject playerChoiceObject) {
     var existingButtons = playerChoicesContainer.GetChildren()
@@ -132,7 +164,7 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
     };
   }
 
-  public void RemoveAllNoGroupChildrenWithSameOriginID(DialogueObject dialogueObject) {
+  public async Task RemoveAllNoGroupChildrenWithSameOriginID(DialogueObject dialogueObject) {
     List<PlayerChoiceButton> buttonsToRemove = new List<PlayerChoiceButton>();
 
     foreach (PlayerChoiceButton child in playerChoicesContainer.GetChildren()) {
@@ -142,15 +174,20 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
     }
 
     foreach (var button in buttonsToRemove) {
+      SizeChanged -= button.OnParentSizeChanged;
+      button.Disconnect("ready", new Callable(this, nameof(OnPlayerChoiceButtonReady)));
+      buttonReadyActions.Remove(button.GetInstanceId());
       playerChoicesContainer.RemoveChild(button);
       button.QueueFree();
     }
   }
 
-  public void RemoveAllPlayerChoiceButtons() {
+  public async Task RemoveAllPlayerChoiceButtons() {
     foreach (Node child in playerChoicesContainer.GetChildren()) {
       if (child is PlayerChoiceButton button) {
         SizeChanged -= button.OnParentSizeChanged;
+        button.Disconnect("ready", new Callable(this, nameof(OnPlayerChoiceButtonReady)));
+        buttonReadyActions.Remove(button.GetInstanceId());
         playerChoicesContainer.RemoveChild(child);
         child.QueueFree();
       }

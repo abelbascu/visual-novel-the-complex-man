@@ -150,21 +150,30 @@ public partial class DialogueManager : Control {
     };
   }
 
-  public void DisplayPlayerChoices(List<DialogueObject> playerChoices, Action<bool> setIsPlayerChoiceBeingPrinted) {
+  public async Task DisplayPlayerChoices(List<DialogueObject> playerChoices, Action<bool> setIsPlayerChoiceBeingPrinted) {
 
     if (playerChoicesBoxUI == null) {
       //before adding the player choices, we need to create the container VBox
-      DisplayPlayerChoicesBoxUI();
+      //DisplayPlayerChoicesBoxUI();
+      GD.Print("DisplayPlayerChoicesBoxUI is null");
+      return;
     }
     if (playerChoicesBoxUI != null) {
+      //playerChoicesBoxUI.RemoveAllPlayerChoiceButtons();
       //ensure the container is visible
-      playerChoicesBoxUI.Show();
       //let's hide the dialogue box, that's used to displaye narrator/NPC texts, not the player's
       if (dialogueBoxUI != null)
         dialogueBoxUI.Hide();
 
       setIsPlayerChoiceBeingPrinted(true);
-      playerChoicesBoxUI.DisplayPlayerChoices(playerChoices, TranslationServer.GetLocale());
+      await playerChoicesBoxUI.DisplayPlayerChoices(playerChoices, TranslationServer.GetLocale());
+      try {
+        DisplayPlayerChoicesBoxUI();
+        // Your existing code that may throw ObjectDisposedException
+      } catch (ObjectDisposedException) {
+        // Optionally log the exception or handle it silently
+        GD.Print("ObjectDisposedException occurred, but we're ignoring it.");
+      }
       setIsPlayerChoiceBeingPrinted(false);
     }
   }
@@ -177,18 +186,22 @@ public partial class DialogueManager : Control {
     dialogueBoxUI.FinishedDisplayingDialogueLine += DialogueManager.Instance.OnTextBoxFinishedDisplayingDialogueLine;
   }
 
-  //!why should we need to create the playerChoicesBoxUI here when we do it in the UIManager?
+  // //!why should we need to create the playerChoicesBoxUI here when we do it in the UIManager?
   public void DisplayPlayerChoicesBoxUI() {
-    PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxU_YD_BottomHorizontal.tscn");
-    Node instance = scene.Instantiate();
-    AddChild(instance);
-    //VBoxContainer playerChoìces = instance as VBoxContainer;
-    playerChoicesBoxUI = instance as PlayerChoicesBoxU_YD_BottomHorizontal;
-    playerChoicesBoxUI.Show();
-    playerChoicesBoxUI.TopLevel = true;
-    //once all chars of the dialogue text are displayed in the container, we can show the next line.
-    playerChoicesBoxUI.FinishedDisplayingPlayerChoice += DialogueManager.Instance.OnTextBoxFinishedDisplayingPlayerChoices;
+
+    UIManager.Instance.playerChoicesBoxUI.Show();
+
   }
+  //   PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxU_YD_BottomHorizontal.tscn");
+  //   Node instance = scene.Instantiate();
+  //   AddChild(instance);
+  //   //VBoxContainer playerChoìces = instance as VBoxContainer;
+  //   playerChoicesBoxUI = instance as PlayerChoicesBoxU_YD_BottomHorizontal;
+  //   playerChoicesBoxUI.Show();
+  //   playerChoicesBoxUI.TopLevel = true;
+  //   //once all chars of the dialogue text are displayed in the container, we can show the next line.
+  //   playerChoicesBoxUI.FinishedDisplayingPlayerChoice += DialogueManager.Instance.OnTextBoxFinishedDisplayingPlayerChoices;
+  // }
 
   //IEnumerable<int> so we can pass a list or a single int when there is only one player choice to add to the playerChoicesList
   public void AddPlayerChoicesToList(IEnumerable<int> destinationDialogIDs, DialogueObject dialogObj) {
@@ -232,7 +245,6 @@ public partial class DialogueManager : Control {
   public void OnDialogueBoxUIPressed() {
 
     DialogueVisited.Invoke(currentDialogueObject.ID);
-
     DialogueObject nextDialogObject = new();
     List<int> destinationDialogIDs = new();
 
@@ -242,13 +254,11 @@ public partial class DialogueManager : Control {
       DisplayDialogueSuddenly();
       return;
     }
-
     //if we reached a dead end path, show again the playerChoices so the player can choose another path
     //dead end paths can be used to provide contexts, make jokes, give hints, etc.
     if (currentDialogueObject.OutgoingLinks.Count == 0) {
       DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
     }
-
     // Iterate over the OutgoingLinks list and add unique "DestinationDialogID" values to the set
     foreach (Dictionary<string, int> dict in currentDialogueObject.OutgoingLinks) {
       if (dict.ContainsKey("DestinationDialogID")) {
@@ -277,7 +287,6 @@ public partial class DialogueManager : Control {
             UIManager.Instance.playerChoicesBoxUI.RemoveAllPlayerChoiceButtons();
         }
       }
-
       //if it's a Group node, it means it has multiple player choices. Traversing a Group subpath won't delete the other unselected Group choices and
       //the player will still be able explore them (unless the end of a subpath he is traversing takes him to a new conversation or a sure death)
       if (nextDialogObject.IsGroup == true) {
@@ -290,7 +299,6 @@ public partial class DialogueManager : Control {
         currentDialogueObject = nextDialogObject;
       }
     }
-
     //if the node is a NoGroupParent, meaning that it is not a GROUP node but it has branching childs, 
     //tag it as NoGroupParent and do the same for the children as NoGroupChild
     //NoGroupChild are exclusive, meaning that at the exact moment that a  NoGroup child player choice
@@ -302,10 +310,8 @@ public partial class DialogueManager : Control {
       AddNoGroupPlayerChoicesToList(currentDialogueObject);
       DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
     }
-
     if (GameStateManager.Instance.IsInState(GameStateMachine.State.InDialogueMode, GameStateMachine.SubState.None))
       GameStateManager.Instance.Fire(GameStateMachine.Trigger.ENTER_DIALOGUE_MODE);
-
   }
 
   public void AddGroupPlayerChoicesToList(DialogueObject nextDialogueObject) {
@@ -349,7 +355,7 @@ public partial class DialogueManager : Control {
     }
   }
 
-  public void OnPlayerChoiceButtonUIPressed(DialogueObject playerChoiceObject) {
+  public async Task OnPlayerChoiceButtonUIPressed(DialogueObject playerChoiceObject) {
 
 
 
@@ -398,7 +404,7 @@ public partial class DialogueManager : Control {
           currentDialogueObject = nextDialogObject;
         } else if (nextDialogObject.IsGroup == true) {
           AddGroupPlayerChoicesToList(nextDialogObject);
-          DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
+          await DisplayPlayerChoices(playerChoicesList, SetIsPlayerChoiceBeingPrinted);
         }
       }
 

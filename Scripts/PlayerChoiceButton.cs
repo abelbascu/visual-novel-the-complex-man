@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
@@ -26,8 +27,25 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
     await Task.CompletedTask;
   }
 
+  public override void _EnterTree() {
+    base._EnterTree();
+    GD.Print($"PlayerChoiceButton {GetInstanceId()} entered scene tree");
+  }
+
+  public override void _ExitTree() {
+    base._ExitTree();
+    button.MouseEntered -= OnMouseEntered;
+    button.MouseExited -= OnMouseExited;
+    button.Pressed -= OnButtonPressed;
+    GD.Print($"PlayerChoiceButton {GetInstanceId()} events unsubscribed");
+    GD.Print($"PlayerChoiceButton {GetInstanceId()} exited scene tree");
+  }
+
 
   public override void _Ready() {
+
+    GD.Print($"PlayerChoiceButton {GetInstanceId()} setup started");
+
     // Set up the MarginContainer (this)
     SizeFlagsHorizontal = SizeFlags.Fill;
     SizeFlagsVertical = SizeFlags.ShrinkCenter;
@@ -94,6 +112,8 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
     button.MouseEntered += OnMouseEntered;
     button.MouseExited += OnMouseExited;
     button.Pressed += OnButtonPressed;
+
+    GD.Print($"PlayerChoiceButton {GetInstanceId()} setup completed");
   }
 
 
@@ -114,7 +134,8 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
 
   public void SetText(string text) {
     textLabel.Text = text;
-    CallDeferred(nameof(UpdateSize));
+    //CallDeferred(nameof(UpdateSize));
+    UpdateSize();
   }
 
   private void UpdateSize() {

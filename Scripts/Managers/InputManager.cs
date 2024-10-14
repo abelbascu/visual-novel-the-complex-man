@@ -80,11 +80,20 @@ public partial class InputManager : Control {
       GD.Print($"currentFocusIndex: {currentFocusedIndex}");
       return;
     }
-    if (@event is InputEventMouseButton mouseEvent && !mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left && !InputBlocker.IsInputBlocked && !isProcessingInput) {
-      lastInputWasKeyboardOrGamepad = false;
-      isProcessingInput = true;
-      await ProcessInputAsync(@event);
-      AcceptEvent(); //stop propagating event
+
+    if (@event is InputEventMouseButton mouseEvent) {
+      if (!mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left && !InputBlocker.IsInputBlocked && !isProcessingInput) {
+        AcceptEvent(); // stop propagating event
+        return; // Exit the method to avoid processing the release event further
+      }
+
+      if (mouseEvent.Pressed && mouseEvent.ButtonIndex == MouseButton.Left && !InputBlocker.IsInputBlocked && !isProcessingInput) {
+        lastInputWasKeyboardOrGamepad = false;
+        isProcessingInput = true;
+        await ProcessInputAsync(@event);
+        AcceptEvent(); // stop propagating event
+      }
+
     } else if (!InputBlocker.IsInputBlocked && !isProcessingInput) {
       //gamepad and keyboard input
       if (@event.IsActionPressed("ui_accept") || @event.IsActionPressed("ui_cancel") || @event.IsActionPressed("ui_left")
@@ -342,7 +351,7 @@ public partial class InputManager : Control {
     bool isVertical = GameStateManager.Instance.CurrentSubstate != SubState.ExitGameConfirmationPopupDisplayed &&
                       GameStateManager.Instance.CurrentSubstate != SubState.ExitToMainMenuConfirmationPopupDisplayed &&
                       GameStateManager.Instance.CurrentState != State.EnterYourNameScreenDisplayed;
-    if (@event is InputEventMouseButton mouseButton && mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left) {
+    if (@event is InputEventMouseButton mouseButton && !mouseButton.Pressed && mouseButton.ButtonIndex == MouseButton.Left) {
       await HandleMouseClick();
       return;
     }

@@ -177,6 +177,7 @@ public partial class DialogueManager : Control {
     dialogueBoxUI.FinishedDisplayingDialogueLine += DialogueManager.Instance.OnTextBoxFinishedDisplayingDialogueLine;
   }
 
+  //!why should we need to create the playerChoicesBoxUI here when we do it in the UIManager?
   public void DisplayPlayerChoicesBoxUI() {
     PackedScene scene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoicesBoxUI.tscn");
     Node instance = scene.Instantiate();

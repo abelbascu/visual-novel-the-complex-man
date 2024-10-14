@@ -7,7 +7,7 @@ public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
   private const float MAX_WIDTH = 800f;
   private string dialogueLineToDisplay = "";
   private int letterIndex = 0;
-  private float letterTime = 0.00005f;
+  private float letterTime = 0.03f;
   private float spaceTime = 0.00006f;
   private float punctuationTime = 0.000002f;
   public DialogueLineLabel dialogueLineLabel;

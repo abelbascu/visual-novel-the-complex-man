@@ -1,6 +1,6 @@
 {
   "1": {
-	"VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+	"VisualPath": "res://Visuals/DialogueOrPlayerChoice/kids playing on he street 2 PIXELATED.png",
 	"VisualPreDelay": 0,
 	"VisualPostDelay": 0,
 	"MusicPath": "res://Audio/Music/Cosmology_SynthChrds.wav",
@@ -11,7 +11,7 @@
 	"SoundPostDelay": 0
   },
   "2": {
-	"VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
+	"VisualPath": "res://Visuals/DialogueOrPlayerChoice/kids playing on he street 2 PIXELATED.png",
 	"VisualPreDelay": 0,
 	"VisualPostDelay": 0,
 	"MusicPath": "",

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 public class DialogueObject {
   public int ID { get; set; }
+  public int ConversationID { get; set; }
   public List<Dictionary<string, int>> OutgoingLinks { get; set; }
   public string DialogueTextDefault { get; set; }
   public string CatalanText { get; set; }

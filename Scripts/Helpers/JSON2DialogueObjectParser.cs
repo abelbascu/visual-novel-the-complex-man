@@ -153,7 +153,8 @@ public static class JSON2DialogueObjectParser {
                     MusicPostDelay = musicPostDelay,
                     SoundPath = soundPath,
                     SoundPreDelay = soundPreDelay,
-                    SoundPostDelay = soundPostDelay
+                    SoundPostDelay = soundPostDelay,
+                    ConversationID = conversationID
 
                   });
 

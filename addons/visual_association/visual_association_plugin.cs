@@ -101,37 +101,54 @@ public partial class visual_association_plugin : EditorPlugin {
     ResetDialogueMediaField("SoundPath");
   }
 
-  private List<int> GetSelectedDialogueIDsFromListView() {
+  private List<(int ConversationID, int DialogueID)> GetSelectedDialoguesFromListView() {
+    //!the issue is that the dictoinary of dialogue objects that we got from the dialogueDB
+    //!does not have a dialogue.ConversationID. I need to verify this in conversationsAndDialoguesDict
     return dialogueListView.GetSelectedItems()
-        .Select(index => (int)dialogueListView.GetItemMetadata(index))
+        .Select(index => {
+          var metadata = (Godot.Collections.Dictionary)dialogueListView.GetItemMetadata(index);
+          int conversationID = (int)metadata["ConversationID"];
+          int dialogueID = (int)metadata["DialogueID"];
+          return (conversationID, dialogueID);
+        })
         .ToList();
   }
-
   private void ResetDialogueMediaField(string fieldName) {
-    var selectedDialogueIDs = GetSelectedDialogueIDsFromListView();
-    if (selectedDialogueIDs.Count == 0) {
+    var selectedDialogues = GetSelectedDialoguesFromListView();
+    if (selectedDialogues.Count == 0) {
       GD.Print("No dialogues selected.");
       return;
     }
-    foreach (var dialogueID in selectedDialogueIDs) {
-      if (DialoguesMediaHandler.AllMediaObjects.TryGetValue(dialogueID, out var dialogueObjectMedia)) {
-        switch (fieldName) {
-          case "VisualPath":
-            dialogueObjectMedia.VisualPath = "";
-            dialogueObjectMedia.VisualPreDelay = 0;
-            dialogueObjectMedia.VisualPostDelay = 0;
-            break;
-          case "MusicPath":
-            dialogueObjectMedia.MusicPath = "";
-            dialogueObjectMedia.MusicPreDelay = 0;
-            dialogueObjectMedia.MusicPostDelay = 0;
-            break;
-          case "SoundPath":
-            dialogueObjectMedia.SoundPath = "";
-            dialogueObjectMedia.SoundPreDelay = 0;
-            dialogueObjectMedia.SoundPostDelay = 0;
-            break;
-        }
+    foreach (var (conversationID, dialogueID) in selectedDialogues) {
+      var dialogue = GetDialogueObjectById(conversationID, dialogueID);
+      if (dialogue == null) continue;
+
+      if (!DialoguesMediaHandler.AllMediaObjects.TryGetValue(conversationID, out var conversationMediaObjects)) {
+        conversationMediaObjects = new Dictionary<int, DialogueMediaObject>();
+        DialoguesMediaHandler.AllMediaObjects[conversationID] = conversationMediaObjects;
+      }
+
+      if (!conversationMediaObjects.TryGetValue(dialogueID, out var dialogueObjectMedia)) {
+        dialogueObjectMedia = new DialogueMediaObject();
+        conversationMediaObjects[dialogueID] = dialogueObjectMedia;
+      }
+
+      switch (fieldName) {
+        case "VisualPath":
+          dialogueObjectMedia.VisualPath = "";
+          dialogueObjectMedia.VisualPreDelay = 0;
+          dialogueObjectMedia.VisualPostDelay = 0;
+          break;
+        case "MusicPath":
+          dialogueObjectMedia.MusicPath = "";
+          dialogueObjectMedia.MusicPreDelay = 0;
+          dialogueObjectMedia.MusicPostDelay = 0;
+          break;
+        case "SoundPath":
+          dialogueObjectMedia.SoundPath = "";
+          dialogueObjectMedia.SoundPreDelay = 0;
+          dialogueObjectMedia.SoundPostDelay = 0;
+          break;
       }
     }
 
@@ -143,7 +160,6 @@ public partial class visual_association_plugin : EditorPlugin {
 
     isResetMedia = false;
   }
-
   private void SetupDialogueListViewForMultiSelection() {
     if (dialogueListView != null) {
       dialogueListView.SelectMode = ItemList.SelectModeEnum.Multi;
@@ -165,16 +181,24 @@ public partial class visual_association_plugin : EditorPlugin {
   }
 
   private Dictionary<int, List<DialogueObject>> GetDialoguesFromDialogueDB() {
+    conversationsAndDialoguesDict = new Dictionary<int, List<DialogueObject>>();
+
     string dialogueDBPath = ProjectSettings.GlobalizePath(DIALLOGUE_DB_JSON_PATH);
     if (!File.Exists(dialogueDBPath)) {
       GD.PrintErr($"File not found: {dialogueDBPath}");
-      return new Dictionary<int, List<DialogueObject>>();
+      return conversationsAndDialoguesDict;
     }
 
     string jsonString = File.ReadAllText(dialogueDBPath);
-    return JSON2DialogueObjectParser.ExtractDialogueObjects(jsonString);
-  }
+    var allDialogues = JSON2DialogueObjectParser.ExtractDialogueObjects(jsonString);
 
+    // Ensure all conversations are included
+    foreach (var conversation in allDialogues) {
+      conversationsAndDialoguesDict[conversation.Key] = conversation.Value;
+    }
+
+    return conversationsAndDialoguesDict;
+  }
 
   private void AddDialoguesToListView() {
     dialogueListView.Clear();
@@ -186,19 +210,23 @@ public partial class visual_association_plugin : EditorPlugin {
         int dialogueRowIndexInPluginView = dialogueListView.AddItem(itemText);
         //add the real dialogue ID as metadata to the item in the list, 
         //because may not coincide with the row index of the item in the list
-        dialogueListView.SetItemMetadata(dialogueRowIndexInPluginView, dialogue.ID);
+        //!should we save the conversatin ID in the metadata?
+        var metadata = new Godot.Collections.Dictionary {
+                { "ConversationID", conversation.Key },
+                { "DialogueID", dialogue.ID }
+            };
+        dialogueListView.SetItemMetadata(dialogueRowIndexInPluginView, metadata);
       }
     }
   }
 
-
   private void InjectDialogueMediaToDialogueDB() {
     try {
-      //we first need to modify the dialogues in the dictionary of dialogues with the new media
-      foreach (var conversation in conversationsAndDialoguesDict.Values) {
-        foreach (var dialogue in conversation) {
-          //in this case the media info comes from the dictionary of media info in the DB, not from the user selection in the plugin
-          if (DialoguesMediaHandler.AllMediaObjects.TryGetValue(dialogue.ID, out DialogueMediaObject mediaInfo)) {
+      foreach (var conversationKVP in conversationsAndDialoguesDict) {
+        int conversationID = conversationKVP.Key;
+        foreach (var dialogue in conversationKVP.Value) {
+          if (DialoguesMediaHandler.AllMediaObjects.TryGetValue(conversationID, out var conversationDialogues) &&
+              conversationDialogues.TryGetValue(dialogue.ID, out DialogueMediaObject mediaInfo)) {
             InjectDialogueWithMediaDBorSelection(dialogue, mediaInfo);
           }
         }
@@ -211,8 +239,8 @@ public partial class visual_association_plugin : EditorPlugin {
     GD.Print("[InjectDialogueMediaToDialogueDB] Finished injecting saved visual paths to dialoguesDB.json");
   }
 
-
   private void InjectDialogueWithMediaDBorSelection(DialogueObject dialogue, DialogueMediaObject mediaInfo) {
+    //we don't need the concersationID here because we come from a conversation foreach loop
     if (!string.IsNullOrEmpty(mediaInfo.VisualPath) || isResetMedia)
       dialogue.VisualPath = mediaInfo.VisualPath;
     if (mediaInfo.VisualPreDelay != 0 || isResetMedia)
@@ -300,17 +328,13 @@ public partial class visual_association_plugin : EditorPlugin {
   private object UpdateDialogNode(JsonElement dialogNode, int conversationId) {
     int dialogId = dialogNode.GetProperty("ID").GetInt32();
     var fields = dialogNode.GetProperty("Fields");
-    //we get a dictionary with 'OngaoingLinks', 'ConversationID', 'IsGroup', 'Fields', 'ID'.
     var updatedDialogueFieldsObject = JsonSerializer.Deserialize<Dictionary<string, object>>(fields.GetRawText());
 
-    //*IMPORTANT: here we are getting the UPDATED dialogue object with the new media from conversationsAndDialoguesDict
-    var dialogueObject = GetDialogueObjectById(dialogId);
+    var dialogueObject = GetDialogueObjectById(conversationId, dialogId);
     if (dialogueObject != null) {
       UpdateFieldsFromDialogue(updatedDialogueFieldsObject, dialogueObject);
     }
-    //returns a Dictionary<string, object> with the updated fields. String is the field name, like visualPath, visualPreDelay, etc.
-    //the values of path nned to be an object and delays are strings and floats so we need an object to hold both types
-    //!we are not using IsRoot in the game it seems, check if we can remove it from the json in chatmapper.
+
     return new {
       OutgoingLinks = JsonSerializer.Deserialize<object>(dialogNode.GetProperty("OutgoingLinks").GetRawText()),
       ConversationID = conversationId,
@@ -320,7 +344,6 @@ public partial class visual_association_plugin : EditorPlugin {
       ID = dialogId
     };
   }
-
   private void UpdateFieldsFromDialogue(Dictionary<string, object> fields, DialogueObject dialogueObject) {
     fields["VisualPath"] = dialogueObject.VisualPath ?? "";
     fields["VisualPreDelay"] = dialogueObject.VisualPreDelay;
@@ -333,10 +356,9 @@ public partial class visual_association_plugin : EditorPlugin {
     fields["SoundPostDelay"] = dialogueObject.SoundPostDelay;
   }
 
-
   private async void OnAssociateVisualButtonPressed() {
-    var selectedDialogueIDs = GetSelectedDialogueIDsFromListView();
-    if (selectedDialogueIDs.Count == 0) {
+    var selectedDialogues = GetSelectedDialoguesFromListView();
+    if (selectedDialogues.Count == 0) {
       GD.Print("No dialogues selected.");
       return;
     }
@@ -354,15 +376,19 @@ public partial class visual_association_plugin : EditorPlugin {
 
     var (preDelay, postDelay) = await ShowDelayInputDialog();
 
-    UpdateSelectedDialoguesWithNewMedia(selectedDialogueIDs, new DialogueMediaObject {
-      VisualPath = path,
-      VisualPreDelay = preDelay,
-      VisualPostDelay = postDelay
-    });
+    //!where we are getting this conversationID from? the 
+    foreach (var (conversationID, dialogueID) in selectedDialogues) {
+      UpdateAllMediaObjects(conversationID, dialogueID, new DialogueMediaObject {
+        VisualPath = path,
+        VisualPreDelay = preDelay,
+        VisualPostDelay = postDelay
+      });
+    }
+    DialoguesMediaHandler.Save();
+    DisplayDialogueDBInListView();
   }
-
   private async void OnAssociateMusicButtonPressed() {
-    var selectedDialogueIDs = GetSelectedDialogueIDsFromListView();
+    var selectedDialogueIDs = GetSelectedDialoguesFromListView();
     if (selectedDialogueIDs.Count == 0) {
       GD.Print("No dialogues selected.");
       return;
@@ -389,7 +415,7 @@ public partial class visual_association_plugin : EditorPlugin {
   }
 
   private async void OnAssociateSoundButtonPressed() {
-    var selectedDialogueIDs = GetSelectedDialogueIDsFromListView();
+    var selectedDialogueIDs = GetSelectedDialoguesFromListView();
     if (selectedDialogueIDs.Count == 0) {
       GD.Print("No dialogues selected.");
       return;
@@ -408,75 +434,61 @@ public partial class visual_association_plugin : EditorPlugin {
 
     var (preDelay, postDelay) = await ShowDelayInputDialog();
 
+    //!this selectedDialogueIDs
     UpdateSelectedDialoguesWithNewMedia(selectedDialogueIDs, new DialogueMediaObject {
       SoundPath = path,
       SoundPreDelay = preDelay,
       SoundPostDelay = postDelay
     });
   }
-
-  private void UpdateSelectedDialoguesWithNewMedia(List<int> dialogueIDs, DialogueMediaObject mediaInfo) {
-    foreach (var dialogueID in dialogueIDs) {
-      var dialogueObj = GetDialogueObject(dialogueID, mediaInfo);
+  private void UpdateSelectedDialoguesWithNewMedia(List<(int ConversationID, int DialogueID)> selectedDialogues, DialogueMediaObject mediaInfo) {
+    foreach (var (conversationID, dialogueID) in selectedDialogues) {
+      var dialogueObj = GetDialogueObjectById(conversationID, dialogueID);
       if (dialogueObj == null) {
-        GD.PrintErr($"Dialogue with ID {dialogueID} not found.");
+        GD.Print($"Dialogue with ID {dialogueID} in Conversation {conversationID} not found.");
         continue;
       }
       InjectDialogueWithMediaDBorSelection(dialogueObj, mediaInfo);
-      UpdateAllMediaObjects(dialogueID, mediaInfo);
+      UpdateAllMediaObjects(conversationID, dialogueID, mediaInfo);
     }
-    SaveInjectedDialogueObjectsToDialogueDB();
     DialoguesMediaHandler.Save();
     DisplayDialogueDBInListView();
   }
 
-
-  private DialogueObject GetDialogueObject(int dialogueID, DialogueMediaObject mediaInfo) {
-
-    var dialogue = GetDialogueObjectById(dialogueID);
+  private DialogueObject GetDialogueObject(int conversationID, int dialogueID, DialogueMediaObject mediaInfo) {
+    var dialogue = GetDialogueObjectById(conversationID, dialogueID);
     if (dialogue == null) {
-      GD.PrintErr($"Dialogue with ID {dialogueID} not found.");
+      GD.PrintErr($"Dialogue with ID {dialogueID} in Conversation {conversationID} not found.");
       return null;
     }
     return dialogue;
   }
-
-  private DialogueObject GetDialogueObjectById(int dialogueID) {
-    //we get the dialogue object from the dictionary that holds all the deserialized dialogue objects from the DB
-    return conversationsAndDialoguesDict.Values
-        .SelectMany(dialogues => dialogues)
-        .FirstOrDefault(d => d.ID == dialogueID);
+  private DialogueObject GetDialogueObjectById(int conversationID, int dialogueID) {
+    if (conversationsAndDialoguesDict.TryGetValue(conversationID, out var dialogues)) {
+      return dialogues.FirstOrDefault(d => d.ID == dialogueID);
+    }
+    return null;
   }
 
-  private void UpdateAllMediaObjects(int dialogueID, DialogueMediaObject mediaInfo) {
-    if (!DialoguesMediaHandler.AllMediaObjects.TryGetValue(dialogueID, out var existingDialogueMediaObject)) {
-      existingDialogueMediaObject = new DialogueMediaObject();
-      DialoguesMediaHandler.AllMediaObjects[dialogueID] = existingDialogueMediaObject;
+  private void UpdateAllMediaObjects(int conversationID, int dialogueID, DialogueMediaObject mediaInfo) {
+    if (!DialoguesMediaHandler.AllMediaObjects.TryGetValue(conversationID, out var conversationDialogues)) {
+      conversationDialogues = new Dictionary<int, DialogueMediaObject>();
+      DialoguesMediaHandler.AllMediaObjects[conversationID] = conversationDialogues;
     }
 
-    if (!string.IsNullOrEmpty(mediaInfo.VisualPath))
-      existingDialogueMediaObject.VisualPath = mediaInfo.VisualPath;
-    if (mediaInfo.VisualPreDelay != 0)
-      existingDialogueMediaObject.VisualPreDelay = mediaInfo.VisualPreDelay;
-    if (mediaInfo.VisualPostDelay != 0)
-      existingDialogueMediaObject.VisualPostDelay = mediaInfo.VisualPostDelay;
-
-    if (!string.IsNullOrEmpty(mediaInfo.MusicPath))
-      existingDialogueMediaObject.MusicPath = mediaInfo.MusicPath;
-    if (mediaInfo.MusicPreDelay != 0)
-      existingDialogueMediaObject.MusicPreDelay = mediaInfo.MusicPreDelay;
-    if (mediaInfo.MusicPostDelay != 0)
-      existingDialogueMediaObject.MusicPostDelay = mediaInfo.MusicPostDelay;
-
-    if (!string.IsNullOrEmpty(mediaInfo.SoundPath))
-      existingDialogueMediaObject.SoundPath = mediaInfo.SoundPath;
-    if (mediaInfo.SoundPreDelay != 0)
-      existingDialogueMediaObject.SoundPreDelay = mediaInfo.SoundPreDelay;
-    if (mediaInfo.SoundPostDelay != 0)
-      existingDialogueMediaObject.SoundPostDelay = mediaInfo.SoundPostDelay;
+    conversationDialogues[dialogueID] = new DialogueMediaObject {
+      ConversationID = conversationID,
+      VisualPath = mediaInfo.VisualPath,
+      VisualPreDelay = mediaInfo.VisualPreDelay,
+      VisualPostDelay = mediaInfo.VisualPostDelay,
+      MusicPath = mediaInfo.MusicPath,
+      MusicPreDelay = mediaInfo.MusicPreDelay,
+      MusicPostDelay = mediaInfo.MusicPostDelay,
+      SoundPath = mediaInfo.SoundPath,
+      SoundPreDelay = mediaInfo.SoundPreDelay,
+      SoundPostDelay = mediaInfo.SoundPostDelay
+    };
   }
-
-
   private async Task<(float preDelay, float postDelay)> ShowDelayInputDialog() {
     var popup = new AcceptDialog();
     var vbox = new VBoxContainer();

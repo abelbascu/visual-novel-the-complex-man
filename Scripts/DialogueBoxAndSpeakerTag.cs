@@ -130,54 +130,6 @@ public partial class DialogueBoxAndSpeakerTag : VBoxContainer {
       letterDisplayTimer.Start(letterTime);
   }
 
-  public void ShowWaitingIndicator() {
-    if (waitingIndicator == null) {
-      waitingIndicator = new RichTextLabel {
-        BbcodeEnabled = true,
-        FitContent = true,
-        ScrollActive = false,
-        SizeFlagsHorizontal = SizeFlags.ShrinkCenter,
-        SizeFlagsVertical = SizeFlags.ShrinkCenter
-      };
-      AddChild(waitingIndicator);
-    }
-
-    waitingIndicator.Visible = true;
-    StartBlinkAnimation();
-  }
-
-  public void HideWaitingIndicator() {
-    if (waitingIndicator != null) {
-      waitingIndicator.Visible = false;
-      StopBlinkAnimation();
-    }
-  }
-
-  private void StartBlinkAnimation() {
-    if (blinkTimer == null) {
-      blinkTimer = new Timer();
-      blinkTimer.Timeout += UpdateBlinkAnimation;
-      AddChild(blinkTimer);
-    }
-
-    dotCount = 0;
-    blinkTimer.Start(0.5f); // Blink every 0.5 seconds
-    UpdateBlinkAnimation();
-  }
-
-  private void StopBlinkAnimation() {
-    if (blinkTimer != null) {
-      blinkTimer.Stop();
-    }
-  }
-
-  private void UpdateBlinkAnimation() {
-    string dots = new string('.', dotCount);
-    waitingIndicator.Text = $"[center]{dots}[/center]";
-    dotCount = (dotCount + 1) % 4; // Cycle through 0, 1, 2, 3
-  }
-
-
   public void OnLetterDisplayTimerTimeout() {
     DisplayLetter();
   }

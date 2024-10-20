@@ -10,7 +10,7 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
   private RichTextLabel textLabel;
   private Color normalColor = Colors.White;
   private Color hoverColor = Colors.Yellow;
-  private const float BUTTON_WIDTH = 700; // Adjust as needed
+  private const float BUTTON_WIDTH = 1000; // Adjust as needed
   private const float SINGLE_LINE_HEIGHT = 40; // Adjust based on your font size
   private const int LINE_SEPARATION = 5;
   public StyleBoxFlat normalStyleBox;
@@ -47,26 +47,31 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
     GD.Print($"PlayerChoiceButton {GetInstanceId()} setup started");
 
     // Set up the MarginContainer (this)
-    SizeFlagsHorizontal = SizeFlags.Fill;
-    SizeFlagsVertical = SizeFlags.ShrinkCenter;
+    // SizeFlagsHorizontal = SizeFlags.Fill;
+    // SizeFlagsVertical = SizeFlags.ExpandFill;
 
     // Set up margins
     AddThemeConstantOverride("margin_left", 10);
     AddThemeConstantOverride("margin_right", 10);
-    AddThemeConstantOverride("margin_top", 5);
-    AddThemeConstantOverride("margin_bottom", 5);
+    // AddThemeConstantOverride("margin_top", 5);
+    // AddThemeConstantOverride("margin_bottom", 5);
 
     // Create and add TextureButton
     button = new InteractableUIButton {
       SizeFlagsHorizontal = SizeFlags.Fill,
-      SizeFlagsVertical = SizeFlags.ShrinkCenter,
-      CustomMinimumSize = new Vector2(BUTTON_WIDTH, SINGLE_LINE_HEIGHT) // Set initial minimum size
+      SizeFlagsVertical = SizeFlags.ExpandFill,
+      //CustomMinimumSize = new Vector2(BUTTON_WIDTH, SINGLE_LINE_HEIGHT) // Set initial minimum size
 
     };
     AddChild(button);
 
     normalStyleBox = new StyleBoxFlat {
       BgColor = new Color(0, 0, 0, 0), // Fully transparent
+      BorderColor = Colors.Red,
+      BorderWidthBottom = 2,
+      BorderWidthTop = 2,
+      BorderWidthLeft = 2,
+      BorderWidthRight = 2,
       CornerRadiusTopLeft = 5,
       CornerRadiusTopRight = 5,
       CornerRadiusBottomRight = 5,
@@ -74,7 +79,12 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
     };
 
     hoverStyleBox = new StyleBoxFlat {
-      BgColor = new Color(0f, 0.3f, 0.3f, 0.3f), // Lighter, more opaque on hover
+      BgColor = new Color(0f, 0.3f, 0.3f, 0.3f),
+      BorderColor = Colors.Red,
+      BorderWidthBottom = 2,
+      BorderWidthTop = 2,
+      BorderWidthLeft = 2,
+      BorderWidthRight = 2, // Lighter, more opaque on hover
       CornerRadiusTopLeft = 5,
       CornerRadiusTopRight = 5,
       CornerRadiusBottomRight = 5,
@@ -91,7 +101,7 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
       SizeFlagsHorizontal = SizeFlags.ShrinkBegin,
       SizeFlagsVertical = SizeFlags.ShrinkCenter,
       MouseFilter = MouseFilterEnum.Ignore, // Allow events to pass through
-      CustomMinimumSize = new Vector2(BUTTON_WIDTH, 0)
+      //CustomMinimumSize = new Vector2(BUTTON_WIDTH, 0)
     };
     button.AddChild(textLabel);
 
@@ -129,12 +139,12 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
 
 
   public void OnParentSizeChanged(Vector2 newSize) {
-    CallDeferred(nameof(UpdateSize));
+    //CallDeferred(nameof(UpdateSize));
   }
 
   public void SetText(string text) {
     textLabel.Text = text;
-    //CallDeferred(nameof(UpdateSize));
+    CallDeferred(nameof(UpdateSize));
     UpdateSize();
   }
 
@@ -144,17 +154,15 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
     //gets preference over its size so we need to update the customMinimumSize to the new size of the parent TextureButton, 
     //that autosizes each time that the PlayerChoicesBoxUI needs to display a different number of PlayerChoiceButtons.
 
-    textLabel.CustomMinimumSize = new Vector2(Size.X - GetThemeConstant("margin_left") - GetThemeConstant("margin_right"), 0);
+    textLabel.CustomMinimumSize = new Vector2(BUTTON_WIDTH - GetThemeConstant("margin_left") - GetThemeConstant("margin_right"), 0);
 
-    // Force the RichTextLabel to update its size
     textLabel.Size = Vector2.Zero;
     var contentSize = textLabel.GetMinimumSize();
 
     float buttonHeight = Math.Max(contentSize.Y, SINGLE_LINE_HEIGHT);
-    CustomMinimumSize = new Vector2(0, buttonHeight + GetThemeConstant("margin_top") + GetThemeConstant("margin_bottom"));
+    CustomMinimumSize = new Vector2(BUTTON_WIDTH, buttonHeight + GetThemeConstant("margin_top") + GetThemeConstant("margin_bottom"));
 
-    // Update the button's size to match the content
-    button.CustomMinimumSize = new Vector2(0, buttonHeight);
+    button.CustomMinimumSize = new Vector2(BUTTON_WIDTH, buttonHeight);
   }
 
   public void SetDialogueObject(DialogueObject dialogObj) {
@@ -168,17 +176,11 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
   private void OnMouseEntered() {
     Scale = new Vector2(1.005f, 1.005f);
     textLabel.AddThemeColorOverride("default_color", hoverColor);
-    //  button.AddThemeStyleboxOverride("normal", hoverStyleBox);
-    //var styleBox = (StyleBoxFlat)button.GetThemeStylebox("normal");
-    // styleBox.BgColor = new Color(0.3f, 0.3f, 0.3f, 0.7f);
   }
 
   private void OnMouseExited() {
     Scale = Vector2.One;
     textLabel.AddThemeColorOverride("default_color", normalColor);
-    // button.AddThemeStyleboxOverride("normal", normalStyleBox);
-    //var styleBox = (StyleBoxFlat)button.GetThemeStylebox("normal");
-    //styleBox.BgColor = new Color(0.2f, 0.2f, 0.2f, 0.5f);
   }
 
   private void OnButtonPressed() {

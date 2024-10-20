@@ -5,12 +5,18 @@ using System.Threading.Tasks;
 public partial class DialogueLineLabel : RichTextLabel, IInteractableUI {
 
   public Action Pressed { get; set; }
-  private const int LINE_SEPARATION = 5;
+  private const int LINE_SEPARATION = 2;
   public bool IsInteractable => Visible;
 
 
   // Called when the node enters the scene tree for the first time.
   public override void _Ready() {
+
+    CustomMinimumSize = new Vector2(900, 0);
+    SizeFlagsVertical = SizeFlags.ExpandFill;
+    AddThemeConstantOverride("margin_top", 60);
+    AddThemeConstantOverride("margin_bottom", 60);
+    AddThemeConstantOverride("alignment", (int)HorizontalAlignment.Center);
 
     MouseFilter = MouseFilterEnum.Stop;
     SetProcessInput(true);
@@ -22,8 +28,8 @@ public partial class DialogueLineLabel : RichTextLabel, IInteractableUI {
     FitContent = true;
     ScrollActive = false;
 
-    SizeFlagsHorizontal = SizeFlags.ExpandFill;
-    SizeFlagsVertical = SizeFlags.ExpandFill;
+    // SizeFlagsHorizontal = SizeFlags.ExpandFill;
+    //  SizeFlagsVertical = SizeFlags.ExpandFill;
 
     AddThemeConstantOverride("line_separation", LINE_SEPARATION);
     AddThemeFontSizeOverride("normal_font_size", 55);

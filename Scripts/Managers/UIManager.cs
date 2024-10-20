@@ -108,16 +108,16 @@ public partial class UIManager : Control {
     dialogueBoxUI = dialogueBoxUIScene.Instantiate<DialogueBoxWithTag_YD_BH>();
     AddChild(dialogueBoxUI);
     dialogueBoxUI.Hide();
-    // Set anchors to stretch horizontally
-    dialogueBoxUI.AnchorLeft = ANCHOR_LEFT_PERCENTAGE;
-    dialogueBoxUI.AnchorRight = ANCHOR_RIGHT_PERCENTAGE;
-    dialogueBoxUI.AnchorTop = ANCHOR_TOP_PERCENTAGE;
-    dialogueBoxUI.AnchorBottom = ANCHOR_BOTTOM_PERCENTAGE;
-    // Reset offsets
-    dialogueBoxUI.OffsetLeft = OFFSET_LEFT;
-    dialogueBoxUI.OffsetRight = OFFSET_RIGHT;
-    dialogueBoxUI.OffsetTop = OFFSET_TOP;  // Adjust this value to set the initial height
-    dialogueBoxUI.OffsetBottom = OFFSET_BOTTOM;
+    // // Set anchors to stretch horizontally
+    // dialogueBoxUI.AnchorLeft = ANCHOR_LEFT_PERCENTAGE;
+    // dialogueBoxUI.AnchorRight = ANCHOR_RIGHT_PERCENTAGE;
+    // dialogueBoxUI.AnchorTop = ANCHOR_TOP_PERCENTAGE;
+    // dialogueBoxUI.AnchorBottom = ANCHOR_BOTTOM_PERCENTAGE;
+    // // Reset offsets
+    // dialogueBoxUI.OffsetLeft = OFFSET_LEFT;
+    // dialogueBoxUI.OffsetRight = OFFSET_RIGHT;
+    // dialogueBoxUI.OffsetTop = OFFSET_TOP;  // Adjust this value to set the initial height
+    // dialogueBoxUI.OffsetBottom = OFFSET_BOTTOM;
 
     // Overlay mask to filter out input when inggame menu is open
     menuOverlay = new Control {

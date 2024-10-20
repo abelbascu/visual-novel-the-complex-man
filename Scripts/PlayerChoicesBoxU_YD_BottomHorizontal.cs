@@ -15,86 +15,55 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
   private Dictionary<ulong, TaskCompletionSource<bool>> buttonReadyTasks = new Dictionary<ulong, TaskCompletionSource<bool>>();
   private Dictionary<ulong, Action> buttonReadyActions = new Dictionary<ulong, Action>();
 
-
-
-
+  private void OnPlayerChoicesContainerDraw() {
+    var rect = playerChoicesContainer.GetRect();
+    playerChoicesContainer.DrawRect(rect, Colors.Red, false, 10);
+  }
 
   public override void _Ready() {
     Show();
 
     backgroundRect = GetNode<NinePatchRect>("NinePatchRect"); // Adjust the path if needed
+    globalMarginContainer = GetNode<MarginContainer>("GloalMarginContainer");
+    playerChoicesContainer = GetNode<VBoxContainer>("GloalMarginContainer/PlayerChoicesContainer");
+
+    playerChoicesContainer.Connect("draw", new Callable(this, nameof(OnPlayerChoicesContainerDraw)));
+
     if (backgroundRect != null) {
       // adjust this value to change transparency
       backgroundRect.Modulate = new Color(backgroundRect.Modulate, 0.9f);
     }
 
-    //We are doing the comments below in the UIManager as delegating the position to the children gives issues
-    //maybe becasue they do not have all the necessary info from the parent?
+    //anchors mode
+    // LayoutMode = 1;
 
-    //----------------------FIRST, SET UP THE MAIN MARGIN CONTAINER-------------------------
-    //Set anchors to allow the container to grow
-    // AnchorLeft = 0.08f;
-    // AnchorRight = 0.925f;
-    // AnchorTop = 1;
-    // AnchorBottom = 1;
-
-    // Reset offsets
-    // OffsetLeft = 0;
-    // OffsetRight = 0;
-    // OffsetTop = -200;  // Adjust this value to set the initial height
-    // OffsetBottom = 0;
-
-
-    CustomMinimumSize = new Vector2(1200, 40);
+    CustomMinimumSize = new Vector2(1200, 225);
 
     SetAnchorsAndOffsetsPreset(LayoutPreset.CenterBottom);
-    SizeFlagsVertical = SizeFlags.ShrinkEnd;
+    SizeFlagsVertical = SizeFlags.Fill;
     GrowVertical = GrowDirection.Begin;
     AnchorLeft = 0.5f;
     AnchorRight = 0.5f;
-    // Prevent horizontal growth
-    // SizeFlagsHorizontal = SizeFlags.Fill;
-
+    AnchorBottom = 0.98f;
 
     // Add margins to the PlayerChoicesBoxUI
     AddThemeConstantOverride("margin_left", 40);
     AddThemeConstantOverride("margin_right", 40);
-    AddThemeConstantOverride("margin_top", 40);
-    AddThemeConstantOverride("margin_bottom", 40);
 
-    //----------------------SECOND, CREATE & SET UP AN INNER MARGIN CONTAINER-------------------------
 
-    // Create and add GlobalMarginContainer to control padding better
-    globalMarginContainer = new MarginContainer();
-    AddChild(globalMarginContainer);
-
-    // Set up GlobalMarginContainer with padding
-    globalMarginContainer.AddThemeConstantOverride("margin_left", 40);
-    globalMarginContainer.AddThemeConstantOverride("margin_right", 40);
-    globalMarginContainer.AddThemeConstantOverride("margin_top", 25);
-    globalMarginContainer.AddThemeConstantOverride("margin_bottom", 25);
-
-    // Set GlobalMarginContainer to fill the entire PlayerChoicesBoxUI
-    globalMarginContainer.AnchorRight = 1;
-    globalMarginContainer.AnchorBottom = 1;
-    // globalMarginContainer.SizeFlagsHorizontal = SizeFlags.Fill;
-    globalMarginContainer.SizeFlagsVertical = SizeFlags.Fill;
-    globalMarginContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
-
-    //----------------------THIRD AND LAST, CREATE & SET UP A VBOXCONTAINER -------------------------
-    //---------- this VBoxContainer stores the playerChoiceButton, aka the player choices------------
-
-    playerChoicesContainer = new VBoxContainer();
-    globalMarginContainer.AddChild(playerChoicesContainer);
     playerChoiceButtonScene = ResourceLoader.Load<PackedScene>("res://Scenes/PlayerChoiceButton.tscn");
 
-    // Ensure buttons are aligned to the top
-    playerChoicesContainer.Alignment = BoxContainer.AlignmentMode.Begin;
-    // playerChoicesContainer.SizeFlagsHorizontal = SizeFlags.Fill;
-    playerChoicesContainer.SizeFlagsVertical = SizeFlags.ShrinkEnd;
+
+    playerChoicesContainer.CustomMinimumSize = new Vector2(
+      globalMarginContainer.Size.X - globalMarginContainer.GetThemeConstant("margin_left") - globalMarginContainer.GetThemeConstant("margin_right"),
+      100
+  );
 
     //The space between the BoxContainer's elements, in pixels.
     playerChoicesContainer.AddThemeConstantOverride("separation", 20);
+
+    playerChoicesContainer.AddThemeColorOverride("bg_color", new Color(1, 0.5f, 0, 0.2f)); // Orange with some transparency
+
 
     Resized += () => OnResized();
   }

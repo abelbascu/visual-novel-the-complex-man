@@ -61,7 +61,7 @@
 			  "Actor": "3",
 			  "Conversant": "3",
 			  "Menu Text": "",
-			  "Dialogue Text": "I remmber when I was a child...\r\n",
+			  "Dialogue Text": "I remmber when I was [wave amp=50.0 freq=5.0 connected=1]a child...[/wave]\r\n",
 			  "Parenthetical": "",
 			  "Audio Files": "[]",
 			  "Video File": "",

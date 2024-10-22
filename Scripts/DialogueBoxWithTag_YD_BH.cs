@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
@@ -12,14 +13,14 @@ public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
   private float punctuationTime = 0.000002f;
   public DialogueLineLabel dialogueLineLabel;
   public RichTextLabel speakerTag;
-  Timer letterDisplayTimer;
+  //Timer letterDisplayTimer;
   NinePatchRect backgroundRect;
   public MarginContainer innerMarginContainer;
 
   public Action FinishedDisplayingDialogueLine;
   public Action DialogueBoxUIWasResized;
   private RichTextLabel waitingIndicator;
-  private Timer blinkTimer;
+  //private Timer blinkTimer;
   private int dotCount = 0;
 
   // Called when the node enters the scene tree for the first time.
@@ -51,8 +52,8 @@ public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
     }
 
     dialogueLineLabel = GetNode<DialogueLineLabel>("DialogueBoxUI_YD_BH/MarginContainer/DialogueLineLabel");
-    letterDisplayTimer = GetNode<Timer>("DialogueBoxUI_YD_BH/LetterDisplayTimer");
-    letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;
+    //letterDisplayTimer = GetNode<Timer>("DialogueBoxUI_YD_BH/LetterDisplayTimer");
+    // letterDisplayTimer.Timeout += OnLetterDisplayTimerTimeout;
 
     dialogueLineLabel.MouseFilter = MouseFilterEnum.Stop;
 
@@ -82,11 +83,28 @@ public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
     FinishedDisplayingDialogueLine += DialogueManager.Instance.OnTextBoxFinishedDisplayingDialogueLine;
   }
 
-  public void DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
+  public async Task DisplayDialogueLine(DialogueObject dialogueObject, string locale) {
     this.dialogueLineToDisplay = GetLocaleDialogue(dialogueObject, locale);
-    // dialogueLineLabel.Text = "";
     dialogueLineLabel.Clear();
-    DisplayLetter();
+    dialogueLineLabel.Text = dialogueLineToDisplay;
+
+    // Start with 0 visible characters
+    dialogueLineLabel.VisibleCharacters = 0;
+
+    // Show characters one by one with delay
+    for (int i = 0; i < dialogueLineToDisplay.Length; i++) {
+      dialogueLineLabel.VisibleCharacters = i + 1;
+
+      // Add different delays based on character type
+      if (dialogueLineToDisplay[i] == '.' || dialogueLineToDisplay[i] == '!' || dialogueLineToDisplay[i] == '?')
+        await Task.Delay((int)(punctuationTime * 1000));
+      else if (dialogueLineToDisplay[i] == ' ')
+        await Task.Delay((int)(spaceTime * 1000));
+      else
+        await Task.Delay((int)(letterTime * 1000));
+    }
+
+    FinishedDisplayingDialogueLine?.Invoke();
   }
 
   public void DisplaySpeakerName(string actor) {
@@ -107,47 +125,47 @@ public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
   }
 
   public void StopLetterByLetterDisplay() {
-    letterDisplayTimer.Stop();
+    //  letterDisplayTimer.Stop();
     //for whatever reason, the line [dialogueLineLabel.Text = dialogueLineToDisplay;]
     //won't work if i do not add this line before
-    dialogueLineLabel.Text = "";
+    //   dialogueLineLabel.Text = "";
     dialogueLineLabel.Text = dialogueLineToDisplay;
-    letterIndex = 0;
+    //   letterIndex = 0;
     FinishedDisplayingDialogueLine?.Invoke();
   }
 
-  public void DisplayLetter() {
+  //   public void DisplayLetter() {
 
-    dialogueLineLabel.AutowrapMode = TextServer.AutowrapMode.Word;
+  //     dialogueLineLabel.AutowrapMode = TextServer.AutowrapMode.Word;
 
-    if (letterIndex < dialogueLineToDisplay.Length) {
-      dialogueLineLabel.AppendText(dialogueLineToDisplay[letterIndex].ToString());
-      letterIndex++;
-      //GD.Print($"letterIndex = {letterIndex}\ndialogueLineToDisplay.Length = {dialogueLineToDisplay.Length} ");
-    } else {
-      //GD.Print($"dialogueLineLabel.Size: {dialogueLineLabel.Size}");
-      dialogueLineLabel.Text = "";
-      dialogueLineLabel.Text = dialogueLineToDisplay;
-      letterIndex = 0;
+  //     if (letterIndex < dialogueLineToDisplay.Length) {
+  //       dialogueLineLabel.AppendText(dialogueLineToDisplay[letterIndex].ToString());
+  //       letterIndex++;
+  //       //GD.Print($"letterIndex = {letterIndex}\ndialogueLineToDisplay.Length = {dialogueLineToDisplay.Length} ");
+  //     } else {
+  //       //GD.Print($"dialogueLineLabel.Size: {dialogueLineLabel.Size}");
+  //       dialogueLineLabel.Text = "";
+  //       dialogueLineLabel.Text = dialogueLineToDisplay;
+  //       letterIndex = 0;
 
-      FinishedDisplayingDialogueLine?.Invoke();
+  //       FinishedDisplayingDialogueLine?.Invoke();
 
-      return;
-    }
+  //       return;
+  //     }
 
-    char[] punctuationCharacters = { '!', '.', ',' };
+  //     char[] punctuationCharacters = { '!', '.', ',' };
 
-    if (letterIndex < dialogueLineToDisplay.Length && punctuationCharacters.Contains(dialogueLineToDisplay[letterIndex]))
-      letterDisplayTimer.Start(punctuationTime);
-    else if (letterIndex < dialogueLineToDisplay.Length && dialogueLineToDisplay[letterIndex] == ' ')
-      letterDisplayTimer.Start(spaceTime);
-    else
-      letterDisplayTimer.Start(letterTime);
-  }
+  //     if (letterIndex < dialogueLineToDisplay.Length && punctuationCharacters.Contains(dialogueLineToDisplay[letterIndex]))
+  //       letterDisplayTimer.Start(punctuationTime);
+  //     else if (letterIndex < dialogueLineToDisplay.Length && dialogueLineToDisplay[letterIndex] == ' ')
+  //       letterDisplayTimer.Start(spaceTime);
+  //     else
+  //       letterDisplayTimer.Start(letterTime);
+  //   }
 
-  public void OnLetterDisplayTimerTimeout() {
-    DisplayLetter();
-  }
+  //   public void OnLetterDisplayTimerTimeout() {
+  //     DisplayLetter();
+  //   }
 }
 
 

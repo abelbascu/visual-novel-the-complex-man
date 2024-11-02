@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://xg3503tdvfgm"
+path="res://.godot/imported/kids playing in the street.mp3-77452f1ef4b2c4749cebf926ccce38d1.mp3str"
+
+[deps]
+
+source_file="res://Audio/FX/kids playing in the street.mp3"
+dest_files=["res://.godot/imported/kids playing in the street.mp3-77452f1ef4b2c4749cebf926ccce38d1.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

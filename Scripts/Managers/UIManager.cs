@@ -9,17 +9,8 @@ public partial class UIManager : Control {
   public PackedScene dialogueBoxUIScene;
   public DialogueBoxWithTag_YD_BH dialogueBoxUI; //the graphical rectangle container to display the text over
   private VBoxContainer dialogueChoicesMarginContainer;
-  private const int UI_BOTTOM_POSITION = 200; //starting at the bottom of the screen, we subtract this value to position the Y screen position of the dilaogue box  
   public PackedScene playerChoicesBoxUIScene;
   public PlayerChoicesBoxU_YD_BottomHorizontal playerChoicesBoxUI;
-  private const float ANCHOR_LEFT_PERCENTAGE = 0.08f;
-  private const float ANCHOR_RIGHT_PERCENTAGE = 0.925f;
-  private const float ANCHOR_TOP_PERCENTAGE = 1f;
-  private const float ANCHOR_BOTTOM_PERCENTAGE = 1f;
-  private const int OFFSET_LEFT = 0;
-  private const int OFFSET_RIGHT = 0;
-  private const int OFFSET_TOP = 200;
-  private const int OFFSET_BOTTOM = 0;
   public MainMenu mainMenu;
   public InGameMenuButton inGameMenuButton;
   public Control menuOverlay;
@@ -108,16 +99,7 @@ public partial class UIManager : Control {
     dialogueBoxUI = dialogueBoxUIScene.Instantiate<DialogueBoxWithTag_YD_BH>();
     AddChild(dialogueBoxUI);
     dialogueBoxUI.Hide();
-    // // Set anchors to stretch horizontally
-    // dialogueBoxUI.AnchorLeft = ANCHOR_LEFT_PERCENTAGE;
-    // dialogueBoxUI.AnchorRight = ANCHOR_RIGHT_PERCENTAGE;
-    // dialogueBoxUI.AnchorTop = ANCHOR_TOP_PERCENTAGE;
-    // dialogueBoxUI.AnchorBottom = ANCHOR_BOTTOM_PERCENTAGE;
-    // // Reset offsets
-    // dialogueBoxUI.OffsetLeft = OFFSET_LEFT;
-    // dialogueBoxUI.OffsetRight = OFFSET_RIGHT;
-    // dialogueBoxUI.OffsetTop = OFFSET_TOP;  // Adjust this value to set the initial height
-    // dialogueBoxUI.OffsetBottom = OFFSET_BOTTOM;
+
 
     // Overlay mask to filter out input when inggame menu is open
     menuOverlay = new Control {

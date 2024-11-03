@@ -101,8 +101,6 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
         playerChoiceButton.SetDialogueObject(playerChoiceObject);
         playerChoicesContainer.AddChild(playerChoiceButton);
         playerChoiceButton.SetText(playerChoiceToDisplay);
-
-        SizeChanged += playerChoiceButton.OnParentSizeChanged;
       }
     }
     //!this is useless we can remove it
@@ -143,7 +141,6 @@ public partial class PlayerChoicesBoxUI : MarginContainer {
   public void RemoveAllPlayerChoiceButtons() {
     foreach (Node child in playerChoicesContainer.GetChildren()) {
       if (child is PlayerChoiceButton button) {
-        SizeChanged -= button.OnParentSizeChanged;
         playerChoicesContainer.RemoveChild(child);
         child.QueueFree();
       }

@@ -137,11 +137,6 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
     Scale = isHighlighted ? new Vector2(1.005f, 1.005f) : Vector2.One;
   }
 
-
-  public void OnParentSizeChanged(Vector2 newSize) {
-    //CallDeferred(nameof(UpdateSize));
-  }
-
   public void SetText(string text) {
     textLabel.Text = text;
     CallDeferred(nameof(UpdateSize));

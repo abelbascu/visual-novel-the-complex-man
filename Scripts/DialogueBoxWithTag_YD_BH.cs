@@ -28,11 +28,6 @@ public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
     // Set layout mode to Anchor (layout_mode = 1)
     LayoutMode = 1;
 
-    // // Set anchors to bottom center
-    // AnchorBottom = 1;
-    // AnchorLeft = 0.5f;
-    // AnchorRight = 0.5f;
-
     // Center horizontally and align to bottom
     AnchorLeft = 0.5f;
     AnchorRight = 0.5f;
@@ -45,6 +40,7 @@ public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
     speakerTag = GetNode<RichTextLabel>("SpeakerTagMarginContainer/SpeakerTagRichTextLabel");
     speakerTag.BbcodeEnabled = true;
 
+    //DO NOT DELETE, THIS IS FOR DEBUGGING THE BACKGROUND RECT
     backgroundRect = GetNode<NinePatchRect>("DialogueBoxUI_YD_BH/NinePatchRect"); // Adjust the path if needed
     if (backgroundRect != null) {
       // Set the alpha to 0.5 (adjust this value to change transparency)
@@ -57,10 +53,6 @@ public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
 
     dialogueLineLabel.MouseFilter = MouseFilterEnum.Stop;
 
-    // AddThemeConstantOverride("margin_left", 40);
-    // AddThemeConstantOverride("margin_top", 40);
-    // AddThemeConstantOverride("margin_right", 40);
-    // AddThemeConstantOverride("margin_bottom", 40);
 
     innerMarginContainer = GetNode<MarginContainer>("DialogueBoxUI_YD_BH/MarginContainer");
     innerMarginContainer.AddThemeConstantOverride("margin_left", 40);

@@ -85,6 +85,9 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
       }
     }
 
+    //only when all tasks associated to each button are completed 
+    //(when all buttons are ready in the scene, we know that as we will connect to the ready signal)
+    //only then we willl show the box with all the buttons.
     await Task.WhenAll(tasks);
 
     CallDeferred(nameof(Show));
@@ -97,15 +100,16 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
     PlayerChoiceButton playerChoiceButton = playerChoiceButtonScene.Instantiate<PlayerChoiceButton>();
 
     buttonReadyTasks[playerChoiceButton.GetInstanceId()] = tcs;
+    //check if the button is ready in the scene, if so we will set  its associated task to true
     var connectionResult = playerChoiceButton.Connect("ready", Callable.From(() => OnPlayerChoiceButtonReady(playerChoiceButton)));
     GD.Print($"Connection result: {connectionResult}");
 
     playerChoiceButton.SetDialogueObject(playerChoiceObject);
     playerChoicesContainer.AddChild(playerChoiceButton);
-    SizeChanged += playerChoiceButton.OnParentSizeChanged;
     playerChoiceButton.SetText(playerChoiceToDisplay);
   }
 
+  //!what doees this do?
   private void OnPlayerChoiceButtonReady(PlayerChoiceButton button) {
     if (buttonReadyTasks.TryGetValue(button.GetInstanceId(), out var tcs)) {
       tcs.SetResult(true);
@@ -143,7 +147,7 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
     }
 
     foreach (var button in buttonsToRemove) {
-      SizeChanged -= button.OnParentSizeChanged;
+
       button.Disconnect("ready", new Callable(this, nameof(OnPlayerChoiceButtonReady)));
       buttonReadyActions.Remove(button.GetInstanceId());
       playerChoicesContainer.RemoveChild(button);
@@ -154,7 +158,7 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
   public async Task RemoveAllPlayerChoiceButtons() {
     foreach (Node child in playerChoicesContainer.GetChildren()) {
       if (child is PlayerChoiceButton button) {
-        SizeChanged -= button.OnParentSizeChanged;
+
         button.Disconnect("ready", new Callable(this, nameof(OnPlayerChoiceButtonReady)));
         buttonReadyActions.Remove(button.GetInstanceId());
         playerChoicesContainer.RemoveChild(child);

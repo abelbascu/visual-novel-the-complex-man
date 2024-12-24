@@ -534,6 +534,7 @@ public partial class MainMenu : Control {
       await FadeOutMainMenu();
       StartNewGameButtonPressed.Invoke();
       GameStateManager.Instance.Fire(Trigger.START_NEW_GAME);
+      await AudioManager.Instance.StopMusic();
     });
   }
 

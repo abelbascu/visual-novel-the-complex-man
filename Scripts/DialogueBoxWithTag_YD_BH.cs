@@ -85,6 +85,11 @@ public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
 
     // Show characters one by one with delay
     for (int i = 0; i < dialogueLineToDisplay.Length; i++) {
+
+      if (dialogueLineLabel.VisibleRatio == 1) {
+        //dialogueLineLabel.Text = dialogueLineToDisplay;
+        return;
+      }
       dialogueLineLabel.VisibleCharacters = i + 1;
 
       // Add different delays based on character type
@@ -123,6 +128,7 @@ public partial class DialogueBoxWithTag_YD_BH : VBoxContainer {
     //   dialogueLineLabel.Text = "";
     dialogueLineLabel.Text = dialogueLineToDisplay;
     //   letterIndex = 0;
+    dialogueLineLabel.VisibleRatio = 1;
     FinishedDisplayingDialogueLine?.Invoke();
   }
 

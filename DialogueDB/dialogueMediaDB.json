@@ -5,7 +5,7 @@
 	  "VisualPath": "res://Visuals/DialogueOrPlayerChoice/field full of flowers.png",
 	  "VisualPreDelay": 0,
 	  "VisualPostDelay": 0,
-	  "MusicPath": "res://Audio/Music/DEEP GUITAR.mp3",
+	  "MusicPath": "",
 	  "MusicPreDelay": 0,
 	  "MusicPostDelay": 0,
 	  "SoundPath": null,

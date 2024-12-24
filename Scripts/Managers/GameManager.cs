@@ -196,6 +196,8 @@ public partial class GameManager : Control {
     UIManager.Instance.saveGameScreen.Hide();
 
     GameStateManager.Instance.Fire(Trigger.COMPLETE_LOADING_BASED_ON_GAME_MODE, GameStateManager.Instance.GetLastGameMode());
+    await AudioManager.Instance.StopMusic();
+    await AudioManager.Instance.StopSound();
   }
 
   public async Task Initialize_Load_Screen() {

@@ -41,8 +41,6 @@ public partial class AudioManager : Control {
   }
 
   private async Task FadeAudio(AudioStreamPlayer2D player, float startVolume, float endVolume, float duration) {
-
-
     var timer = new System.Diagnostics.Stopwatch();
     timer.Start();
 
@@ -64,6 +62,17 @@ public partial class AudioManager : Control {
   private float EaseInOutQuad(float t) {
     return t < 0.5f ? 2f * t * t : 1f - (float)Math.Pow(-2f * t + 2f, 2) / 2f;
   }
+
+
+  public async Task StopMusic(float fadeDuration = 3.0f) {
+    if (musicPlayer.Playing) {
+      await FadeAudio(musicPlayer, Mathf.DbToLinear(musicPlayer.VolumeDb), 0, fadeDuration);
+      musicPlayer.Stop();
+      musicPlayer.Finished -= OnMusicFinished;
+    }
+  }
+
+
 
   public async Task PlayMusic(string path, float preDelay = 0, float postDelay = 0, float fadeDuration = 1.5f, bool loop = true) {
     var newStream = ResourceLoader.Load<AudioStream>(path);
@@ -122,6 +131,13 @@ public partial class AudioManager : Control {
     await Task.Delay((int)(preDelay * 1000));
     soundPlayer.Play();
     await Task.Delay((int)(postDelay * 1000));
+  }
+
+  public async Task StopSound(float fadeDuration = 2.5f) {
+    if (soundPlayer.Playing) {
+      await FadeAudio(soundPlayer, Mathf.DbToLinear(soundPlayer.VolumeDb), 0, fadeDuration);
+      soundPlayer.Stop();
+    }
   }
 
   private void ApplyCompressorIfNeeded(AudioStreamPlayer2D player) {

@@ -67,6 +67,7 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
 
     normalStyleBox = new StyleBoxFlat {
       BgColor = new Color(0, 0, 0, 0), // Fully transparent
+      //DO NOT DELETE, BorderColor is for debug purposes only
       BorderColor = Colors.Red,
       BorderWidthBottom = 2,
       BorderWidthTop = 2,
@@ -80,6 +81,7 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
 
     hoverStyleBox = new StyleBoxFlat {
       BgColor = new Color(0f, 0.3f, 0.3f, 0.3f),
+      //DO NOT DELETE, BorderColor is for debug purposes only
       BorderColor = Colors.Red,
       BorderWidthBottom = 2,
       BorderWidthTop = 2,

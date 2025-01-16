@@ -15,8 +15,8 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
   private const int LINE_SEPARATION = 5;
   public StyleBoxFlat normalStyleBox;
   public StyleBoxFlat hoverStyleBox;
+  public StyleBoxFlat debugStyleBox;
   public InteractableUIButton Button => button;
-
 
   // i think that if we select a player choices and hit ui_accept on keyboard or gamepad
   //Interact() is triggered, BUT if it's clicked with the mouse, it directly calls the
@@ -65,7 +65,22 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
     };
     AddChild(button);
 
+
     normalStyleBox = new StyleBoxFlat {
+      BgColor = new Color(0, 0, 0, 0), // Fully transparent
+      //DO NOT DELETE, BorderColor is for debug purposes only
+      BorderColor = new Color(0, 0, 0, 0),
+      BorderWidthBottom = 2,
+      BorderWidthTop = 2,
+      BorderWidthLeft = 2,
+      BorderWidthRight = 2,
+      CornerRadiusTopLeft = 5,
+      CornerRadiusTopRight = 5,
+      CornerRadiusBottomRight = 5,
+      CornerRadiusBottomLeft = 5
+    };
+
+    debugStyleBox = new StyleBoxFlat {
       BgColor = new Color(0, 0, 0, 0), // Fully transparent
       //DO NOT DELETE, BorderColor is for debug purposes only
       BorderColor = Colors.Red,
@@ -79,10 +94,13 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
       CornerRadiusBottomLeft = 5
     };
 
+
     hoverStyleBox = new StyleBoxFlat {
-      BgColor = new Color(0f, 0.3f, 0.3f, 0.3f),
+      //BgColor = new Color(0f, 0.3f, 0.3f, 0.3f),
       //DO NOT DELETE, BorderColor is for debug purposes only
-      BorderColor = Colors.Red,
+      BgColor = new Color(0, 0, 0, 0),
+      BorderColor = new Color(0, 0, 0, 0),
+      //BorderColor = Colors.Red,
       BorderWidthBottom = 2,
       BorderWidthTop = 2,
       BorderWidthLeft = 2,
@@ -94,7 +112,7 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
     };
 
     button.AddThemeStyleboxOverride("normal", normalStyleBox);
-    button.AddThemeStyleboxOverride("hover", hoverStyleBox);
+    // button.AddThemeStyleboxOverride("hover", hoverStyleBox);
 
     // Create and add RichTextLabel
     textLabel = new RichTextLabel {
@@ -126,6 +144,13 @@ public partial class PlayerChoiceButton : MarginContainer, IInteractableUI {
     button.Pressed += OnButtonPressed;
 
     GD.Print($"PlayerChoiceButton {GetInstanceId()} setup completed");
+  }
+
+
+  public void ApplyDebugStyle() {
+    button.AddThemeStyleboxOverride("normal", debugStyleBox);
+    button.AddThemeStyleboxOverride("hover", debugStyleBox);
+    // button.AddThemeStyleboxOverride("focus", debugStyleBox);
   }
 
 

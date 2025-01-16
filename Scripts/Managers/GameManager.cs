@@ -19,6 +19,7 @@ public partial class GameManager : Control {
   private PackedScene mainMenuPackedScene;
   private Control mainMenuScene;
   private MainMenu mainMenu;
+  public DebugMenu debugMenu;
 
 
   public enum GameState {
@@ -45,6 +46,12 @@ public partial class GameManager : Control {
     SetupInitialLanguage();
     LoadTranslations();
     // DialogueManager.Instance.DialogueStarted += OnDialogueStarted;
+
+#if DEBUG
+    debugMenu = new DebugMenu();
+    AddChild(debugMenu);
+    debugMenu.Name = "DebugMenu";
+#endif
   }
 
   private void SetupInitialLanguage() {
@@ -92,6 +99,22 @@ public partial class GameManager : Control {
       GD.Print($"Loaded translation locale: {locale}");
     }
   }
+
+
+  public void Enter_Debug_Mode() {
+    debugMenu.Visible = true;
+    Input.SetCustomMouseCursor(null); // Switch to system cursor
+  }
+
+  public void Exit_Debug_Mode() {
+    debugMenu.Visible = false;
+    // Switch back to game cursor
+    var cursorScaler = GetNode<DynamicCursorScaler>("/root/DynamicCursorScaler");
+    if (cursorScaler != null) {
+      cursorScaler.UpdateCursorScale();
+    }
+  }
+
 
   private void GameInit() {
 

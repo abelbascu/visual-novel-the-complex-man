@@ -15,10 +15,24 @@ public partial class PlayerChoicesBoxU_YD_BottomHorizontal : MarginContainer {
   private Dictionary<ulong, TaskCompletionSource<bool>> buttonReadyTasks = new Dictionary<ulong, TaskCompletionSource<bool>>();
   private Dictionary<ulong, Action> buttonReadyActions = new Dictionary<ulong, Action>();
 
-  private void OnPlayerChoicesContainerDraw() {
-    var rect = playerChoicesContainer.GetRect();
-    playerChoicesContainer.DrawRect(rect, Colors.Red, false, 10);
+  public static bool DEBUG_SHOW_CONTAINERS = false;
+
+
+  public void OnPlayerChoicesContainerDraw() {
+#if DEBUG
+    if (DEBUG_SHOW_CONTAINERS) {
+      var rect = playerChoicesContainer.GetRect();
+      playerChoicesContainer.DrawRect(rect, Colors.Red, false, 10);
+
+      foreach (var child in playerChoicesContainer.GetChildren()) {
+        if (child is PlayerChoiceButton playerChoiceButton) {
+          playerChoiceButton.ApplyDebugStyle();
+        }
+      }
+    }
   }
+#endif
+
 
   public override void _Ready() {
     Show();

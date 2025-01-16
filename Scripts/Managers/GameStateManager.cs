@@ -219,7 +219,7 @@ public partial class GameStateManager : Node {
              {(State.MainMenuDisplayed, SubState.None, State.MainMenuDisplayed, SubState.CreditsDisplayed, Trigger.DISPLAY_CREDITS),
                 () => {}},
 
-            //game credits > go back to main menu    
+       //game credits > go back to main menu    
              {(State.MainMenuDisplayed, SubState.CreditsDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
                 () => GameManager.Instance.Display_Main_Menu_Container_Only()},
           
@@ -235,14 +235,29 @@ public partial class GameStateManager : Node {
             {(State.MainMenuDisplayed, SubState.ExitGameConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
                 () =>  GameManager.Instance.Display_Main_Menu_Container_Only()},
 
-
             //exit to main menu confirmation popup > display main menu
             {(State.MainMenuDisplayed, SubState.ExitToMainMenuConfirmationPopupDisplayed, State.MainMenuDisplayed, SubState.DisplayingMainMenu, Trigger.DISPLAY_MAIN_MENU),
                 () => GameManager.Instance.Display_Main_Menu_Container_Only()},
 
-
+            //main menu to main menu??
             {(State.MainMenuDisplayed, SubState.DisplayingMainMenu, State.MainMenuDisplayed, SubState.None, Trigger.MAIN_MENU_DISPLAYED),
                 () => {}},
+
+                      // From any state to debug mode
+            {(State.InDialogueMode, SubState.None, State.InDebugMode, SubState.None, Trigger.ENTER_DEBUG_MODE),
+                () => GameManager.Instance.Enter_Debug_Mode()},
+            {(State.MainMenuDisplayed, SubState.None, State.InDebugMode, SubState.None, Trigger.ENTER_DEBUG_MODE),
+                () => GameManager.Instance.Enter_Debug_Mode()},
+            {(State.InGameMenuDisplayed, SubState.None, State.InDebugMode, SubState.None, Trigger.ENTER_DEBUG_MODE),
+                () => GameManager.Instance.Enter_Debug_Mode()},
+            // Exit debug mode back to previous state
+            {(State.InDebugMode, SubState.None, State.InDialogueMode, SubState.None, Trigger.EXIT_DEBUG_MODE),
+                () => GameManager.Instance.Exit_Debug_Mode()},
+
+
+
+
+
         };
 
     // Configure transitions in the state machine

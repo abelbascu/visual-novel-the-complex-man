@@ -44,6 +44,7 @@ public partial class UIManager : Control {
 
   public override void _Ready() {
 
+
     // Connect to the GUI input event of all child controls
     //!why is this still here?
     ConnectAllControlsGuiInput(this);

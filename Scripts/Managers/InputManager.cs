@@ -5,6 +5,8 @@ using System.Linq;
 using State = GameStateMachine.State;
 using SubState = GameStateMachine.SubState;
 using System.Threading.Tasks;
+using static GameStateMachine;
+
 
 public partial class InputManager : Control {
   public static InputManager Instance { get; private set; }
@@ -36,6 +38,7 @@ public partial class InputManager : Control {
   //NECESSARY onditiions to block further input
   public bool isProcessingInput = false; //DO NOT REMOVE
   private bool lastInputWasKeyboardOrGamepad = false;
+  private DebugMenu debugMenu;
 
   public override void _EnterTree() {
     if (Instance == null) {
@@ -52,10 +55,20 @@ public partial class InputManager : Control {
   }
 
   public override void _Ready() {
+    InitializeDebugMenu();
     //subcribe when game changes state, so we can refresh the UI focusableUIControls list
     GameStateManager.Instance.StateChanged += (prevState, prevSubState, newState, newSubState, args) => {
       _ = OnGameStateChanged(prevState, prevSubState, newState, newSubState, args);
     };
+  }
+
+
+  private void InitializeDebugMenu() {
+    if (GameManager.Instance != null) {
+      debugMenu = GameManager.Instance.debugMenu;
+    } else {
+      CallDeferred(nameof(InitializeDebugMenu));
+    }
   }
 
   //try to prevent repeated fast input that would break the game state transitions
@@ -64,6 +77,20 @@ public partial class InputManager : Control {
   }
 
   public override async void _Input(InputEvent @event) {
+    // Handle debug menu dragging before input blockers
+    if (GameStateManager.Instance.IsInState(State.InDebugMode, SubState.None)) {
+      if (isDraggingDebugMenu && @event is InputEventMouseMotion) {
+        debugMenu.Position = GetGlobalMousePosition() - debugMenuDragOffset;
+        GetViewport().SetInputAsHandled();
+        return;
+      }
+
+      if (@event is InputEventMouseButton mouseButton && !mouseButton.Pressed) {
+        isDraggingDebugMenu = false;
+        GetViewport().SetInputAsHandled();
+        return;
+      }
+    }
     //if there is any pending input to process, do not accept more input
     if (InputBlocker.IsInputBlocked) {
       GetViewport().SetInputAsHandled();
@@ -74,6 +101,20 @@ public partial class InputManager : Control {
       GetViewport().SetInputAsHandled();
       return;
     }
+
+
+#if DEBUG
+    if (@event is InputEventKey eventKey && eventKey.Keycode == Key.F12 && eventKey.Pressed && !eventKey.Echo) {
+      if (!GameStateManager.Instance.IsInState(State.InDebugMode, SubState.None)) {
+        GameStateManager.Instance.Fire(Trigger.ENTER_DEBUG_MODE);
+      } else {
+        GameStateManager.Instance.Fire(Trigger.EXIT_DEBUG_MODE);
+      }
+      AcceptEvent();
+      return;
+    }
+#endif
+
     //----------------- READ INPUT FROM MOUSE, GAMEPAD OR KEYBOARD -----------------------------------------------
     if (@event is InputEventMouseMotion) {
       HandleMouseMotion();
@@ -109,6 +150,8 @@ public partial class InputManager : Control {
   //depending on the game state, execute custom input methods
   private async Task ProcessInputAsync(InputEvent @event) {
     try {
+
+
       if (GameStateManager.Instance.IsInState(GameStateMachine.State.SplashScreenDisplayed, GameStateMachine.SubState.None)) {
         await HandleSplashScreenInput(@event);
       } else if (GameStateManager.Instance.IsInState(GameStateMachine.State.MainMenuDisplayed, GameStateMachine.SubState.LoadScreenDisplayed) ||
@@ -130,6 +173,11 @@ public partial class InputManager : Control {
           await HandleMenuInput(@event);
         }
       }
+#if DEBUG
+              else if (GameStateManager.Instance.IsInState(State.InDebugMode, SubState.None)) {
+        await HandleDebugInput(@event);
+      }
+#endif
     } finally {
       isProcessingInput = false;
     }
@@ -169,6 +217,15 @@ public partial class InputManager : Control {
     focusableUIControls.Clear();
     currentFocusedIndex = -1; // Start with no button focused
     currentFocusedScene = null;
+
+#if DEBUG
+    if (currentState == State.InDebugMode) {
+      currentFocusedScene = GameManager.Instance.debugMenu;
+      SetFocusableControls(currentFocusedScene);
+      return;
+    }
+#endif
+
     //Splash screen
     if (currentState == State.SplashScreenDisplayed && currentSubstate == SubState.None) {
       currentFocusedScene = UIManager.Instance.splashScreen;
@@ -249,6 +306,17 @@ public partial class InputManager : Control {
   private void SetFocusableControls(Node node) {
     //we pass the screen and get the focusable UI controls
     if (node is Control control) {
+#if DEBUG
+      // Special handling for debug controls
+      if (GameStateManager.Instance.IsInState(State.InDebugMode, SubState.None)) {
+        if (control is Button || control is SpinBox || control is OptionButton || control is CheckBox || (control is PanelContainer && control.GetParent() is DebugMenu)) {
+          focusableUIControls.Add(control);
+          return;
+        }
+      }
+#endif
+
+
       if (control is IInteractableUI && control.Visible) {
         focusableUIControls.Add(control);
         GD.Print($"Focusable control: {control.Name}, Type: {control.GetType().Name}");
@@ -262,6 +330,46 @@ public partial class InputManager : Control {
       }
     }
   }
+
+
+#if DEBUG
+  private async Task HandleDebugInput(InputEvent @event) {
+    if (debugMenu == null) return;
+
+    if (@event is InputEventMouseButton mouseEvent) {
+      if (mouseEvent.ButtonIndex == MouseButton.Left) {
+        var debugPanel = debugMenu.GetNode<PanelContainer>("MainContainer/Panel");
+
+        // If we're releasing the mouse button, stop dragging
+        if (!mouseEvent.Pressed) {
+          isDraggingDebugMenu = false;
+          await HandleMouseClick();
+          return;
+        }
+
+        // Check if we're clicking the panel (not on a control)
+        if (debugPanel.GetGlobalRect().HasPoint(GetGlobalMousePosition()) && GetControlUnderMouse() == null) {
+          isDraggingDebugMenu = true;
+          debugMenuDragOffset = GetGlobalMousePosition() - debugMenu.Position;
+          return;
+        }
+
+        // Handle normal control clicking
+        await HandleMouseClick();
+      }
+    } else if (@event is InputEventMouseMotion && isDraggingDebugMenu) {
+      debugMenu.Position = GetGlobalMousePosition() - debugMenuDragOffset;
+      return;
+    } else if (@event is InputEventKey keyEvent && keyEvent.Pressed) {
+      foreach (var control in focusableUIControls) {
+        if (control.HasFocus()) {
+          control.EmitSignal("gui_input", @event);
+        }
+      }
+    }
+  }
+#endif
+
 
 
   private int GetIndexOfControlUnderMouse() {
@@ -308,13 +416,75 @@ public partial class InputManager : Control {
     }
   }
 
+
+  private bool isDragging = false;
+  private Vector2 dragOffset;
+  private bool isDraggingDebugMenu = false;
+  private Vector2 debugMenuDragOffset;
+
   private async Task HandleMouseClick() {
     for (int i = 0; i < focusableUIControls.Count; i++) {
-      if (focusableUIControls[i] is IInteractableUI && focusableUIControls[i] is Control focusable
-          && focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) && focusable.Visible == true) {
+      var control = focusableUIControls[i];
+      if (control is Control focusable &&
+          focusable.GetGlobalRect().HasPoint(GetGlobalMousePosition()) &&
+          focusable.Visible) {
+
         currentFocusedIndex = i;
-        GD.Print($"clicked on currentFocusedIndex: {currentFocusedIndex}, control: {focusableUIControls[i].Name}");
-        await HandleAcceptInputPressed();
+
+        if (control is IInteractableUI interactable) {
+          await HandleAcceptInputPressed();
+
+          //if we are showing the debug window, let's find out what control was clicked on
+        } else if (GameStateManager.Instance.IsInState(State.InDebugMode, SubState.None)) {
+          if (control is PanelContainer && control.GetParent() is DebugMenu) {
+            isDraggingDebugMenu = true;
+            debugMenuDragOffset = GetGlobalMousePosition() - debugMenu.Position;
+            debugMenu.Position = GetGlobalMousePosition() - debugMenuDragOffset;
+          } else if (control is OptionButton optionButton) {
+            optionButton.GetPopup().Position = new Vector2I(
+                (int)(optionButton.GlobalPosition.X),
+                (int)(optionButton.GlobalPosition.Y + optionButton.Size.Y)
+            ); optionButton.GetPopup().Show();
+            optionButton.GetPopup().IdPressed += (long id) => {
+              GameManager.Instance.debugMenu.OnLanguageSelected(id);
+              optionButton.Selected = (int)id;
+            };
+          } else if (control is SpinBox spinBox) {
+            spinBox.Editable = true;
+            var mousePos = GetGlobalMousePosition() - spinBox.GlobalPosition;
+            float arrowWidth = 20;
+            float arrowHeight = spinBox.Size.Y / 2;
+
+            // Check if we're in the arrows area (rightmost section)
+            if (mousePos.X > spinBox.Size.X - arrowWidth) {
+              // Upper half is increment
+              if (mousePos.Y < arrowHeight) {
+                spinBox.Value += 1;
+              }
+              // Lower half is decrement
+              else {
+                spinBox.Value -= 1;
+              }
+            } else {
+              spinBox.GrabFocus();
+            }
+
+
+          } else if (control is Button button && button.Text == "Jump to Dialogue") {
+            debugMenu.OnJumpPressed();
+          } else if (control is CheckBox checkBox) {
+            checkBox.ButtonPressed = !checkBox.ButtonPressed;
+            PlayerChoicesBoxU_YD_BottomHorizontal.DEBUG_SHOW_CONTAINERS = checkBox.ButtonPressed;
+            UIManager.Instance.playerChoicesBoxUI.OnPlayerChoicesContainerDraw();
+
+          } else {
+            control.GrabFocus();
+            control.EmitSignal("gui_input", new InputEventMouseButton {
+              ButtonIndex = MouseButton.Left,
+              Pressed = true
+            });
+          }
+        }
         return;
       }
     }

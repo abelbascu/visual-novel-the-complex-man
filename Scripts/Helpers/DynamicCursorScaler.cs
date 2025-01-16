@@ -22,7 +22,7 @@ public partial class DynamicCursorScaler : Node {
     UpdateCursorScale();
   }
 
-  private void UpdateCursorScale() {
+  public void UpdateCursorScale() {
     Vector2I windowSize = DisplayServer.WindowGetSize();
     float scaleFactor = Mathf.Min(windowSize.X / 1920f, windowSize.Y / 1080f);
     scaleFactor = Mathf.Clamp(scaleFactor, MinScale, MaxScale);
